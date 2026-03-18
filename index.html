@@ -98,53 +98,28 @@
           </div>
           <div class="browser-content">
             <!-- Live Interactive Demo Quiz -->
-            <div class="demo-quiz">
+            <div class="demo-quiz" id="demoQuiz">
               <div class="demo-quiz-header">
-                <h3 style="margin: 0; font-size: 18px; color: #1e293b;">Sample Quiz Question</h3>
+                <h3 style="margin: 0; font-size: 18px; color: #1e293b;" id="demoQuestionTitle">Sample Quiz Question</h3>
                 <div class="demo-extension-badge">
                   <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite;"></span>
                   StudyFlow Active
                 </div>
               </div>
 
-              <div class="demo-question">
-                <p style="margin: 15px 0; font-size: 15px; color: #334155; line-height: 1.6;">
-                  <strong>Question 1:</strong> What is the capital of France?
-                </p>
+              <div class="demo-question" id="demoQuestionContent">
+                <!-- Question content will be dynamically inserted -->
+              </div>
 
-                <div class="demo-answers">
-                  <label class="demo-answer" data-correct="false">
-                    <input type="radio" name="demo-q1" value="a">
-                    <span>A) London</span>
-                  </label>
-                  <label class="demo-answer" data-correct="true">
-                    <input type="radio" name="demo-q1" value="b">
-                    <span>B) Paris</span>
-                    <span class="demo-ai-hint">✨ AI Suggestion</span>
-                  </label>
-                  <label class="demo-answer" data-correct="false">
-                    <input type="radio" name="demo-q1" value="c">
-                    <span>C) Berlin</span>
-                  </label>
-                  <label class="demo-answer" data-correct="false">
-                    <input type="radio" name="demo-q1" value="d">
-                    <span>D) Madrid</span>
-                  </label>
-                </div>
+              <button class="demo-submit-btn" id="demoSubmitBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Watch Demo
+              </button>
 
-                <button class="demo-submit-btn" id="demoSubmitBtn">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  Watch Demo
-                </button>
-
-                <div class="demo-explanation" id="demoExplanation" style="display: none;">
-                  <strong style="color: #10b981;">✓ Correct!</strong>
-                  <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748b;">
-                    Paris is the capital and most populous city of France.
-                  </p>
-                </div>
+              <div class="demo-progress" id="demoProgress">
+                <span class="progress-text">Question <span id="currentQ">1</span> of 4</span>
               </div>
             </div>
           </div>
@@ -650,5 +625,6 @@
   </footer>
 
   <script src="script.js"></script>
+  <script src="demo-quiz.js"></script>
 </body>
 </html>

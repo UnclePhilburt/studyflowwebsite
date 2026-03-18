@@ -1501,3 +1501,54 @@ body.dark-mode .theme-toggle .moon-icon {
 .demo-explanation p {
   margin: 0;
 }
+
+.demo-progress {
+  margin-top: 20px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.demo-input, .demo-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s;
+  margin: 15px 0;
+}
+
+.demo-input:focus, .demo-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #f8fafc;
+}
+
+.demo-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.demo-textarea.filled {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.typing-indicator {
+  display: inline-block;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
