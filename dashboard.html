@@ -502,9 +502,27 @@
       window.location.href = 'index.html';
     }
 
-    function manageSubscription() {
-      // Redirect to Stripe customer portal
-      window.open('https://billing.stripe.com/p/login/test_XXXXX', '_blank');
+    async function manageSubscription() {
+      try {
+        const response = await fetch(`${API_URL}/create-portal-session`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Open Stripe Customer Portal in new tab
+          window.open(data.url, '_blank');
+        } else {
+          alert(data.error || 'Failed to open billing portal');
+        }
+      } catch (error) {
+        console.error('Error creating portal session:', error);
+        alert('Failed to open billing portal. Please try again.');
+      }
     }
 
     // Load user data on page load
