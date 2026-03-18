@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial: Sequential Quiz - Question 2 of 5</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f7fa;
+      color: #2d3b45;
+      line-height: 1.6;
+    }
+
+    .tutorial-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .tutorial-banner-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .tutorial-banner-text {
+      flex: 1;
+    }
+
+    .tutorial-banner-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .tutorial-banner-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .tutorial-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .quiz-container {
+      max-width: 900px;
+      margin: 2rem auto 4rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .quiz-header {
+      background: #394b58;
+      color: white;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #2d3b45;
+    }
+
+    .quiz-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .quiz-meta {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+    }
+
+    .quiz-content {
+      padding: 3rem 2rem;
+    }
+
+    .question {
+      margin-bottom: 2rem;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 1rem;
+    }
+
+    .question-number {
+      font-weight: 700;
+      color: #2d3b45;
+      margin-right: 0.5rem;
+    }
+
+    .question_text {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: #2d3b45;
+      margin-bottom: 1.5rem;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .answer {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border: 1px solid #c7cdd1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background-color: #fff;
+    }
+
+    .answer:hover {
+      background-color: #f5f7f9;
+      border-color: #8b969e;
+    }
+
+    .answer input[type="radio"] {
+      margin-right: 1rem;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      accent-color: #667eea;
+    }
+
+    .answer-text {
+      font-size: 0.95rem;
+      color: #2d3b45;
+    }
+
+    .button-container {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid #e5e7eb;
+      background-color: #f9fafb;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background-color: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #5568d3;
+    }
+
+    .progress-indicator {
+      text-align: center;
+      padding: 1rem;
+      background: #fff9e6;
+      border: 1px solid #f0e5c0;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      color: #6b5d00;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="tutorial-banner">
+    <div class="tutorial-banner-content">
+      <div class="tutorial-banner-text">
+        <div class="tutorial-banner-title">📚 Tutorial: Sequential Quiz Format</div>
+        <div class="tutorial-banner-subtitle">This quiz shows ONE question per page - perfect for testing sequential mode</div>
+      </div>
+      <div class="tutorial-badge">Mode: Sequential</div>
+    </div>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <h1>General Knowledge Practice Quiz</h1>
+      <div class="quiz-meta">Sequential Format • 5 Questions • One Question Per Page</div>
+    </div>
+
+    <div class="quiz-content">
+      <div class="progress-indicator">
+        Question 2 of 5
+      </div>
+
+      <div class="question">
+        <div class="question-header">
+          <span class="question-number">Question 2</span>
+        </div>
+        <div class="question_text">
+          Which programming paradigm is characterized by the use of immutable data and functions without side effects?
+        </div>
+        <div class="answers">
+          <label class="answer">
+            <input type="radio" name="q2" value="a">
+            <span class="answer-text">Object-Oriented Programming</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q2" value="b">
+            <span class="answer-text">Procedural Programming</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q2" value="c">
+            <span class="answer-text">Functional Programming</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q2" value="d">
+            <span class="answer-text">Event-Driven Programming</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button class="btn btn-primary" onclick="window.location.href='sequential-q3.html'">Next Question →</button>
+    </div>
+  </div>
+</body>
+</html>

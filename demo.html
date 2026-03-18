@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Quizzes - StudyFlowSuite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    .demo-page {
+      padding: 100px 0 60px;
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .demo-title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .demo-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .demo-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .demo-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .demo-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .demo-card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .demo-badge {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .demo-card-description {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+    }
+
+    .demo-card-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .demo-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .demo-stat-icon {
+      font-size: 1rem;
+    }
+
+    .demo-card-button {
+      width: 100%;
+      padding: 1rem;
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .demo-card-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .instructions-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 3rem;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .instructions-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .instructions-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .instruction-step {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      background: var(--card-bg);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      margin: 0 auto 1rem;
+    }
+
+    .step-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="assets/logo.svg" alt="StudyFlowSuite" class="logo-img">
+        <span class="logo-text">StudyFlowSuite</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="demo.html">Demo</a></li>
+        <li>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
+        <li><a href="index.html#download" class="btn btn-primary">Download</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Demo Page -->
+  <section class="demo-page">
+    <div class="container">
+      <div class="demo-header">
+        <h1 class="demo-title">Try StudyFlowSuite</h1>
+        <p class="demo-subtitle">Test the extension on these sample quizzes. Install the extension first, then click any quiz below to try it out!</p>
+      </div>
+
+      <!-- Instructions -->
+      <div class="instructions-card">
+        <h2 class="instructions-title">How to Test</h2>
+        <div class="instructions-steps">
+          <div class="instruction-step">
+            <div class="step-number">1</div>
+            <p class="step-text">Download and install the StudyFlowSuite extension from the download page</p>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">2</div>
+            <p class="step-text">Click on any demo quiz below to open it in a new tab</p>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">3</div>
+            <p class="step-text">Click the extension icon and press "Start Quiz" to watch it work!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo Quiz Grid -->
+      <div class="demo-grid">
+        <!-- Tutorial 1: Sequential (One Question Per Page) -->
+        <div class="demo-card" onclick="window.open('tutorial-sequential.html', '_blank')">
+          <div class="demo-card-header">
+            <h3 class="demo-card-title">Tutorial: Sequential Quiz</h3>
+            <span class="demo-badge" style="background: linear-gradient(135deg, rgba(0, 230, 118, 0.2) 0%, rgba(0, 200, 83, 0.2) 100%); color: #00c853;">Start Here</span>
+          </div>
+          <p class="demo-card-description">
+            One question per page format. Perfect for first-time users - learn how to use sequential mode with step-by-step instructions.
+          </p>
+          <div class="demo-card-stats">
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📝</span>
+              <span>5 Questions</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📄</span>
+              <span>5 Pages</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">⏱️</span>
+              <span>~2 min</span>
+            </div>
+          </div>
+          <button class="demo-card-button">Launch Tutorial →</button>
+        </div>
+
+        <!-- Tutorial 2: One-Page (All Questions Visible) -->
+        <div class="demo-card" onclick="window.open('tutorial-onepage.html', '_blank')">
+          <div class="demo-card-header">
+            <h3 class="demo-card-title">Tutorial: One-Page Quiz</h3>
+            <span class="demo-badge">Tutorial</span>
+          </div>
+          <p class="demo-card-description">
+            All questions on one page format. Learn how to enable and use one-page mode for quizzes that show all questions at once.
+          </p>
+          <div class="demo-card-stats">
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📝</span>
+              <span>6 Questions</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📄</span>
+              <span>1 Page</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">⏱️</span>
+              <span>~2 min</span>
+            </div>
+          </div>
+          <button class="demo-card-button">Launch Tutorial →</button>
+        </div>
+
+        <!-- Tutorial 3: Multi-Page (Multiple Questions Per Page) -->
+        <div class="demo-card" onclick="window.open('tutorial-multipage.html', '_blank')">
+          <div class="demo-card-header">
+            <h3 class="demo-card-title">Tutorial: Multi-Page Quiz</h3>
+            <span class="demo-badge">Tutorial</span>
+          </div>
+          <p class="demo-card-description">
+            Multiple questions per page across several pages. Learn how pause/resume works and how to navigate multi-page quizzes.
+          </p>
+          <div class="demo-card-stats">
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📝</span>
+              <span>9 Questions</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📄</span>
+              <span>3 Pages</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">⏱️</span>
+              <span>~3 min</span>
+            </div>
+          </div>
+          <button class="demo-card-button">Launch Tutorial →</button>
+        </div>
+
+        <!-- Canvas LMS Example -->
+        <div class="demo-card" onclick="window.open('demo-canvas-quiz.html', '_blank')">
+          <div class="demo-card-header">
+            <h3 class="demo-card-title">Canvas LMS Quiz</h3>
+            <span class="demo-badge" style="background: linear-gradient(135deg, rgba(241, 142, 36, 0.2) 0%, rgba(239, 108, 0, 0.2) 100%); color: #ef6c00;">Example</span>
+          </div>
+          <p class="demo-card-description">
+            Authentic Canvas LMS quiz design with nursing fundamentals questions. Features Canvas-style navigation, styling, and multi-page layout.
+          </p>
+          <div class="demo-card-stats">
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📝</span>
+              <span>12 Questions</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">📄</span>
+              <span>3 Pages</span>
+            </div>
+            <div class="demo-stat">
+              <span class="demo-stat-icon">⏱️</span>
+              <span>~5 min</span>
+            </div>
+          </div>
+          <button class="demo-card-button">Launch Canvas Quiz →</button>
+        </div>
+      </div>
+
+      <!-- Help Section -->
+      <div style="background: var(--card-bg); padding: 3rem; border-radius: 16px; text-align: center; border: 2px solid var(--border-color);">
+        <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem;">Need Help?</h3>
+        <p style="color: var(--gray); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+          If you encounter any issues with the demo quizzes, check out our documentation or reach out to support.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <a href="docs.html" class="btn btn-primary">View Documentation</a>
+          <a href="index.html#download" class="btn btn-secondary">Download Extension</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="footer-logo">
+            <img src="assets/logo.svg" alt="StudyFlowSuite">
+            <span>StudyFlowSuite</span>
+          </div>
+          <p class="footer-description">Automated quiz completion tool for students.</p>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><a href="index.html#download">Download</a></li>
+            <li><a href="docs.html">Documentation</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Resources</h4>
+          <ul class="footer-links">
+            <li><a href="demo.html">Demo Quizzes</a></li>
+            <li><a href="docs.html">Docs</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 StudyFlowSuite. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

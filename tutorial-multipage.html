@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial: Multi-Page Quiz (Multiple Questions Per Page)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f7fa;
+      color: #2d3b45;
+      line-height: 1.6;
+    }
+
+    /* Tutorial Banner */
+    .tutorial-banner {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .tutorial-banner-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .tutorial-banner-text {
+      flex: 1;
+    }
+
+    .tutorial-banner-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .tutorial-banner-subtitle {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .tutorial-badge {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Info Card */
+    .info-card {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #f59e0b;
+    }
+
+    .info-card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-card-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .info-step {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 0.25rem;
+    }
+
+    .step-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .important-note {
+      background: #dbeafe;
+      border-left: 4px solid #3b82f6;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+    }
+
+    .important-note strong {
+      color: #1e40af;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .important-note p {
+      color: #1e3a8a;
+      font-size: 0.875rem;
+    }
+
+    /* Quiz Container */
+    .quiz-container {
+      max-width: 900px;
+      margin: 2rem auto 4rem;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .quiz-header {
+      background: #394b58;
+      color: white;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #2d3b45;
+    }
+
+    .quiz-header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .quiz-meta {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+    }
+
+    .quiz-content {
+      padding: 3rem 2rem;
+    }
+
+    .question {
+      margin-bottom: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .question:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 1rem;
+    }
+
+    .question-number {
+      font-weight: 700;
+      color: #2d3b45;
+      margin-right: 0.5rem;
+    }
+
+    .question_text {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: #2d3b45;
+      margin-bottom: 1.5rem;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .answer {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border: 1px solid #c7cdd1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background-color: #fff;
+    }
+
+    .answer:hover {
+      background-color: #f5f7f9;
+      border-color: #8b969e;
+    }
+
+    .answer input[type="radio"] {
+      margin-right: 1rem;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      accent-color: #f59e0b;
+    }
+
+    .answer-text {
+      font-size: 0.95rem;
+      color: #2d3b45;
+    }
+
+    .button-container {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid #e5e7eb;
+      background-color: #f9fafb;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #d97706;
+    }
+
+    .btn-primary:disabled {
+      background-color: #c7cdd1;
+      cursor: not-allowed;
+    }
+
+    .progress-indicator {
+      text-align: center;
+      padding: 1rem;
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .page-content {
+      display: none;
+    }
+
+    .page-content.active {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tutorial Banner -->
+  <div class="tutorial-banner">
+    <div class="tutorial-banner-content">
+      <div class="tutorial-banner-text">
+        <div class="tutorial-banner-title">📑 Tutorial: Multi-Page Quiz Format</div>
+        <div class="tutorial-banner-subtitle">This quiz has MULTIPLE questions per page across 3 pages - tests pause/resume</div>
+      </div>
+      <div class="tutorial-badge">Mode: Multi-Page</div>
+    </div>
+  </div>
+
+  <!-- Info Card -->
+  <div class="info-card">
+    <div class="info-card-title">
+      💡 How to Use This Tutorial
+    </div>
+    <div class="info-card-steps">
+      <div class="info-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-title">Install Extension</div>
+          <div class="step-description">Make sure StudyFlowSuite is installed</div>
+        </div>
+      </div>
+      <div class="info-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-title">Click Extension Icon</div>
+          <div class="step-description">Open the extension popup from toolbar</div>
+        </div>
+      </div>
+      <div class="info-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <div class="step-title">Keep Default Settings</div>
+          <div class="step-description">Don't check "One-page quiz mode" for this quiz</div>
+        </div>
+      </div>
+      <div class="info-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <div class="step-title">Click "Start Quiz"</div>
+          <div class="step-description">It will answer all 3 questions on page 1, then stop</div>
+        </div>
+      </div>
+      <div class="info-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <div class="step-title">Click "Next Page"</div>
+          <div class="step-description">Manually navigate to page 2 after questions are answered</div>
+        </div>
+      </div>
+      <div class="info-step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <div class="step-title">Click "Resume Quiz"</div>
+          <div class="step-description">Extension continues with new questions on page 2</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="important-note">
+      <strong>💡 How This Works:</strong>
+      <p>The extension will answer all 3 questions on page 1, then STOP. You manually click "Next Page" to go to page 2. Once page 2 loads, click "Resume Quiz" in the extension to continue. It tracks which questions were already answered and only answers new questions. Repeat for page 3.</p>
+    </div>
+  </div>
+
+  <!-- Quiz Container -->
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <h1>Mathematics & Logic Practice Quiz</h1>
+      <div class="quiz-meta">Multi-Page Format • 9 Questions • 3 Questions Per Page</div>
+    </div>
+
+    <div class="quiz-content">
+      <div class="progress-indicator">
+        Page <span id="currentPage">1</span> of 3
+      </div>
+
+      <!-- Page 1 - Questions 1-3 -->
+      <div class="page-content active" data-page="1">
+        <!-- Question 1 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 1</span>
+          </div>
+          <div class="question_text">
+            What is 15 × 8?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q1" value="a">
+              <span class="answer-text">100</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q1" value="b">
+              <span class="answer-text">120</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q1" value="c">
+              <span class="answer-text">130</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q1" value="d">
+              <span class="answer-text">140</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 2</span>
+          </div>
+          <div class="question_text">
+            What is 10 + 5?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q2" value="a">
+              <span class="answer-text">10</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q2" value="b">
+              <span class="answer-text">12</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q2" value="c">
+              <span class="answer-text">15</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q2" value="d">
+              <span class="answer-text">20</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 3</span>
+          </div>
+          <div class="question_text">
+            What is the square root of 144?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q3" value="a">
+              <span class="answer-text">10</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q3" value="b">
+              <span class="answer-text">11</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q3" value="c">
+              <span class="answer-text">12</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q3" value="d">
+              <span class="answer-text">13</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 2 - Questions 4-6 -->
+      <div class="page-content" data-page="2">
+        <!-- Question 4 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 4</span>
+          </div>
+          <div class="question_text">
+            What is 3/4 as a decimal?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q4" value="a">
+              <span class="answer-text">0.5</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q4" value="b">
+              <span class="answer-text">0.6</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q4" value="c">
+              <span class="answer-text">0.75</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q4" value="d">
+              <span class="answer-text">0.8</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 5</span>
+          </div>
+          <div class="question_text">
+            What is the next number in this sequence: 2, 4, 8, 16, ___?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q5" value="a">
+              <span class="answer-text">20</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q5" value="b">
+              <span class="answer-text">24</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q5" value="c">
+              <span class="answer-text">28</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q5" value="d">
+              <span class="answer-text">32</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 6</span>
+          </div>
+          <div class="question_text">
+            What is 50% of 200?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q6" value="a">
+              <span class="answer-text">50</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q6" value="b">
+              <span class="answer-text">75</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q6" value="c">
+              <span class="answer-text">100</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q6" value="d">
+              <span class="answer-text">150</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 3 - Questions 7-9 -->
+      <div class="page-content" data-page="3">
+        <!-- Question 7 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 7</span>
+          </div>
+          <div class="question_text">
+            What is the perimeter of a square with side length 5?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q7" value="a">
+              <span class="answer-text">10</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q7" value="b">
+              <span class="answer-text">15</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q7" value="c">
+              <span class="answer-text">20</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q7" value="d">
+              <span class="answer-text">25</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 8</span>
+          </div>
+          <div class="question_text">
+            If a triangle has angles of 60° and 60°, what is the third angle?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q8" value="a">
+              <span class="answer-text">30°</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q8" value="b">
+              <span class="answer-text">45°</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q8" value="c">
+              <span class="answer-text">60°</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q8" value="d">
+              <span class="answer-text">90°</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 9 -->
+        <div class="question">
+          <div class="question-header">
+            <span class="question-number">Question 9</span>
+          </div>
+          <div class="question_text">
+            What is 2³ (2 to the power of 3)?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q9" value="a">
+              <span class="answer-text">4</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q9" value="b">
+              <span class="answer-text">6</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q9" value="c">
+              <span class="answer-text">8</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q9" value="d">
+              <span class="answer-text">9</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-container">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextPage()">Next Page →</button>
+      <button class="btn btn-primary hidden" id="submitBtn" onclick="submitQuiz()">Submit Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    let currentPageNum = 1;
+    const totalPages = 3;
+
+    function updateDisplay() {
+      // Hide all pages
+      document.querySelectorAll('.page-content').forEach(page => {
+        page.classList.remove('active');
+      });
+
+      // Show current page
+      const activePage = document.querySelector(`.page-content[data-page="${currentPageNum}"]`);
+      if (activePage) {
+        activePage.classList.add('active');
+      }
+
+      // Update progress
+      document.getElementById('currentPage').textContent = currentPageNum;
+
+      // Update buttons
+      if (currentPageNum === totalPages) {
+        document.getElementById('nextBtn').classList.add('hidden');
+        document.getElementById('submitBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('nextBtn').classList.remove('hidden');
+        document.getElementById('submitBtn').classList.add('hidden');
+      }
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextPage() {
+      if (currentPageNum < totalPages) {
+        currentPageNum++;
+        updateDisplay();
+      }
+    }
+
+    function submitQuiz() {
+      alert('🎉 Quiz submitted! Great job testing the multi-page format!');
+    }
+
+    // Initialize
+    updateDisplay();
+  </script>
+</body>
+</html>

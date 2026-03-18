@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - StudyFlowSuite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="docs.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="assets/logo.svg" alt="StudyFlowSuite" class="logo-img">
+        <span class="logo-text">StudyFlowSuite</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
+        <li><a href="index.html#download" class="btn btn-primary">Download</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Docs Container -->
+  <div class="docs-container">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <div class="sidebar-content">
+        <h3 class="sidebar-title">Documentation</h3>
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <h4 class="nav-section-title">Getting Started</h4>
+            <ul class="nav-section-links">
+              <li><a href="#installation">Installation</a></li>
+              <li><a href="#quick-start">Quick Start</a></li>
+              <li><a href="#setup-wizard">Setup Wizard</a></li>
+            </ul>
+          </div>
+
+          <div class="nav-section">
+            <h4 class="nav-section-title">Features</h4>
+            <ul class="nav-section-links">
+              <li><a href="#question-types">Question Types</a></li>
+              <li><a href="#quiz-modes">Quiz Modes</a></li>
+              <li><a href="#smart-pacing">Smart Pacing</a></li>
+              <li><a href="#settings">Settings</a></li>
+            </ul>
+          </div>
+
+          <div class="nav-section">
+            <h4 class="nav-section-title">Platform Support</h4>
+            <ul class="nav-section-links">
+              <li><a href="#canvas">Canvas LMS</a></li>
+              <li><a href="#blackboard">Blackboard</a></li>
+              <li><a href="#moodle">Moodle</a></li>
+              <li><a href="#custom">Custom Platforms</a></li>
+            </ul>
+          </div>
+
+          <div class="nav-section">
+            <h4 class="nav-section-title">Troubleshooting</h4>
+            <ul class="nav-section-links">
+              <li><a href="#common-issues">Common Issues</a></li>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="#support">Get Support</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-main">
+      <div class="docs-content">
+        <!-- Installation -->
+        <section id="installation" class="doc-section">
+          <h1 class="doc-title">Installation</h1>
+          <p class="doc-intro">Get started with StudyFlowSuite in just a few minutes.</p>
+
+          <h2>Chrome Web Store (Recommended)</h2>
+          <ol class="doc-list">
+            <li>Visit the <a href="https://chrome.google.com/webstore" target="_blank">Chrome Web Store</a></li>
+            <li>Search for "StudyFlowSuite"</li>
+            <li>Click "Add to Chrome"</li>
+            <li>Confirm the installation when prompted</li>
+          </ol>
+
+          <h2>Manual Installation</h2>
+          <ol class="doc-list">
+            <li>Download the <code>StudyFlowSuite-v0.8.3.zip</code> file</li>
+            <li>Extract the ZIP file to a folder</li>
+            <li>Open Chrome and go to <code>chrome://extensions</code></li>
+            <li>Enable "Developer mode" in the top right</li>
+            <li>Click "Load unpacked" and select the extracted folder</li>
+          </ol>
+
+          <div class="callout callout-info">
+            <strong>Note:</strong> Manual installation requires keeping the folder in place. Don't delete it after installation!
+          </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section id="quick-start" class="doc-section">
+          <h1 class="doc-title">Quick Start</h1>
+
+          <h2>First Time Setup</h2>
+          <ol class="doc-list">
+            <li>Navigate to a quiz page on Canvas, Blackboard, or your learning platform</li>
+            <li>Click the StudyFlowSuite icon in your browser toolbar</li>
+            <li>The extension will guide you through a 3-step setup wizard</li>
+            <li>Configure your quiz settings (optional)</li>
+            <li>Click "Start Quiz"</li>
+          </ol>
+
+          <div class="callout callout-success">
+            <strong>Pro Tip:</strong> Enable "One-page quiz mode" if all questions appear on a single page instead of clicking through pages.
+          </div>
+        </section>
+
+        <!-- Setup Wizard -->
+        <section id="setup-wizard" class="doc-section">
+          <h1 class="doc-title">Setup Wizard</h1>
+          <p class="doc-intro">The first time you use StudyFlowSuite on a new website, you'll be guided through a simple 3-step setup.</p>
+
+          <h2>Step 1: Select Question Element</h2>
+          <p>Click on the question text on your quiz page. This helps the extension identify where questions are located.</p>
+
+          <h2>Step 2: Select Answer Area</h2>
+          <p>Click on any answer option. This teaches the extension where answer choices appear.</p>
+
+          <h2>Step 3: Select Submit Button</h2>
+          <p>Click on the Submit or Next button. This allows automatic progression through the quiz.</p>
+
+          <div class="callout callout-warning">
+            <strong>Important:</strong> These settings are saved per-domain. You only need to set up once per quiz platform!
+          </div>
+
+          <h2>Skipping Setup</h2>
+          <p>If you enable <strong>One-page quiz mode</strong>, the setup wizard is automatically skipped since the extension uses different detection methods.</p>
+        </section>
+
+        <!-- Question Types -->
+        <section id="question-types" class="doc-section">
+          <h1 class="doc-title">Supported Question Types</h1>
+
+          <h2>Multiple Choice</h2>
+          <p>The most common question type. The extension analyzes all answer options and selects the correct one.</p>
+          <ul class="doc-list">
+            <li>Single selection (radio buttons)</li>
+            <li>Multiple selection (checkboxes)</li>
+            <li>True/False questions</li>
+          </ul>
+
+          <h2>Fill in the Blank</h2>
+          <p>Short answer questions where you need to provide a specific word or phrase.</p>
+          <div class="code-block">
+            <pre><code>Example: The capital of France is _______.</code></pre>
+          </div>
+
+          <h2>Short Answer</h2>
+          <p>Questions requiring a brief text response (2-5 sentences).</p>
+
+          <h2>Essay Questions</h2>
+          <p>Long-form questions requiring detailed, multi-paragraph responses. The extension generates well-structured, contextually appropriate essays.</p>
+        </section>
+
+        <!-- Quiz Modes -->
+        <section id="quiz-modes" class="doc-section">
+          <h1 class="doc-title">Quiz Modes</h1>
+
+          <h2>Sequential Mode (Default)</h2>
+          <p>For quizzes where questions appear one at a time:</p>
+          <ul class="doc-list">
+            <li>Answer one question</li>
+            <li>Click Submit/Next automatically</li>
+            <li>Move to next question</li>
+            <li>Repeat until quiz complete</li>
+          </ul>
+
+          <h2>One-Page Mode</h2>
+          <p>For quizzes where all questions are visible at once:</p>
+          <ul class="doc-list">
+            <li>Scans all visible questions</li>
+            <li>Answers questions in order</li>
+            <li>Pauses when page is complete</li>
+            <li>Prompts user to navigate manually</li>
+          </ul>
+
+          <div class="callout callout-success">
+            <strong>How to choose:</strong> Check the "One-page quiz mode" checkbox if you can scroll and see multiple questions at once.
+          </div>
+        </section>
+
+        <!-- Smart Pacing -->
+        <section id="smart-pacing" class="doc-section">
+          <h1 class="doc-title">Smart Pacing</h1>
+          <p class="doc-intro">Make your quiz completion look natural and human-like.</p>
+
+          <h2>How It Works</h2>
+          <p>Smart Pacing distributes your quiz time naturally across all questions:</p>
+          <ol class="doc-list">
+            <li>Set your target completion time (in minutes)</li>
+            <li>Set total number of questions</li>
+            <li>The extension calculates optimal delays between questions</li>
+            <li>Adds random variation (±30%) to appear natural</li>
+          </ol>
+
+          <h2>Example</h2>
+          <div class="code-block">
+            <pre><code>Total Questions: 50
+Target Time: 25 minutes
+
+Result: ~30 seconds per question
+         (with 20-40 second variation)</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <strong>Note:</strong> Leave both fields empty for instant completion with no delays.
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section id="settings" class="doc-section">
+          <h1 class="doc-title">Settings</h1>
+
+          <h2>Total Questions</h2>
+          <p>Set the expected number of questions in your quiz. Used for:</p>
+          <ul class="doc-list">
+            <li>Smart pacing calculations</li>
+            <li>Auto-stop when limit reached</li>
+            <li>Progress tracking</li>
+          </ul>
+
+          <h2>Target Time</h2>
+          <p>How long you want the quiz to take (in minutes). Requires Total Questions to be set.</p>
+
+          <h2>One-Page Quiz Mode</h2>
+          <p>Toggle between sequential and one-page detection modes.</p>
+
+          <h2>Clear Saved Setup</h2>
+          <p>Reset the setup wizard for the current website. Use this if:</p>
+          <ul class="doc-list">
+            <li>The quiz layout has changed</li>
+            <li>Detection is not working correctly</li>
+            <li>You want to reconfigure element selectors</li>
+          </ul>
+        </section>
+
+        <!-- Canvas -->
+        <section id="canvas" class="doc-section">
+          <h1 class="doc-title">Canvas LMS Support</h1>
+          <p class="doc-intro">StudyFlowSuite has native support for Canvas LMS with optimized question detection.</p>
+
+          <h2>Supported Features</h2>
+          <ul class="doc-list">
+            <li>✓ Multiple choice questions</li>
+            <li>✓ True/False questions</li>
+            <li>✓ Fill in the blank</li>
+            <li>✓ Short answer</li>
+            <li>✓ Essay questions</li>
+            <li>✓ Multi-page quizzes</li>
+            <li>✓ Timed quizzes</li>
+          </ul>
+
+          <h2>Best Practices</h2>
+          <ol class="doc-list">
+            <li>Enable "One-page quiz mode" if your Canvas quiz shows all questions at once</li>
+            <li>Set accurate Total Questions for proper pacing</li>
+            <li>Allow the extension to complete page navigation</li>
+          </ol>
+
+          <div class="callout callout-success">
+            <strong>Tip:</strong> Canvas quizzes work best with the setup wizard. Complete it once and it will remember your settings!
+          </div>
+        </section>
+
+        <!-- Blackboard -->
+        <section id="blackboard" class="doc-section">
+          <h1 class="doc-title">Blackboard Support</h1>
+          <p>StudyFlowSuite supports Blackboard Learn quizzes with automatic question detection.</p>
+
+          <h2>Compatibility</h2>
+          <ul class="doc-list">
+            <li>Blackboard Learn Ultra</li>
+            <li>Blackboard Learn Original</li>
+            <li>Most custom Blackboard installations</li>
+          </ul>
+        </section>
+
+        <!-- Moodle -->
+        <section id="moodle" class="doc-section">
+          <h1 class="doc-title">Moodle Support</h1>
+          <p>Full support for Moodle quizzes including custom question types.</p>
+
+          <h2>Moodle-Specific Features</h2>
+          <ul class="doc-list">
+            <li>Detects <code>.qtext</code> question containers</li>
+            <li>Works with Moodle's navigation system</li>
+            <li>Supports Moodle essay grading format</li>
+          </ul>
+        </section>
+
+        <!-- Custom Platforms -->
+        <section id="custom" class="doc-section">
+          <h1 class="doc-title">Custom Platforms</h1>
+          <p>StudyFlowSuite can work with any quiz platform using the setup wizard.</p>
+
+          <h2>Requirements</h2>
+          <ul class="doc-list">
+            <li>Questions must be in HTML elements</li>
+            <li>Answer options must be selectable (radio/checkbox inputs or text fields)</li>
+            <li>Submit button must be clickable</li>
+          </ul>
+
+          <h2>Troubleshooting Custom Platforms</h2>
+          <p>If detection isn't working:</p>
+          <ol class="doc-list">
+            <li>Try "One-page quiz mode" toggle</li>
+            <li>Clear saved setup and re-run wizard</li>
+            <li>Check browser console for errors</li>
+            <li>Contact support with platform details</li>
+          </ol>
+        </section>
+
+        <!-- Common Issues -->
+        <section id="common-issues" class="doc-section">
+          <h1 class="doc-title">Common Issues</h1>
+
+          <h2>Extension Not Detecting Questions</h2>
+          <p><strong>Solution:</strong></p>
+          <ol class="doc-list">
+            <li>Refresh the page</li>
+            <li>Clear saved setup for this site</li>
+            <li>Run setup wizard again</li>
+            <li>Try toggling "One-page quiz mode"</li>
+          </ol>
+
+          <h2>Wrong Answers Being Selected</h2>
+          <p><strong>Solution:</strong></p>
+          <ol class="doc-list">
+            <li>Check that question text is being captured correctly (view console logs)</li>
+            <li>Ensure all answer options are visible</li>
+            <li>Try refreshing and restarting</li>
+          </ol>
+
+          <h2>Stuck After Completing Page</h2>
+          <p><strong>Solution:</strong></p>
+          <ul class="doc-list">
+            <li>This is expected behavior! Click the displayed Next/Submit button, then click "Resume" in the extension popup</li>
+            <li>The extension pauses to let you control page navigation</li>
+          </ul>
+
+          <h2>Essay Answers Are Generic</h2>
+          <p><strong>Solution:</strong></p>
+          <ul class="doc-list">
+            <li>Make sure the full question text is being captured</li>
+            <li>Check console logs to see what text is being processed</li>
+            <li>Question might need more context for better responses</li>
+          </ul>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="doc-section">
+          <h1 class="doc-title">Frequently Asked Questions</h1>
+
+          <div class="faq-doc-item">
+            <h3>Can teachers detect if I'm using this?</h3>
+            <p>StudyFlowSuite operates like a human user - clicking buttons and filling forms. There's no definitive way for instructors to detect automated quiz taking vs. manual completion. However, always use responsibly and in accordance with your institution's academic policies.</p>
+          </div>
+
+          <div class="faq-doc-item">
+            <h3>Does it work on timed quizzes?</h3>
+            <p>Yes! Use the Smart Pacing feature to ensure completion within your time limit. Set "Total Questions" and "Target Time" to automatically distribute time appropriately.</p>
+          </div>
+
+          <div class="faq-doc-item">
+            <h3>What happens if a question is answered incorrectly?</h3>
+            <p>The extension tracks errors in the popup. Some questions may be ambiguous or require specific course knowledge not available in the question text.</p>
+          </div>
+
+          <div class="faq-doc-item">
+            <h3>Can I pause mid-quiz?</h3>
+            <p>Yes! Click the "Stop Quiz" button at any time. Your progress is saved. You can restart by clicking "Start Quiz" again.</p>
+          </div>
+
+          <div class="faq-doc-item">
+            <h3>Do I need an account?</h3>
+            <p>No account needed for the free tier. Pro features require a subscription account.</p>
+          </div>
+        </section>
+
+        <!-- Support -->
+        <section id="support" class="doc-section">
+          <h1 class="doc-title">Get Support</h1>
+
+          <h2>Community Support</h2>
+          <p>Join our Discord community for help from other users:</p>
+          <a href="#" class="btn btn-secondary">Join Discord</a>
+
+          <h2>Email Support</h2>
+          <p>Pro users get priority email support:</p>
+          <ul class="doc-list">
+            <li><strong>Free users:</strong> Community support only</li>
+            <li><strong>Pro users:</strong> support@studyflowsuite.com (24hr response)</li>
+            <li><strong>Enterprise:</strong> Dedicated support channel</li>
+          </ul>
+
+          <h2>Bug Reports</h2>
+          <p>Found a bug? Report it on GitHub:</p>
+          <a href="#" class="btn btn-secondary">Report on GitHub</a>
+
+          <h2>Feature Requests</h2>
+          <p>Have an idea? We'd love to hear it:</p>
+          <a href="mailto:feedback@studyflowsuite.com" class="btn btn-secondary">Send Feedback</a>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="docs.js"></script>
+</body>
+</html>

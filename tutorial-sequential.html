@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial: Sequential Quiz (One Question Per Page)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #2d3b45;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Walkthrough Container */
+    .walkthrough-container {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    /* Walkthrough Banner */
+    .walkthrough-banner {
+      background: white;
+      color: #2d3b45;
+      padding: 3rem;
+      text-align: center;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .walkthrough-step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .walkthrough-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      transition: all 0.3s;
+    }
+
+    .walkthrough-dot.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 32px;
+      border-radius: 5px;
+    }
+
+    .walkthrough-dot:not(.active) {
+      opacity: 0.5;
+    }
+
+    .walkthrough-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: #1a1a2e;
+    }
+
+    .walkthrough-description {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      color: #6b7280;
+    }
+
+    .walkthrough-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .walkthrough-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-family: inherit;
+    }
+
+    .walkthrough-btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .walkthrough-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .walkthrough-btn-secondary {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .walkthrough-btn-secondary:hover {
+      background: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="walkthrough-container">
+    <!-- Walkthrough Banner -->
+    <div class="walkthrough-banner" id="walkthroughBanner">
+      <div class="walkthrough-step-indicator">
+        <div class="walkthrough-dot active" id="dot0"></div>
+        <div class="walkthrough-dot" id="dot1"></div>
+        <div class="walkthrough-dot" id="dot2"></div>
+        <div class="walkthrough-dot" id="dot3"></div>
+        <div class="walkthrough-dot" id="dot4"></div>
+      </div>
+      <h2 class="walkthrough-title" id="walkthroughTitle">Welcome! 👋</h2>
+      <p class="walkthrough-description" id="walkthroughDescription">
+        Let me walk you through the key areas the extension will interact with on this quiz page.
+      </p>
+      <div class="walkthrough-buttons">
+        <button class="walkthrough-btn walkthrough-btn-secondary" id="skipBtn" onclick="startQuiz()">Skip & Start Quiz</button>
+        <button class="walkthrough-btn walkthrough-btn-primary" id="walkthroughNextBtn" onclick="nextWalkthroughStep()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let walkthroughStep = 0;
+
+    const walkthroughSteps = [
+      {
+        title: "Welcome! 👋",
+        description: "Let me walk you through the key areas the extension will interact with on this quiz page. Click Next to continue."
+      },
+      {
+        title: "Step 1: Question Area 📝",
+        description: "The extension will locate and read the question text. On each page, you can see a question - the extension reads this text and sends it to get the answer."
+      },
+      {
+        title: "Step 2: Answer Area ✅",
+        description: "The extension will analyze all available answer choices and automatically select the correct one. You'll see it click on the right answer option from the list."
+      },
+      {
+        title: "Step 3: Submit Button ➡️",
+        description: "After selecting an answer, the extension will automatically click the \"Next Question\" button to move to the next page. This repeats for all questions in the quiz."
+      },
+      {
+        title: "Ready to Start! 🚀",
+        description: "That's how it works! Click the button below to start the quiz, then click the extension icon in your toolbar and press \"Start Quiz\"."
+      }
+    ];
+
+    function nextWalkthroughStep() {
+      walkthroughStep++;
+      if (walkthroughStep >= walkthroughSteps.length) {
+        startQuiz();
+        return;
+      }
+      updateWalkthroughDisplay();
+    }
+
+    function updateWalkthroughDisplay() {
+      const step = walkthroughSteps[walkthroughStep];
+      document.getElementById('walkthroughTitle').textContent = step.title;
+      document.getElementById('walkthroughDescription').textContent = step.description;
+
+      // Update dots
+      for (let i = 0; i < walkthroughSteps.length; i++) {
+        const dot = document.getElementById('dot' + i);
+        if (dot) {
+          dot.classList.toggle('active', i === walkthroughStep);
+        }
+      }
+
+      // Change button text on last step
+      const nextBtn = document.getElementById('walkthroughNextBtn');
+      if (walkthroughStep === walkthroughSteps.length - 1) {
+        nextBtn.textContent = 'Start Quiz →';
+      }
+    }
+
+    function startQuiz() {
+      window.location.href = 'sequential-q1.html';
+    }
+
+    // Initialize
+    updateWalkthroughDisplay();
+  </script>
+</body>
+</html>

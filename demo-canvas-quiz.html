@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz: Nursing Fundamentals Practice Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Canvas LMS Authentic Styling - Pixel Perfect Replica */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #2d3b45;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* Top Navigation Bar */
+    .canvas-topnav {
+      background-color: #394b58;
+      border-bottom: 1px solid #2d3b45;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .canvas-logo {
+      color: white;
+      font-size: 18px;
+      font-weight: 300;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .canvas-logo svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
+
+    .canvas-nav-right {
+      margin-left: auto;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .canvas-nav-item {
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+
+    .canvas-nav-item:hover {
+      opacity: 1;
+    }
+
+    /* Breadcrumb */
+    .canvas-breadcrumb {
+      background: white;
+      border-bottom: 1px solid #c7cdd1;
+      padding: 12px 20px;
+      font-size: 12px;
+    }
+
+    .breadcrumb-link {
+      color: #008ee2;
+      text-decoration: none;
+    }
+
+    .breadcrumb-link:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-separator {
+      margin: 0 8px;
+      color: #6b7780;
+    }
+
+    .breadcrumb-current {
+      color: #2d3b45;
+    }
+
+    /* Main Layout */
+    .canvas-layout {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+    }
+
+    /* Left Sidebar - Questions Menu */
+    .canvas-sidebar {
+      width: 260px;
+      background: #f9f9f9;
+      border-right: 1px solid #c7cdd1;
+      padding: 20px;
+      position: sticky;
+      top: 50px;
+      height: calc(100vh - 50px);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2d3b45;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .quiz-timer {
+      background: #fef7e0;
+      border: 1px solid #f0e5c0;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 11px;
+      color: #6b5d00;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .timer-display {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3b45;
+      font-family: 'Courier New', monospace;
+    }
+
+    .questions-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .question-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: white;
+      border: 1px solid #c7cdd1;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+
+    .question-item:hover {
+      background: #f5f7f9;
+      border-color: #8b969e;
+    }
+
+    .question-item.current {
+      background: #e8f5fa;
+      border-color: #008ee2;
+    }
+
+    .question-item.answered {
+      background: #edf7ed;
+      border-color: #4caf50;
+    }
+
+    .question-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .question-number-text {
+      flex: 1;
+      color: #2d3b45;
+      font-weight: 500;
+    }
+
+    /* Main Content Area */
+    .canvas-main {
+      flex: 1;
+      padding: 30px 40px;
+      max-width: 900px;
+    }
+
+    .quiz-title {
+      font-size: 28px;
+      font-weight: 300;
+      color: #2d3b45;
+      margin-bottom: 8px;
+    }
+
+    .quiz-meta {
+      font-size: 13px;
+      color: #6b7780;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e1e4e6;
+    }
+
+    .quiz-instructions {
+      background: #f9f9f9;
+      border-left: 4px solid #008ee2;
+      padding: 16px 20px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: #2d3b45;
+      border-radius: 4px;
+    }
+
+    .instructions-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #2d3b45;
+    }
+
+    /* Question Styling */
+    .question {
+      margin-bottom: 50px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid #e1e4e6;
+    }
+
+    .question:last-child {
+      border-bottom: none;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .question-label {
+      font-weight: 700;
+      color: #2d3b45;
+      font-size: 14px;
+    }
+
+    .question-points {
+      font-size: 12px;
+      color: #6b7780;
+      background: #f5f5f5;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .question_text {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #2d3b45;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .answers {
+      margin-left: 0;
+      padding-left: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .answer {
+      display: flex;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: #fafafa;
+      border: 2px solid #c7cdd1;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .answer:hover {
+      background: #f0f7fb;
+      border-color: #008ee2;
+    }
+
+    .answer input[type="radio"] {
+      margin-right: 14px;
+      margin-top: 3px;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      accent-color: #008ee2;
+    }
+
+    .answer-text {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #2d3b45;
+    }
+
+    /* Text Input Fields */
+    .short-answer-field, .essay-field {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #c7cdd1;
+      border-radius: 4px;
+      font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+
+    .short-answer-field:focus, .essay-field:focus {
+      outline: none;
+      border-color: #008ee2;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(0, 142, 226, 0.1);
+    }
+
+    .short-answer-field {
+      max-width: 500px;
+    }
+
+    .essay-field {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    /* Navigation Buttons */
+    .button-container {
+      padding: 25px 0;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      border-top: 2px solid #e1e4e6;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Lato', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background-color: #008ee2;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0, 142, 226, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: #007ac2;
+      box-shadow: 0 4px 8px rgba(0, 142, 226, 0.3);
+    }
+
+    .btn-secondary {
+      background-color: white;
+      color: #2d3b45;
+      border: 2px solid #c7cdd1;
+    }
+
+    .btn-secondary:hover {
+      background-color: #f5f7f9;
+      border-color: #8b969e;
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-submit {
+      background-color: #00ac18;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0, 172, 24, 0.2);
+    }
+
+    .btn-submit:hover {
+      background-color: #008f15;
+      box-shadow: 0 4px 8px rgba(0, 172, 24, 0.3);
+    }
+
+    /* Quiz Progress Bar */
+    .progress-container {
+      background: white;
+      border: 1px solid #c7cdd1;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: #6b7780;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar-bg {
+      background: #e1e4e6;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #008ee2 0%, #00ac18 100%);
+      height: 100%;
+      transition: width 0.3s;
+      border-radius: 4px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Page Indicator */
+    .page-indicator {
+      text-align: center;
+      padding: 12px;
+      background: #fff9e6;
+      border: 1px solid #f0e5c0;
+      border-radius: 4px;
+      margin-bottom: 30px;
+      font-size: 13px;
+      color: #6b5d00;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas Top Navigation -->
+  <div class="canvas-topnav">
+    <a href="#" class="canvas-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      Canvas
+    </a>
+    <div class="canvas-nav-right">
+      <a href="#" class="canvas-nav-item">Dashboard</a>
+      <a href="#" class="canvas-nav-item">Courses</a>
+      <a href="#" class="canvas-nav-item">Calendar</a>
+      <a href="#" class="canvas-nav-item">Help</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb Navigation -->
+  <div class="canvas-breadcrumb">
+    <a href="#" class="breadcrumb-link">NURS 3000</a>
+    <span class="breadcrumb-separator">›</span>
+    <a href="#" class="breadcrumb-link">Quizzes</a>
+    <span class="breadcrumb-separator">›</span>
+    <span class="breadcrumb-current">Nursing Fundamentals Practice Test</span>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="canvas-layout">
+    <!-- Left Sidebar with Question Navigation -->
+    <aside class="canvas-sidebar">
+      <div class="sidebar-header">
+        <span>Questions</span>
+        <span style="font-size: 12px; font-weight: 400; color: #6b7780;">12 Total</span>
+      </div>
+
+      <!-- Timer Widget -->
+      <div class="quiz-timer">
+        <div class="timer-label">Time Remaining</div>
+        <div class="timer-display" id="timerDisplay">58:42</div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-container">
+        <div class="progress-label">
+          <span>Progress</span>
+          <span id="progressText">0/12</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <ul class="questions-list">
+        <li class="question-item current" data-q="1">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 1</span>
+        </li>
+        <li class="question-item" data-q="2">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 2</span>
+        </li>
+        <li class="question-item" data-q="3">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 3</span>
+        </li>
+        <li class="question-item" data-q="4">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 4</span>
+        </li>
+        <li class="question-item" data-q="5">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 5</span>
+        </li>
+        <li class="question-item" data-q="6">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 6</span>
+        </li>
+        <li class="question-item" data-q="7">
+          <span class="question-icon">✍️</span>
+          <span class="question-number-text">Question 7</span>
+        </li>
+        <li class="question-item" data-q="8">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 8</span>
+        </li>
+        <li class="question-item" data-q="9">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 9</span>
+        </li>
+        <li class="question-item" data-q="10">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 10</span>
+        </li>
+        <li class="question-item" data-q="11">
+          <span class="question-icon">✍️</span>
+          <span class="question-number-text">Question 11</span>
+        </li>
+        <li class="question-item" data-q="12">
+          <span class="question-icon">📝</span>
+          <span class="question-number-text">Question 12</span>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="canvas-main">
+      <h1 class="quiz-title">Nursing Fundamentals Practice Test</h1>
+      <div class="quiz-meta">Time Limit: 60 minutes | 15 Points Possible</div>
+
+      <!-- Instructions -->
+      <div class="quiz-instructions">
+        <div class="instructions-title">Instructions</div>
+        Answer all questions to the best of your ability. You can navigate between pages using the Next and Previous buttons below, or jump to specific questions using the sidebar. Click "Submit Quiz" when you're finished.
+      </div>
+
+      <!-- Page Indicator -->
+      <div class="page-indicator" id="pageIndicator">
+        Page <span id="currentPage">1</span> of 3
+      </div>
+
+      <!-- PAGE 1: Questions 1-5 -->
+      <div class="quiz-page active" data-page="1">
+        <!-- Question 1 -->
+        <div class="question" data-question-id="q1">
+          <div class="question-header">
+            <span class="question-label">Question 1</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is assessing a client who has heart failure. Which of the following findings should the nurse expect?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q1" value="a">
+              <span class="answer-text">Decreased heart rate</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q1" value="b">
+              <span class="answer-text">Dry cough</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q1" value="c">
+              <span class="answer-text">Dyspnea</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q1" value="d">
+              <span class="answer-text">Weight loss</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question" data-question-id="q2">
+          <div class="question-header">
+            <span class="question-label">Question 2</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            The normal range for adult respiratory rate is _______ to _______ breaths per minute.
+          </div>
+          <input type="text" class="short-answer-field" placeholder="Enter your answer">
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question" data-question-id="q3">
+          <div class="question-header">
+            <span class="question-label">Question 3</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is preparing to administer medication to a client. Which of the following actions should the nurse take to verify the client's identity?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q3" value="a">
+              <span class="answer-text">Ask the client to state their name and date of birth</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q3" value="b">
+              <span class="answer-text">Check the client's room number</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q3" value="c">
+              <span class="answer-text">Verify the client's diagnosis</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q3" value="d">
+              <span class="answer-text">Ask the client's roommate</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question" data-question-id="q4">
+          <div class="question-header">
+            <span class="question-label">Question 4</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            What does the acronym HIPAA stand for in healthcare?
+          </div>
+          <input type="text" class="short-answer-field" placeholder="Enter your answer">
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question" data-question-id="q5">
+          <div class="question-header">
+            <span class="question-label">Question 5</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is caring for a client who is receiving oxygen therapy. Which of the following interventions should the nurse implement?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q5" value="a">
+              <span class="answer-text">Place a "No Smoking" sign on the client's door</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q5" value="b">
+              <span class="answer-text">Allow the client to adjust the oxygen flow rate</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q5" value="c">
+              <span class="answer-text">Use petroleum jelly on the client's lips</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q5" value="d">
+              <span class="answer-text">Encourage the client to ambulate with oxygen removed</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 2: Questions 6-10 -->
+      <div class="quiz-page hidden" data-page="2">
+        <!-- Question 6 -->
+        <div class="question" data-question-id="q6">
+          <div class="question-header">
+            <span class="question-label">Question 6</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is teaching a client about hand hygiene. Which of the following statements by the client indicates understanding?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q6" value="a">
+              <span class="answer-text">"I should wash my hands for at least 10 seconds."</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q6" value="b">
+              <span class="answer-text">"I should use cold water to wash my hands."</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q6" value="c">
+              <span class="answer-text">"I should rub my hands together for at least 20 seconds."</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q6" value="d">
+              <span class="answer-text">"I only need to wash my hands before meals."</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 7 - Essay -->
+        <div class="question" data-question-id="q7">
+          <div class="question-header">
+            <span class="question-label">Question 7</span>
+            <span class="question-points">3 pts</span>
+          </div>
+          <div class="question_text">
+            Explain the importance of using the nursing process (Assessment, Diagnosis, Planning, Implementation, Evaluation) in patient care. Provide at least two specific examples.
+          </div>
+          <textarea class="essay-field" placeholder="Type your answer here..."></textarea>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="question" data-question-id="q8">
+          <div class="question-header">
+            <span class="question-label">Question 8</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is preparing to perform a sterile dressing change. Which of the following actions should the nurse take?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q8" value="a">
+              <span class="answer-text">Open the sterile package away from the body</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q8" value="b">
+              <span class="answer-text">Reach across the sterile field to grab supplies</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q8" value="c">
+              <span class="answer-text">Talk over the sterile field while working</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q8" value="d">
+              <span class="answer-text">Touch the outside of sterile gloves after donning</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 9 -->
+        <div class="question" data-question-id="q9">
+          <div class="question-header">
+            <span class="question-label">Question 9</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            The five rights of medication administration include: Right patient, Right medication, Right dose, Right route, and Right _______.
+          </div>
+          <input type="text" class="short-answer-field" placeholder="Enter your answer">
+        </div>
+
+        <!-- Question 10 -->
+        <div class="question" data-question-id="q10">
+          <div class="question-header">
+            <span class="question-label">Question 10</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is caring for a client who has diabetes mellitus. Which of the following findings should the nurse report to the provider immediately?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q10" value="a">
+              <span class="answer-text">Blood glucose 110 mg/dL</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q10" value="b">
+              <span class="answer-text">Fruity breath odor</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q10" value="c">
+              <span class="answer-text">Decreased appetite</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q10" value="d">
+              <span class="answer-text">Mild thirst</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 3: Questions 11-12 -->
+      <div class="quiz-page hidden" data-page="3">
+        <!-- Question 11 - Essay -->
+        <div class="question" data-question-id="q11">
+          <div class="question-header">
+            <span class="question-label">Question 11</span>
+            <span class="question-points">3 pts</span>
+          </div>
+          <div class="question_text">
+            Describe three key components of effective therapeutic communication between a nurse and a patient. How do these components improve patient outcomes?
+          </div>
+          <textarea class="essay-field" placeholder="Type your answer here..."></textarea>
+        </div>
+
+        <!-- Question 12 -->
+        <div class="question" data-question-id="q12">
+          <div class="question-header">
+            <span class="question-label">Question 12</span>
+            <span class="question-points">1 pt</span>
+          </div>
+          <div class="question_text">
+            A nurse is reviewing infection control practices. Which of the following requires the use of contact precautions?
+          </div>
+          <div class="answers">
+            <label class="answer">
+              <input type="radio" name="q12" value="a">
+              <span class="answer-text">Tuberculosis</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q12" value="b">
+              <span class="answer-text">Influenza</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q12" value="c">
+              <span class="answer-text">Methicillin-resistant Staphylococcus aureus (MRSA)</span>
+            </label>
+            <label class="answer">
+              <input type="radio" name="q12" value="d">
+              <span class="answer-text">Measles</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="button-container">
+        <button class="btn btn-secondary" id="prevBtn" onclick="previousPage()" disabled>
+          ← Previous
+        </button>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-primary" id="nextBtn" onclick="nextPage()">
+            Next →
+          </button>
+          <button class="btn btn-submit hidden" id="submitBtn" onclick="submitQuiz()">
+            Submit Quiz
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const totalPages = 3;
+    let timeRemaining = 3522; // 58:42 in seconds
+
+    // Timer countdown
+    function updateTimer() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      document.getElementById('timerDisplay').textContent =
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+      if (timeRemaining > 0) {
+        timeRemaining--;
+      }
+    }
+
+    setInterval(updateTimer, 1000);
+
+    function updatePageDisplay() {
+      // Hide all pages
+      document.querySelectorAll('.quiz-page').forEach(page => {
+        page.classList.add('hidden');
+      });
+
+      // Show current page
+      const activePage = document.querySelector(`.quiz-page[data-page="${currentPage}"]`);
+      if (activePage) {
+        activePage.classList.remove('hidden');
+      }
+
+      // Update page indicator
+      document.getElementById('currentPage').textContent = currentPage;
+
+      // Update button states
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+
+      if (currentPage === totalPages) {
+        document.getElementById('nextBtn').classList.add('hidden');
+        document.getElementById('submitBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('nextBtn').classList.remove('hidden');
+        document.getElementById('submitBtn').classList.add('hidden');
+      }
+
+      // Update sidebar highlighting
+      document.querySelectorAll('.question-item').forEach(item => {
+        item.classList.remove('current');
+      });
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages) {
+        currentPage++;
+        updatePageDisplay();
+      }
+    }
+
+    function previousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        updatePageDisplay();
+      }
+    }
+
+    function submitQuiz() {
+      const confirmed = confirm('Are you sure you want to submit your quiz? You will not be able to make changes after submitting.');
+      if (confirmed) {
+        alert('Quiz submitted successfully! Your responses have been recorded.');
+        // In real Canvas, this would submit to the server
+      }
+    }
+
+    // Track answered questions
+    document.querySelectorAll('input[type="radio"], input[type="text"], textarea').forEach(input => {
+      input.addEventListener('change', updateProgress);
+      input.addEventListener('input', updateProgress);
+    });
+
+    function updateProgress() {
+      let answered = 0;
+
+      // Check radio questions
+      for (let i = 1; i <= 12; i++) {
+        if (i === 2 || i === 4 || i === 9) continue; // Skip text input questions
+        if (i === 7 || i === 11) continue; // Skip essay questions
+
+        const radio = document.querySelector(`input[name="q${i}"]:checked`);
+        if (radio) {
+          answered++;
+          document.querySelector(`.question-item[data-q="${i}"]`)?.classList.add('answered');
+        }
+      }
+
+      // Check text inputs and textareas
+      document.querySelectorAll('input[type="text"], textarea').forEach((input, idx) => {
+        if (input.value.trim().length > 0) {
+          answered++;
+        }
+      });
+
+      const percentage = (answered / 12) * 100;
+      document.getElementById('progressBar').style.width = percentage + '%';
+      document.getElementById('progressText').textContent = `${answered}/12`;
+    }
+
+    // Initialize
+    updatePageDisplay();
+    updateProgress();
+  </script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Tutorial - StudyFlowSuite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f7fa;
+      color: #2d3b45;
+      line-height: 1.6;
+    }
+
+    /* Tutorial Overlay */
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .tutorial-card {
+      background: white;
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 600px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .tutorial-step-indicator {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+
+    .step-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 32px;
+      border-radius: 6px;
+    }
+
+    .tutorial-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .tutorial-description {
+      font-size: 1.125rem;
+      color: #6b7280;
+      margin-bottom: 2rem;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .tutorial-visual {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .tutorial-visual-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .tutorial-visual-text {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .tutorial-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .tutorial-btn {
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-family: inherit;
+    }
+
+    .tutorial-btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .tutorial-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .tutorial-btn-secondary {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .tutorial-btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    /* Pointer Arrow */
+    .tutorial-pointer {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      display: none;
+    }
+
+    .tutorial-pointer.active {
+      display: block;
+    }
+
+    .pointer-arrow {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(-10px); }
+    }
+
+    .pointer-label {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-left: 10px;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Quiz Container */
+    .quiz-container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .quiz-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .quiz-header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .quiz-header p {
+      opacity: 0.9;
+      font-size: 1.125rem;
+    }
+
+    .quiz-content {
+      padding: 2rem;
+    }
+
+    .question {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 2px solid #e5e7eb;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 1.5rem;
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .answer {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .answer:hover {
+      border-color: #667eea;
+      background: #f5f7ff;
+    }
+
+    .answer input[type="radio"] {
+      margin-right: 1rem;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .answer-text {
+      font-size: 1rem;
+      color: #2d3b45;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea.text-input {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-size: 1.125rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 2rem;
+      transition: all 0.2s;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Help Banner */
+    .help-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .help-banner.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tutorial Overlay -->
+  <div class="tutorial-overlay" id="tutorialOverlay">
+    <div class="tutorial-card">
+      <div class="tutorial-step-indicator">
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <h2 class="tutorial-title">Welcome to StudyFlowSuite! 👋</h2>
+      <p class="tutorial-description">
+        This interactive tutorial will guide you through using the extension on a real quiz. Let's get started!
+      </p>
+      <div class="tutorial-visual">
+        <div class="tutorial-visual-icon">🎯</div>
+        <p class="tutorial-visual-text">
+          Follow the step-by-step instructions to see how StudyFlowSuite automatically completes quizzes for you.
+        </p>
+      </div>
+      <div class="tutorial-actions">
+        <button class="tutorial-btn tutorial-btn-secondary" onclick="skipTutorial()">Skip Tutorial</button>
+        <button class="tutorial-btn tutorial-btn-primary" onclick="nextStep()">Start Tutorial →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial Pointer -->
+  <div class="tutorial-pointer" id="tutorialPointer">
+    <div style="display: flex; align-items: center;">
+      <div class="pointer-arrow"></div>
+      <div class="pointer-label" id="pointerLabel">Click here!</div>
+    </div>
+  </div>
+
+  <!-- Help Banner -->
+  <div class="help-banner" id="helpBanner">
+    Step 1 of 4: First, install the StudyFlowSuite extension if you haven't already
+  </div>
+
+  <!-- Quiz Container -->
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <h1>Tutorial Practice Quiz</h1>
+      <p>Complete this quiz using StudyFlowSuite</p>
+    </div>
+
+    <div class="quiz-content">
+      <!-- Question 1 -->
+      <div class="question">
+        <div class="question-text">1. What is the capital of France?</div>
+        <div class="answers">
+          <label class="answer">
+            <input type="radio" name="q1" value="a">
+            <span class="answer-text">London</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q1" value="b">
+            <span class="answer-text">Berlin</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q1" value="c">
+            <span class="answer-text">Paris</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q1" value="d">
+            <span class="answer-text">Madrid</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="question">
+        <div class="question-text">2. What is 2 + 2?</div>
+        <div class="answers">
+          <label class="answer">
+            <input type="radio" name="q2" value="a">
+            <span class="answer-text">3</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q2" value="b">
+            <span class="answer-text">4</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q2" value="c">
+            <span class="answer-text">5</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q2" value="d">
+            <span class="answer-text">6</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="question">
+        <div class="question-text">3. Fill in the blank: The largest ocean on Earth is the _______ Ocean.</div>
+        <input type="text" class="text-input" placeholder="Type your answer here...">
+      </div>
+
+      <!-- Question 4 -->
+      <div class="question">
+        <div class="question-text">4. In a few sentences, explain what photosynthesis is.</div>
+        <textarea class="text-input" placeholder="Type your essay answer here..."></textarea>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="question">
+        <div class="question-text">5. Which planet is known as the Red Planet?</div>
+        <div class="answers">
+          <label class="answer">
+            <input type="radio" name="q5" value="a">
+            <span class="answer-text">Venus</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q5" value="b">
+            <span class="answer-text">Mars</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q5" value="c">
+            <span class="answer-text">Jupiter</span>
+          </label>
+          <label class="answer">
+            <input type="radio" name="q5" value="d">
+            <span class="answer-text">Saturn</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="submit-btn">Submit Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 0;
+    const steps = [
+      {
+        title: "Welcome to StudyFlowSuite! 👋",
+        description: "This interactive tutorial will guide you through using the extension on a real quiz. Let's get started!",
+        icon: "🎯",
+        visualText: "Follow the step-by-step instructions to see how StudyFlowSuite automatically completes quizzes for you.",
+        banner: "Step 1 of 4: First, install the StudyFlowSuite extension if you haven't already"
+      },
+      {
+        title: "Open the Extension 🔌",
+        description: "Click the StudyFlowSuite icon in your browser toolbar (top-right corner). It looks like a purple icon with a shield.",
+        icon: "🔌",
+        visualText: "Look for the extension icon near your address bar. Click it to open the popup.",
+        banner: "Step 2 of 4: Click the StudyFlowSuite extension icon in your browser toolbar",
+        pointer: true,
+        pointerText: "Extension icon is here →"
+      },
+      {
+        title: "Configure Settings ⚙️",
+        description: "In the extension popup, you can set optional parameters like total questions (5) and target time. For this tutorial, you can leave them empty.",
+        icon: "⚙️",
+        visualText: "Optional: Set total questions to 5 for this quiz. Leave target time empty for instant completion.",
+        banner: "Step 3 of 4: Optional - Configure quiz settings in the extension popup"
+      },
+      {
+        title: "Start the Quiz! 🚀",
+        description: "Click the 'Start Quiz' button in the extension popup. Watch as StudyFlowSuite automatically answers all the questions!",
+        icon: "🚀",
+        visualText: "The extension will detect questions, analyze them, and fill in answers automatically. Just sit back and watch!",
+        banner: "Step 4 of 4: Click 'Start Quiz' in the extension and watch the magic happen!"
+      }
+    ];
+
+    function updateTutorial() {
+      const step = steps[currentStep];
+      document.querySelector('.tutorial-title').textContent = step.title;
+      document.querySelector('.tutorial-description').textContent = step.description;
+      document.querySelector('.tutorial-visual-icon').textContent = step.icon;
+      document.querySelector('.tutorial-visual-text').textContent = step.visualText;
+      document.getElementById('helpBanner').textContent = step.banner;
+
+      // Update step indicators
+      document.querySelectorAll('.step-dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentStep);
+      });
+
+      // Show/hide pointer
+      const pointer = document.getElementById('tutorialPointer');
+      if (step.pointer) {
+        pointer.classList.add('active');
+        pointer.style.top = '20px';
+        pointer.style.right = '100px';
+        document.getElementById('pointerLabel').textContent = step.pointerText;
+      } else {
+        pointer.classList.remove('active');
+      }
+    }
+
+    function nextStep() {
+      currentStep++;
+      if (currentStep >= steps.length) {
+        completeTutorial();
+      } else {
+        updateTutorial();
+      }
+    }
+
+    function skipTutorial() {
+      document.getElementById('tutorialOverlay').style.display = 'none';
+    }
+
+    function completeTutorial() {
+      document.getElementById('tutorialOverlay').style.display = 'none';
+      setTimeout(() => {
+        alert('🎉 Tutorial complete! Now try clicking the extension icon and pressing "Start Quiz" to see it in action!');
+      }, 500);
+    }
+
+    // Button actions in tutorial overlay
+    document.querySelector('.tutorial-btn-primary').onclick = nextStep;
+    document.querySelector('.tutorial-btn-secondary').onclick = skipTutorial;
+
+    // Initialize
+    updateTutorial();
+  </script>
+</body>
+</html>

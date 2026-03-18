@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - StudyFlowSuite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    .checkout-page {
+      min-height: 100vh;
+      background: var(--bg-secondary);
+      padding: 60px 20px;
+    }
+
+    .checkout-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 500px;
+      gap: 40px;
+    }
+
+    @media (max-width: 968px) {
+      .checkout-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .checkout-main {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 40px;
+      border: 1px solid var(--border-color);
+    }
+
+    .checkout-sidebar {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+      height: fit-content;
+      position: sticky;
+      top: 80px;
+    }
+
+    .checkout-header {
+      margin-bottom: 30px;
+    }
+
+    .checkout-header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .checkout-header p {
+      color: var(--text-secondary);
+    }
+
+    .plan-summary {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .plan-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 15px;
+    }
+
+    .plan-features {
+      list-style: none;
+      padding: 0;
+    }
+
+    .plan-features li {
+      padding: 8px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--primary);
+      font-weight: 700;
+      margin-right: 10px;
+    }
+
+    .plan-price {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      border-top: 2px solid var(--border-color);
+      margin-top: 20px;
+    }
+
+    .plan-price-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .plan-price-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .plan-price-value span {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .form-section {
+      margin-bottom: 30px;
+    }
+
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    #card-element {
+      padding: 14px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-secondary);
+    }
+
+    #card-element.StripeElement--focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    #card-errors {
+      color: #c33;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .secure-badge svg {
+      flex-shrink: 0;
+    }
+
+    .btn-checkout {
+      width: 100%;
+      padding: 16px;
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-checkout:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-checkout:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .trial-notice {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .powered-by {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .powered-by svg {
+      width: 40px;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="checkout-page">
+    <div class="checkout-container">
+      <!-- Main Checkout Form -->
+      <div class="checkout-main">
+        <div class="checkout-header">
+          <h1>Complete Your Purchase</h1>
+          <p>Subscribe to StudyFlowSuite Pro and unlock unlimited quiz automation</p>
+        </div>
+
+        <form id="payment-form">
+          <!-- Account Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">Account Information</h3>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" required>
+            </div>
+          </div>
+
+          <!-- Payment Information -->
+          <div class="form-section">
+            <h3 class="form-section-title">Payment Information</h3>
+
+            <div class="secure-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Secure payment powered by Stripe. Your card details are encrypted and never stored on our servers.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="card-element">Card Information</label>
+              <div id="card-element"></div>
+              <div id="card-errors" role="alert"></div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-checkout" id="submit-button">
+            Start 7-Day Free Trial
+          </button>
+
+          <p class="trial-notice">
+            You won't be charged until after your 7-day free trial. Cancel anytime.
+          </p>
+
+          <div class="powered-by">
+            <span>Powered by</span>
+            <svg viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg"><title>Stripe logo</title><path fill="var(--primary)" d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.56 1.1c-4.01 0-6.83-2.5-6.83-7.48 0-4.19 2.39-7.52 6.3-7.52 3.92 0 5.96 3.28 5.96 7.5 0 .4-.04 1.26-.06 1.48zm-5.92-5.62c-1.03 0-2.17.73-2.17 2.58h4.25c0-1.85-1.07-2.58-2.08-2.58zM40.95 20.3c-1.44 0-2.32-.6-2.9-1.04l-.02 4.63-4.12.87V5.57h3.76l.08 1.02a4.7 4.7 0 0 1 3.23-1.29c2.9 0 5.62 2.6 5.62 7.4 0 5.23-2.7 7.6-5.65 7.6zM40 8.95c-.95 0-1.54.34-1.97.81l.02 6.12c.4.44.98.78 1.95.78 1.52 0 2.54-1.65 2.54-3.87 0-2.15-1.04-3.84-2.54-3.84zM28.24 5.57h4.13v14.44h-4.13V5.57zm0-4.7L32.37 0v3.36l-4.13.88V.88zm-4.32 9.35v9.79H19.8V5.57h3.7l.12 1.22c1-1.77 3.07-1.41 3.62-1.22v3.79c-.52-.17-2.29-.43-3.32.86zm-8.55 4.72c0 2.43 2.6 1.68 3.12 1.46v3.36c-.55.3-1.54.54-2.89.54a4.15 4.15 0 0 1-4.27-4.24l.01-13.17 4.02-.86v3.54h3.14V9.1h-3.13v5.85zm-4.91.7c0 2.97-2.31 4.66-5.73 4.66a11.2 11.2 0 0 1-4.46-.93v-3.93c1.38.75 3.1 1.31 4.46 1.31.92 0 1.53-.24 1.53-1C6.26 13.77 0 14.51 0 9.95 0 7.04 2.28 5.3 5.62 5.3c1.36 0 2.72.2 4.09.75v3.88a9.23 9.23 0 0 0-4.1-1.06c-.86 0-1.44.25-1.44.9 0 1.85 6.29.97 6.29 5.88z" fill-rule="evenodd"/></svg>
+          </div>
+        </form>
+      </div>
+
+      <!-- Order Summary Sidebar -->
+      <div class="checkout-sidebar">
+        <div class="plan-summary">
+          <h3 class="plan-name">StudyFlowSuite Pro</h3>
+          <ul class="plan-features">
+            <li>Unlimited questions per day</li>
+            <li>All question types supported</li>
+            <li>Advanced AI models</li>
+            <li>Priority support</li>
+            <li>Export quiz history</li>
+            <li>Custom branding options</li>
+          </ul>
+          <div class="plan-price">
+            <span class="plan-price-label">Monthly</span>
+            <span class="plan-price-value">$4.99<span>/mo</span></span>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-secondary); padding: 15px; border-radius: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+          <strong style="color: var(--text-primary);">7-Day Free Trial</strong><br>
+          Try StudyFlowSuite Pro risk-free for 7 days. No charges until the trial ends. Cancel anytime with one click.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://studyflowsuite.onrender.com/api';
+    const stripe = Stripe('pk_test_51TCOSE9LWKaKRffVikuGMgAxgMDcDoTaJxjzB1sLggcNenLlXnWX2kWqjJqcRxpegKmiZzTwXVEwPYNIIoJoG8Kz00EFpsPqKu');
+    const elements = stripe.elements();
+
+    const cardElement = elements.create('card', {
+      style: {
+        base: {
+          color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+          fontFamily: '"Inter", sans-serif',
+          fontSize: '15px',
+          '::placeholder': {
+            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+          }
+        }
+      }
+    });
+    cardElement.mount('#card-element');
+
+    cardElement.on('change', (event) => {
+      const displayError = document.getElementById('card-errors');
+      if (event.error) {
+        displayError.textContent = event.error.message;
+      } else {
+        displayError.textContent = '';
+      }
+    });
+
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const name = document.getElementById('name').value;
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processing...';
+
+      try {
+        // Create payment method
+        const {error, paymentMethod} = await stripe.createPaymentMethod({
+          type: 'card',
+          card: cardElement,
+          billing_details: {
+            email: email,
+            name: name,
+          },
+        });
+
+        if (error) {
+          document.getElementById('card-errors').textContent = error.message;
+          submitButton.disabled = false;
+          submitButton.textContent = 'Start 7-Day Free Trial';
+          return;
+        }
+
+        // Send to backend to create subscription
+        const response = await fetch(`${API_URL}/create-subscription`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            name: name,
+            paymentMethodId: paymentMethod.id,
+            plan: 'pro'
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Store user session
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('token', data.token);
+
+          // Redirect to dashboard
+          window.location.href = 'dashboard.html?welcome=true';
+        } else {
+          document.getElementById('card-errors').textContent = data.error || 'Payment failed. Please try again.';
+          submitButton.disabled = false;
+          submitButton.textContent = 'Start 7-Day Free Trial';
+        }
+      } catch (error) {
+        document.getElementById('card-errors').textContent = 'Connection error. Please try again.';
+        submitButton.disabled = false;
+        submitButton.textContent = 'Start 7-Day Free Trial';
+      }
+    });
+  </script>
+</body>
+</html>
