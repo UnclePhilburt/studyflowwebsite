@@ -1787,7 +1787,7 @@ body.dark-mode .theme-toggle .moon-icon {
 /* Statistics Section */
 .stats-section {
   padding: 60px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   color: white;
 }
 
