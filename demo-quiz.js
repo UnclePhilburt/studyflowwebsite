@@ -10,28 +10,28 @@ const demoQuestions = [
       { text: 'C) Berlin', correct: false },
       { text: 'D) Madrid', correct: false }
     ],
-    explanation: 'Paris is the capital and most populous city of France.'
+    explanation: 'AI identified and clicked the correct answer automatically.'
   },
   {
     type: 'fill-in-blank',
     title: 'Fill in the Blank',
     question: '<strong>Question 2:</strong> The process by which plants make food using sunlight is called _______.',
     correctAnswer: 'photosynthesis',
-    explanation: 'Photosynthesis is the process plants use to convert light energy into chemical energy.'
+    explanation: 'AI automatically filled in the correct answer for you.'
   },
   {
     type: 'short-answer',
     title: 'Short Answer Question',
     question: '<strong>Question 3:</strong> Briefly explain what DNA stands for and its function.',
     answer: 'DNA stands for Deoxyribonucleic Acid. It is a molecule that carries genetic instructions for the development, functioning, growth, and reproduction of all known organisms.',
-    explanation: 'AI generated a concise answer covering the acronym and main function.'
+    explanation: 'AI wrote a concise short answer response automatically.'
   },
   {
     type: 'essay',
     title: 'Essay Question',
     question: '<strong>Question 4:</strong> Discuss the impact of climate change on global ecosystems.',
     answer: 'Climate change significantly impacts global ecosystems through rising temperatures, altered precipitation patterns, and increased frequency of extreme weather events. These changes affect biodiversity, as many species struggle to adapt to rapidly shifting conditions. Ecosystems such as coral reefs face bleaching and death due to warming oceans, while polar regions experience habitat loss for species like polar bears.\n\nAdditionally, climate change disrupts food chains and migration patterns, leading to cascading effects throughout ecosystems. Agricultural systems are also affected, with changes in crop yields and growing seasons threatening food security. Addressing climate change requires global cooperation to reduce emissions and implement sustainable practices.',
-    explanation: 'AI generated a comprehensive essay with multiple paragraphs and supporting details.'
+    explanation: 'AI wrote a full multi-paragraph essay response automatically.'
   }
 ];
 
@@ -52,7 +52,7 @@ function renderQuestion(index) {
   if (question.type === 'multiple-choice') {
     html += '<div class="demo-answers">';
     question.answers.forEach((answer, i) => {
-      const hint = answer.correct ? '<span class="demo-ai-hint">✨ AI Suggestion</span>' : '';
+      const hint = answer.correct ? '<span class="demo-ai-hint">✨ Auto-Select</span>' : '';
       html += `
         <label class="demo-answer" data-correct="${answer.correct}">
           <input type="radio" name="demo-current" value="${i}">
@@ -164,16 +164,16 @@ function nextQuestion() {
     document.getElementById('demoQuestionTitle').textContent = 'Demo Complete! 🎉';
     document.getElementById('demoQuestionContent').innerHTML = `
       <p style="margin: 15px 0; font-size: 15px; color: #334155; line-height: 1.6;">
-        <strong>You've seen how StudyFlow handles:</strong>
+        <strong>You've seen how StudyFlow automatically:</strong>
       </p>
       <ul style="margin: 10px 0 10px 30px; color: #334155; line-height: 2;">
-        <li>✓ Multiple choice questions with AI suggestions</li>
-        <li>✓ Fill-in-the-blank questions</li>
-        <li>✓ Short answer responses</li>
-        <li>✓ Long essay questions</li>
+        <li>✓ Clicks correct answers on multiple choice</li>
+        <li>✓ Fills in blank fields</li>
+        <li>✓ Writes short answer responses</li>
+        <li>✓ Generates full essay answers</li>
       </ul>
       <p style="margin: 15px 0; font-size: 14px; color: #64748b;">
-        Ready to ace your quizzes? Download the extension and get started!
+        Ready to automate your quizzes? Download the extension and get started!
       </p>
     `;
 
