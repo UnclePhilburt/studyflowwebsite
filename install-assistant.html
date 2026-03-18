@@ -342,15 +342,21 @@
         <div class="step-title">Open Chrome Extensions Page</div>
       </div>
       <div class="step-content">
-        <p class="step-description">Open Chrome's extensions management page. Click the button below:</p>
-        <button class="action-btn" id="openExtensionsBtn">
-          🚀 Open chrome://extensions
+        <p class="step-description">Open Chrome's extensions management page.</p>
+        <div class="code" style="user-select: all; cursor: pointer;" onclick="navigator.clipboard.writeText('chrome://extensions/'); alert('Copied to clipboard! Now paste it in Chrome address bar.');">
+          chrome://extensions/
+          <span style="float: right; font-size: 11px; color: #10b981;">📋 Click to copy</span>
+        </div>
+        <p class="step-description" style="margin-top: 10px; font-size: 14px;">
+          1. Copy the URL above (click it)<br>
+          2. Open a new Chrome tab<br>
+          3. Paste it in the address bar and press Enter
+        </p>
+        <button class="action-btn secondary" id="openExtensionsBtn" style="margin-top: 15px;">
+          ✓ I've Opened Extensions
         </button>
         <div class="help-text show">
           <strong>Alternative:</strong> In Chrome, click the three dots menu → Extensions → Manage Extensions
-        </div>
-        <div class="status-badge checking" id="extensionsStatus" style="display: none;">
-          Checking if extensions page is open...
         </div>
       </div>
     </div>
@@ -455,20 +461,8 @@
 
     // Step 3: Open Extensions
     document.getElementById('openExtensionsBtn').addEventListener('click', function() {
-      // Try to open chrome://extensions in a new tab
-      // Note: This will fail due to Chrome security, but we'll show instructions
-      try {
-        window.open('chrome://extensions/', '_blank');
-      } catch (e) {
-        alert('Please manually open Chrome and type: chrome://extensions in the address bar');
-      }
-
-      document.getElementById('extensionsStatus').style.display = 'inline-block';
-
-      setTimeout(() => {
-        completeStep(3);
-        activateStep(4);
-      }, 3000);
+      completeStep(3);
+      activateStep(4);
     });
 
     // Step 4: Developer Mode
