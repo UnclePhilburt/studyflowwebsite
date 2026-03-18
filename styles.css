@@ -1806,6 +1806,7 @@ body.dark-mode .theme-toggle .moon-icon {
   font-weight: 800;
   margin-bottom: 12px;
   line-height: 1;
+  color: white;
 }
 
 .stat-label {
@@ -1813,9 +1814,11 @@ body.dark-mode .theme-toggle .moon-icon {
   font-weight: 600;
   margin-bottom: 8px;
   opacity: 0.95;
+  color: white;
 }
 
 .stat-sublabel {
+  color: white;
   font-size: 14px;
   opacity: 0.8;
 }
