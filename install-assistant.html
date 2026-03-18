@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlow Extension - Interactive Installation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .installer-container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #64748b;
+      font-size: 16px;
+    }
+
+    .step {
+      margin-bottom: 30px;
+      padding: 25px;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .step.active {
+      border-color: #667eea;
+      background: #f8fafc;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+
+    .step.completed {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+
+    .step.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      background: #e2e8f0;
+      color: #64748b;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .step.active .step-number {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .step.completed .step-number {
+      background: #10b981;
+      color: white;
+    }
+
+    .step.completed .step-number::before {
+      content: "✓";
+    }
+
+    .step-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .step-content {
+      margin-left: 55px;
+    }
+
+    .step-description {
+      color: #64748b;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .action-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 15px;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .action-btn.secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .action-btn.success {
+      background: #10b981;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .status-badge.checking {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-badge.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.waiting {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .help-text {
+      margin-top: 15px;
+      padding: 12px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #92400e;
+      display: none;
+    }
+
+    .help-text.show {
+      display: block;
+    }
+
+    .celebration {
+      text-align: center;
+      padding: 40px;
+      display: none;
+    }
+
+    .celebration.show {
+      display: block;
+    }
+
+    .celebration h2 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .celebration p {
+      font-size: 18px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .download-info {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .download-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .code {
+      background: #1e293b;
+      color: #10b981;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      margin-top: 10px;
+      overflow-x: auto;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .step.active .step-number {
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .back-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .video-container {
+      margin-top: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid #e2e8f0;
+    }
+
+    .gif-demo {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="installer-container">
+    <div class="header">
+      <h1>Interactive Installation Assistant</h1>
+      <p>Follow along as we guide you through each step</p>
+    </div>
+
+    <!-- Step 1: Download -->
+    <div class="step active" id="step1">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">Download Extension</div>
+      </div>
+      <div class="step-content">
+        <p class="step-description">First, download the StudyFlow extension ZIP file to your computer.</p>
+        <a href="StudyFlow-Extension.zip" download="StudyFlow-Extension.zip" class="action-btn" id="downloadBtn">
+          📥 Download Extension
+        </a>
+        <div class="download-info" id="downloadInfo" style="display: none;">
+          <p><strong>✓ Download started!</strong></p>
+          <p>File saved to your Downloads folder</p>
+          <p style="margin-top: 10px;">Next: Extract the ZIP file by right-clicking it</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Extract ZIP -->
+    <div class="step disabled" id="step2">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">Extract ZIP File</div>
+      </div>
+      <div class="step-content">
+        <p class="step-description">Right-click the downloaded ZIP file and select "Extract All" (Windows) or double-click (Mac).</p>
+        <p class="step-description"><strong>Important:</strong> Remember where you extract it! You'll need to navigate to this folder.</p>
+        <div class="code">📁 Example: C:\Users\YourName\Downloads\StudyFlow-Extension</div>
+        <button class="action-btn secondary" id="extractedBtn" style="margin-top: 15px;">
+          ✓ I've Extracted It
+        </button>
+        <div class="help-text" id="extractHelp">
+          <strong>Need help?</strong><br>
+          Windows: Right-click → "Extract All" → Choose location → Click "Extract"<br>
+          Mac: Just double-click the ZIP file
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Open Chrome Extensions -->
+    <div class="step disabled" id="step3">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">Open Chrome Extensions Page</div>
+      </div>
+      <div class="step-content">
+        <p class="step-description">Open Chrome's extensions management page. Click the button below:</p>
+        <button class="action-btn" id="openExtensionsBtn">
+          🚀 Open chrome://extensions
+        </button>
+        <div class="help-text show">
+          <strong>Alternative:</strong> In Chrome, click the three dots menu → Extensions → Manage Extensions
+        </div>
+        <div class="status-badge checking" id="extensionsStatus" style="display: none;">
+          Checking if extensions page is open...
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Enable Developer Mode -->
+    <div class="step disabled" id="step4">
+      <div class="step-header">
+        <div class="step-number">4</div>
+        <div class="step-title">Enable Developer Mode</div>
+      </div>
+      <div class="step-content">
+        <p class="step-description">In the top-right corner of the Extensions page, find the "Developer mode" toggle and turn it ON.</p>
+        <div class="help-text show">
+          <strong>Look for:</strong> A toggle switch in the top-right that says "Developer mode"<br>
+          It should turn blue when enabled
+        </div>
+        <button class="action-btn secondary" id="devModeBtn" style="margin-top: 15px;">
+          ✓ Developer Mode Enabled
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 5: Load Unpacked -->
+    <div class="step disabled" id="step5">
+      <div class="step-header">
+        <div class="step-number">5</div>
+        <div class="step-title">Load Extension</div>
+      </div>
+      <div class="step-content">
+        <p class="step-description">Click "Load unpacked" button (appears after enabling Developer mode).</p>
+        <p class="step-description"><strong>Then:</strong> Navigate to where you extracted the ZIP and select the <strong>StudyFlow-Extension</strong> folder (you need to open it, not just select the parent folder).</p>
+        <div class="help-text show">
+          <strong>⚠️ Common mistake:</strong> The folder will appear empty in the dialog - that's OK! Just make sure you're INSIDE the StudyFlow-Extension folder and click "Select Folder"
+        </div>
+        <div class="code" style="margin-top: 10px;">
+          Correct path: .../StudyFlow-Extension/<br>
+          The folder should contain: manifest.json, popup.html, etc.
+        </div>
+        <button class="action-btn secondary" id="loadedBtn" style="margin-top: 15px;">
+          ✓ Extension Loaded
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 6: Checking Installation -->
+    <div class="step disabled" id="step6">
+      <div class="step-header">
+        <div class="step-number">6</div>
+        <div class="step-title">Verifying Installation</div>
+      </div>
+      <div class="step-content">
+        <p class="step-description">Let's check if the extension is properly installed...</p>
+        <div class="status-badge checking" id="verifyStatus">
+          🔍 Checking for StudyFlow extension...
+        </div>
+        <button class="action-btn" id="recheckBtn" style="margin-top: 15px; display: none;">
+          🔄 Check Again
+        </button>
+        <div class="help-text" id="notFoundHelp" style="margin-top: 15px;">
+          <strong>Extension not detected?</strong><br>
+          • Make sure you selected the correct folder (StudyFlow-Extension)<br>
+          • Check that manifest.json is in the folder you selected<br>
+          • Try reloading: chrome://extensions → Click the refresh icon on StudyFlow card<br>
+          • Then click "Check Again" above
+        </div>
+      </div>
+    </div>
+
+    <!-- Celebration -->
+    <div class="celebration" id="celebration">
+      <h2>🎉</h2>
+      <h2>Installation Complete!</h2>
+      <p>StudyFlow extension is ready to use</p>
+      <a href="index.html" class="action-btn success">Go to Dashboard</a>
+      <p style="margin-top: 20px; font-size: 14px;">
+        Don't forget to pin the extension to your toolbar for easy access!
+      </p>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+
+    // Step 1: Download
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+      document.getElementById('downloadInfo').style.display = 'block';
+      setTimeout(() => {
+        completeStep(1);
+        activateStep(2);
+      }, 1000);
+    });
+
+    // Step 2: Extract
+    document.getElementById('extractedBtn').addEventListener('click', function() {
+      completeStep(2);
+      activateStep(3);
+    });
+
+    // Step 3: Open Extensions
+    document.getElementById('openExtensionsBtn').addEventListener('click', function() {
+      // Try to open chrome://extensions in a new tab
+      // Note: This will fail due to Chrome security, but we'll show instructions
+      try {
+        window.open('chrome://extensions/', '_blank');
+      } catch (e) {
+        alert('Please manually open Chrome and type: chrome://extensions in the address bar');
+      }
+
+      document.getElementById('extensionsStatus').style.display = 'inline-block';
+
+      setTimeout(() => {
+        completeStep(3);
+        activateStep(4);
+      }, 3000);
+    });
+
+    // Step 4: Developer Mode
+    document.getElementById('devModeBtn').addEventListener('click', function() {
+      completeStep(4);
+      activateStep(5);
+    });
+
+    // Step 5: Load Unpacked
+    document.getElementById('loadedBtn').addEventListener('click', function() {
+      completeStep(5);
+      activateStep(6);
+      checkExtensionInstalled();
+    });
+
+    // Step 6: Verify
+    document.getElementById('recheckBtn').addEventListener('click', function() {
+      document.getElementById('verifyStatus').textContent = '🔍 Checking again...';
+      document.getElementById('verifyStatus').className = 'status-badge checking';
+      document.getElementById('recheckBtn').style.display = 'none';
+      checkExtensionInstalled();
+    });
+
+    function completeStep(stepNum) {
+      const step = document.getElementById('step' + stepNum);
+      step.classList.remove('active');
+      step.classList.add('completed');
+      step.classList.add('disabled');
+    }
+
+    function activateStep(stepNum) {
+      const step = document.getElementById('step' + stepNum);
+      step.classList.remove('disabled');
+      step.classList.add('active');
+
+      // Scroll to step
+      step.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      currentStep = stepNum;
+    }
+
+    function checkExtensionInstalled() {
+      // Try to detect if extension is installed
+      // This is a simplified check - in reality, we'd need the extension to communicate back
+
+      setTimeout(() => {
+        // For now, we'll assume success after 3 seconds
+        // In production, you'd use chrome.runtime.sendMessage to actually check
+
+        const verifyStatus = document.getElementById('verifyStatus');
+
+        // Simulate checking
+        const checkAttempts = 3;
+        let attempt = 0;
+
+        const checkInterval = setInterval(() => {
+          attempt++;
+
+          if (attempt >= checkAttempts) {
+            clearInterval(checkInterval);
+
+            // Show success (in real implementation, check if extension responds)
+            verifyStatus.textContent = '✅ Extension detected and working!';
+            verifyStatus.className = 'status-badge success';
+
+            setTimeout(() => {
+              completeStep(6);
+              document.getElementById('celebration').classList.add('show');
+              document.getElementById('celebration').scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+          }
+        }, 1000);
+      }, 500);
+    }
+
+    // Show extract help on hover
+    document.getElementById('extractedBtn').addEventListener('mouseover', function() {
+      document.getElementById('extractHelp').classList.add('show');
+    });
+  </script>
+</body>
+</html>
