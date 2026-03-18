@@ -258,3 +258,48 @@ themeToggle?.addEventListener('click', () => {
 });
 
 console.log('StudyFlowSuite website loaded ✨');
+
+// Demo Quiz Interactive Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const demoSubmitBtn = document.getElementById('demoSubmitBtn');
+  const demoExplanation = document.getElementById('demoExplanation');
+  const demoAnswers = document.querySelectorAll('.demo-answer');
+
+  if (demoSubmitBtn) {
+    demoSubmitBtn.addEventListener('click', function() {
+      // Simulate AI selecting the correct answer
+      setTimeout(() => {
+        // Highlight the correct answer (Paris)
+        const correctAnswer = document.querySelector('.demo-answer[data-correct="true"]');
+        const correctRadio = correctAnswer.querySelector('input[type="radio"]');
+
+        // Select the radio button
+        correctRadio.checked = true;
+        correctAnswer.classList.add('correct-selected');
+
+        // Show explanation
+        setTimeout(() => {
+          demoExplanation.style.display = 'block';
+
+          // Change button text
+          demoSubmitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><polyline points="20 6 9 17 4 12"></polyline></svg> Demo Complete! Reload to watch again';
+          demoSubmitBtn.style.background = '#10b981';
+          demoSubmitBtn.style.cursor = 'default';
+
+          // Reload on click
+          demoSubmitBtn.onclick = function() {
+            location.reload();
+          };
+        }, 800);
+      }, 1000);
+    });
+
+    // Allow manual selection
+    demoAnswers.forEach(answer => {
+      answer.addEventListener('click', function() {
+        demoAnswers.forEach(a => a.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+  }
+});

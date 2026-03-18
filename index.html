@@ -94,10 +94,59 @@
               <span></span>
               <span></span>
             </div>
-            <div class="browser-url">studyflowsuite.com/demo</div>
+            <div class="browser-url">canvas.instructure.com/courses/quiz</div>
           </div>
           <div class="browser-content">
-            <img src="assets/screenshot.png" alt="StudyFlowSuite Interface" class="screenshot">
+            <!-- Live Interactive Demo Quiz -->
+            <div class="demo-quiz">
+              <div class="demo-quiz-header">
+                <h3 style="margin: 0; font-size: 18px; color: #1e293b;">Sample Quiz Question</h3>
+                <div class="demo-extension-badge">
+                  <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite;"></span>
+                  StudyFlow Active
+                </div>
+              </div>
+
+              <div class="demo-question">
+                <p style="margin: 15px 0; font-size: 15px; color: #334155; line-height: 1.6;">
+                  <strong>Question 1:</strong> What is the capital of France?
+                </p>
+
+                <div class="demo-answers">
+                  <label class="demo-answer" data-correct="false">
+                    <input type="radio" name="demo-q1" value="a">
+                    <span>A) London</span>
+                  </label>
+                  <label class="demo-answer" data-correct="true">
+                    <input type="radio" name="demo-q1" value="b">
+                    <span>B) Paris</span>
+                    <span class="demo-ai-hint">✨ AI Suggestion</span>
+                  </label>
+                  <label class="demo-answer" data-correct="false">
+                    <input type="radio" name="demo-q1" value="c">
+                    <span>C) Berlin</span>
+                  </label>
+                  <label class="demo-answer" data-correct="false">
+                    <input type="radio" name="demo-q1" value="d">
+                    <span>D) Madrid</span>
+                  </label>
+                </div>
+
+                <button class="demo-submit-btn" id="demoSubmitBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Watch Demo
+                </button>
+
+                <div class="demo-explanation" id="demoExplanation" style="display: none;">
+                  <strong style="color: #10b981;">✓ Correct!</strong>
+                  <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748b;">
+                    Paris is the capital and most populous city of France.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -454,23 +503,43 @@
         <div class="download-image">
           <div class="extension-preview">
             <div class="popup-mockup">
-              <div class="popup-header">
-                <img src="assets/icon.png" alt="Icon" class="popup-icon">
-                <span>StudyFlowSuite</span>
-              </div>
-              <div class="popup-stats">
-                <div class="popup-stat">
-                  <div class="popup-stat-value">42</div>
-                  <div class="popup-stat-label">Questions</div>
-                </div>
-                <div class="popup-stat">
-                  <div class="popup-stat-value">0</div>
-                  <div class="popup-stat-label">Errors</div>
+              <div class="popup-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; border-radius: 12px 12px 0 0;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">S</div>
+                  <span style="font-weight: 600; font-size: 16px;">StudyFlow</span>
                 </div>
               </div>
-              <div class="popup-status">
-                <div class="status-dot"></div>
-                <span>Quiz mode running</span>
+              <div style="padding: 20px; background: white;">
+                <div style="margin-bottom: 20px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="color: #64748b; font-size: 13px;">Model Selection</span>
+                  </div>
+                  <select style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                    <option>Basic Model</option>
+                    <option>Advanced Model (Pro Only)</option>
+                  </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                  <div>
+                    <label style="display: block; color: #64748b; font-size: 13px; margin-bottom: 6px;">Question Limit</label>
+                    <input type="number" value="10" style="width: 100%; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                  </div>
+                  <div>
+                    <label style="display: block; color: #64748b; font-size: 13px; margin-bottom: 6px;">Target Time (s)</label>
+                    <input type="number" value="30" style="width: 100%; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                  </div>
+                </div>
+
+                <button style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <span>▶</span>
+                  <span>Start Assistant</span>
+                </button>
+
+                <div style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 6px; font-size: 13px; color: #065f46;">
+                  <strong>Ready to help!</strong>
+                  <div style="margin-top: 4px; color: #047857;">Navigate to your quiz and click Start</div>
+                </div>
               </div>
             </div>
           </div>
