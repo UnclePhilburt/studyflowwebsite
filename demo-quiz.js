@@ -125,6 +125,18 @@ function showExplanation(text) {
     <p style="margin: 8px 0 0 0; font-size: 13px; color: #64748b;">${text}</p>
   `;
   content.appendChild(explanation);
+
+  // Auto-advance to next question after 2 seconds
+  if (currentQuestionIndex < demoQuestions.length - 1) {
+    setTimeout(() => {
+      nextQuestion();
+    }, 2000);
+  } else {
+    // Last question - show completion screen after 2 seconds
+    setTimeout(() => {
+      nextQuestion();
+    }, 2000);
+  }
 }
 
 function nextQuestion() {
@@ -132,14 +144,6 @@ function nextQuestion() {
 
   if (currentQuestionIndex < demoQuestions.length) {
     renderQuestion(currentQuestionIndex);
-
-    const btn = document.getElementById('demoSubmitBtn');
-    btn.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-        <polyline points="20 6 9 17 4 12"></polyline>
-      </svg>
-      Continue Demo
-    `;
 
     setTimeout(() => {
       animateAnswer(currentQuestionIndex);
@@ -152,9 +156,10 @@ function nextQuestion() {
         <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
         <path d="M12 9l0 3l2 2"></path>
       </svg>
-      Restart Demo
+      Watch Again
     `;
     btn.style.background = '#10b981';
+    btn.style.display = 'flex';
 
     document.getElementById('demoQuestionTitle').textContent = 'Demo Complete! 🎉';
     document.getElementById('demoQuestionContent').innerHTML = `
@@ -190,17 +195,14 @@ document.addEventListener('DOMContentLoaded', function() {
         demoRunning = true;
         renderQuestion(0);
 
-        this.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Continue Demo
-        `;
+        // Hide button during demo
+        this.style.display = 'none';
         this.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 
-        animateAnswer(0);
-      } else {
-        nextQuestion();
+        // Start the slideshow
+        setTimeout(() => {
+          animateAnswer(0);
+        }, 500);
       }
     });
   }
