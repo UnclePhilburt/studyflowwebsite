@@ -10,6 +10,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Mobile-Only Desktop Redirect Banner -->
+  <div class="mobile-desktop-banner" id="mobileDesktopBanner">
+    <div class="banner-content">
+      <div class="banner-icon">💻</div>
+      <div class="banner-text">
+        <strong>Download Required</strong>
+        <p>StudyFlow is a Chrome extension. Visit this page on your computer to download!</p>
+      </div>
+      <button class="banner-close" onclick="document.getElementById('mobileDesktopBanner').style.display='none'">&times;</button>
+    </div>
+  </div>
+
   <!-- Navigation -->
   <nav class="navbar">
     <div class="container nav-container">
@@ -79,7 +91,8 @@
           </div>
         </div>
         <div class="hero-buttons">
-          <a href="install-assistant.html" class="btn btn-primary btn-large">
+          <!-- Desktop Button -->
+          <a href="install-assistant.html" class="btn btn-primary btn-large desktop-only-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
@@ -87,12 +100,28 @@
             </svg>
             Start Free Trial
           </a>
+
+          <!-- Mobile Button - Email Link -->
+          <a href="#" class="btn btn-primary btn-large mobile-only-btn" id="emailMeBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email Me Download Link
+          </a>
+
           <a href="#how-it-works" class="btn btn-secondary btn-large">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
-            Watch Demo
+            <span class="desktop-text">Watch Demo</span>
+            <span class="mobile-text">See How It Works</span>
           </a>
+        </div>
+
+        <!-- Mobile-Only Reminder -->
+        <div class="mobile-reminder">
+          <p>💡 <strong>Heads up!</strong> StudyFlow requires Chrome on a computer. Save this link and visit on your desktop to download.</p>
         </div>
         <div class="trust-badges">
           <span class="trust-badge">🔒 100% Secure & Private</span>

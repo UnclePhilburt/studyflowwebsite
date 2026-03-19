@@ -259,6 +259,23 @@ themeToggle?.addEventListener('click', () => {
 
 console.log('StudyFlowSuite website loaded ✨');
 
+// Mobile Email Me Button
+document.getElementById('emailMeBtn')?.addEventListener('click', function(e) {
+  e.preventDefault();
+  const email = prompt('Enter your email to receive the download link:');
+  if (email && email.includes('@')) {
+    // Create mailto link
+    const subject = 'StudyFlow Download Link';
+    const body = `Hi!\n\nHere's the link to download StudyFlow on your computer:\n\nhttps://unclephilburt.github.io/studyflowwebsite/\n\nRemember:\n✅ Must use Chrome browser\n✅ Visit on desktop/laptop\n✅ Follow the installation guide\n\nQuestions? Visit our FAQ: https://unclephilburt.github.io/studyflowwebsite/docs.html\n\nHappy studying!\n- StudyFlow Team`;
+
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    alert('Opening your email app! Send the email to yourself so you have the link on your computer.');
+  } else if (email !== null) {
+    alert('Please enter a valid email address');
+  }
+});
+
 // Demo Quiz Interactive Functionality
 document.addEventListener('DOMContentLoaded', function() {
   const demoSubmitBtn = document.getElementById('demoSubmitBtn');
