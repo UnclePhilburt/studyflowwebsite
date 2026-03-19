@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="AI-powered quiz automation for Canvas, Blackboard, and Moodle. Complete quizzes 10x faster. Desktop only.">
-  <title>StudyFlow - AI Quiz Automation</title>
+  <meta name="description" content="AI-powered study assistant for Canvas, Blackboard, and Moodle. Enhance your learning experience. Desktop only.">
+  <title>StudyFlow - AI Study Assistant</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
@@ -603,8 +603,8 @@
         <span>💻</span>
         <span>Chrome Extension</span>
       </div>
-      <h1 class="hero-title">AI Quiz Automation for Students</h1>
-      <p class="hero-description">Complete Canvas, Blackboard, and Moodle quizzes 10x faster with advanced AI. Available on desktop computers only.</p>
+      <h1 class="hero-title">AI-Powered Study Assistant</h1>
+      <p class="hero-description">Enhance your learning experience on Canvas, Blackboard, and Moodle with intelligent AI support. Available on desktop computers only.</p>
     </div>
   </section>
 
@@ -623,29 +623,18 @@
       <div class="section-header">
         <span class="section-label">Get Started</span>
         <h2 class="section-title">Send Link to Your Computer</h2>
-        <p class="section-subtitle">Enter your email and we'll send you the download link to open on your desktop or laptop.</p>
+        <p class="section-subtitle">Open your email app to send yourself the download link, or copy/share it below.</p>
       </div>
 
       <div class="cta-card">
-        <div class="form-group">
-          <label class="form-label" for="emailInput">Email Address</label>
-          <input
-            type="email"
-            id="emailInput"
-            class="input"
-            placeholder="you@example.com"
-            autocomplete="email"
-          >
-        </div>
-
-        <button class="btn" id="submitBtn">
-          <span>Send Download Link</span>
+        <button class="btn" id="emailBtn" onclick="emailMyself()">
+          <span>📧</span>
+          <span>Email Link to Myself</span>
         </button>
 
         <div class="alert-message alert-success" id="successMessage">
-          <strong>✓ Email sent successfully!</strong> Check your inbox and open the link on your computer.
+          <strong>✓ Email app opened!</strong> Send the email to yourself and open it on your computer.
         </div>
-        <div class="alert-message alert-error" id="errorMessage"></div>
 
         <div class="divider">
           <span>or share another way</span>
@@ -746,7 +735,7 @@
           <div class="step-number"></div>
           <div class="step-content">
             <h3 class="step-title">Start Using StudyFlow</h3>
-            <p class="step-desc">Navigate to any quiz on your learning platform and click the extension icon. AI handles the rest automatically.</p>
+            <p class="step-desc">Navigate to your coursework on your learning platform and click the extension icon to get AI-powered assistance.</p>
           </div>
         </div>
       </div>
@@ -758,8 +747,8 @@
     <div class="container">
       <div class="section-header">
         <span class="section-label">Features</span>
-        <h2 class="section-title">Powerful AI Automation</h2>
-        <p class="section-subtitle">Everything you need to complete quizzes faster</p>
+        <h2 class="section-title">Intelligent Study Support</h2>
+        <p class="section-subtitle">AI-powered tools to enhance your learning experience</p>
       </div>
 
       <div class="feature-grid">
@@ -770,17 +759,17 @@
               <h3 class="feature-title">Advanced AI Technology</h3>
             </div>
           </div>
-          <p class="feature-desc">Handles multiple choice, true/false, fill-in-blank, and essay questions with high accuracy using advanced language models.</p>
+          <p class="feature-desc">Provides intelligent assistance for various question types including multiple choice, essays, and more using advanced language models.</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-header">
             <div class="feature-icon">⚡</div>
             <div>
-              <h3 class="feature-title">10x Faster Completion</h3>
+              <h3 class="feature-title">Streamlined Workflow</h3>
             </div>
           </div>
-          <p class="feature-desc">Complete quizzes in seconds instead of hours. Save 5+ hours per week on coursework and focus on what matters most.</p>
+          <p class="feature-desc">Optimize your study time and coursework efficiency. Save hours per week and focus on what matters most to your learning.</p>
         </div>
 
         <div class="feature-card">
@@ -790,7 +779,7 @@
               <h3 class="feature-title">Safe & Secure</h3>
             </div>
           </div>
-          <p class="feature-desc">Bank-level encryption. All processing happens locally in your browser. We never store your quiz answers or personal data.</p>
+          <p class="feature-desc">Bank-level encryption. All processing happens locally in your browser. We never store your coursework content or personal data.</p>
         </div>
 
         <div class="feature-card">
@@ -800,7 +789,7 @@
               <h3 class="feature-title">Free to Try</h3>
             </div>
           </div>
-          <p class="feature-desc">Start with 10 questions per day for free. Pro plan is $4.99/month for unlimited questions and priority support.</p>
+          <p class="feature-desc">Start with a generous free tier to test the platform. Pro plan is $4.99/month for unlimited access and priority support.</p>
         </div>
       </div>
     </div>
@@ -817,11 +806,11 @@
       <div class="stats-grid">
         <div>
           <div class="stat-value">2M+</div>
-          <div class="stat-label">Questions Answered</div>
+          <div class="stat-label">Study Sessions</div>
         </div>
         <div>
           <div class="stat-value">10K+</div>
-          <div class="stat-label">Active Students</div>
+          <div class="stat-label">Active Users</div>
         </div>
         <div>
           <div class="stat-value">4.9★</div>
@@ -857,7 +846,7 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            StudyFlow offers a free plan with 10 questions per day - perfect for testing it out. The Pro plan costs $4.99/month and includes unlimited questions, support for all question types (multiple choice, essay, fill-in-blank), and priority support.
+            StudyFlow offers a free plan with daily usage limits - perfect for testing it out. The Pro plan costs $4.99/month and includes unlimited access, full feature set, and priority support.
           </div>
         </div>
 
@@ -877,7 +866,7 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            Absolutely. StudyFlow runs entirely in your Chrome browser using bank-level encryption. We never store your quiz answers or personally identifiable information on our servers. Your privacy and security are our highest priorities.
+            Absolutely. StudyFlow runs entirely in your Chrome browser using bank-level encryption. We never store your coursework content or personally identifiable information on our servers. Your privacy and security are our highest priorities.
           </div>
         </div>
 
@@ -887,7 +876,7 @@
             <span class="faq-icon">▼</span>
           </div>
           <div class="faq-answer">
-            Yes! The free plan includes 10 questions per day with no credit card required. This lets you test StudyFlow with real quizzes on your learning platform before deciding to upgrade. Try it completely risk-free.
+            Yes! The free plan includes daily usage limits with no credit card required. This lets you test StudyFlow with your actual coursework on your learning platform before deciding to upgrade. Try it completely risk-free.
           </div>
         </div>
       </div>
@@ -903,59 +892,37 @@
   </footer>
 
   <script>
-    const API_URL = 'https://studyflowsuite.onrender.com/api';
+    function emailMyself() {
+      const subject = encodeURIComponent('StudyFlow Download Link - Open on Desktop');
+      const body = encodeURIComponent(`Hi!
 
-    document.getElementById('submitBtn').addEventListener('click', async function() {
-      const email = document.getElementById('emailInput').value.trim();
-      const submitBtn = this;
-      const successMsg = document.getElementById('successMessage');
-      const errorMsg = document.getElementById('errorMessage');
+I visited StudyFlow on my mobile device, but it only works on desktop computers.
 
-      successMsg.classList.remove('show');
-      errorMsg.classList.remove('show');
+🔗 Open this link on your desktop or laptop:
+https://unclephilburt.github.io/studyflowwebsite/
 
-      if (!email || !email.includes('@')) {
-        errorMsg.textContent = 'Please enter a valid email address';
-        errorMsg.classList.add('show');
-        return;
-      }
+Requirements:
+✅ Desktop or laptop computer
+✅ Chrome browser
+✅ Follow the installation guide
 
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
+Questions? Visit the FAQ: https://unclephilburt.github.io/studyflowwebsite/docs.html
 
-      try {
-        const response = await fetch(`${API_URL}/send-download-link`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
+---
+StudyFlow - AI-Powered Study Assistant
+https://unclephilburt.github.io/studyflowwebsite/`);
 
-        const data = await response.json();
+      // Open email app with pre-filled message
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
 
-        if (response.ok) {
-          successMsg.classList.add('show');
-          document.getElementById('emailInput').value = '';
-          submitBtn.innerHTML = '<span>✓ Sent Successfully</span>';
-          setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Send Download Link</span>';
-          }, 3000);
-        } else {
-          throw new Error(data.error || 'Failed to send email');
-        }
-      } catch (error) {
-        errorMsg.textContent = error.message || 'Something went wrong. Please try again.';
-        errorMsg.classList.add('show');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>Send Download Link</span>';
-      }
-    });
-
-    document.getElementById('emailInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('submitBtn').click();
-      }
-    });
+      // Show success message
+      setTimeout(() => {
+        document.getElementById('successMessage').classList.add('show');
+        setTimeout(() => {
+          document.getElementById('successMessage').classList.remove('show');
+        }, 5000);
+      }, 500);
+    }
 
     function copyLink() {
       const link = 'https://unclephilburt.github.io/studyflowwebsite/';
@@ -972,8 +939,8 @@
     function shareLink() {
       if (navigator.share) {
         navigator.share({
-          title: 'StudyFlow - AI Quiz Automation',
-          text: 'Complete quizzes 10x faster with AI',
+          title: 'StudyFlow - AI Study Assistant',
+          text: 'Enhance your learning with AI-powered study tools',
           url: 'https://unclephilburt.github.io/studyflowwebsite/'
         });
       } else {
