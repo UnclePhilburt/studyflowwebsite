@@ -127,6 +127,7 @@
         <div class="walkthrough-dot" id="dot2"></div>
         <div class="walkthrough-dot" id="dot3"></div>
         <div class="walkthrough-dot" id="dot4"></div>
+        <div class="walkthrough-dot" id="dot5"></div>
       </div>
       <h2 class="walkthrough-title" id="walkthroughTitle">Welcome! 👋</h2>
       <p class="walkthrough-description" id="walkthroughDescription">
@@ -145,23 +146,27 @@
     const walkthroughSteps = [
       {
         title: "Welcome! 👋",
-        description: "Let me walk you through the key areas the extension will interact with on this quiz page. Click Next to continue."
+        description: "This tutorial will show you how to use StudyFlow on sequential quizzes (one question per page). These are common on Canvas, Blackboard, and Moodle. Click Next to continue."
       },
       {
-        title: "Step 1: Question Area 📝",
-        description: "The extension will locate and read the question text. On each page, you can see a question - the extension reads this text and sends it to get the answer."
+        title: "Step 1: Open the Extension 🔧",
+        description: "Click the StudyFlow extension icon in your browser toolbar (top-right corner). If you don't see it, click the puzzle piece icon and pin StudyFlow to your toolbar for easy access."
       },
       {
-        title: "Step 2: Answer Area ✅",
-        description: "The extension will analyze all available answer choices and automatically select the correct one. You'll see it click on the right answer option from the list."
+        title: "Step 2: Select Quiz Format 📋",
+        description: "In the extension popup, you'll see a \"Quiz Format\" dropdown menu. Click it and select \"Sequential (one question per page)\" from the options. This tells StudyFlow how your quiz is structured."
       },
       {
-        title: "Step 3: Submit Button ➡️",
-        description: "After selecting an answer, the extension will automatically click the \"Next Question\" button to move to the next page. This repeats for all questions in the quiz."
+        title: "Step 3: Configure Settings ⚙️",
+        description: "You can adjust optional settings like delay between questions (default: 3 seconds) and target time per question (default: 30 seconds). These settings help the extension behave more naturally. Leave them at default if you're unsure."
       },
       {
-        title: "Ready to Start! 🚀",
-        description: "That's how it works! Click the button below to start the quiz, then click the extension icon in your toolbar and press \"Start Quiz\"."
+        title: "Step 4: Start the Assistant ▶️",
+        description: "Once you've selected \"Sequential\" format, click the green \"Start Assistant\" button. The extension will automatically read each question, select the correct answer, and click \"Next\" to move through all pages until the quiz is complete."
+      },
+      {
+        title: "Ready to Try! 🚀",
+        description: "That's all you need to know! Click below to start the practice quiz. Remember: open the extension, select \"Sequential\" from the dropdown, and press Start. The extension handles the rest automatically."
       }
     ];
 
