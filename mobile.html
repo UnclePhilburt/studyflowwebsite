@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>StudyFlow - Open on Desktop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -14,103 +14,185 @@
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       color: #1e293b;
       overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated background gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+      animation: gradientShift 10s ease infinite;
+      pointer-events: none;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
     }
 
     .container {
       max-width: 480px;
       margin: 0 auto;
       padding: 0 20px;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Alert Section */
-    .alert-section {
+    /* Hero Section */
+    .hero-section {
       text-align: center;
-      padding: 60px 20px 40px;
-      background: white;
-      border-radius: 0 0 30px 30px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      padding: 50px 20px 40px;
+      animation: fadeInDown 0.6s ease;
     }
 
-    .alert-icon {
-      font-size: 80px;
-      margin-bottom: 20px;
-      animation: bounce 2s infinite;
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin: 0 auto 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-10px); }
     }
 
-    .alert-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: #1e293b;
+    .hero-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: white;
       margin-bottom: 12px;
-      line-height: 1.2;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .alert-subtitle {
-      font-size: 16px;
-      color: #64748b;
+    .hero-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.95);
       line-height: 1.6;
       margin-bottom: 8px;
+      font-weight: 500;
     }
 
-    .alert-detail {
-      font-size: 14px;
-      color: #94a3b8;
-      font-style: italic;
+    .hero-detail {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 400;
     }
 
-    /* Email Section */
+    /* Email Card */
     .email-section {
-      padding: 40px 20px;
+      padding: 20px 20px 30px;
+      animation: fadeInUp 0.6s ease 0.2s both;
     }
 
-    .section-title {
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .email-card {
+      background: white;
+      padding: 32px 24px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .email-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card-title {
       font-size: 20px;
       font-weight: 700;
-      color: white;
-      text-align: center;
-      margin-bottom: 20px;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .email-form {
-      background: white;
-      padding: 30px 24px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .form-label {
-      display: block;
+    .card-subtitle {
       font-size: 14px;
-      font-weight: 600;
-      color: #475569;
-      margin-bottom: 10px;
+      color: #64748b;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .email-input-wrapper {
+      position: relative;
+      margin-bottom: 12px;
     }
 
     .email-input {
       width: 100%;
-      padding: 16px;
+      padding: 16px 16px 16px 48px;
       font-size: 16px;
       border: 2px solid #e2e8f0;
-      border-radius: 12px;
+      border-radius: 14px;
       font-family: 'Inter', sans-serif;
       transition: all 0.2s;
-      margin-bottom: 16px;
+      background: #f8fafc;
     }
 
     .email-input:focus {
       outline: none;
       border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .email-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px;
+      opacity: 0.5;
     }
 
     .submit-btn {
@@ -119,7 +201,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
@@ -128,10 +210,12 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     }
 
     .submit-btn:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
     .submit-btn:disabled {
@@ -141,7 +225,7 @@
 
     .success-message {
       display: none;
-      background: #d1fae5;
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
       color: #065f46;
       padding: 16px;
       border-radius: 12px;
@@ -149,11 +233,13 @@
       font-size: 14px;
       line-height: 1.6;
       text-align: center;
+      font-weight: 600;
+      border: 2px solid #6ee7b7;
     }
 
     .success-message.show {
       display: block;
-      animation: slideIn 0.3s ease;
+      animation: slideIn 0.4s ease;
     }
 
     @keyframes slideIn {
@@ -169,47 +255,78 @@
 
     .error-message {
       display: none;
-      background: #fee;
-      color: #c33;
-      padding: 12px;
-      border-radius: 8px;
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 14px;
+      border-radius: 12px;
       margin-top: 12px;
       font-size: 14px;
       text-align: center;
+      font-weight: 600;
+      border: 2px solid #fca5a5;
     }
 
     .error-message.show {
       display: block;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 24px 0;
+      gap: 12px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .divider-text {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Quick Actions */
     .quick-actions {
-      padding: 30px 20px;
-    }
-
-    .action-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      margin-top: 16px;
     }
 
     .action-btn {
-      background: white;
-      padding: 20px 16px;
-      border-radius: 16px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      padding: 16px;
+      border-radius: 14px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
-      border: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 2px solid #e2e8f0;
     }
 
     .action-btn:active {
       transform: scale(0.95);
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
     }
 
     .action-icon {
-      font-size: 32px;
+      font-size: 28px;
       margin-bottom: 8px;
     }
 
@@ -219,81 +336,117 @@
       color: #475569;
     }
 
-    /* Preview Section */
-    .preview-section {
-      padding: 30px 20px 40px;
-      text-align: center;
+    /* Features Section */
+    .features-section {
+      padding: 30px 20px;
+      animation: fadeInUp 0.6s ease 0.4s both;
     }
 
-    .preview-title {
-      font-size: 18px;
+    .section-title {
+      font-size: 20px;
       font-weight: 700;
       color: white;
+      text-align: center;
       margin-bottom: 20px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .preview-card {
-      background: white;
-      padding: 24px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    .feature-grid {
+      display: grid;
+      gap: 12px;
     }
 
-    .demo-gif {
-      width: 100%;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      background: #f1f5f9;
-      aspect-ratio: 16/9;
+    .feature-item {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 18px;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #94a3b8;
+      align-items: start;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .feature-content {
+      flex: 1;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .feature-desc {
       font-size: 14px;
+      color: #64748b;
+      line-height: 1.5;
     }
 
-    .stats {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
+    /* Stats Section */
+    .stats-section {
+      padding: 30px 20px;
+      animation: fadeInUp 0.6s ease 0.6s both;
     }
 
-    .stat {
+    .stats-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 28px 24px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .stat-item {
       text-align: center;
     }
 
     .stat-value {
-      font-size: 20px;
-      font-weight: 800;
-      color: #667eea;
+      font-size: 26px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       display: block;
+      margin-bottom: 4px;
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: 12px;
       color: #64748b;
-      margin-top: 4px;
+      font-weight: 600;
     }
 
-    /* FAQ */
+    /* FAQ Section */
     .faq-section {
       padding: 30px 20px 40px;
-    }
-
-    .faq-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: white;
-      text-align: center;
-      margin-bottom: 20px;
+      animation: fadeInUp 0.6s ease 0.8s both;
     }
 
     .faq-item {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       padding: 20px;
       border-radius: 16px;
       margin-bottom: 12px;
       cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .faq-item:active {
+      transform: scale(0.98);
     }
 
     .faq-question {
@@ -303,10 +456,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
     }
 
     .faq-arrow {
+      font-size: 12px;
       transition: transform 0.3s;
+      color: #667eea;
+      font-weight: 700;
     }
 
     .faq-item.open .faq-arrow {
@@ -319,103 +476,162 @@
       line-height: 1.6;
       margin-top: 12px;
       display: none;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
     }
 
     .faq-item.open .faq-answer {
       display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     /* Footer */
     .footer {
-      padding: 30px 20px;
+      padding: 30px 20px 40px;
       text-align: center;
       color: white;
     }
 
     .footer-text {
-      font-size: 14px;
-      opacity: 0.9;
-      margin-bottom: 10px;
+      font-size: 13px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+      font-weight: 500;
     }
 
     .desktop-link {
-      font-size: 12px;
-      opacity: 0.7;
+      font-size: 11px;
+      opacity: 0.6;
       word-break: break-all;
+      font-weight: 400;
+    }
+
+    /* Loading animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
     }
   </style>
 </head>
 <body>
-  <!-- Alert Section -->
-  <div class="alert-section">
+  <!-- Hero Section -->
+  <div class="hero-section">
     <div class="container">
-      <div class="alert-icon">🖥️</div>
-      <h1 class="alert-title">You Need a Computer</h1>
-      <p class="alert-subtitle">StudyFlow is a Chrome extension that only works on desktop computers.</p>
-      <p class="alert-detail">Don't worry - we'll help you get there!</p>
+      <div class="logo-icon">📚</div>
+      <h1 class="hero-title">Desktop Required</h1>
+      <p class="hero-subtitle">StudyFlow is a Chrome extension</p>
+      <p class="hero-detail">We'll help you get there!</p>
     </div>
   </div>
 
   <!-- Email Section -->
   <div class="email-section">
     <div class="container">
-      <h2 class="section-title">📧 Send Yourself the Link</h2>
-      <div class="email-form">
-        <label class="form-label">Enter your email address</label>
-        <input
-          type="email"
-          class="email-input"
-          id="emailInput"
-          placeholder="you@example.com"
-          autocomplete="email"
-        >
-        <button class="submit-btn" id="submitBtn">
-          <span>✉️</span>
+      <div class="email-card">
+        <h2 class="card-title">
+          <span>📧</span>
           <span>Email Me the Link</span>
+        </h2>
+        <p class="card-subtitle">We'll send the download link to your inbox so you can open it on your computer.</p>
+
+        <div class="email-input-wrapper">
+          <span class="email-icon">✉️</span>
+          <input
+            type="email"
+            class="email-input"
+            id="emailInput"
+            placeholder="you@example.com"
+            autocomplete="email"
+          >
+        </div>
+
+        <button class="submit-btn" id="submitBtn">
+          <span>Send Link</span>
         </button>
+
         <div class="success-message" id="successMessage">
           <strong>✓ Email sent!</strong><br>
           Check your inbox and open the link on your computer.
         </div>
         <div class="error-message" id="errorMessage"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <div class="container">
-      <div class="action-grid">
-        <button class="action-btn" onclick="copyLink()">
-          <div class="action-icon">📋</div>
-          <div class="action-label">Copy Link</div>
-        </button>
-        <button class="action-btn" onclick="shareLink()">
-          <div class="action-icon">📤</div>
-          <div class="action-label">Share Link</div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Preview Section -->
-  <div class="preview-section">
-    <div class="container">
-      <h2 class="preview-title">See What You're Missing</h2>
-      <div class="preview-card">
-        <div class="demo-gif">
-          🎬 Demo Video
+        <div class="divider">
+          <span class="divider-text">Or</span>
         </div>
-        <div class="stats">
-          <div class="stat">
+
+        <div class="quick-actions">
+          <button class="action-btn" onclick="copyLink()">
+            <div class="action-icon">📋</div>
+            <div class="action-label">Copy Link</div>
+          </button>
+          <button class="action-btn" onclick="shareLink()">
+            <div class="action-icon">📤</div>
+            <div class="action-label">Share Link</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="features-section">
+    <div class="container">
+      <h2 class="section-title">✨ What You'll Get</h2>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-content">
+            <div class="feature-title">AI-Powered Answers</div>
+            <div class="feature-desc">Instantly answers multiple choice, fill-in-blank, and essay questions</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-content">
+            <div class="feature-title">10x Faster Quizzes</div>
+            <div class="feature-desc">Complete quizzes in seconds instead of hours</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🎓</div>
+          <div class="feature-content">
+            <div class="feature-title">Works Everywhere</div>
+            <div class="feature-desc">Canvas, Blackboard, Moodle, and more</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="container">
+      <h2 class="section-title">📊 Trusted by Students</h2>
+      <div class="stats-card">
+        <div class="stats-grid">
+          <div class="stat-item">
             <span class="stat-value">2M+</span>
             <span class="stat-label">Questions</span>
           </div>
-          <div class="stat">
+          <div class="stat-item">
             <span class="stat-value">10K+</span>
             <span class="stat-label">Students</span>
           </div>
-          <div class="stat">
+          <div class="stat-item">
             <span class="stat-value">4.9★</span>
             <span class="stat-label">Rating</span>
           </div>
@@ -427,7 +643,7 @@
   <!-- FAQ Section -->
   <div class="faq-section">
     <div class="container">
-      <h2 class="faq-title">Quick Questions</h2>
+      <h2 class="section-title">❓ Quick Questions</h2>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-question">
           <span>Why desktop only?</span>
@@ -461,8 +677,8 @@
   <!-- Footer -->
   <div class="footer">
     <div class="container">
-      <p class="footer-text">Visit this site on your computer to download:</p>
-      <p class="desktop-link">https://unclephilburt.github.io/studyflowwebsite/</p>
+      <p class="footer-text">Visit on your computer:</p>
+      <p class="desktop-link">unclephilburt.github.io/studyflowwebsite</p>
     </div>
   </div>
 
@@ -475,17 +691,20 @@
       const successMsg = document.getElementById('successMessage');
       const errorMsg = document.getElementById('errorMessage');
 
+      // Hide previous messages
+      successMsg.classList.remove('show');
+      errorMsg.classList.remove('show');
+
       // Validate email
       if (!email || !email.includes('@')) {
         errorMsg.textContent = 'Please enter a valid email address';
         errorMsg.classList.add('show');
-        setTimeout(() => errorMsg.classList.remove('show'), 3000);
         return;
       }
 
-      // Disable button
+      // Disable button and show loading
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>⏳</span><span>Sending...</span>';
+      submitBtn.innerHTML = '<div class="loading-spinner"></div><span>Sending...</span>';
 
       try {
         const response = await fetch(`${API_URL}/send-download-link`, {
@@ -502,7 +721,7 @@
           submitBtn.innerHTML = '<span>✓</span><span>Sent!</span>';
           setTimeout(() => {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>✉️</span><span>Email Me the Link</span>';
+            submitBtn.innerHTML = '<span>Send Link</span>';
           }, 3000);
         } else {
           throw new Error(data.error || 'Failed to send email');
@@ -511,15 +730,26 @@
         errorMsg.textContent = error.message || 'Something went wrong. Please try again.';
         errorMsg.classList.add('show');
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>✉️</span><span>Email Me the Link</span>';
-        setTimeout(() => errorMsg.classList.remove('show'), 5000);
+        submitBtn.innerHTML = '<span>Send Link</span>';
+      }
+    });
+
+    // Allow Enter key to submit
+    document.getElementById('emailInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('submitBtn').click();
       }
     });
 
     function copyLink() {
       const link = 'https://unclephilburt.github.io/studyflowwebsite/';
       navigator.clipboard.writeText(link).then(() => {
-        alert('Link copied! Paste it in your computer browser.');
+        const btn = event.target.closest('.action-btn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<div class="action-icon">✓</div><div class="action-label">Copied!</div>';
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+        }, 2000);
       });
     }
 
