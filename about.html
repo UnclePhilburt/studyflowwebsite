@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - StudyFlow</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .about-hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+
+    .about-hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .about-hero-subtitle {
+      font-size: 1.5rem;
+      opacity: 0.95;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .about-section {
+      padding: 80px 0;
+    }
+
+    .about-section:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    .about-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .about-section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .about-text {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: #475569;
+      margin-bottom: 1.5rem;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .value-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      border: 2px solid #e5e7eb;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .value-card:hover {
+      border-color: #667eea;
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .value-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .value-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    .value-description {
+      font-size: 1rem;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .timeline {
+      max-width: 700px;
+      margin: 3rem auto;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .timeline-item:nth-child(odd) {
+      flex-direction: row;
+    }
+
+    .timeline-item:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .timeline-content {
+      flex: 1;
+      padding: 1.5rem;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #e5e7eb;
+      margin: 0 2rem;
+    }
+
+    .timeline-date {
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-description {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      background: #667eea;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 0 0 2px #667eea;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+
+    .stats-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1.125rem;
+      opacity: 0.9;
+    }
+
+    .cta-section {
+      background: #0f172a;
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .cta-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .cta-subtitle {
+      font-size: 1.25rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (max-width: 768px) {
+      .about-hero-title {
+        font-size: 2.5rem;
+      }
+
+      .timeline::before {
+        left: 10px;
+      }
+
+      .timeline-item:nth-child(even) {
+        flex-direction: row;
+      }
+
+      .timeline-dot {
+        left: 10px;
+      }
+
+      .timeline-content {
+        margin-left: 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="icon128.png" alt="StudyFlow" style="width: 32px; height: 32px; border-radius: 7px;">
+        <span class="logo-text">StudyFlow</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="index.html#download" class="btn btn-primary">Join Beta</a></li>
+      </ul>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="about-hero">
+    <div class="container">
+      <h1 class="about-hero-title">Building the Future of AI Study Tools</h1>
+      <p class="about-hero-subtitle">We're on a mission to help students learn more efficiently with cutting-edge AI technology</p>
+    </div>
+  </section>
+
+  <!-- Our Story -->
+  <section class="about-section">
+    <div class="container">
+      <div class="about-content">
+        <h2 class="about-section-title">Our Story</h2>
+        <p class="about-text">
+          StudyFlow was born from a simple observation: students spend countless hours on repetitive quiz assignments that don't contribute meaningfully to their learning. As students ourselves, we recognized that valuable study time was being wasted on busy work rather than deep learning and comprehension.
+        </p>
+        <p class="about-text">
+          We built StudyFlow to solve this problem. By leveraging advanced AI technology, we help students automate the repetitive aspects of their coursework, giving them more time to focus on what truly matters—understanding concepts, building critical thinking skills, and preparing for real-world applications.
+        </p>
+        <p class="about-text">
+          What started as a small project has grown into a powerful tool used by students across the country. We're currently in beta, actively working with our founding members to refine the product and build features that truly serve the student community.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Values -->
+  <section class="about-section">
+    <div class="container">
+      <h2 class="about-section-title">Our Values</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">🎯</div>
+          <h3 class="value-title">Student-First</h3>
+          <p class="value-description">Every decision we make prioritizes student needs, feedback, and success. Our founding members directly shape our roadmap.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🚀</div>
+          <h3 class="value-title">Innovation</h3>
+          <p class="value-description">We leverage cutting-edge AI technology to solve real problems. We're constantly pushing boundaries to deliver better results.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🔒</div>
+          <h3 class="value-title">Privacy</h3>
+          <p class="value-description">Your data is yours. We don't store coursework content, and all processing happens securely with bank-level encryption.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+          <h3 class="value-title">Transparency</h3>
+          <p class="value-description">We're honest about what our tool does and doesn't do. No fake stats, no misleading claims—just real value.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">💡</div>
+          <h3 class="value-title">Continuous Learning</h3>
+          <p class="value-description">We're always learning from our users and improving. Beta testing allows us to iterate quickly based on real feedback.</p>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">⚡</div>
+          <h3 class="value-title">Speed & Reliability</h3>
+          <p class="value-description">Time is precious. We build tools that are fast, reliable, and work seamlessly when you need them most.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Journey -->
+  <section class="about-section">
+    <div class="container">
+      <h2 class="about-section-title">Our Journey</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">Early 2024</div>
+            <h3 class="timeline-title">The Idea</h3>
+            <p class="timeline-description">Identified the need for AI-powered study automation while observing students struggle with repetitive Canvas assignments.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">Mid 2024</div>
+            <h3 class="timeline-title">Development Begins</h3>
+            <p class="timeline-description">Built the first prototype using GPT-4 and Claude. Tested on real Canvas quizzes with promising results.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">Late 2024</div>
+            <h3 class="timeline-title">Private Beta Launch</h3>
+            <p class="timeline-description">Launched limited beta with hand-picked testers. Gathered critical feedback and refined the AI voting system.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-date">Today</div>
+            <h3 class="timeline-title">Founding Members Program</h3>
+            <p class="timeline-description">Opening beta to founding members. Building the future of AI study tools with direct input from our early adopters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Banner -->
+  <section class="stats-banner">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">3</div>
+          <div class="stat-label">AI Models Working Together</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Question Types Supported</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Canvas LMS Compatible</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title">Become a Founding Member</h2>
+      <p class="cta-subtitle">Join our beta program and help shape the future of AI study tools. Lock in $4.99/month pricing forever.</p>
+      <a href="index.html#pricing" class="btn btn-primary btn-large">Join Beta Program</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <div class="footer-logo">
+            <img src="icon128.png" alt="StudyFlow" style="width: 32px; height: 32px; border-radius: 7px;">
+            <span>StudyFlow</span>
+          </div>
+          <p class="footer-description">AI-powered study assistant for Canvas LMS</p>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><a href="docs.html">Documentation</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="about.html">About</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4 class="footer-title">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 StudyFlow. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
