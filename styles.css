@@ -1301,13 +1301,24 @@ body.dark-mode .theme-toggle .moon-icon {
 }
 
 /* Responsive Design */
+/* Tablet and Mobile Optimization */
 @media (max-width: 768px) {
+  /* Navigation */
   .nav-links {
     display: none;
   }
 
   .mobile-menu-btn {
     display: flex;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 60px 0 40px;
   }
 
   .hero-container,
@@ -1318,6 +1329,16 @@ body.dark-mode .theme-toggle .moon-icon {
 
   .hero-title {
     font-size: 2.5rem;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
   }
 
   .hero-stats {
@@ -1325,6 +1346,24 @@ body.dark-mode .theme-toggle .moon-icon {
     gap: 1rem;
   }
 
+  /* Buttons */
+  .hero-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .download-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
+    font-size: 0.95rem;
+  }
+
+  /* Steps */
   .steps {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -1334,23 +1373,124 @@ body.dark-mode .theme-toggle .moon-icon {
     display: none;
   }
 
+  /* Grids */
   .pricing-grid,
   .features-grid,
   .faq-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* Section Spacing */
+  section {
+    padding: 60px 0;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+  }
+
+  /* Footer */
   .footer-content {
     grid-template-columns: 1fr;
     gap: 2rem;
+    text-align: center;
   }
 
-  .hero-buttons {
-    flex-direction: column;
+  /* Browser Mockup */
+  .browser-mockup {
+    display: none;
   }
 
-  .download-buttons {
+  /* Demo Quiz */
+  .demo-quiz {
+    padding: 20px;
+  }
+
+  /* Pricing Cards */
+  .pricing-card {
+    padding: 30px 20px;
+  }
+
+  .pricing-urgency {
     flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  /* Safety Section */
+  .detection-info {
+    padding: 30px 20px;
+  }
+
+  .safety-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Small Mobile Optimization */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .hero-stats-mini {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .stat-mini {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-number {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  .feature-card,
+  .pricing-card,
+  .testimonial-card {
+    padding: 20px;
+  }
+
+  .demo-quiz {
+    padding: 16px;
+  }
+
+  .demo-quiz-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .container {
+    padding: 0 16px;
   }
 }
 
@@ -1741,13 +1881,28 @@ body.dark-mode .theme-toggle .moon-icon {
     grid-template-columns: 1fr;
   }
 
+  .detection-info {
+    margin: 30px 0;
+    padding: 30px 20px;
+  }
+
+  .detection-card {
+    padding: 20px;
+  }
+
   .tech-grid {
     grid-template-columns: 1fr;
+  }
+
+  .technical-details {
+    padding: 30px 20px;
+    margin-top: 30px;
   }
 
   .responsibility-notice {
     flex-direction: column;
     text-align: center;
+    padding: 30px 20px;
   }
 
   .notice-icon {
