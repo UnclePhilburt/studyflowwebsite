@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>StudyFlow - Open on Desktop</title>
+  <title>StudyFlow - Download on Desktop</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -14,292 +14,241 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
       min-height: 100vh;
       color: #1e293b;
-      overflow-x: hidden;
-      position: relative;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Animated background gradient */
-    body::before {
-      content: '';
-      position: fixed;
+    /* Header */
+    .header {
+      background: white;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background:
-        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
-      animation: gradientShift 10s ease infinite;
-      pointer-events: none;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
     }
 
-    @keyframes gradientShift {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-
-    .container {
-      max-width: 480px;
+    .header-content {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 20px;
-      position: relative;
-      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    /* Hero Section */
-    .hero-section {
-      text-align: center;
-      padding: 50px 20px 30px;
-      animation: fadeInDown 0.6s ease;
-    }
-
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #1e293b;
     }
 
     .logo-icon {
-      width: 80px;
-      height: 80px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 20px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      margin: 0 auto 24px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-      animation: float 3s ease-in-out infinite;
+      font-size: 20px;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+    .badge {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 48px 20px;
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
     }
 
     .hero-title {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 900;
-      color: white;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
     }
 
     .hero-subtitle {
       font-size: 18px;
-      color: rgba(255, 255, 255, 0.95);
+      opacity: 0.95;
       line-height: 1.6;
-      margin-bottom: 8px;
-      font-weight: 500;
+      margin-bottom: 32px;
+      font-weight: 400;
     }
 
-    .hero-detail {
-      font-size: 15px;
-      color: rgba(255, 255, 255, 0.8);
-      font-weight: 400;
-      line-height: 1.5;
-      max-width: 360px;
+    /* Container */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Section */
+    .section {
+      padding: 48px 20px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      font-size: 16px;
+      color: #64748b;
+      max-width: 480px;
       margin: 0 auto;
     }
 
-    /* Info Badge */
-    .info-badge {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      display: inline-block;
-      margin-top: 16px;
-      backdrop-filter: blur(10px);
-    }
-
     /* Email Card */
-    .email-section {
-      padding: 20px 20px 30px;
-      animation: fadeInUp 0.6s ease 0.2s both;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
     .email-card {
       background: white;
+      border-radius: 16px;
       padding: 32px 24px;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 16px;
     }
 
-    .email-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .card-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-subtitle {
+    .card-label {
       font-size: 14px;
-      color: #64748b;
-      margin-bottom: 20px;
-      line-height: 1.5;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 8px;
+      display: block;
     }
 
-    .email-input-wrapper {
+    .input-wrapper {
       position: relative;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
-    .email-input {
+    .input {
       width: 100%;
-      padding: 16px 16px 16px 48px;
+      padding: 14px 16px;
       font-size: 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 14px;
-      font-family: 'Inter', sans-serif;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-family: inherit;
       transition: all 0.2s;
       background: #f8fafc;
     }
 
-    .email-input:focus {
+    .input:focus {
       outline: none;
       border-color: #667eea;
       background: white;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
-    .email-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 20px;
-      opacity: 0.5;
-    }
-
-    .submit-btn {
+    .btn {
       width: 100%;
-      padding: 18px;
+      padding: 16px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      border-radius: 14px;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 700;
+      font-family: inherit;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     }
 
-    .submit-btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    .btn:active {
+      transform: scale(0.98);
     }
 
-    .submit-btn:disabled {
+    .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    .success-message {
-      display: none;
-      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-      color: #065f46;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 16px;
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1.5px solid #e2e8f0;
+    }
+
+    .alert {
+      padding: 14px 16px;
+      border-radius: 10px;
       font-size: 14px;
-      line-height: 1.6;
-      text-align: center;
-      font-weight: 600;
-      border: 2px solid #6ee7b7;
-    }
-
-    .success-message.show {
-      display: block;
-      animation: slideIn 0.4s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .error-message {
+      margin-top: 16px;
       display: none;
+      font-weight: 500;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .alert-error {
       background: #fee2e2;
       color: #991b1b;
-      padding: 14px;
-      border-radius: 12px;
-      margin-top: 12px;
-      font-size: 14px;
-      text-align: center;
-      font-weight: 600;
-      border: 2px solid #fca5a5;
+      border: 1px solid #fca5a5;
     }
 
-    .error-message.show {
-      display: block;
-      animation: shake 0.5s;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    /* Divider */
     .divider {
       display: flex;
       align-items: center;
-      text-align: center;
       margin: 24px 0;
-      gap: 12px;
+      gap: 16px;
     }
 
     .divider::before,
@@ -314,139 +263,99 @@
       font-size: 13px;
       color: #94a3b8;
       font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    /* Quick Actions */
-    .quick-actions {
+    .btn-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 16px;
     }
 
-    .action-btn {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      padding: 16px;
-      border-radius: 14px;
-      text-align: center;
+    .btn-icon {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      color: #475569;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      border: 2px solid #e2e8f0;
-    }
-
-    .action-btn:active {
-      transform: scale(0.95);
-      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-    }
-
-    .action-icon {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    .action-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #475569;
-    }
-
-    /* Section Styling */
-    .info-section {
-      padding: 30px 20px;
-      animation: fadeInUp 0.6s ease 0.4s both;
-    }
-
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: white;
-      text-align: center;
-      margin-bottom: 20px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Requirements Card */
-    .requirements-card {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 28px 24px;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
-    }
-
-    .requirement-item {
       display: flex;
-      align-items: start;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon:active {
+      transform: scale(0.96);
+      background: #f8fafc;
+    }
+
+    .btn-icon span:first-child {
+      font-size: 24px;
+    }
+
+    /* Cards */
+    .card-grid {
+      display: grid;
       gap: 16px;
-      margin-bottom: 20px;
     }
 
-    .requirement-item:last-child {
-      margin-bottom: 0;
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #f1f5f9;
     }
 
-    .requirement-icon {
-      font-size: 28px;
-      flex-shrink: 0;
+    .card-icon {
       width: 48px;
       height: 48px;
       background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid #bae6fd;
+      font-size: 24px;
+      margin-bottom: 16px;
+      border: 1px solid #bae6fd;
     }
 
-    .requirement-content {
-      flex: 1;
-      padding-top: 4px;
-    }
-
-    .requirement-title {
-      font-size: 16px;
+    .card-title {
+      font-size: 18px;
       font-weight: 700;
       color: #1e293b;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
 
-    .requirement-desc {
-      font-size: 14px;
+    .card-desc {
+      font-size: 15px;
       color: #64748b;
       line-height: 1.6;
     }
 
-    /* How It Works */
-    .steps-card {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 28px 24px;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
+    /* Steps */
+    .steps {
+      display: grid;
+      gap: 24px;
     }
 
-    .step-item {
+    .step {
       display: flex;
-      align-items: start;
       gap: 16px;
-      margin-bottom: 24px;
       position: relative;
     }
 
-    .step-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .step-item:not(:last-child)::after {
+    .step:not(:last-child)::after {
       content: '';
       position: absolute;
       left: 23px;
       top: 48px;
       bottom: -24px;
       width: 2px;
-      background: linear-gradient(180deg, #bae6fd 0%, transparent 100%);
+      background: linear-gradient(180deg, #e2e8f0 0%, transparent 100%);
     }
 
     .step-number {
@@ -454,49 +363,48 @@
       height: 48px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 20px;
       font-weight: 800;
       flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
     }
 
     .step-content {
       flex: 1;
-      padding-top: 4px;
+      padding-top: 2px;
     }
 
     .step-title {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       color: #1e293b;
       margin-bottom: 6px;
     }
 
     .step-desc {
-      font-size: 14px;
+      font-size: 15px;
       color: #64748b;
       line-height: 1.6;
     }
 
-    /* Features Grid */
-    .feature-grid {
+    /* Feature List */
+    .feature-list {
       display: grid;
       gap: 12px;
     }
 
-    .feature-item {
-      background: rgba(255, 255, 255, 0.95);
+    .feature {
+      background: white;
+      border-radius: 12px;
       padding: 20px;
-      border-radius: 18px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       display: flex;
-      align-items: start;
       gap: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      backdrop-filter: blur(10px);
+      border: 1px solid #f1f5f9;
     }
 
     .feature-icon {
@@ -522,26 +430,19 @@
     }
 
     /* Stats */
-    .stats-card {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 28px 24px;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
-    }
-
-    .stats-grid {
+    .stats {
+      background: white;
+      border-radius: 12px;
+      padding: 32px 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .stat-item {
+      gap: 24px;
       text-align: center;
     }
 
     .stat-value {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
@@ -551,94 +452,88 @@
     }
 
     .stat-label {
-      font-size: 12px;
+      font-size: 13px;
       color: #64748b;
       font-weight: 600;
     }
 
     /* FAQ */
-    .faq-item {
-      background: rgba(255, 255, 255, 0.95);
+    .faq {
+      background: white;
+      border-radius: 12px;
       padding: 20px;
-      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       margin-bottom: 12px;
       cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #f1f5f9;
+      transition: all 0.2s;
     }
 
-    .faq-item:active {
-      transform: scale(0.98);
+    .faq:active {
+      transform: scale(0.99);
     }
 
     .faq-question {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       color: #1e293b;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
 
     .faq-arrow {
-      font-size: 12px;
-      transition: transform 0.3s;
       color: #667eea;
-      font-weight: 700;
+      font-size: 14px;
+      transition: transform 0.3s;
+      flex-shrink: 0;
     }
 
-    .faq-item.open .faq-arrow {
+    .faq.open .faq-arrow {
       transform: rotate(180deg);
     }
 
     .faq-answer {
-      font-size: 14px;
+      font-size: 15px;
       color: #64748b;
       line-height: 1.6;
       margin-top: 12px;
-      display: none;
       padding-top: 12px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #f1f5f9;
+      display: none;
     }
 
-    .faq-item.open .faq-answer {
+    .faq.open .faq-answer {
       display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
 
     /* Footer */
     .footer {
-      padding: 30px 20px 40px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      padding: 40px 20px;
       text-align: center;
-      color: white;
+      color: #64748b;
     }
 
     .footer-text {
-      font-size: 13px;
-      opacity: 0.8;
+      font-size: 14px;
       margin-bottom: 8px;
-      font-weight: 500;
     }
 
-    .desktop-link {
-      font-size: 11px;
-      opacity: 0.6;
-      word-break: break-all;
-      font-weight: 400;
+    .footer-link {
+      font-size: 13px;
+      color: #667eea;
+      font-weight: 600;
     }
 
-    /* Loading animation */
+    /* Loading spinner */
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    .loading-spinner {
+    .spinner {
       display: inline-block;
       width: 16px;
       height: 16px;
@@ -647,250 +542,267 @@
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
     }
+
+    /* Background pattern */
+    .section-bg {
+      background:
+        linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
   </style>
 </head>
 <body>
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <div class="container">
-      <div class="logo-icon">📚</div>
-      <h1 class="hero-title">StudyFlow Suite</h1>
-      <p class="hero-subtitle">AI-Powered Quiz Automation</p>
-      <p class="hero-detail">Complete quizzes 10x faster with AI. Works on Canvas, Blackboard, Moodle, and more.</p>
-      <div class="info-badge">Chrome Extension • Desktop Only</div>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">📚</div>
+        <span>StudyFlow</span>
+      </div>
+      <div class="badge">Chrome Extension</div>
     </div>
   </div>
 
-  <!-- Email Section -->
-  <div class="email-section">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">Desktop Required</div>
+      <h1 class="hero-title">AI Quiz Automation for Students</h1>
+      <p class="hero-subtitle">Complete Canvas, Blackboard, and Moodle quizzes 10x faster with advanced AI. Works on desktop computers only.</p>
+    </div>
+  </div>
+
+  <!-- Email CTA -->
+  <div class="section">
     <div class="container">
       <div class="email-card">
-        <h2 class="card-title">
-          <span>📧</span>
-          <span>Get Download Link via Email</span>
-        </h2>
-        <p class="card-subtitle">Enter your email and we'll send you the download link to open on your computer.</p>
-
-        <div class="email-input-wrapper">
-          <span class="email-icon">✉️</span>
+        <label class="card-label">Get Download Link via Email</label>
+        <div class="input-wrapper">
           <input
             type="email"
-            class="email-input"
+            class="input"
             id="emailInput"
-            placeholder="you@example.com"
+            placeholder="Enter your email address"
             autocomplete="email"
           >
         </div>
-
-        <button class="submit-btn" id="submitBtn">
+        <button class="btn" id="submitBtn">
           <span>Send Download Link</span>
         </button>
-
-        <div class="success-message" id="successMessage">
-          <strong>✓ Email sent!</strong><br>
-          Check your inbox and open the link on your computer.
+        <div class="alert alert-success" id="successMessage">
+          <strong>✓ Email sent!</strong> Check your inbox and open the link on your computer.
         </div>
-        <div class="error-message" id="errorMessage"></div>
+        <div class="alert alert-error" id="errorMessage"></div>
 
         <div class="divider">
-          <span class="divider-text">Or</span>
+          <span class="divider-text">or</span>
         </div>
 
-        <div class="quick-actions">
-          <button class="action-btn" onclick="copyLink()">
-            <div class="action-icon">📋</div>
-            <div class="action-label">Copy Link</div>
+        <div class="btn-grid">
+          <button class="btn-icon" onclick="copyLink()">
+            <span>📋</span>
+            <span>Copy Link</span>
           </button>
-          <button class="action-btn" onclick="shareLink()">
-            <div class="action-icon">📤</div>
-            <div class="action-label">Share Link</div>
+          <button class="btn-icon" onclick="shareLink()">
+            <span>📤</span>
+            <span>Share</span>
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Requirements Section -->
-  <div class="info-section">
+  <!-- Requirements -->
+  <div class="section section-bg">
     <div class="container">
-      <h2 class="section-title">💻 What You'll Need</h2>
-      <div class="requirements-card">
-        <div class="requirement-item">
-          <div class="requirement-icon">🖥️</div>
-          <div class="requirement-content">
-            <div class="requirement-title">Desktop or Laptop Computer</div>
-            <div class="requirement-desc">Chrome extensions only work on desktop computers, not mobile devices. Mac or Windows both work perfectly.</div>
-          </div>
+      <div class="section-header">
+        <h2 class="section-title">What You'll Need</h2>
+        <p class="section-subtitle">Simple requirements to get started with StudyFlow</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">💻</div>
+          <h3 class="card-title">Desktop Computer</h3>
+          <p class="card-desc">Works on Mac or Windows laptops and desktops. Chrome extensions cannot be installed on mobile devices.</p>
         </div>
-        <div class="requirement-item">
-          <div class="requirement-icon">🌐</div>
-          <div class="requirement-content">
-            <div class="requirement-title">Google Chrome Browser</div>
-            <div class="requirement-desc">StudyFlow is a Chrome extension. You'll need Chrome installed on your computer (it's free to download).</div>
-          </div>
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <h3 class="card-title">Chrome Browser</h3>
+          <p class="card-desc">Free to download from google.com/chrome. StudyFlow is a Chrome extension for seamless integration.</p>
         </div>
-        <div class="requirement-item">
-          <div class="requirement-icon">🎓</div>
-          <div class="requirement-content">
-            <div class="requirement-title">Access to Your Learning Platform</div>
-            <div class="requirement-desc">Works with Canvas, Blackboard, Moodle, McGraw Hill, Pearson, and 100+ other quiz platforms.</div>
-          </div>
+        <div class="card">
+          <div class="card-icon">🎓</div>
+          <h3 class="card-title">LMS Access</h3>
+          <p class="card-desc">Compatible with Canvas, Blackboard, Moodle, McGraw Hill, Pearson, and 100+ learning platforms.</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- How It Works -->
-  <div class="info-section" style="animation-delay: 0.5s;">
+  <div class="section">
     <div class="container">
-      <h2 class="section-title">🚀 How It Works</h2>
-      <div class="steps-card">
-        <div class="step-item">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <div class="step-title">Open Link on Your Computer</div>
-            <div class="step-desc">Use the email link or copy/paste the URL into Chrome on your desktop or laptop.</div>
+      <div class="section-header">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Get started in minutes with these simple steps</p>
+      </div>
+      <div class="email-card">
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-title">Open Link on Computer</div>
+              <div class="step-desc">Use the email link or paste the URL into Chrome on your desktop or laptop.</div>
+            </div>
           </div>
-        </div>
-        <div class="step-item">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <div class="step-title">Install the Extension</div>
-            <div class="step-desc">Click "Add to Chrome" - takes just 10 seconds. The extension is free to try with 10 questions per day.</div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-title">Install Extension</div>
+              <div class="step-desc">Click "Add to Chrome" - takes 10 seconds. Free plan includes 10 questions per day.</div>
+            </div>
           </div>
-        </div>
-        <div class="step-item">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <div class="step-title">Create Your Account</div>
-            <div class="step-desc">Sign up with your email to start your free trial. No credit card required for the free plan.</div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-title">Create Account</div>
+              <div class="step-desc">Sign up with your email. No credit card required for the free plan.</div>
+            </div>
           </div>
-        </div>
-        <div class="step-item">
-          <div class="step-number">4</div>
-          <div class="step-content">
-            <div class="step-title">Start Answering Quizzes</div>
-            <div class="step-desc">Navigate to any quiz on Canvas, Blackboard, or Moodle. Click the extension and let AI do the work!</div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <div class="step-title">Start Answering</div>
+              <div class="step-desc">Navigate to any quiz and click the extension. AI handles the rest automatically.</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Features Section -->
-  <div class="info-section" style="animation-delay: 0.6s;">
+  <!-- Features -->
+  <div class="section section-bg">
     <div class="container">
-      <h2 class="section-title">✨ What You Get</h2>
-      <div class="feature-grid">
-        <div class="feature-item">
+      <div class="section-header">
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-subtitle">Everything you need for automated quiz completion</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature">
           <div class="feature-icon">🤖</div>
           <div class="feature-content">
-            <div class="feature-title">AI-Powered Answers</div>
-            <div class="feature-desc">Advanced AI analyzes questions and provides accurate answers for multiple choice, true/false, fill-in-blank, and essay questions.</div>
+            <div class="feature-title">AI-Powered Intelligence</div>
+            <div class="feature-desc">Advanced AI handles multiple choice, true/false, fill-in-blank, and essay questions with high accuracy.</div>
           </div>
         </div>
-        <div class="feature-item">
+        <div class="feature">
           <div class="feature-icon">⚡</div>
           <div class="feature-content">
             <div class="feature-title">10x Faster Completion</div>
-            <div class="feature-desc">Complete quizzes in seconds instead of hours. Save 5+ hours per week on coursework and focus on what matters.</div>
+            <div class="feature-desc">Complete quizzes in seconds instead of hours. Save 5+ hours per week on coursework.</div>
           </div>
         </div>
-        <div class="feature-item">
+        <div class="feature">
           <div class="feature-icon">🎓</div>
           <div class="feature-content">
-            <div class="feature-title">Works on All Platforms</div>
-            <div class="feature-desc">Compatible with Canvas, Blackboard, Moodle, McGraw Hill, Pearson, Cengage, and 100+ other learning management systems.</div>
+            <div class="feature-title">Universal Compatibility</div>
+            <div class="feature-desc">Works with Canvas, Blackboard, Moodle, McGraw Hill, Pearson, Cengage, and 100+ platforms.</div>
           </div>
         </div>
-        <div class="feature-item">
+        <div class="feature">
           <div class="feature-icon">🔒</div>
           <div class="feature-content">
             <div class="feature-title">Safe & Secure</div>
-            <div class="feature-desc">All processing happens locally in your browser. Bank-level encryption protects your data. We never store your quiz answers.</div>
+            <div class="feature-desc">Bank-level encryption. All processing happens locally. We never store your quiz answers.</div>
           </div>
         </div>
-        <div class="feature-item">
+        <div class="feature">
           <div class="feature-icon">💰</div>
           <div class="feature-content">
-            <div class="feature-title">Free to Start</div>
-            <div class="feature-desc">Try free with 10 questions per day. Upgrade to Pro ($4.99/month) for unlimited questions and premium features.</div>
+            <div class="feature-title">Free to Try</div>
+            <div class="feature-desc">10 questions per day on free plan. Pro plan is $4.99/month for unlimited questions.</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats Section -->
-  <div class="info-section" style="animation-delay: 0.7s;">
+  <!-- Stats -->
+  <div class="section">
     <div class="container">
-      <h2 class="section-title">📊 Trusted by Students Worldwide</h2>
-      <div class="stats-card">
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value">2M+</span>
-            <span class="stat-label">Questions Answered</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">10K+</span>
-            <span class="stat-label">Active Students</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">4.9★</span>
-            <span class="stat-label">Average Rating</span>
-          </div>
+      <div class="section-header">
+        <h2 class="section-title">Trusted by Students</h2>
+        <p class="section-subtitle">Join thousands of students saving time every day</p>
+      </div>
+      <div class="stats">
+        <div>
+          <div class="stat-value">2M+</div>
+          <div class="stat-label">Questions Answered</div>
+        </div>
+        <div>
+          <div class="stat-value">10K+</div>
+          <div class="stat-label">Active Students</div>
+        </div>
+        <div>
+          <div class="stat-value">4.9★</div>
+          <div class="stat-label">Average Rating</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- FAQ Section -->
-  <div class="info-section" style="animation-delay: 0.8s;">
+  <!-- FAQ -->
+  <div class="section section-bg">
     <div class="container">
-      <h2 class="section-title">❓ Frequently Asked Questions</h2>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-question">
-          <span>Why can't I install it on mobile?</span>
-          <span class="faq-arrow">▼</span>
-        </div>
-        <div class="faq-answer">
-          StudyFlow is a Chrome browser extension, and Chrome extensions can only be installed on desktop/laptop computers. This is a Chrome limitation, not ours. However, you can email yourself the link and install it on any desktop or laptop (Mac or Windows).
-        </div>
+      <div class="section-header">
+        <h2 class="section-title">Common Questions</h2>
+        <p class="section-subtitle">Everything you need to know about StudyFlow</p>
       </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-question">
-          <span>How much does it cost?</span>
-          <span class="faq-arrow">▼</span>
+      <div>
+        <div class="faq" onclick="this.classList.toggle('open')">
+          <div class="faq-question">
+            <span>Why can't I install it on mobile?</span>
+            <span class="faq-arrow">▼</span>
+          </div>
+          <div class="faq-answer">
+            StudyFlow is a Chrome browser extension. Chrome extensions can only be installed on desktop or laptop computers - this is a Chrome platform limitation. However, you can email yourself the link and install it on any Mac or Windows computer.
+          </div>
         </div>
-        <div class="faq-answer">
-          StudyFlow is free to try with 10 questions per day - perfect for testing it out. If you need more, the Pro plan is $4.99/month and includes unlimited questions, all question types (essay, fill-in-blank, multiple choice), and priority support.
+        <div class="faq" onclick="this.classList.toggle('open')">
+          <div class="faq-question">
+            <span>How much does it cost?</span>
+            <span class="faq-arrow">▼</span>
+          </div>
+          <div class="faq-answer">
+            StudyFlow offers a free plan with 10 questions per day - perfect for testing it out. The Pro plan costs $4.99/month and includes unlimited questions, all question types (multiple choice, essay, fill-in-blank), and priority support.
+          </div>
         </div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-question">
-          <span>What platforms does it work with?</span>
-          <span class="faq-arrow">▼</span>
+        <div class="faq" onclick="this.classList.toggle('open')">
+          <div class="faq-question">
+            <span>What learning platforms are supported?</span>
+            <span class="faq-arrow">▼</span>
+          </div>
+          <div class="faq-answer">
+            StudyFlow works with Canvas, Blackboard, Moodle, McGraw Hill Connect, Pearson MyLab, Cengage WebAssign, Top Hat, Wiley, and 100+ other learning management systems. If your school uses online quizzes, chances are StudyFlow supports it.
+          </div>
         </div>
-        <div class="faq-answer">
-          StudyFlow works with Canvas, Blackboard, Moodle, McGraw Hill Connect, Pearson MyLab, Cengage WebAssign, Top Hat, and 100+ other learning platforms. If your school uses online quizzes, chances are StudyFlow supports it.
+        <div class="faq" onclick="this.classList.toggle('open')">
+          <div class="faq-question">
+            <span>Is my data safe and secure?</span>
+            <span class="faq-arrow">▼</span>
+          </div>
+          <div class="faq-answer">
+            Absolutely. StudyFlow runs entirely in your Chrome browser using bank-level encryption. We never store your quiz answers or personally identifiable information on our servers. Your privacy and security are our highest priorities.
+          </div>
         </div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-question">
-          <span>Is it safe and secure?</span>
-          <span class="faq-arrow">▼</span>
-        </div>
-        <div class="faq-answer">
-          Absolutely. StudyFlow runs locally in your Chrome browser. We use bank-level encryption to protect your data, and we never store your quiz answers or personally identifiable information on our servers. Your privacy and security are our top priorities.
-        </div>
-      </div>
-      <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-question">
-          <span>Can I try it before paying?</span>
-          <span class="faq-arrow">▼</span>
-        </div>
-        <div class="faq-answer">
-          Yes! The free plan includes 10 questions per day with no credit card required. This lets you test StudyFlow with real quizzes before deciding to upgrade. You can try it risk-free.
+        <div class="faq" onclick="this.classList.toggle('open')">
+          <div class="faq-question">
+            <span>Can I try it for free first?</span>
+            <span class="faq-arrow">▼</span>
+          </div>
+          <div class="faq-answer">
+            Yes! The free plan includes 10 questions per day with no credit card required. This lets you test StudyFlow with real quizzes on your learning platform before deciding to upgrade. Try it completely risk-free.
+          </div>
         </div>
       </div>
     </div>
@@ -899,8 +811,8 @@
   <!-- Footer -->
   <div class="footer">
     <div class="container">
-      <p class="footer-text">Visit on your computer to get started:</p>
-      <p class="desktop-link">unclephilburt.github.io/studyflowwebsite</p>
+      <p class="footer-text">Visit on your computer to get started</p>
+      <a href="https://unclephilburt.github.io/studyflowwebsite/" class="footer-link">unclephilburt.github.io/studyflowwebsite</a>
     </div>
   </div>
 
@@ -926,7 +838,7 @@
 
       // Disable button and show loading
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<div class="loading-spinner"></div><span>Sending...</span>';
+      submitBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
 
       try {
         const response = await fetch(`${API_URL}/send-download-link`, {
@@ -940,7 +852,7 @@
         if (response.ok) {
           successMsg.classList.add('show');
           document.getElementById('emailInput').value = '';
-          submitBtn.innerHTML = '<span>✓</span><span>Sent!</span>';
+          submitBtn.innerHTML = '<span>✓ Sent!</span>';
           setTimeout(() => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<span>Send Download Link</span>';
@@ -956,7 +868,7 @@
       }
     });
 
-    // Allow Enter key to submit
+    // Enter key support
     document.getElementById('emailInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         document.getElementById('submitBtn').click();
@@ -966,9 +878,9 @@
     function copyLink() {
       const link = 'https://unclephilburt.github.io/studyflowwebsite/';
       navigator.clipboard.writeText(link).then(() => {
-        const btn = event.target.closest('.action-btn');
+        const btn = event.target.closest('.btn-icon');
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<div class="action-icon">✓</div><div class="action-label">Copied!</div>';
+        btn.innerHTML = '<span>✓</span><span>Copied!</span>';
         setTimeout(() => {
           btn.innerHTML = originalHTML;
         }, 2000);
@@ -979,7 +891,7 @@
       if (navigator.share) {
         navigator.share({
           title: 'StudyFlow - AI Quiz Automation',
-          text: 'Check out StudyFlow! Open on desktop to download:',
+          text: 'Complete quizzes 10x faster with AI. Open on desktop:',
           url: 'https://unclephilburt.github.io/studyflowwebsite/'
         });
       } else {
