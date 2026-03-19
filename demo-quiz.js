@@ -2,35 +2,35 @@
 const demoQuestions = [
   {
     type: 'multiple-choice',
-    title: 'Multiple Choice Question',
-    question: '<strong>Question 1:</strong> What is the capital of France?',
+    title: 'Question 1',
+    question: 'A patient with hypertension is prescribed a thiazide diuretic. Which of the following electrolyte imbalances should the nurse monitor for?',
     answers: [
-      { text: 'A) London', correct: false },
-      { text: 'B) Paris', correct: true },
-      { text: 'C) Berlin', correct: false },
-      { text: 'D) Madrid', correct: false }
+      { text: 'Hypernatremia', correct: false },
+      { text: 'Hypokalemia', correct: true },
+      { text: 'Hypercalcemia', correct: false },
+      { text: 'Hypermagnesemia', correct: false }
     ],
     explanation: 'AI identified and clicked the correct answer automatically.'
   },
   {
     type: 'fill-in-blank',
-    title: 'Fill in the Blank',
-    question: '<strong>Question 2:</strong> The process by which plants make food using sunlight is called _______.',
-    correctAnswer: 'photosynthesis',
+    title: 'Question 2',
+    question: 'The normal range for adult heart rate is _______ to _______ beats per minute.',
+    correctAnswer: '60 to 100',
     explanation: 'AI automatically filled in the correct answer for you.'
   },
   {
     type: 'short-answer',
-    title: 'Short Answer Question',
-    question: '<strong>Question 3:</strong> Briefly explain what DNA stands for and its function.',
-    answer: 'DNA stands for Deoxyribonucleic Acid. It is a molecule that carries genetic instructions for the development, functioning, growth, and reproduction of all known organisms.',
+    title: 'Question 3',
+    question: 'List three signs and symptoms of hypoglycemia.',
+    answer: 'Three signs and symptoms of hypoglycemia include: tremors/shakiness, diaphoresis (excessive sweating), and confusion or difficulty concentrating. Other symptoms may include tachycardia, hunger, and dizziness.',
     explanation: 'AI wrote a concise short answer response automatically.'
   },
   {
     type: 'essay',
-    title: 'Essay Question',
-    question: '<strong>Question 4:</strong> Discuss the impact of climate change on global ecosystems.',
-    answer: 'Climate change significantly impacts global ecosystems through rising temperatures, altered precipitation patterns, and increased frequency of extreme weather events. These changes affect biodiversity, as many species struggle to adapt to rapidly shifting conditions. Ecosystems such as coral reefs face bleaching and death due to warming oceans, while polar regions experience habitat loss for species like polar bears.\n\nAdditionally, climate change disrupts food chains and migration patterns, leading to cascading effects throughout ecosystems. Agricultural systems are also affected, with changes in crop yields and growing seasons threatening food security. Addressing climate change requires global cooperation to reduce emissions and implement sustainable practices.',
+    title: 'Question 4',
+    question: 'Describe the pathophysiology of Type 2 Diabetes Mellitus and explain how it differs from Type 1 Diabetes.',
+    answer: 'Type 2 Diabetes Mellitus (T2DM) is characterized by insulin resistance and relative insulin deficiency. In T2DM, the body\'s cells become resistant to insulin\'s effects, leading to impaired glucose uptake. The pancreas initially compensates by producing more insulin, but over time, beta cell function declines, resulting in insufficient insulin production.\n\nThis differs significantly from Type 1 Diabetes, which is an autoimmune condition where the immune system destroys pancreatic beta cells, resulting in absolute insulin deficiency. T2DM typically develops gradually in adults and is associated with obesity and lifestyle factors, while Type 1 usually presents acutely in children and young adults. T2DM can often be managed with lifestyle modifications and oral medications initially, whereas Type 1 requires insulin therapy from diagnosis.',
     explanation: 'AI wrote a full multi-paragraph essay response automatically.'
   }
 ];
