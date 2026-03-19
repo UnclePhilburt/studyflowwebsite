@@ -53,7 +53,7 @@
     /* Hero Section */
     .hero-section {
       text-align: center;
-      padding: 50px 20px 40px;
+      padding: 50px 20px 30px;
       animation: fadeInDown 0.6s ease;
     }
 
@@ -108,6 +108,22 @@
       font-size: 15px;
       color: rgba(255, 255, 255, 0.8);
       font-weight: 400;
+      line-height: 1.5;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    /* Info Badge */
+    .info-badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 16px;
+      backdrop-filter: blur(10px);
     }
 
     /* Email Card */
@@ -336,8 +352,8 @@
       color: #475569;
     }
 
-    /* Features Section */
-    .features-section {
+    /* Section Styling */
+    .info-section {
       padding: 30px 20px;
       animation: fadeInUp 0.6s ease 0.4s both;
     }
@@ -351,6 +367,122 @@
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
+    /* Requirements Card */
+    .requirements-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 28px 24px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .requirement-item {
+      display: flex;
+      align-items: start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .requirement-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .requirement-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #bae6fd;
+    }
+
+    .requirement-content {
+      flex: 1;
+      padding-top: 4px;
+    }
+
+    .requirement-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .requirement-desc {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    /* How It Works */
+    .steps-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 28px 24px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: start;
+      gap: 16px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 23px;
+      top: 48px;
+      bottom: -24px;
+      width: 2px;
+      background: linear-gradient(180deg, #bae6fd 0%, transparent 100%);
+    }
+
+    .step-number {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .step-content {
+      flex: 1;
+      padding-top: 4px;
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    /* Features Grid */
     .feature-grid {
       display: grid;
       gap: 12px;
@@ -389,12 +521,7 @@
       line-height: 1.5;
     }
 
-    /* Stats Section */
-    .stats-section {
-      padding: 30px 20px;
-      animation: fadeInUp 0.6s ease 0.6s both;
-    }
-
+    /* Stats */
     .stats-card {
       background: rgba(255, 255, 255, 0.95);
       padding: 28px 24px;
@@ -429,12 +556,7 @@
       font-weight: 600;
     }
 
-    /* FAQ Section */
-    .faq-section {
-      padding: 30px 20px 40px;
-      animation: fadeInUp 0.6s ease 0.8s both;
-    }
-
+    /* FAQ */
     .faq-item {
       background: rgba(255, 255, 255, 0.95);
       padding: 20px;
@@ -532,9 +654,10 @@
   <div class="hero-section">
     <div class="container">
       <div class="logo-icon">📚</div>
-      <h1 class="hero-title">Desktop Required</h1>
-      <p class="hero-subtitle">StudyFlow is a Chrome extension</p>
-      <p class="hero-detail">We'll help you get there!</p>
+      <h1 class="hero-title">StudyFlow Suite</h1>
+      <p class="hero-subtitle">AI-Powered Quiz Automation</p>
+      <p class="hero-detail">Complete quizzes 10x faster with AI. Works on Canvas, Blackboard, Moodle, and more.</p>
+      <div class="info-badge">Chrome Extension • Desktop Only</div>
     </div>
   </div>
 
@@ -544,9 +667,9 @@
       <div class="email-card">
         <h2 class="card-title">
           <span>📧</span>
-          <span>Email Me the Link</span>
+          <span>Get Download Link via Email</span>
         </h2>
-        <p class="card-subtitle">We'll send the download link to your inbox so you can open it on your computer.</p>
+        <p class="card-subtitle">Enter your email and we'll send you the download link to open on your computer.</p>
 
         <div class="email-input-wrapper">
           <span class="email-icon">✉️</span>
@@ -560,7 +683,7 @@
         </div>
 
         <button class="submit-btn" id="submitBtn">
-          <span>Send Link</span>
+          <span>Send Download Link</span>
         </button>
 
         <div class="success-message" id="successMessage">
@@ -587,30 +710,111 @@
     </div>
   </div>
 
-  <!-- Features Section -->
-  <div class="features-section">
+  <!-- Requirements Section -->
+  <div class="info-section">
     <div class="container">
-      <h2 class="section-title">✨ What You'll Get</h2>
+      <h2 class="section-title">💻 What You'll Need</h2>
+      <div class="requirements-card">
+        <div class="requirement-item">
+          <div class="requirement-icon">🖥️</div>
+          <div class="requirement-content">
+            <div class="requirement-title">Desktop or Laptop Computer</div>
+            <div class="requirement-desc">Chrome extensions only work on desktop computers, not mobile devices. Mac or Windows both work perfectly.</div>
+          </div>
+        </div>
+        <div class="requirement-item">
+          <div class="requirement-icon">🌐</div>
+          <div class="requirement-content">
+            <div class="requirement-title">Google Chrome Browser</div>
+            <div class="requirement-desc">StudyFlow is a Chrome extension. You'll need Chrome installed on your computer (it's free to download).</div>
+          </div>
+        </div>
+        <div class="requirement-item">
+          <div class="requirement-icon">🎓</div>
+          <div class="requirement-content">
+            <div class="requirement-title">Access to Your Learning Platform</div>
+            <div class="requirement-desc">Works with Canvas, Blackboard, Moodle, McGraw Hill, Pearson, and 100+ other quiz platforms.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="info-section" style="animation-delay: 0.5s;">
+    <div class="container">
+      <h2 class="section-title">🚀 How It Works</h2>
+      <div class="steps-card">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Open Link on Your Computer</div>
+            <div class="step-desc">Use the email link or copy/paste the URL into Chrome on your desktop or laptop.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Install the Extension</div>
+            <div class="step-desc">Click "Add to Chrome" - takes just 10 seconds. The extension is free to try with 10 questions per day.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Create Your Account</div>
+            <div class="step-desc">Sign up with your email to start your free trial. No credit card required for the free plan.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Start Answering Quizzes</div>
+            <div class="step-desc">Navigate to any quiz on Canvas, Blackboard, or Moodle. Click the extension and let AI do the work!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="info-section" style="animation-delay: 0.6s;">
+    <div class="container">
+      <h2 class="section-title">✨ What You Get</h2>
       <div class="feature-grid">
         <div class="feature-item">
           <div class="feature-icon">🤖</div>
           <div class="feature-content">
             <div class="feature-title">AI-Powered Answers</div>
-            <div class="feature-desc">Instantly answers multiple choice, fill-in-blank, and essay questions</div>
+            <div class="feature-desc">Advanced AI analyzes questions and provides accurate answers for multiple choice, true/false, fill-in-blank, and essay questions.</div>
           </div>
         </div>
         <div class="feature-item">
           <div class="feature-icon">⚡</div>
           <div class="feature-content">
-            <div class="feature-title">10x Faster Quizzes</div>
-            <div class="feature-desc">Complete quizzes in seconds instead of hours</div>
+            <div class="feature-title">10x Faster Completion</div>
+            <div class="feature-desc">Complete quizzes in seconds instead of hours. Save 5+ hours per week on coursework and focus on what matters.</div>
           </div>
         </div>
         <div class="feature-item">
           <div class="feature-icon">🎓</div>
           <div class="feature-content">
-            <div class="feature-title">Works Everywhere</div>
-            <div class="feature-desc">Canvas, Blackboard, Moodle, and more</div>
+            <div class="feature-title">Works on All Platforms</div>
+            <div class="feature-desc">Compatible with Canvas, Blackboard, Moodle, McGraw Hill, Pearson, Cengage, and 100+ other learning management systems.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-content">
+            <div class="feature-title">Safe & Secure</div>
+            <div class="feature-desc">All processing happens locally in your browser. Bank-level encryption protects your data. We never store your quiz answers.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💰</div>
+          <div class="feature-content">
+            <div class="feature-title">Free to Start</div>
+            <div class="feature-desc">Try free with 10 questions per day. Upgrade to Pro ($4.99/month) for unlimited questions and premium features.</div>
           </div>
         </div>
       </div>
@@ -618,22 +822,22 @@
   </div>
 
   <!-- Stats Section -->
-  <div class="stats-section">
+  <div class="info-section" style="animation-delay: 0.7s;">
     <div class="container">
-      <h2 class="section-title">📊 Trusted by Students</h2>
+      <h2 class="section-title">📊 Trusted by Students Worldwide</h2>
       <div class="stats-card">
         <div class="stats-grid">
           <div class="stat-item">
             <span class="stat-value">2M+</span>
-            <span class="stat-label">Questions</span>
+            <span class="stat-label">Questions Answered</span>
           </div>
           <div class="stat-item">
             <span class="stat-value">10K+</span>
-            <span class="stat-label">Students</span>
+            <span class="stat-label">Active Students</span>
           </div>
           <div class="stat-item">
             <span class="stat-value">4.9★</span>
-            <span class="stat-label">Rating</span>
+            <span class="stat-label">Average Rating</span>
           </div>
         </div>
       </div>
@@ -641,34 +845,52 @@
   </div>
 
   <!-- FAQ Section -->
-  <div class="faq-section">
+  <div class="info-section" style="animation-delay: 0.8s;">
     <div class="container">
-      <h2 class="section-title">❓ Quick Questions</h2>
+      <h2 class="section-title">❓ Frequently Asked Questions</h2>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-question">
-          <span>Why desktop only?</span>
+          <span>Why can't I install it on mobile?</span>
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-answer">
-          StudyFlow is a Chrome browser extension. Chrome extensions can only be installed on desktop/laptop computers, not on mobile phones or tablets.
+          StudyFlow is a Chrome browser extension, and Chrome extensions can only be installed on desktop/laptop computers. This is a Chrome limitation, not ours. However, you can email yourself the link and install it on any desktop or laptop (Mac or Windows).
         </div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-question">
-          <span>Is it free?</span>
+          <span>How much does it cost?</span>
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-answer">
-          Yes! Free plan includes 10 questions per day. Pro plan ($4.99/month) gives unlimited questions.
+          StudyFlow is free to try with 10 questions per day - perfect for testing it out. If you need more, the Pro plan is $4.99/month and includes unlimited questions, all question types (essay, fill-in-blank, multiple choice), and priority support.
         </div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
         <div class="faq-question">
-          <span>Is it safe?</span>
+          <span>What platforms does it work with?</span>
           <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-answer">
-          Absolutely. StudyFlow runs locally in your browser. We use bank-level encryption and never store your quiz answers.
+          StudyFlow works with Canvas, Blackboard, Moodle, McGraw Hill Connect, Pearson MyLab, Cengage WebAssign, Top Hat, and 100+ other learning platforms. If your school uses online quizzes, chances are StudyFlow supports it.
+        </div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-question">
+          <span>Is it safe and secure?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Absolutely. StudyFlow runs locally in your Chrome browser. We use bank-level encryption to protect your data, and we never store your quiz answers or personally identifiable information on our servers. Your privacy and security are our top priorities.
+        </div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-question">
+          <span>Can I try it before paying?</span>
+          <span class="faq-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Yes! The free plan includes 10 questions per day with no credit card required. This lets you test StudyFlow with real quizzes before deciding to upgrade. You can try it risk-free.
         </div>
       </div>
     </div>
@@ -677,7 +899,7 @@
   <!-- Footer -->
   <div class="footer">
     <div class="container">
-      <p class="footer-text">Visit on your computer:</p>
+      <p class="footer-text">Visit on your computer to get started:</p>
       <p class="desktop-link">unclephilburt.github.io/studyflowwebsite</p>
     </div>
   </div>
@@ -721,7 +943,7 @@
           submitBtn.innerHTML = '<span>✓</span><span>Sent!</span>';
           setTimeout(() => {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>Send Link</span>';
+            submitBtn.innerHTML = '<span>Send Download Link</span>';
           }, 3000);
         } else {
           throw new Error(data.error || 'Failed to send email');
@@ -730,7 +952,7 @@
         errorMsg.textContent = error.message || 'Something went wrong. Please try again.';
         errorMsg.classList.add('show');
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>Send Link</span>';
+        submitBtn.innerHTML = '<span>Send Download Link</span>';
       }
     });
 
