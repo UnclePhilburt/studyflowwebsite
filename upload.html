@@ -517,6 +517,30 @@
           <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt,image/*">
         </div>
 
+        <!-- Course Metadata Form -->
+        <div style="margin-top: 24px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 1px solid #e5e7eb;">
+          <h3 style="font-size: 14px; font-weight: 700; color: #1f2937; margin-bottom: 16px;">Course Information (Optional but Recommended)</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">University</label>
+              <input type="text" id="university-input" placeholder="e.g., Michigan State University" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Course Code</label>
+              <input type="text" id="course-code-input" placeholder="e.g., BIO 101" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Professor (Optional)</label>
+              <input type="text" id="professor-input" placeholder="e.g., Dr. Smith" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">Semester (Optional)</label>
+              <input type="text" id="semester-input" placeholder="e.g., Fall 2024" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+            </div>
+          </div>
+          <p style="font-size: 12px; color: #6b7280; margin-top: 12px;">💡 Adding course info helps us match you with notes from the same class in the Collective Brain!</p>
+        </div>
+
         <div class="upload-progress" id="upload-progress"></div>
       </div>
 
@@ -659,6 +683,18 @@
       try {
         const formData = new FormData();
         formData.append('file', file);
+
+        // Add course metadata
+        const university = document.getElementById('university-input').value.trim();
+        const courseCode = document.getElementById('course-code-input').value.trim();
+        const professor = document.getElementById('professor-input').value.trim();
+        const semester = document.getElementById('semester-input').value.trim();
+
+        if (university) formData.append('university', university);
+        if (courseCode) formData.append('course_code', courseCode);
+        if (professor) formData.append('professor', professor);
+        if (semester) formData.append('semester', semester);
+
         const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
 
         let progress = 0;
@@ -726,15 +762,21 @@
       notesList.innerHTML = notes.map(note => {
         const icon = getFileIcon(note.filename);
         const date = new Date(note.uploaded_at).toLocaleDateString();
+        const courseInfo = [];
+        if (note.university) courseInfo.push(note.university);
+        if (note.course_code) courseInfo.push(note.course_code);
+        const courseLine = courseInfo.length > 0 ? `<div class="note-meta" style="color: #667eea; font-weight: 600;">📚 ${courseInfo.join(' - ')}</div>` : '';
+        const processingBadge = note.processed ? '' : '<span style="background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">Processing...</span>';
         return `
           <div class="note-card">
             <div class="note-icon">${icon}</div>
             <div class="note-info">
-              <div class="note-name">${note.filename}</div>
+              <div class="note-name">${note.filename} ${processingBadge}</div>
+              ${courseLine}
               <div class="note-meta">${date} • ${note.pages || '?'} pages</div>
             </div>
             <div class="note-actions">
-              <button class="btn-delete" onclick="deleteNote(${note.id})">Delete</button>
+              <button class="btn-delete" onclick="deleteNote('${note.id}')">Delete</button>
             </div>
           </div>
         `;
