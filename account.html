@@ -475,41 +475,42 @@
       }
 
       try {
-        // Get user info
-        const userResponse = await fetch(`${BACKEND_URL}/api/user`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        // Get user info from localStorage first (faster)
+        const userFromStorage = localStorage.getItem('user');
+        if (userFromStorage) {
+          try {
+            const user = JSON.parse(userFromStorage);
 
-        if (userResponse.ok) {
-          const user = await userResponse.json();
+            // Update profile card
+            const userName = user.name || user.email.split('@')[0];
+            document.getElementById('profile-name').textContent = userName;
+            document.getElementById('profile-email').textContent = user.email;
+            document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
 
-          // Update profile card
-          const userName = user.name || user.email.split('@')[0];
-          document.getElementById('profile-name').textContent = userName;
-          document.getElementById('profile-email').textContent = user.email;
-          document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
+            // Update tier
+            let tier = 'Free Plan';
+            if (user.subscription_status === 'active' || user.subscription_status === 'trialing') {
+              tier = 'Pro Plan';
+            } else if (user.is_beta) {
+              tier = 'Beta Tester';
+            }
+            document.getElementById('profile-tier').textContent = tier;
 
-          // Update tier
-          let tier = 'Free Plan';
-          if (user.subscription_status === 'active' || user.subscription_status === 'trialing') {
-            tier = 'Pro Plan';
-          } else if (user.is_beta) {
-            tier = 'Beta Tester';
-          }
-          document.getElementById('profile-tier').textContent = tier;
-
-          // Update member since
-          if (user.created_at) {
-            const date = new Date(user.created_at);
-            document.getElementById('member-since').textContent = date.toLocaleDateString('en-US', {
-              month: 'long',
-              year: 'numeric'
-            });
+            // Update member since
+            if (user.created_at) {
+              const date = new Date(user.created_at);
+              document.getElementById('member-since').textContent = date.toLocaleDateString('en-US', {
+                month: 'long',
+                year: 'numeric'
+              });
+            }
+          } catch (e) {
+            console.error('Error parsing user from localStorage:', e);
           }
         }
 
         // Get notes stats
-        const notesResponse = await fetch(`${BACKEND_URL}/api/notes`, {
+        const notesResponse = await fetch(`${BACKEND_URL}/api/notes/list`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -522,10 +523,17 @@
             totalPages += note.num_pages || 0;
           });
           document.getElementById('total-pages').textContent = totalPages;
+        } else {
+          // If API call fails, just show 0
+          document.getElementById('total-notes').textContent = '0';
+          document.getElementById('total-pages').textContent = '0';
         }
 
       } catch (error) {
         console.error('Error loading profile:', error);
+        // Set defaults on error
+        document.getElementById('total-notes').textContent = '0';
+        document.getElementById('total-pages').textContent = '0';
       }
     }
 
