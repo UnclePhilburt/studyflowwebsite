@@ -402,7 +402,6 @@
           <div class="profile-avatar" id="profile-avatar">S</div>
           <div class="profile-name" id="profile-name">Loading...</div>
           <div class="profile-email" id="profile-email">Loading...</div>
-          <div class="profile-tier" id="profile-tier">Loading...</div>
         </div>
 
         <div class="info-row">
@@ -486,15 +485,6 @@
             document.getElementById('profile-name').textContent = userName;
             document.getElementById('profile-email').textContent = user.email;
             document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
-
-            // Update tier
-            let tier = 'Free Plan';
-            if (user.subscription_tier === 'pro' || user.subscription_status === 'active' || user.subscription_status === 'trialing') {
-              tier = 'Pro Plan';
-            } else if (user.is_beta) {
-              tier = 'Beta Tester';
-            }
-            document.getElementById('profile-tier').textContent = tier;
           } catch (e) {
             console.error('Error parsing user from localStorage:', e);
           }
