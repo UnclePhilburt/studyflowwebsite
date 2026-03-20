@@ -399,6 +399,110 @@
       font-size: 24px;
       margin-bottom: 8px;
     }
+
+    /* Preview Modal */
+    .preview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .preview-modal.active {
+      display: flex;
+    }
+
+    .preview-container {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .preview-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      word-break: break-word;
+      flex: 1;
+      margin-right: 16px;
+    }
+
+    .preview-close {
+      background: #f3f4f6;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 20px;
+      color: #6b7280;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .preview-close:hover {
+      background: #e5e7eb;
+      color: #1f2937;
+    }
+
+    .preview-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .preview-content {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #1f2937;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .preview-pdf-container {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+    }
+
+    .preview-pdf-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+    }
+
+    .preview-loading {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .preview-error {
+      text-align: center;
+      padding: 60px 20px;
+      color: #dc2626;
+    }
   </style>
 </head>
 <body>
@@ -560,7 +664,7 @@
           : '';
 
         return `
-          <div class="note-card">
+          <div class="note-card" onclick="previewNote('${note.id}', '${note.filename.replace(/'/g, "\\'")}')">
             <div class="note-header">
               <div class="note-icon">${fileExt.substring(0, 3)}</div>
               <div class="note-status">${statusBadge}</div>
@@ -578,11 +682,11 @@
                 📅 ${formatDate(note.uploaded_at)}
               </div>
             </div>
-            <div class="note-actions">
-              <button class="btn-action btn-download" onclick="downloadNote('${note.id}', '${note.filename}')">
+            <div class="note-actions" onclick="event.stopPropagation()">
+              <button class="btn-action btn-download" onclick="downloadNote('${note.id}', '${note.filename.replace(/'/g, "\\'")}')">
                 ⬇️ Download
               </button>
-              <button class="btn-action btn-delete" onclick="deleteNote('${note.id}', '${note.filename}')">
+              <button class="btn-action btn-delete" onclick="deleteNote('${note.id}', '${note.filename.replace(/'/g, "\\'")}')">
                 🗑️ Delete
               </button>
             </div>
@@ -704,6 +808,72 @@
       window.location.href = 'login.html';
     }
 
+    // Preview note
+    async function previewNote(noteId, filename) {
+      const modal = document.getElementById('preview-modal');
+      const titleEl = document.getElementById('preview-modal-title');
+      const bodyEl = document.getElementById('preview-modal-body');
+
+      // Show modal
+      modal.classList.add('active');
+      titleEl.textContent = filename;
+      bodyEl.innerHTML = '<div class="preview-loading"><div class="loading-spinner"></div><div class="loading-text">Loading preview...</div></div>';
+
+      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      const fileExt = filename.split('.').pop().toLowerCase();
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load preview');
+
+        if (fileExt === 'pdf') {
+          // PDF preview using iframe
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          bodyEl.innerHTML = `
+            <div class="preview-pdf-container">
+              <iframe src="${url}"></iframe>
+            </div>
+          `;
+        } else if (fileExt === 'txt') {
+          // Text file preview
+          const text = await response.text();
+          bodyEl.innerHTML = `<div class="preview-content">${escapeHtml(text)}</div>`;
+        } else {
+          // Unsupported format
+          bodyEl.innerHTML = `
+            <div class="preview-error">
+              <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
+              <div style="font-size: 16px; margin-bottom: 8px;">Preview not available for ${fileExt.toUpperCase()} files</div>
+              <div style="font-size: 14px; color: #6b7280;">Download the file to view it</div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Preview error:', error);
+        bodyEl.innerHTML = `
+          <div class="preview-error">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 16px;">Failed to load preview</div>
+          </div>
+        `;
+      }
+    }
+
+    function closePreview() {
+      const modal = document.getElementById('preview-modal');
+      modal.classList.remove('active');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     // Initialize
     checkAuth();
 
@@ -711,6 +881,29 @@
     setInterval(() => {
       loadNotes();
     }, 10000);
+
+    // Close modal on background click
+    document.getElementById('preview-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'preview-modal') {
+        closePreview();
+      }
+    });
   </script>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal" id="preview-modal">
+    <div class="preview-container">
+      <div class="preview-header">
+        <div class="preview-title" id="preview-modal-title">Note Preview</div>
+        <button class="preview-close" onclick="closePreview()">×</button>
+      </div>
+      <div class="preview-body" id="preview-modal-body">
+        <div class="preview-loading">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Loading preview...</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
