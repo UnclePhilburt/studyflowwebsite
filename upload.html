@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Notes - StudyFlow NoteFlow</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    .upload-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 20px;
+    }
+
+    .upload-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .upload-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .upload-header h1 {
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .upload-header p {
+      font-size: 18px;
+      opacity: 0.95;
+    }
+
+    .upload-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+
+    .user-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .user-info-banner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .user-details h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+
+    .user-details p {
+      font-size: 13px;
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    .btn-logout {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .upload-zone {
+      border: 3px dashed #d1d5db;
+      border-radius: 16px;
+      padding: 60px 40px;
+      text-align: center;
+      background: #f9fafb;
+      transition: all 0.3s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: #667eea;
+      background: #f0f4ff;
+      transform: scale(1.01);
+    }
+
+    .upload-zone-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.6;
+    }
+
+    .upload-zone h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .upload-zone p {
+      font-size: 15px;
+      color: #6b7280;
+      margin-bottom: 20px;
+    }
+
+    .upload-zone-btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .upload-zone-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .file-types {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 16px;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .upload-progress {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .upload-progress.active {
+      display: block;
+    }
+
+    .progress-item {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .progress-filename {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 14px;
+    }
+
+    .progress-status {
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .progress-bar-container {
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    .notes-list-section {
+      margin-top: 40px;
+    }
+
+    .notes-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .notes-list-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0;
+    }
+
+    .notes-count {
+      font-size: 14px;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .notes-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .note-item {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .note-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .note-info {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex: 1;
+    }
+
+    .note-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .note-details {
+      flex: 1;
+    }
+
+    .note-name {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .note-meta {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .note-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-delete {
+      padding: 8px 16px;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #dc2626;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: #fecaca;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 15px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 30px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 16px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-page">
+    <div class="upload-container">
+      <!-- Back Link -->
+      <a href="index.html" class="back-link">
+        <span>←</span>
+        <span>Back to Home</span>
+      </a>
+
+      <!-- Header -->
+      <div class="upload-header">
+        <h1>📝 Upload Your Notes</h1>
+        <p>Upload your class notes to power AI-guided studying</p>
+      </div>
+
+      <!-- User Banner -->
+      <div class="user-banner">
+        <div class="user-info-banner">
+          <div class="user-avatar">👤</div>
+          <div class="user-details">
+            <h3 id="user-name">Loading...</h3>
+            <p id="user-email">Loading...</p>
+          </div>
+        </div>
+        <button class="btn-logout" id="logout-btn">Sign Out</button>
+      </div>
+
+      <!-- Upload Card -->
+      <div class="upload-card">
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-zone-icon">📤</div>
+          <h3>Drag & Drop Your Notes</h3>
+          <p>or click to browse files</p>
+          <button class="upload-zone-btn" id="browse-btn">Choose Files</button>
+          <p class="file-types">Supports: PDF, JPG, PNG, Word docs, handwritten notes</p>
+          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,image/*">
+        </div>
+
+        <!-- Upload Progress -->
+        <div class="upload-progress" id="upload-progress">
+          <!-- Progress items will be added here -->
+        </div>
+
+        <!-- Notes List -->
+        <div class="notes-list-section">
+          <div class="notes-list-header">
+            <h2>Your Uploaded Notes</h2>
+            <span class="notes-count" id="notes-count">0 notes</span>
+          </div>
+          <div class="notes-list" id="notes-list">
+            <!-- Will be populated by JavaScript -->
+            <div class="empty-state">
+              <div class="empty-state-icon">📚</div>
+              <p>No notes uploaded yet. Upload your first note to get started!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Processing your notes with AI...</p>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    let currentUser = null;
+
+    // Check authentication
+    async function checkAuth() {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/current-user`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Not authenticated');
+        }
+
+        const user = await response.json();
+        currentUser = user;
+
+        document.getElementById('user-name').textContent = user.name || 'User';
+        document.getElementById('user-email').textContent = user.email;
+
+        loadNotes();
+      } catch (error) {
+        console.error('Auth error:', error);
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to sign out?')) {
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'index.html';
+      }
+    });
+
+    // File upload handling
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const browseBtn = document.getElementById('browse-btn');
+
+    browseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    uploadZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      uploadZone.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Highlight drop zone when dragging
+    ['dragenter', 'dragover'].forEach(eventName => {
+      uploadZone.addEventListener(eventName, () => {
+        uploadZone.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      uploadZone.addEventListener(eventName, () => {
+        uploadZone.classList.remove('drag-over');
+      });
+    });
+
+    // Handle dropped files
+    uploadZone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      handleFiles(files);
+    });
+
+    // Handle selected files
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    // Handle file uploads
+    async function handleFiles(files) {
+      if (files.length === 0) return;
+
+      const progressContainer = document.getElementById('upload-progress');
+      progressContainer.classList.add('active');
+      progressContainer.innerHTML = '';
+
+      for (let file of files) {
+        await uploadFile(file);
+      }
+
+      // Reload notes list
+      setTimeout(() => {
+        loadNotes();
+        progressContainer.classList.remove('active');
+      }, 1000);
+    }
+
+    async function uploadFile(file) {
+      const progressItem = document.createElement('div');
+      progressItem.className = 'progress-item';
+      progressItem.innerHTML = `
+        <div class="progress-header">
+          <span class="progress-filename">${file.name}</span>
+          <span class="progress-status">Uploading...</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 0%"></div>
+        </div>
+      `;
+      document.getElementById('upload-progress').appendChild(progressItem);
+
+      const progressBar = progressItem.querySelector('.progress-bar');
+      const progressStatus = progressItem.querySelector('.progress-status');
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const token = localStorage.getItem('jwtToken');
+
+        // Simulate progress (will be replaced with real upload later)
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 10;
+          progressBar.style.width = `${Math.min(progress, 90)}%`;
+          if (progress >= 90) clearInterval(interval);
+        }, 200);
+
+        const response = await fetch(`${BACKEND_URL}/api/notes/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        clearInterval(interval);
+
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+
+        progressBar.style.width = '100%';
+        progressStatus.textContent = '✓ Uploaded';
+        progressStatus.style.color = '#10b981';
+
+      } catch (error) {
+        console.error('Upload error:', error);
+        progressStatus.textContent = '✗ Failed';
+        progressStatus.style.color = '#dc2626';
+      }
+    }
+
+    // Load notes list
+    async function loadNotes() {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load notes');
+        }
+
+        const notes = await response.json();
+        displayNotes(notes);
+      } catch (error) {
+        console.error('Load notes error:', error);
+        // Show empty state for now
+        displayNotes([]);
+      }
+    }
+
+    function displayNotes(notes) {
+      const notesList = document.getElementById('notes-list');
+      const notesCount = document.getElementById('notes-count');
+
+      notesCount.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
+
+      if (notes.length === 0) {
+        notesList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📚</div>
+            <p>No notes uploaded yet. Upload your first note to get started!</p>
+          </div>
+        `;
+        return;
+      }
+
+      notesList.innerHTML = notes.map(note => {
+        const icon = getFileIcon(note.filename);
+        const date = new Date(note.uploaded_at).toLocaleDateString();
+
+        return `
+          <div class="note-item">
+            <div class="note-info">
+              <div class="note-icon">${icon}</div>
+              <div class="note-details">
+                <div class="note-name">${note.filename}</div>
+                <div class="note-meta">Uploaded ${date} • ${note.pages || '?'} pages</div>
+              </div>
+            </div>
+            <div class="note-actions">
+              <button class="btn-delete" onclick="deleteNote(${note.id})">Delete</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      if (ext === 'pdf') return '📄';
+      if (['jpg', 'jpeg', 'png'].includes(ext)) return '🖼️';
+      if (['doc', 'docx'].includes(ext)) return '📝';
+      return '📋';
+    }
+
+    async function deleteNote(noteId) {
+      if (!confirm('Are you sure you want to delete this note?')) return;
+
+      const token = localStorage.getItem('jwtToken');
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Delete failed');
+        }
+
+        loadNotes();
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('Failed to delete note. Please try again.');
+      }
+    }
+
+    // Initialize
+    checkAuth();
+  </script>
+</body>
+</html>
