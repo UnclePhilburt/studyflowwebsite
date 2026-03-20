@@ -482,31 +482,44 @@
             const user = JSON.parse(userFromStorage);
 
             // Update profile card
-            const userName = user.name || user.email.split('@')[0];
+            const userName = user.full_name || user.name || user.email.split('@')[0];
             document.getElementById('profile-name').textContent = userName;
             document.getElementById('profile-email').textContent = user.email;
             document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
 
             // Update tier
             let tier = 'Free Plan';
-            if (user.subscription_status === 'active' || user.subscription_status === 'trialing') {
+            if (user.subscription_tier === 'pro' || user.subscription_status === 'active' || user.subscription_status === 'trialing') {
               tier = 'Pro Plan';
             } else if (user.is_beta) {
               tier = 'Beta Tester';
             }
             document.getElementById('profile-tier').textContent = tier;
-
-            // Update member since
-            if (user.created_at) {
-              const date = new Date(user.created_at);
-              document.getElementById('member-since').textContent = date.toLocaleDateString('en-US', {
-                month: 'long',
-                year: 'numeric'
-              });
-            }
           } catch (e) {
             console.error('Error parsing user from localStorage:', e);
           }
+        }
+
+        // Fetch full user data from backend to get created_at
+        const userResponse = await fetch(`${BACKEND_URL}/api/current-user`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+
+          // Update member since if available
+          if (userData.created_at) {
+            const date = new Date(userData.created_at);
+            document.getElementById('member-since').textContent = date.toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric'
+            });
+          } else {
+            document.getElementById('member-since').textContent = 'Recently';
+          }
+        } else {
+          document.getElementById('member-since').textContent = 'Recently';
         }
 
         // Get notes stats
@@ -520,7 +533,7 @@
 
           let totalPages = 0;
           notes.forEach(note => {
-            totalPages += note.num_pages || 0;
+            totalPages += note.pages || 0;
           });
           document.getElementById('total-pages').textContent = totalPages;
         } else {
@@ -534,6 +547,7 @@
         // Set defaults on error
         document.getElementById('total-notes').textContent = '0';
         document.getElementById('total-pages').textContent = '0';
+        document.getElementById('member-since').textContent = 'Recently';
       }
     }
 
