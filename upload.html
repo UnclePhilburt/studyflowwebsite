@@ -481,7 +481,8 @@
       </a>
       <div class="nav-links">
         <a href="index.html" class="nav-link">Home</a>
-        <a href="upload.html" class="nav-link">Upload Notes</a>
+        <a href="upload.html" class="nav-link">Upload</a>
+        <a href="notes.html" class="nav-link">My Notes</a>
         <a href="dashboard.html" class="nav-link">Account</a>
         <div class="nav-user" id="nav-user" style="display: none;">
           <div class="nav-user-avatar" id="user-avatar">U</div>
@@ -715,13 +716,47 @@
         if (!response.ok) throw new Error('Upload failed');
 
         progressBar.style.width = '100%';
-        progressStatus.textContent = '✓ Done';
+        progressStatus.textContent = '✓ Upload complete - Processing notes...';
         progressStatus.style.color = '#10b981';
+
+        // Poll for processing completion
+        await pollForProcessing();
       } catch (error) {
         console.error('Upload error:', error);
         progressStatus.textContent = '✗ Failed';
         progressStatus.style.color = '#ef4444';
       }
+    }
+
+    async function pollForProcessing() {
+      let attempts = 0;
+      const maxAttempts = 30; // 30 attempts = 30 seconds max
+
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        await loadNotes();
+
+        // Check if any notes are still processing
+        const processingBadges = document.querySelectorAll('.note-card');
+        let hasProcessing = false;
+
+        processingBadges.forEach(card => {
+          if (card.textContent.includes('Processing')) {
+            hasProcessing = true;
+          }
+        });
+
+        if (!hasProcessing) {
+          clearInterval(pollInterval);
+          console.log('✅ Processing complete!');
+          return;
+        }
+
+        if (attempts >= maxAttempts) {
+          clearInterval(pollInterval);
+          console.log('⏱️ Stopped polling after 30 seconds');
+        }
+      }, 1000); // Check every 1 second
     }
 
     async function loadNotes() {
