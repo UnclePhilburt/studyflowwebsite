@@ -586,33 +586,23 @@
     async function checkAuth() {
       const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
       if (!token) {
-        showLoginPrompt();
+        window.location.href = 'login.html';
         return;
       }
 
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/current-user`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) throw new Error('Not authenticated');
-
-        const user = await response.json();
-        currentUser = user;
-
-        // Show user in nav
-        document.getElementById('nav-user').style.display = 'flex';
-        document.getElementById('user-avatar').textContent = (user.name || user.email).charAt(0).toUpperCase();
-        document.getElementById('user-name-nav').textContent = user.name || 'User';
-        document.getElementById('user-email-nav').textContent = user.email;
-
-        loadNotes();
-      } catch (error) {
-        console.error('Auth error:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('jwtToken');
-        showLoginPrompt();
+      // Just load the page - don't validate token on every page load
+      // The API calls will handle authentication
+      const user = localStorage.getItem('user');
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          currentUser = userData;
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
       }
+
+      loadNotes();
     }
 
     function showLoginPrompt() {
@@ -770,12 +760,24 @@
 
     async function loadNotes() {
       const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      if (!token) return;
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (response.status === 401) {
+          // Token is invalid, redirect to login
+          localStorage.removeItem('token');
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+          return;
+        }
 
         if (!response.ok) throw new Error('Failed to load notes');
 
