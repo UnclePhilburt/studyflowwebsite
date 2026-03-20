@@ -289,9 +289,11 @@
         const data = await response.json();
 
         if (response.ok) {
-          // Store user session
+          // Store user session with Supabase Auth tokens
           localStorage.setItem('user', JSON.stringify(data.user));
-          localStorage.setItem('token', data.token);
+          localStorage.setItem('token', data.access_token);  // Supabase returns access_token
+          localStorage.setItem('refreshToken', data.refresh_token);  // Store for future refresh
+          localStorage.setItem('tokenExpiresAt', Date.now() + (data.expires_in * 1000));  // Track expiration
 
           if (remember) {
             localStorage.setItem('remember', 'true');
