@@ -49,6 +49,7 @@
       <ul class="nav-links">
         <li><a href="#features">Features</a></li>
         <li><a href="upload.html">Upload Notes</a></li>
+        <li><a href="notes.html">My Notes</a></li>
         <li><a href="dashboard.html">Account</a></li>
         <li>
           <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
@@ -68,7 +69,7 @@
             </svg>
           </button>
         </li>
-        <li><a href="login.html" class="btn btn-secondary">Sign In</a></li>
+        <li id="auth-nav-item"><a href="login.html" class="btn btn-secondary" id="auth-btn">Sign In</a></li>
         <li><a href="#download" class="btn btn-primary">Download</a></li>
       </ul>
       <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -707,5 +708,39 @@
 
   <script src="script.js"></script>
   <script src="demo-quiz.js"></script>
+
+  <!-- Auth Check Script -->
+  <script>
+    (function() {
+      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      const user = localStorage.getItem('user');
+
+      if (token && user) {
+        try {
+          const userData = JSON.parse(user);
+          const authBtn = document.getElementById('auth-btn');
+
+          // Update button to show logout instead of sign in
+          authBtn.textContent = 'Logout';
+          authBtn.href = '#';
+          authBtn.className = 'btn btn-secondary';
+          authBtn.onclick = function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('user');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('tokenExpiresAt');
+            window.location.reload();
+          };
+        } catch (e) {
+          // Invalid user data, clear it
+          localStorage.removeItem('token');
+          localStorage.removeItem('jwtToken');
+          localStorage.removeItem('user');
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
