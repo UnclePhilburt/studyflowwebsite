@@ -74,6 +74,22 @@
       color: #667eea;
     }
 
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+
     .nav-user {
       display: flex;
       align-items: center;
@@ -480,17 +496,10 @@
         <span>StudyFlow</span>
       </a>
       <div class="nav-links">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="upload.html" class="nav-link">Upload</a>
+        <a href="upload.html" class="nav-link">Upload Notes</a>
         <a href="notes.html" class="nav-link">My Notes</a>
-        <a href="dashboard.html" class="nav-link">Account</a>
-        <div class="nav-user" id="nav-user" style="display: none;">
-          <div class="nav-user-avatar" id="user-avatar">U</div>
-          <div class="nav-user-info">
-            <div class="nav-user-name" id="user-name-nav">Loading...</div>
-            <div class="nav-user-email" id="user-email-nav">Loading...</div>
-          </div>
-        </div>
+        <a href="account.html" class="nav-link">Account</a>
+        <button class="btn-logout" onclick="logout()">Logout</button>
       </div>
     </div>
   </nav>
@@ -844,6 +853,13 @@
         console.error('Delete error:', error);
         alert('Failed to delete note');
       }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('jwtToken');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
     }
 
     checkAuth();

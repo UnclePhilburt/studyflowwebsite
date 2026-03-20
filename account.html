@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account - StudyFlow NoteFlow</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    /* Navigation */
+    .top-nav {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #6b7280;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #667eea;
+    }
+
+    .nav-link.active {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: #6b7280;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0;
+      background: white;
+      border-radius: 12px 12px 0 0;
+      border-bottom: 2px solid #e5e7eb;
+      padding: 0 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .tab {
+      padding: 16px 24px;
+      background: transparent;
+      border: none;
+      color: #6b7280;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-family: inherit;
+    }
+
+    .tab:hover {
+      color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      background: white;
+      border-radius: 0 0 12px 12px;
+      padding: 32px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Profile Section */
+    .profile-section {
+      max-width: 600px;
+    }
+
+    .profile-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 32px;
+      color: white;
+      margin-bottom: 32px;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .profile-email {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .profile-tier {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: #1f2937;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Settings Section */
+    .setting-item {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .setting-item:hover {
+      border-color: #667eea;
+      background: #f5f7ff;
+    }
+
+    .setting-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .setting-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .setting-text {
+      flex: 1;
+    }
+
+    .setting-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 6px;
+    }
+
+    .setting-description {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 56px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: 0.3s;
+      border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .toggle-slider {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+    }
+
+    .setting-help-text {
+      background: #eff6ff;
+      border-left: 4px solid #667eea;
+      padding: 16px;
+      margin-top: 24px;
+      border-radius: 8px;
+    }
+
+    .setting-help-text p {
+      color: #1f2937;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #dcfce7;
+      color: #166534;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .sync-status.syncing {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="top-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        📚 <span>StudyFlow</span>
+      </a>
+      <div class="nav-links">
+        <a href="upload.html" class="nav-link">Upload Notes</a>
+        <a href="notes.html" class="nav-link">My Notes</a>
+        <a href="account.html" class="nav-link active">Account</a>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">My Account</h1>
+      <p class="page-subtitle">Manage your profile and preferences</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="profile">Profile</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="tab-content active" id="profileTab">
+      <div class="profile-section">
+        <div class="profile-card">
+          <div class="profile-avatar" id="profile-avatar">S</div>
+          <div class="profile-name" id="profile-name">Loading...</div>
+          <div class="profile-email" id="profile-email">Loading...</div>
+          <div class="profile-tier" id="profile-tier">Loading...</div>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-value" id="member-since">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Total Notes Uploaded</span>
+          <span class="info-value" id="total-notes">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Total Pages</span>
+          <span class="info-value" id="total-pages">-</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settingsTab">
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon">🧠</div>
+          <div class="setting-text">
+            <div class="setting-title">Collective Brain</div>
+            <div class="setting-description">
+              Share your notes to access everyone's notes. Turn off to keep notes private (you won't see others' notes).
+            </div>
+            <div class="sync-status" id="sync-status">
+              <span>✓</span>
+              <span>Synced with extension</span>
+            </div>
+          </div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="collective-brain-toggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-help-text">
+        <p><strong>🌟 How it works:</strong> When enabled, your notes help other students and their notes help you. It's a win-win! Changes sync automatically between the website and browser extension.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.getAttribute('data-tab');
+
+        // Update tab buttons
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+      });
+    });
+
+    // Load user profile
+    async function loadProfile() {
+      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      if (!token) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        // Get user info
+        const userResponse = await fetch(`${BACKEND_URL}/api/user`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (userResponse.ok) {
+          const user = await userResponse.json();
+
+          // Update profile card
+          const userName = user.name || user.email.split('@')[0];
+          document.getElementById('profile-name').textContent = userName;
+          document.getElementById('profile-email').textContent = user.email;
+          document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
+
+          // Update tier
+          let tier = 'Free Plan';
+          if (user.subscription_status === 'active' || user.subscription_status === 'trialing') {
+            tier = 'Pro Plan';
+          } else if (user.is_beta) {
+            tier = 'Beta Tester';
+          }
+          document.getElementById('profile-tier').textContent = tier;
+
+          // Update member since
+          if (user.created_at) {
+            const date = new Date(user.created_at);
+            document.getElementById('member-since').textContent = date.toLocaleDateString('en-US', {
+              month: 'long',
+              year: 'numeric'
+            });
+          }
+        }
+
+        // Get notes stats
+        const notesResponse = await fetch(`${BACKEND_URL}/api/notes`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (notesResponse.ok) {
+          const notes = await notesResponse.json();
+          document.getElementById('total-notes').textContent = notes.length;
+
+          let totalPages = 0;
+          notes.forEach(note => {
+            totalPages += note.num_pages || 0;
+          });
+          document.getElementById('total-pages').textContent = totalPages;
+        }
+
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    // Load collective brain setting
+    async function loadCollectiveBrainSetting() {
+      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/settings/collective-brain`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('collective-brain-toggle').checked = data.enabled !== false;
+        }
+      } catch (error) {
+        console.error('Error loading collective brain setting:', error);
+      }
+    }
+
+    // Update collective brain setting
+    document.getElementById('collective-brain-toggle').addEventListener('change', async (e) => {
+      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      if (!token) return;
+
+      const isEnabled = e.target.checked;
+      const syncStatus = document.getElementById('sync-status');
+
+      // Show syncing status
+      syncStatus.className = 'sync-status syncing';
+      syncStatus.innerHTML = '<span>⟳</span><span>Syncing...</span>';
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/settings/collective-brain`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ enabled: isEnabled })
+        });
+
+        if (response.ok) {
+          // Show synced status
+          syncStatus.className = 'sync-status';
+          syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
+        } else {
+          throw new Error('Failed to update setting');
+        }
+      } catch (error) {
+        console.error('Error updating collective brain setting:', error);
+        // Revert toggle on error
+        e.target.checked = !isEnabled;
+        alert('Failed to update setting. Please try again.');
+      }
+    });
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('jwtToken');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    }
+
+    // Initialize
+    loadProfile();
+    loadCollectiveBrainSetting();
+
+    // Poll for changes from extension every 5 seconds
+    setInterval(async () => {
+      const currentChecked = document.getElementById('collective-brain-toggle').checked;
+      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/settings/collective-brain`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const serverEnabled = data.enabled !== false;
+
+          // If server value differs from current UI, update UI
+          if (serverEnabled !== currentChecked) {
+            document.getElementById('collective-brain-toggle').checked = serverEnabled;
+
+            // Show sync notification
+            const syncStatus = document.getElementById('sync-status');
+            syncStatus.className = 'sync-status';
+            syncStatus.innerHTML = '<span>✓</span><span>Updated from extension</span>';
+
+            setTimeout(() => {
+              syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
+            }, 2000);
+          }
+        }
+      } catch (error) {
+        // Silently fail - don't spam console
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

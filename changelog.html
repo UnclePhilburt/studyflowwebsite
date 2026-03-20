@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog - StudyFlowSuite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    .changelog-container {
+      max-width: 900px;
+      margin: 100px auto 50px;
+      padding: 0 20px;
+    }
+
+    .changelog-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .changelog-header h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .changelog-header p {
+      font-size: 18px;
+      color: #64748b;
+    }
+
+    .version-block {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .version-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    .version-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .version-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .version-badge.beta {
+      background: #f59e0b;
+    }
+
+    .version-date {
+      margin-left: auto;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .change-category {
+      margin-bottom: 24px;
+    }
+
+    .change-category h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .change-category h3::before {
+      content: '';
+      width: 4px;
+      height: 18px;
+      border-radius: 2px;
+    }
+
+    .change-category.new h3::before {
+      background: #10b981;
+    }
+
+    .change-category.improved h3::before {
+      background: #3b82f6;
+    }
+
+    .change-category.fixed h3::before {
+      background: #f59e0b;
+    }
+
+    .change-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .change-list li {
+      padding: 8px 0 8px 24px;
+      color: #475569;
+      font-size: 15px;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .change-list li::before {
+      content: '•';
+      position: absolute;
+      left: 8px;
+      color: #cbd5e1;
+      font-weight: bold;
+    }
+
+    .change-list code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #667eea;
+      font-family: 'Courier New', monospace;
+    }
+
+    [data-theme="dark"] .version-block {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    [data-theme="dark"] .version-header {
+      border-bottom-color: #334155;
+    }
+
+    [data-theme="dark"] .change-category h3 {
+      color: #f1f5f9;
+    }
+
+    [data-theme="dark"] .change-list li {
+      color: #cbd5e1;
+    }
+
+    [data-theme="dark"] .change-list code {
+      background: #334155;
+      color: #a5b4fc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <div class="logo">
+        <img src="assets/logo.svg" alt="StudyFlowSuite" class="logo-img">
+        <span class="logo-text">StudyFlowSuite</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="index.html#pricing">Pricing</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="changelog.html" class="active">Changelog</a></li>
+        <li><a href="demo.html">Demo</a></li>
+        <li>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </li>
+        <li><a href="login.html" class="btn btn-secondary">Sign In</a></li>
+        <li><a href="index.html#download" class="btn btn-primary">Download</a></li>
+      </ul>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Changelog Content -->
+  <div class="changelog-container">
+    <div class="changelog-header">
+      <h1>Changelog</h1>
+      <p>Latest updates and improvements to StudyFlowSuite</p>
+    </div>
+
+    <!-- Version 0.0.4 -->
+    <div class="version-block">
+      <div class="version-header">
+        <span class="version-number">v0.0.4</span>
+        <span class="version-badge">Latest</span>
+        <span class="version-date">March 19, 2026</span>
+      </div>
+
+      <div class="change-category fixed">
+        <h3>Fixed</h3>
+        <ul class="change-list">
+          <li>Fixed "Invalid launch" errors in Canvas sequential mode by increasing delays between answer clicks and submit button</li>
+          <li>Improved Canvas LTI session handling to prevent 403 errors during page transitions</li>
+          <li>Extended wait time to 3 seconds after clicking answer and 4 seconds after clicking submit</li>
+        </ul>
+      </div>
+
+      <div class="change-category improved">
+        <h3>Improved</h3>
+        <ul class="change-list">
+          <li>More reliable quiz navigation in Canvas sequential mode</li>
+          <li>Better compatibility with Canvas LTI authentication flow</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Version 0.0.3 -->
+    <div class="version-block">
+      <div class="version-header">
+        <span class="version-number">v0.0.3</span>
+        <span class="version-date">March 19, 2026</span>
+      </div>
+
+      <div class="change-category new">
+        <h3>New Features</h3>
+        <ul class="change-list">
+          <li>Added support for multiple-answer multiple choice questions (checkboxes)</li>
+          <li>Extension now detects checkbox vs radio button questions automatically</li>
+          <li>AI returns multiple correct answers for "select all that apply" questions</li>
+        </ul>
+      </div>
+
+      <div class="change-category improved">
+        <h3>Improved</h3>
+        <ul class="change-list">
+          <li>Backend API now handles both single-answer and multiple-answer question types</li>
+          <li>Click logic loops through all correct checkboxes with 500ms delay between clicks</li>
+          <li>Answer display shows all selected options for multiple-answer questions</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Version 0.0.2 -->
+    <div class="version-block">
+      <div class="version-header">
+        <span class="version-number">v0.0.2</span>
+        <span class="version-date">March 19, 2026</span>
+      </div>
+
+      <div class="change-category improved">
+        <h3>Improved</h3>
+        <ul class="change-list">
+          <li>Removed unused <code>scripting</code> permission (Chrome Web Store requirement)</li>
+          <li>Removed Dev Inspector feature for production release</li>
+          <li>Simplified host permissions to backend API only</li>
+          <li>Uses <code>activeTab</code> permission for better security and user control</li>
+        </ul>
+      </div>
+
+      <div class="change-category fixed">
+        <h3>Fixed</h3>
+        <ul class="change-list">
+          <li>Extension now works on any school website domain</li>
+          <li>Improved compatibility with custom Canvas installations</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Version 0.0.1 -->
+    <div class="version-block">
+      <div class="version-header">
+        <span class="version-number">v0.0.1</span>
+        <span class="version-badge beta">Initial Beta</span>
+        <span class="version-date">March 2026</span>
+      </div>
+
+      <div class="change-category new">
+        <h3>New Features</h3>
+        <ul class="change-list">
+          <li>Initial release of StudyFlowSuite Chrome extension</li>
+          <li>Support for Canvas LMS and Learnosity quiz platforms</li>
+          <li>Sequential mode: One question per page with auto-navigation</li>
+          <li>Single-page mode: All questions visible on one page</li>
+          <li>Multi-question mode: Multiple questions per page with manual navigation</li>
+          <li>AI-powered answer detection using OpenAI GPT models</li>
+          <li>Support for multiple choice, essay, and fill-in-blank questions</li>
+          <li>User authentication and subscription management</li>
+          <li>Free tier: 10 questions per day</li>
+          <li>Pro tier: Unlimited questions with advanced models</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="logo">
+            <img src="assets/logo.svg" alt="StudyFlowSuite" class="logo-img">
+            <span class="logo-text">StudyFlowSuite</span>
+          </div>
+          <p>AI-powered study assistance for modern learners</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="index.html#features">Features</a></li>
+              <li><a href="index.html#pricing">Pricing</a></li>
+              <li><a href="demo.html">Demo</a></li>
+              <li><a href="changelog.html">Changelog</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="docs.html">Documentation</a></li>
+              <li><a href="install.html">Installation</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="privacy.html">Privacy Policy</a></li>
+              <li><a href="terms.html">Terms of Service</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 StudyFlowSuite. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
