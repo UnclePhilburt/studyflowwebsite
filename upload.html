@@ -7,155 +7,207 @@
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    .upload-page {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 40px 20px;
     }
 
-    .upload-container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .upload-header {
-      text-align: center;
-      color: white;
-      margin-bottom: 40px;
-    }
-
-    .upload-header h1 {
-      font-size: 42px;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .upload-header p {
-      font-size: 18px;
-      opacity: 0.95;
-    }
-
-    .upload-card {
+    /* Navigation */
+    .top-nav {
       background: white;
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-      margin-bottom: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
-    .user-banner {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px 30px;
-      border-radius: 16px;
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
     }
 
-    .user-info-banner {
+    .nav-logo {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+      text-decoration: none;
     }
 
-    .user-avatar {
-      width: 50px;
-      height: 50px;
-      background: rgba(255, 255, 255, 0.2);
+    .nav-logo span {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #6b7280;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #667eea;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: #f3f4f6;
+      border-radius: 10px;
+    }
+
+    .nav-user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-    }
-
-    .user-details h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0 0 4px 0;
-    }
-
-    .user-details p {
-      font-size: 13px;
-      opacity: 0.9;
-      margin: 0;
-    }
-
-    .btn-logout {
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 10px;
       color: white;
-      font-weight: 600;
-      cursor: pointer;
       font-size: 14px;
-      transition: all 0.2s;
+      font-weight: 600;
     }
 
-    .btn-logout:hover {
-      background: rgba(255, 255, 255, 0.3);
+    .nav-user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .nav-user-email {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    /* Main Container */
+    .main-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: #6b7280;
+    }
+
+    /* Upload Section */
+    .upload-section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 20px;
     }
 
     .upload-zone {
-      border: 3px dashed #d1d5db;
-      border-radius: 16px;
-      padding: 60px 40px;
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 48px 32px;
       text-align: center;
-      background: #f9fafb;
+      background: #fafbfc;
       transition: all 0.3s;
       cursor: pointer;
-      position: relative;
     }
 
     .upload-zone:hover,
     .upload-zone.drag-over {
       border-color: #667eea;
       background: #f0f4ff;
-      transform: scale(1.01);
     }
 
-    .upload-zone-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.6;
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
     }
 
-    .upload-zone h3 {
-      font-size: 22px;
-      font-weight: 700;
+    .upload-text {
+      font-size: 16px;
+      font-weight: 600;
       color: #1f2937;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .upload-zone p {
-      font-size: 15px;
+    .upload-subtext {
+      font-size: 14px;
       color: #6b7280;
       margin-bottom: 20px;
     }
 
-    .upload-zone-btn {
+    .upload-btn {
       display: inline-block;
-      padding: 12px 28px;
+      padding: 12px 24px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border-radius: 10px;
+      border-radius: 8px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
-      transition: all 0.2s;
       border: none;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .upload-zone-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    .upload-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
     .file-types {
-      font-size: 13px;
+      font-size: 12px;
       color: #9ca3af;
       margin-top: 16px;
     }
@@ -164,8 +216,9 @@
       display: none;
     }
 
+    /* Progress */
     .upload-progress {
-      margin-top: 30px;
+      margin-top: 24px;
       display: none;
     }
 
@@ -175,7 +228,7 @@
 
     .progress-item {
       background: #f9fafb;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 16px;
       margin-bottom: 12px;
       border: 1px solid #e5e7eb;
@@ -201,7 +254,7 @@
     }
 
     .progress-bar-container {
-      height: 6px;
+      height: 4px;
       background: #e5e7eb;
       border-radius: 10px;
       overflow: hidden;
@@ -214,107 +267,101 @@
       width: 0%;
     }
 
-    .notes-list-section {
-      margin-top: 40px;
+    /* Notes List */
+    .notes-section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
     }
 
-    .notes-list-header {
+    .notes-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .notes-list-header h2 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1f2937;
-      margin: 0;
+      margin-bottom: 24px;
     }
 
     .notes-count {
-      font-size: 14px;
+      font-size: 13px;
       color: #6b7280;
       background: #f3f4f6;
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 4px 12px;
+      border-radius: 12px;
       font-weight: 600;
     }
 
-    .notes-list {
+    .notes-grid {
       display: grid;
-      gap: 16px;
+      gap: 12px;
     }
 
-    .note-item {
-      background: #f9fafb;
+    .note-card {
+      background: #fafbfc;
       border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 16px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 16px;
       transition: all 0.2s;
     }
 
-    .note-item:hover {
+    .note-card:hover {
       border-color: #667eea;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    .note-info {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      flex: 1;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .note-icon {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 20px;
+      flex-shrink: 0;
     }
 
-    .note-details {
+    .note-info {
       flex: 1;
     }
 
     .note-name {
       font-weight: 600;
       color: #1f2937;
-      font-size: 15px;
+      font-size: 14px;
       margin-bottom: 4px;
     }
 
     .note-meta {
-      font-size: 13px;
+      font-size: 12px;
       color: #6b7280;
     }
 
     .note-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn-delete {
-      padding: 8px 16px;
-      background: #fee2e2;
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      color: #dc2626;
+      padding: 6px 12px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      color: #ef4444;
       font-weight: 600;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       transition: all 0.2s;
     }
 
     .btn-delete:hover {
-      background: #fecaca;
+      background: #fef2f2;
+      border-color: #fecaca;
     }
 
     .empty-state {
@@ -323,32 +370,15 @@
       color: #9ca3af;
     }
 
-    .empty-state-icon {
+    .empty-icon {
       font-size: 64px;
       margin-bottom: 16px;
-      opacity: 0.5;
+      opacity: 0.3;
     }
 
-    .empty-state p {
-      font-size: 15px;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      margin-bottom: 30px;
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      transition: all 0.2s;
-    }
-
-    .back-link:hover {
-      background: rgba(255, 255, 255, 0.3);
+    .empty-text {
+      font-size: 14px;
+      color: #9ca3af;
     }
 
     .loading-overlay {
@@ -357,7 +387,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.5);
       display: none;
       align-items: center;
       justify-content: center;
@@ -371,7 +401,7 @@
     .loading-content {
       background: white;
       padding: 40px;
-      border-radius: 20px;
+      border-radius: 16px;
       text-align: center;
       max-width: 400px;
     }
@@ -395,74 +425,111 @@
       color: #1f2937;
       font-weight: 600;
     }
+
+    .login-prompt {
+      background: white;
+      border-radius: 16px;
+      padding: 60px 32px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+    }
+
+    .login-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .login-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+
+    .login-text {
+      font-size: 16px;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .btn-login {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
   </style>
 </head>
 <body>
-  <div class="upload-page">
-    <div class="upload-container">
-      <!-- Navigation -->
-      <div style="display: flex; gap: 12px; margin-bottom: 30px;">
-        <a href="index.html" class="back-link">
-          <span>←</span>
-          <span>Home</span>
-        </a>
-        <a href="demo.html" class="back-link">
-          <span>🎮</span>
-          <span>Demo</span>
-        </a>
-        <a href="docs.html" class="back-link">
-          <span>📚</span>
-          <span>Docs</span>
-        </a>
-      </div>
-
-      <!-- Header -->
-      <div class="upload-header">
-        <h1>📝 Upload Your Notes</h1>
-        <p>Upload your class notes to power AI-guided studying</p>
-      </div>
-
-      <!-- User Banner -->
-      <div class="user-banner">
-        <div class="user-info-banner">
-          <div class="user-avatar">👤</div>
-          <div class="user-details">
-            <h3 id="user-name">Loading...</h3>
-            <p id="user-email">Loading...</p>
+  <!-- Navigation -->
+  <nav class="top-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span>📝</span>
+        <span>StudyFlow</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="upload.html" class="nav-link">Upload Notes</a>
+        <a href="dashboard.html" class="nav-link">Account</a>
+        <div class="nav-user" id="nav-user" style="display: none;">
+          <div class="nav-user-avatar" id="user-avatar">U</div>
+          <div class="nav-user-info">
+            <div class="nav-user-name" id="user-name-nav">Loading...</div>
+            <div class="nav-user-email" id="user-email-nav">Loading...</div>
           </div>
         </div>
-        <button class="btn-logout" id="logout-btn">Sign Out</button>
       </div>
+    </div>
+  </nav>
 
-      <!-- Upload Card -->
-      <div class="upload-card">
-        <!-- Upload Zone -->
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Upload Your Notes</h1>
+      <p class="page-subtitle">Add your class notes to power AI-guided studying</p>
+    </div>
+
+    <!-- Content (Hidden until auth check) -->
+    <div id="content-container">
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <h2 class="section-title">Add New Notes</h2>
+
         <div class="upload-zone" id="upload-zone">
-          <div class="upload-zone-icon">📤</div>
-          <h3>Drag & Drop Your Notes</h3>
-          <p>or click to browse files</p>
-          <button class="upload-zone-btn" id="browse-btn">Choose Files</button>
-          <p class="file-types">Supports: PDF, JPG, PNG, Word docs, handwritten notes</p>
+          <div class="upload-icon">📤</div>
+          <div class="upload-text">Drag & drop your files here</div>
+          <div class="upload-subtext">or click to browse</div>
+          <button class="upload-btn" id="browse-btn">Choose Files</button>
+          <p class="file-types">Supports: PDF, JPG, PNG, Word docs</p>
           <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,image/*">
         </div>
 
-        <!-- Upload Progress -->
-        <div class="upload-progress" id="upload-progress">
-          <!-- Progress items will be added here -->
-        </div>
+        <div class="upload-progress" id="upload-progress"></div>
+      </div>
 
-        <!-- Notes List -->
-        <div class="notes-list-section">
-          <div class="notes-list-header">
-            <h2>Your Uploaded Notes</h2>
-            <span class="notes-count" id="notes-count">0 notes</span>
-          </div>
-          <div class="notes-list" id="notes-list">
-            <!-- Will be populated by JavaScript -->
-            <div class="empty-state">
-              <div class="empty-state-icon">📚</div>
-              <p>No notes uploaded yet. Upload your first note to get started!</p>
-            </div>
+      <!-- Notes List -->
+      <div class="notes-section">
+        <div class="notes-header">
+          <h2 class="section-title">Your Notes</h2>
+          <span class="notes-count" id="notes-count">0 notes</span>
+        </div>
+        <div class="notes-grid" id="notes-list">
+          <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <p class="empty-text">No notes uploaded yet</p>
           </div>
         </div>
       </div>
@@ -473,7 +540,7 @@
   <div class="loading-overlay" id="loading-overlay">
     <div class="loading-content">
       <div class="loading-spinner"></div>
-      <p class="loading-text">Processing your notes with AI...</p>
+      <p class="loading-text">Processing your notes...</p>
     </div>
   </div>
 
@@ -483,30 +550,27 @@
 
     // Check authentication
     async function checkAuth() {
-      // Check both possible token storage keys for compatibility
       const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
       if (!token) {
-        // Not logged in - show login prompt instead of redirect
         showLoginPrompt();
         return;
       }
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/current-user`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) {
-          throw new Error('Not authenticated');
-        }
+        if (!response.ok) throw new Error('Not authenticated');
 
         const user = await response.json();
         currentUser = user;
 
-        document.getElementById('user-name').textContent = user.name || 'User';
-        document.getElementById('user-email').textContent = user.email;
+        // Show user in nav
+        document.getElementById('nav-user').style.display = 'flex';
+        document.getElementById('user-avatar').textContent = (user.name || user.email).charAt(0).toUpperCase();
+        document.getElementById('user-name-nav').textContent = user.name || 'User';
+        document.getElementById('user-email-nav').textContent = user.email;
 
         loadNotes();
       } catch (error) {
@@ -517,41 +581,18 @@
       }
     }
 
-    // Show login prompt on page instead of redirecting
     function showLoginPrompt() {
-      document.querySelector('.user-banner').innerHTML = `
-        <div class="user-info-banner">
-          <div class="user-avatar">🔒</div>
-          <div class="user-details">
-            <h3>Sign in to upload notes</h3>
-            <p>You need to be logged in to use NoteFlow</p>
-          </div>
-        </div>
-        <a href="login.html" class="btn-logout" style="text-decoration: none;">Sign In</a>
-      `;
-
-      // Disable upload zone
-      document.getElementById('upload-zone').style.opacity = '0.5';
-      document.getElementById('upload-zone').style.pointerEvents = 'none';
-      document.getElementById('notes-list').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">🔒</div>
-          <p>Please sign in to view and upload notes.</p>
+      document.getElementById('content-container').innerHTML = `
+        <div class="login-prompt">
+          <div class="login-icon">🔒</div>
+          <h2 class="login-title">Sign In Required</h2>
+          <p class="login-text">Please sign in to upload and manage your notes</p>
+          <a href="login.html" class="btn-login">Sign In</a>
         </div>
       `;
     }
 
-    // Logout
-    document.getElementById('logout-btn').addEventListener('click', () => {
-      if (confirm('Are you sure you want to sign out?')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('jwtToken');
-        localStorage.removeItem('user');
-        window.location.href = 'index.html';
-      }
-    });
-
-    // File upload handling
+    // File upload
     const uploadZone = document.getElementById('upload-zone');
     const fileInput = document.getElementById('file-input');
     const browseBtn = document.getElementById('browse-btn');
@@ -561,46 +602,26 @@
       fileInput.click();
     });
 
-    uploadZone.addEventListener('click', () => {
-      fileInput.click();
-    });
+    uploadZone.addEventListener('click', () => fileInput.click());
 
-    // Prevent default drag behaviors
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, preventDefaults, false);
-      document.body.addEventListener(eventName, preventDefaults, false);
+      uploadZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
     });
 
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    // Highlight drop zone when dragging
     ['dragenter', 'dragover'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, () => {
-        uploadZone.classList.add('drag-over');
-      });
+      uploadZone.addEventListener(eventName, () => uploadZone.classList.add('drag-over'));
     });
 
     ['dragleave', 'drop'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, () => {
-        uploadZone.classList.remove('drag-over');
-      });
+      uploadZone.addEventListener(eventName, () => uploadZone.classList.remove('drag-over'));
     });
 
-    // Handle dropped files
-    uploadZone.addEventListener('drop', (e) => {
-      const files = e.dataTransfer.files;
-      handleFiles(files);
-    });
+    uploadZone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files));
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
-    // Handle selected files
-    fileInput.addEventListener('change', (e) => {
-      handleFiles(e.target.files);
-    });
-
-    // Handle file uploads
     async function handleFiles(files) {
       if (files.length === 0) return;
 
@@ -612,7 +633,6 @@
         await uploadFile(file);
       }
 
-      // Reload notes list
       setTimeout(() => {
         loadNotes();
         progressContainer.classList.remove('active');
@@ -628,7 +648,7 @@
           <span class="progress-status">Uploading...</span>
         </div>
         <div class="progress-bar-container">
-          <div class="progress-bar" style="width: 0%"></div>
+          <div class="progress-bar"></div>
         </div>
       `;
       document.getElementById('upload-progress').appendChild(progressItem);
@@ -639,10 +659,8 @@
       try {
         const formData = new FormData();
         formData.append('file', file);
-
         const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
 
-        // Simulate progress (will be replaced with real upload later)
         let progress = 0;
         const interval = setInterval(() => {
           progress += 10;
@@ -652,50 +670,39 @@
 
         const response = await fetch(`${BACKEND_URL}/api/notes/upload`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
           body: formData
         });
 
         clearInterval(interval);
 
-        if (!response.ok) {
-          throw new Error('Upload failed');
-        }
+        if (!response.ok) throw new Error('Upload failed');
 
         progressBar.style.width = '100%';
-        progressStatus.textContent = '✓ Uploaded';
+        progressStatus.textContent = '✓ Done';
         progressStatus.style.color = '#10b981';
-
       } catch (error) {
         console.error('Upload error:', error);
         progressStatus.textContent = '✗ Failed';
-        progressStatus.style.color = '#dc2626';
+        progressStatus.style.color = '#ef4444';
       }
     }
 
-    // Load notes list
     async function loadNotes() {
       const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
       if (!token) return;
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to load notes');
-        }
+        if (!response.ok) throw new Error('Failed to load notes');
 
         const notes = await response.json();
         displayNotes(notes);
       } catch (error) {
         console.error('Load notes error:', error);
-        // Show empty state for now
         displayNotes([]);
       }
     }
@@ -709,8 +716,8 @@
       if (notes.length === 0) {
         notesList.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">📚</div>
-            <p>No notes uploaded yet. Upload your first note to get started!</p>
+            <div class="empty-icon">📚</div>
+            <p class="empty-text">No notes uploaded yet</p>
           </div>
         `;
         return;
@@ -719,15 +726,12 @@
       notesList.innerHTML = notes.map(note => {
         const icon = getFileIcon(note.filename);
         const date = new Date(note.uploaded_at).toLocaleDateString();
-
         return `
-          <div class="note-item">
+          <div class="note-card">
+            <div class="note-icon">${icon}</div>
             <div class="note-info">
-              <div class="note-icon">${icon}</div>
-              <div class="note-details">
-                <div class="note-name">${note.filename}</div>
-                <div class="note-meta">Uploaded ${date} • ${note.pages || '?'} pages</div>
-              </div>
+              <div class="note-name">${note.filename}</div>
+              <div class="note-meta">${date} • ${note.pages || '?'} pages</div>
             </div>
             <div class="note-actions">
               <button class="btn-delete" onclick="deleteNote(${note.id})">Delete</button>
@@ -746,30 +750,24 @@
     }
 
     async function deleteNote(noteId) {
-      if (!confirm('Are you sure you want to delete this note?')) return;
+      if (!confirm('Delete this note?')) return;
 
       const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}`, {
           method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!response.ok) {
-          throw new Error('Delete failed');
-        }
-
+        if (!response.ok) throw new Error('Delete failed');
         loadNotes();
       } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to delete note. Please try again.');
+        alert('Failed to delete note');
       }
     }
 
-    // Initialize
     checkAuth();
   </script>
 </body>
