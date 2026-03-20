@@ -513,8 +513,8 @@
           <div class="upload-text">Drag & drop your files here</div>
           <div class="upload-subtext">or click to browse</div>
           <button class="upload-btn" id="browse-btn">Choose Files</button>
-          <p class="file-types">Supports: PDF, JPG, PNG, Word docs</p>
-          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,image/*">
+          <p class="file-types">Supports: PDF, JPG, PNG, Word docs, TXT</p>
+          <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt,image/*">
         </div>
 
         <div class="upload-progress" id="upload-progress"></div>
@@ -746,6 +746,7 @@
       if (ext === 'pdf') return '📄';
       if (['jpg', 'jpeg', 'png'].includes(ext)) return '🖼️';
       if (['doc', 'docx'].includes(ext)) return '📝';
+      if (ext === 'txt') return '📃';
       return '📋';
     }
 
