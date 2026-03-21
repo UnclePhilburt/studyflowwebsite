@@ -55,7 +55,13 @@
       color: #e5e7eb;
     }
 
-    .settings-btn {
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
       background: transparent;
       border: none;
       cursor: pointer;
@@ -66,7 +72,7 @@
       transition: all 0.2s;
     }
 
-    .settings-btn:hover {
+    .icon-btn:hover {
       background: #2d3748;
     }
 
@@ -515,10 +521,11 @@
     <!-- Left Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="logo-section">
-          <span class="logo-text">NoteFlow</span>
+        <div class="header-actions">
+          <button class="icon-btn" id="uploadBtn" title="Upload Notes">📤</button>
+          <button class="icon-btn" id="myNotesBtn" title="My Notes">📝</button>
+          <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
         </div>
-        <button class="settings-btn" id="settingsBtn" title="Settings">⚙️</button>
       </div>
 
       <button class="new-chat-btn" id="newChatBtn">
@@ -621,6 +628,8 @@
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsPopup = document.getElementById('settingsPopup');
     const collectiveBrainToggle = document.getElementById('collectiveBrainToggle');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const myNotesBtn = document.getElementById('myNotesBtn');
 
     // Initialize
     async function init() {
@@ -916,6 +925,16 @@
     settingsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       settingsPopup.classList.toggle('active');
+    });
+
+    // Upload button - navigate to upload page
+    uploadBtn.addEventListener('click', () => {
+      window.location.href = 'upload.html';
+    });
+
+    // My Notes button - navigate to notes page
+    myNotesBtn.addEventListener('click', () => {
+      window.location.href = 'notes.html';
     });
 
     // Collective Brain toggle
