@@ -193,22 +193,8 @@
     }
   </style>
 
-  <!-- Supabase Authentication Check -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    (async function() {
-      const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.kcBbr5xjQOxR1AanJ3zl6YRPLKsOzZSwR7TfeFZiZgw';
-
-      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data: { session } } = await supabaseClient.auth.getSession();
-
-      // If user is logged in, redirect to chat interface
-      if (session) {
-        window.location.href = 'chat.html';
-      }
-    })();
-  </script>
 </head>
 <body>
   <div class="auth-container">
@@ -250,6 +236,14 @@
       'https://mxddgbpxjoltaimftpmn.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.kcBbr5xjQOxR1AanJ3zl6YRPLKsOzZSwR7TfeFZiZgw'
     );
+
+    // Check if already logged in and redirect to chat
+    (async function() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        window.location.href = 'chat.html';
+      }
+    })();
 
     const loginForm = document.getElementById('loginForm');
     const emailInput = document.getElementById('email');
