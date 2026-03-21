@@ -14,7 +14,7 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f8f9fa;
+      background: #0f1419;
       height: 100vh;
       overflow: hidden;
     }
@@ -28,8 +28,8 @@
     /* Left Sidebar */
     .sidebar {
       width: 280px;
-      background: white;
-      border-right: 1px solid #e5e7eb;
+      background: #1a1f2e;
+      border-right: 1px solid #2d3748;
       display: flex;
       flex-direction: column;
       transition: transform 0.3s ease;
@@ -37,7 +37,7 @@
 
     .sidebar-header {
       padding: 16px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid #2d3748;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -64,13 +64,13 @@
       cursor: pointer;
       padding: 8px;
       border-radius: 8px;
-      color: #6b7280;
+      color: #9ca3af;
       font-size: 20px;
       transition: all 0.2s;
     }
 
     .settings-btn:hover {
-      background: #f3f4f6;
+      background: #2d3748;
     }
 
     .new-chat-btn {
@@ -107,7 +107,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
-      color: #374151;
+      color: #d1d5db;
       font-size: 14px;
       white-space: nowrap;
       overflow: hidden;
@@ -115,18 +115,18 @@
     }
 
     .conversation-item:hover {
-      background: #f3f4f6;
+      background: #2d3748;
     }
 
     .conversation-item.active {
-      background: #e0e7ff;
-      color: #667eea;
+      background: #312e81;
+      color: #a5b4fc;
       font-weight: 600;
     }
 
     .sidebar-footer {
       padding: 16px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid #2d3748;
     }
 
     .user-info {
@@ -155,7 +155,7 @@
 
     .user-email {
       font-size: 13px;
-      color: #6b7280;
+      color: #9ca3af;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -164,7 +164,7 @@
     .logout-btn {
       background: transparent;
       border: none;
-      color: #ef4444;
+      color: #f87171;
       cursor: pointer;
       font-size: 12px;
       font-weight: 600;
@@ -174,7 +174,7 @@
     }
 
     .logout-btn:hover {
-      background: #fef2f2;
+      background: #2d1f1f;
     }
 
     /* Main Chat Area */
@@ -182,12 +182,12 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: white;
+      background: #0f1419;
     }
 
     .chat-header {
       padding: 16px 24px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid #2d3748;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -196,7 +196,7 @@
     .chat-title {
       font-size: 18px;
       font-weight: 600;
-      color: #1f2937;
+      color: #e5e7eb;
     }
 
     .messages-container {
@@ -215,7 +215,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      color: #6b7280;
+      color: #9ca3af;
       padding: 40px;
     }
 
@@ -227,13 +227,13 @@
     .welcome-title {
       font-size: 28px;
       font-weight: 700;
-      color: #1f2937;
+      color: #e5e7eb;
       margin-bottom: 8px;
     }
 
     .welcome-subtitle {
       font-size: 16px;
-      color: #6b7280;
+      color: #9ca3af;
       max-width: 500px;
     }
 
@@ -272,8 +272,8 @@
     }
 
     .message.assistant .message-avatar {
-      background: #f3f4f6;
-      color: #6b7280;
+      background: #2d3748;
+      color: #9ca3af;
     }
 
     .message-content {
@@ -290,8 +290,9 @@
     }
 
     .message.assistant .message-content {
-      background: #f3f4f6;
-      color: #1f2937;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      color: #e5e7eb;
     }
 
     .typing-indicator {
@@ -319,7 +320,7 @@
     /* Input Area */
     .input-container {
       padding: 24px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid #2d3748;
     }
 
     .input-wrapper {
@@ -331,7 +332,7 @@
     .input-box {
       width: 100%;
       padding: 14px 56px 14px 16px;
-      border: 2px solid #e5e7eb;
+      border: 2px solid #2d3748;
       border-radius: 12px;
       font-size: 15px;
       font-family: 'Inter', sans-serif;
@@ -339,6 +340,8 @@
       min-height: 52px;
       max-height: 200px;
       transition: border-color 0.2s;
+      background: #1a1f2e;
+      color: #e5e7eb;
     }
 
     .input-box:focus {
@@ -379,11 +382,12 @@
       top: 16px;
       left: 16px;
       z-index: 1000;
-      background: white;
-      border: 1px solid #e5e7eb;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
       border-radius: 8px;
       padding: 8px;
       cursor: pointer;
+      color: #e5e7eb;
     }
 
     /* Responsive */
@@ -414,12 +418,13 @@
     .loading {
       text-align: center;
       padding: 40px;
-      color: #6b7280;
+      color: #9ca3af;
     }
 
     .error-message {
-      background: #fef2f2;
-      color: #dc2626;
+      background: #2d1f1f;
+      color: #f87171;
+      border: 1px solid #3f1f1f;
       padding: 12px 16px;
       border-radius: 8px;
       margin: 16px;
