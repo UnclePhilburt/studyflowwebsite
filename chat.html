@@ -548,8 +548,100 @@
       userEmail.textContent = currentUser.email;
       userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
 
+      // Load conversation history
+      await loadConversations();
+
       // Enable input
       messageInput.disabled = false;
+    }
+
+    // Load Conversations List
+    async function loadConversations() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/conversations`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        displayConversations(data.conversations || []);
+
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+      }
+    }
+
+    // Display Conversations in Sidebar
+    function displayConversations(conversations) {
+      conversationList.innerHTML = '';
+
+      if (conversations.length === 0) {
+        conversationList.innerHTML = '<div style="padding: 12px; color: #6b7280; font-size: 13px; text-align: center;">No conversations yet</div>';
+        return;
+      }
+
+      conversations.forEach(conv => {
+        const item = document.createElement('div');
+        item.className = 'conversation-item';
+        if (conv.id === conversationId) {
+          item.classList.add('active');
+        }
+
+        const title = conv.title || 'New conversation';
+        item.textContent = title.length > 40 ? title.substring(0, 40) + '...' : title;
+        item.title = title;
+
+        item.addEventListener('click', (e) => loadConversation(conv.id, e.currentTarget));
+
+        conversationList.appendChild(item);
+      });
+    }
+
+    // Load Specific Conversation
+    async function loadConversation(convId, clickedElement) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/conversations/${convId}/messages`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Clear current messages
+        messagesContainer.innerHTML = '';
+
+        // Hide welcome screen
+        if (welcomeScreen) {
+          welcomeScreen.style.display = 'none';
+        }
+
+        // Display all messages
+        data.messages.forEach(msg => {
+          addMessage(msg.content, msg.role);
+        });
+
+        // Set active conversation
+        conversationId = convId;
+
+        // Update active state in sidebar
+        document.querySelectorAll('.conversation-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+      } catch (error) {
+        console.error('Error loading conversation:', error);
+      }
     }
 
     // Send Message
@@ -605,6 +697,9 @@
 
         // Add AI response
         addMessage(data.response || 'Sorry, I couldn\'t generate a response.', 'assistant');
+
+        // Refresh conversation list (to show new chat or updated title)
+        await loadConversations();
 
       } catch (error) {
         console.error('Error sending message:', error);
@@ -675,6 +770,11 @@
     function startNewChat() {
       conversationId = null;
       messagesContainer.innerHTML = '';
+
+      // Remove active state from all conversations
+      document.querySelectorAll('.conversation-item').forEach(item => {
+        item.classList.remove('active');
+      });
 
       const welcomeDiv = document.createElement('div');
       welcomeDiv.className = 'welcome-screen';
