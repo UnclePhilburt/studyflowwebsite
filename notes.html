@@ -504,13 +504,16 @@
       color: #dc2626;
     }
   </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <!-- Navigation -->
   <nav class="top-nav">
     <div class="nav-container">
       <a href="index.html" class="nav-logo">
-        <span>📚 StudyFlow</span>
+        <span>StudyFlow</span>
       </a>
       <div class="nav-links">
         <a href="upload.html" class="nav-link">Upload Notes</a>
@@ -574,35 +577,29 @@
 
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let allNotes = [];
+    let authToken = null;
 
     // Check authentication
     async function checkAuth() {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      if (!token) {
-        window.location.href = 'login.html';
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
+        window.location.href = 'index.html';
         return;
       }
 
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/current-user`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) throw new Error('Auth failed');
-
-        loadNotes();
-      } catch (error) {
-        console.error('Auth error:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('jwtToken');
-        window.location.href = 'login.html';
-      }
+      authToken = session.access_token;
+      loadNotes();
     }
 
     // Load notes
     async function loadNotes() {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
@@ -699,7 +696,7 @@
 
     // Download note
     async function downloadNote(noteId, filename) {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
@@ -729,7 +726,7 @@
         return;
       }
 
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}`, {
@@ -801,11 +798,9 @@
       return date.toLocaleDateString();
     }
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('jwtToken');
-      localStorage.removeItem('user');
-      window.location.href = 'login.html';
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
     }
 
     // Preview note
@@ -819,7 +814,7 @@
       titleEl.textContent = filename;
       bodyEl.innerHTML = '<div class="preview-loading"><div class="loading-spinner"></div><div class="loading-text">Loading preview...</div></div>';
 
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
+      
       const fileExt = filename.split('.').pop().toLowerCase();
 
       try {
