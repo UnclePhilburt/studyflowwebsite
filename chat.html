@@ -488,7 +488,7 @@
     }
 
     .toggle-switch.active {
-      background: #4b5563;
+      background: #10b981;
     }
 
     .toggle-slider {
@@ -549,7 +549,7 @@
           <div class="settings-option-label">Collective Brain</div>
           <div class="settings-option-description">Search all user notes for answers</div>
         </div>
-        <div class="toggle-switch" id="collectiveBrainToggle">
+        <div class="toggle-switch active" id="collectiveBrainToggle">
           <div class="toggle-slider"></div>
         </div>
       </div>
@@ -605,7 +605,7 @@
     let authToken = null;
     let conversationId = null;
     let conversations = [];
-    let collectiveBrainEnabled = false;
+    let collectiveBrainEnabled = true;
 
     // DOM Elements
     const messagesContainer = document.getElementById('messagesContainer');
