@@ -3,28 +3,195 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyFlowSuite - Automated Quiz Completion</title>
+  <title>StudyFlowSuite - NoteFlow AI Chat</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <!-- Device Detection: Redirect mobile users to mobile.html -->
-  <script>
-    (function() {
-      // Check if device is mobile
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const isSmallScreen = window.innerWidth <= 768;
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-      // Only redirect if both mobile device AND small screen
-      if (isMobile && isSmallScreen) {
-        // Check if we're not already on mobile.html to prevent redirect loop
-        if (!window.location.pathname.includes('mobile.html')) {
-          window.location.href = 'mobile.html';
-        }
-      }
-    })();
-  </script>
+    .auth-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 450px;
+      width: 100%;
+      padding: 50px 40px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .auth-logo h1 {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .auth-logo p {
+      color: #6b7280;
+      font-size: 15px;
+    }
+
+    .auth-form {
+      margin-top: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      background: #f9fafb;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      background: white;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .auth-divider {
+      text-align: center;
+      margin: 25px 0;
+      color: #9ca3af;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    .auth-divider::before {
+      left: 0;
+    }
+
+    .auth-divider::after {
+      right: 0;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .auth-footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .auth-footer a:hover {
+      color: #764ba2;
+    }
+
+    .error-message {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .success-message {
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+  </style>
 
   <!-- Supabase Authentication Check -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -44,701 +211,119 @@
   </script>
 </head>
 <body>
-  <!-- Mobile-Only Desktop Redirect Banner -->
-  <div class="mobile-desktop-banner" id="mobileDesktopBanner">
-    <div class="banner-content">
-      <div class="banner-icon">💻</div>
-      <div class="banner-text">
-        <strong>Download Required</strong>
-        <p>StudyFlow is a Chrome extension. Visit this page on your computer to download!</p>
+  <div class="auth-container">
+    <div class="auth-logo">
+      <h1>StudyFlowSuite</h1>
+      <p>AI-powered study assistant</p>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <form class="auth-form" id="loginForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="your@email.com" required>
       </div>
-      <button class="banner-close" onclick="document.getElementById('mobileDesktopBanner').style.display='none'">&times;</button>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+
+      <button type="submit" class="btn-primary" id="loginBtn">
+        Sign In
+      </button>
+    </form>
+
+    <div class="loading" id="loading">Signing you in...</div>
+
+    <div class="auth-divider">or</div>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="signup.html">Sign up</a>
     </div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="container nav-container">
-      <div class="logo">
-        <img src="assets/logo.svg" alt="StudyFlowSuite" class="logo-img">
-        <span class="logo-text">StudyFlowSuite</span>
-      </div>
-      <ul class="nav-links">
-        <li><a href="upload.html">Upload Notes</a></li>
-        <li><a href="notes.html">My Notes</a></li>
-        <li><a href="account.html">Account</a></li>
-        <li id="auth-nav-item"><a href="login.html" class="btn btn-secondary" id="auth-btn">Sign In</a></li>
-        <li><a href="#download" class="btn btn-primary">Download</a></li>
-      </ul>
-      <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container hero-container">
-      <div class="hero-content">
-        <div class="badge">🚀 Founding Members Program</div>
-        <h1 class="hero-title">
-          Become a Founding Member of<br>
-          <span class="gradient-text">AI Study Tools</span>
-        </h1>
-        <p class="hero-subtitle">
-          Be one of our founding beta testers for AI-powered Canvas automation. Get early access to cutting-edge features while helping us build the future of study assistance. <strong>Limited founding spots available.</strong>
-        </p>
-        <div class="hero-stats-mini">
-          <div class="stat-mini">
-            <div class="stat-mini-value">Founding</div>
-            <div class="stat-mini-label">Member Status</div>
-          </div>
-          <div class="stat-mini">
-            <div class="stat-mini-value">Early</div>
-            <div class="stat-mini-label">Access</div>
-          </div>
-          <div class="stat-mini">
-            <div class="stat-mini-value">$4.99</div>
-            <div class="stat-mini-label">Locked Forever</div>
-          </div>
-        </div>
-        <div class="hero-buttons">
-          <!-- Desktop Button -->
-          <a href="install-assistant.html" class="btn btn-primary btn-large desktop-only-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            Join Beta Program
-          </a>
-
-          <!-- Mobile Button - Email Link -->
-          <a href="#" class="btn btn-primary btn-large mobile-only-btn" id="emailMeBtn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            Email Me Beta Access
-          </a>
-
-          <a href="#how-it-works" class="btn btn-secondary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <span class="desktop-text">Watch Demo</span>
-            <span class="mobile-text">See How It Works</span>
-          </a>
-        </div>
-
-        <!-- Mobile-Only Reminder -->
-        <div class="mobile-reminder">
-          <p>💡 <strong>Heads up!</strong> StudyFlow requires Chrome on a computer. Save this link and visit on your desktop to download.</p>
-        </div>
-        <div class="trust-badges">
-          <span class="trust-badge">🔒 100% Secure & Private</span>
-          <span class="trust-badge">✅ No Credit Card Required</span>
-          <span class="trust-badge">⚡ 2-Minute Setup</span>
-        </div>
-      </div>
-      <div class="hero-image">
-        <div class="browser-mockup">
-          <div class="browser-header">
-            <div class="browser-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <div class="browser-url">canvas.instructure.com/courses/quiz</div>
-          </div>
-          <div class="browser-content">
-            <!-- Live Interactive Demo Quiz -->
-            <div class="demo-quiz" id="demoQuiz">
-              <div class="demo-quiz-header">
-                <h3 style="margin: 0; font-size: 18px; color: #1e293b;" id="demoQuestionTitle">Sample Quiz Question</h3>
-                <div class="demo-extension-badge">
-                  <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite;"></span>
-                  StudyFlow Active
-                </div>
-              </div>
-
-              <div class="demo-question" id="demoQuestionContent">
-                <!-- Question content will be dynamically inserted -->
-              </div>
-
-              <button class="demo-submit-btn" id="demoSubmitBtn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-                Start Demo
-              </button>
-
-              <div class="demo-progress" id="demoProgress">
-                <span class="progress-text">Question <span id="currentQ">1</span> of 4</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
-  <section class="features" id="features">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Beta Tester Benefits</h2>
-        <p class="section-subtitle">Get exclusive perks as an early access member</p>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5"></path>
-              <path d="M2 12l10 5 10-5"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Free Early Access</h3>
-          <p class="feature-description">Use all beta features completely free while we're in development</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Shape Development</h3>
-          <p class="feature-description">Your feedback directly influences new features and improvements</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-          </div>
-          <h3 class="feature-title">Priority Support</h3>
-          <p class="feature-description">Direct line to our dev team for bug reports and feature requests</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Exclusive Features</h3>
-          <p class="feature-description">Access cutting-edge AI features before public release</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-            </svg>
-          </div>
-          <h3 class="feature-title">Community Access</h3>
-          <p class="feature-description">Join our beta tester community and connect with other early adopters</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>
-          </div>
-          <h3 class="feature-title">Lifetime Discount</h3>
-          <p class="feature-description">Lock in special pricing when we launch - beta testers get 50% off forever</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works Section -->
-  <section class="how-it-works" id="how-it-works">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Join the Beta Program</h2>
-        <p class="section-subtitle">Get started in 3 simple steps</p>
-      </div>
-      <div class="steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3 class="step-title">Request Beta Access</h3>
-            <p class="step-description">Download and install the beta Chrome extension to get early access</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3 class="step-title">Test Features</h3>
-            <p class="step-description">Try out beta features on your Canvas quizzes and provide feedback</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3 class="step-title">Share Feedback</h3>
-            <p class="step-description">Help us improve by sharing your experience and feature requests</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Pricing Section -->
-  <section class="pricing" id="pricing">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Beta Access Options</h2>
-        <p class="section-subtitle">Choose your level of access during beta testing</p>
-        <div class="pricing-urgency">
-          <span class="urgency-badge">🎯 Beta Program</span>
-          <span class="urgency-text">Pay $4.99 now and lock in this price forever - or pay $9.99 after launch</span>
-        </div>
-      </div>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 class="pricing-title">Free Beta</h3>
-            <div class="pricing-price">
-              <span class="price">$0</span>
-              <span class="period">/month</span>
-            </div>
-          </div>
-          <ul class="pricing-features">
-            <li>✓ 10 questions per day</li>
-            <li>✓ Multiple choice questions</li>
-            <li>✓ Essay questions</li>
-            <li>✓ Fill-in-the-blank</li>
-            <li>✓ Community support</li>
-            <li>✗ No priority support</li>
-          </ul>
-          <a href="signup.html" class="btn btn-secondary btn-block">Try Free</a>
-        </div>
-
-        <div class="pricing-card featured">
-          <div class="popular-badge">Most Popular</div>
-          <div class="pricing-header">
-            <h3 class="pricing-title">Pro Beta</h3>
-            <div class="pricing-price">
-              <span class="price">$4.99</span>
-              <span class="period">/month</span>
-            </div>
-            <div class="launch-price-tag">🎁 3-day free trial · Lock in price forever</div>
-          </div>
-          <ul class="pricing-features">
-            <li>✓ 3-day free trial</li>
-            <li>✓ Unlimited questions</li>
-            <li>✓ All question types</li>
-            <li>✓ Priority support</li>
-            <li>✓ Shape development</li>
-            <li>✓ Keep $4.99 rate forever</li>
-          </ul>
-          <a href="signup.html?plan=pro" class="btn btn-primary btn-block">Start 3-Day Trial</a>
-        </div>
-
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 class="pricing-title">After Launch</h3>
-            <div class="pricing-price">
-              <span class="price">$9.99</span>
-              <span class="period">/month</span>
-            </div>
-          </div>
-          <ul class="pricing-features">
-            <li>✓ Unlimited questions</li>
-            <li>✓ All question types</li>
-            <li>✓ Standard support</li>
-            <li>✗ No price lock</li>
-            <li>✗ No beta perks</li>
-            <li>✗ Available post-launch</li>
-          </ul>
-          <a href="signup.html" class="btn btn-secondary btn-block">Join Waiting List</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Download Section -->
-  <section class="download" id="download">
-    <div class="container">
-      <div class="download-container">
-        <div class="download-content">
-          <h2 class="download-title">Ready to Join the Beta?</h2>
-          <p class="download-subtitle">Get early access and help shape the future of AI study tools</p>
-          <div class="download-buttons">
-            <a href="install-assistant.html" class="btn btn-primary btn-large" style="margin-right: 15px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="12" y1="18" x2="12" y2="12"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-              </svg>
-              Interactive Installation Guide
-            </a>
-            <a href="StudyFlow-Extension.zip" download="StudyFlow-Extension.zip" class="btn btn-secondary btn-large">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              Direct Download
-            </a>
-          </div>
-
-          <!-- Installation Steps -->
-          <div class="install-steps">
-            <div class="install-step">
-              <div class="step-icon">1</div>
-              <div class="step-text">
-                <strong>Extract ZIP</strong>
-                <span>Unzip the downloaded file to a folder</span>
-              </div>
-            </div>
-            <div class="install-step">
-              <div class="step-icon">2</div>
-              <div class="step-text">
-                <strong>Open Extensions</strong>
-                <span>Go to <code>chrome://extensions</code></span>
-              </div>
-            </div>
-            <div class="install-step">
-              <div class="step-icon">3</div>
-              <div class="step-text">
-                <strong>Enable Dev Mode</strong>
-                <span>Toggle "Developer mode" ON in top-right</span>
-              </div>
-            </div>
-            <div class="install-step">
-              <div class="step-icon">4</div>
-              <div class="step-text">
-                <strong>Load Extension</strong>
-                <span>Click "Load unpacked" → Navigate INTO the extracted folder → Select the folder (it will appear empty in the dialog, that's OK!)</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="download-info">
-            <div class="info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <span>Free to use</span>
-            </div>
-            <div class="info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <span>No credit card required</span>
-            </div>
-            <div class="info-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <span>5-minute setup</span>
-            </div>
-          </div>
-        </div>
-        <div class="download-image">
-          <div class="extension-preview">
-            <div class="popup-mockup">
-              <div class="popup-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; border-radius: 12px 12px 0 0;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <div style="width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px;">S</div>
-                  <span style="font-weight: 600; font-size: 16px;">StudyFlow</span>
-                </div>
-              </div>
-              <div style="padding: 20px; background: white;">
-                <div style="margin-bottom: 20px;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                    <span style="color: #64748b; font-size: 13px;">Model Selection</span>
-                  </div>
-                  <select style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
-                    <option>Basic Model</option>
-                    <option>Advanced Model (Pro Only)</option>
-                  </select>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                  <div>
-                    <label style="display: block; color: #64748b; font-size: 13px; margin-bottom: 6px;">Question Limit</label>
-                    <input type="number" value="10" style="width: 100%; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
-                  </div>
-                  <div>
-                    <label style="display: block; color: #64748b; font-size: 13px; margin-bottom: 6px;">Target Time (s)</label>
-                    <input type="number" value="30" style="width: 100%; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
-                  </div>
-                </div>
-
-                <button style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                  <span>▶</span>
-                  <span>Start Assistant</span>
-                </button>
-
-                <div style="margin-top: 16px; padding: 12px; background: #f0fdf4; border-left: 4px solid #10b981; border-radius: 6px; font-size: 13px; color: #065f46;">
-                  <strong>Ready to help!</strong>
-                  <div style="margin-top: 4px; color: #047857;">Navigate to your quiz and click Start</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Safety & Security Section -->
-  <section class="safety-section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Smart Usage Guidelines</h2>
-        <p class="section-subtitle">Get the most out of StudyFlow while staying safe and responsible</p>
-      </div>
-
-      <div class="safety-content">
-        <div class="safety-card">
-          <div class="safety-icon">🛡️</div>
-          <h3>Browser Extension Technology</h3>
-          <p>StudyFlow runs as a standard Chrome extension using the same technology as ad blockers, password managers, and productivity tools used by millions daily. It operates entirely within your browser and never modifies your computer's system files.</p>
-        </div>
-
-        <div class="safety-card">
-          <div class="safety-icon">🔒</div>
-          <h3>Your Data Privacy</h3>
-          <p>StudyFlow only processes quiz questions you explicitly activate it on. No browsing history, personal files, or unrelated data is collected. Question data is sent securely via HTTPS to our AI service for processing, then immediately discarded.</p>
-        </div>
-
-        <div class="safety-card">
-          <div class="safety-icon">🎯</div>
-          <h3>Learning Aid Tool</h3>
-          <p>StudyFlow is designed as a study assistance tool. It works best for practice quizzes, self-assessments, and homework where the goal is to learn material efficiently. We recommend using it responsibly to supplement your education.</p>
-        </div>
-      </div>
-
-      <div class="detection-info">
-        <h3 style="font-size: 24px; margin-bottom: 20px; text-align: center; color: #1e293b;">Platform Compatibility</h3>
-
-        <div class="detection-grid">
-          <div class="detection-card safe">
-            <h4>✅ Works Great With:</h4>
-            <ul>
-              <li>Standard Canvas and other LMS platforms</li>
-              <li>Colibri Real Estate courses and exams</li>
-              <li>Basic online quizzes without proctoring</li>
-              <li>Practice tests and self-assessments</li>
-              <li>Homework assignments</li>
-              <li>Study guides and review materials</li>
-            </ul>
-            <p class="detection-note">Most college websites don't actively monitor for browser extensions unless using specialized proctoring software.</p>
-          </div>
-
-          <div class="detection-card caution">
-            <h4>⚠️ Not Recommended With:</h4>
-            <ul>
-              <li>Respondus LockDown Browser</li>
-              <li>Proctorio or Honorlock proctoring</li>
-              <li>ProctorU live proctoring</li>
-              <li>Examity or similar services</li>
-              <li>High-stakes exams with monitoring</li>
-            </ul>
-            <p class="detection-note">Proctoring software specifically monitors for automation tools and browser extensions. StudyFlow will not work with these services and attempting to use it may violate academic integrity policies.</p>
-          </div>
-        </div>
-
-        <div class="technical-details">
-          <h4>Technical Detection Information</h4>
-          <div class="tech-grid">
-            <div class="tech-item">
-              <strong>Extension Detection:</strong>
-              <p>Websites can detect browser extensions through various methods. StudyFlow operates like any standard extension (similar to Grammarly or LastPass) and is visible to sites that actively check for extensions.</p>
-            </div>
-            <div class="tech-item">
-              <strong>Activity Patterns:</strong>
-              <p>The extension automates form filling and clicking. On platforms with basic LMS (no proctoring), this activity appears similar to a fast typist. Advanced proctoring tools may flag automated patterns.</p>
-            </div>
-            <div class="tech-item">
-              <strong>Network Requests:</strong>
-              <p>StudyFlow communicates with our secure API to process questions. This creates network traffic that advanced monitoring could detect, though most standard LMS platforms don't monitor external API calls.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="responsibility-notice">
-        <div class="notice-icon">📚</div>
-        <div class="notice-content">
-          <h4>Use Responsibly</h4>
-          <p>StudyFlow is a powerful learning tool designed to help students work through practice materials efficiently. It's your responsibility to use it in accordance with your institution's academic integrity policies. We recommend using StudyFlow for:</p>
-          <ul>
-            <li>Practice quizzes where the goal is learning, not assessment</li>
-            <li>Homework assignments that allow outside resources</li>
-            <li>Self-study and review materials</li>
-            <li>Time-saving on repetitive coursework</li>
-          </ul>
-          <p><strong>Important:</strong> Do not use StudyFlow on proctored exams, high-stakes assessments, or any scenario where its use would violate academic integrity policies. Always check your institution's policies before use.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ Section -->
-  <section class="faq">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Frequently Asked Questions</h2>
-      </div>
-      <div class="faq-grid">
-        <div class="faq-item">
-          <h3 class="faq-question">Is StudyFlowSuite free?</h3>
-          <p class="faq-answer">Yes! We offer a free tier with 10 questions per day. Upgrade to Pro for unlimited questions and advanced features.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">What quiz platforms are supported?</h3>
-          <p class="faq-answer">StudyFlowSuite works with Canvas LMS. We're constantly adding new integrations.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">What quiz platforms are supported?</h3>
-          <p class="faq-answer">StudyFlowSuite works with Canvas LMS. We're constantly adding new integrations.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">Can websites detect StudyFlow?</h3>
-          <p class="faq-answer">Standard LMS platforms like Canvas without proctoring software typically don't monitor for extensions. However, advanced proctoring tools like Respondus, Proctorio, or Honorlock can detect browser extensions. See our safety section above for details.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">Is it safe to use on my college quizzes?</h3>
-          <p class="faq-answer">StudyFlow works best with unproctored practice quizzes and homework. For high-stakes proctored exams, we strongly recommend NOT using it as proctoring software will detect it. Always check your institution's academic integrity policies.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">Is my data safe?</h3>
-          <p class="faq-answer">Absolutely. We don't collect or store any personal data. All quiz content is processed securely and discarded immediately.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">Can I use it on multiple devices?</h3>
-          <p class="faq-answer">Yes! Your Pro subscription works across all your Chrome browsers when logged in with the same account.</p>
-        </div>
-        <div class="faq-item">
-          <h3 class="faq-question">What if I need help?</h3>
-          <p class="faq-answer">Free users get community support. Pro users get priority email support with response times under 24 hours.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <div class="footer-logo">
-            <img src="assets/logo.svg" alt="StudyFlowSuite">
-            <span>StudyFlowSuite</span>
-          </div>
-          <p class="footer-description">Automated quiz completion tool for students.</p>
-          <div class="social-links">
-            <a href="#" aria-label="Twitter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path>
-              </svg>
-            </a>
-            <a href="#" aria-label="GitHub">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"></path>
-              </svg>
-            </a>
-            <a href="#" aria-label="Discord">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"></path>
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="footer-section">
-          <h4 class="footer-title">Product</h4>
-          <ul class="footer-links">
-            <li><a href="#features">Features</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#download">Download</a></li>
-            <li><a href="docs.html">Documentation</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-section">
-          <h4 class="footer-title">Company</h4>
-          <ul class="footer-links">
-            <li><a href="about.html">About</a></li>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="careers.html">Careers</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-section">
-          <h4 class="footer-title">Legal</h4>
-          <ul class="footer-links">
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="terms.html">Terms of Service</a></li>
-            <li><a href="license.html">License</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2024 StudyFlowSuite. All rights reserved.</p>
-        <p>Made with ❤️ for students everywhere</p>
-      </div>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-  <script src="demo-quiz.js"></script>
-
-  <!-- Auth Check Script -->
   <script>
-    (function() {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      const user = localStorage.getItem('user');
+    const supabase = window.supabase.createClient(
+      'https://mxddgbpxjoltaimftpmn.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.kcBbr5xjQOxR1AanJ3zl6YRPLKsOzZSwR7TfeFZiZgw'
+    );
 
-      if (token && user) {
-        try {
-          const userData = JSON.parse(user);
-          const authBtn = document.getElementById('auth-btn');
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const loading = document.getElementById('loading');
 
-          // Update button to show logout instead of sign in
-          authBtn.textContent = 'Logout';
-          authBtn.href = '#';
-          authBtn.className = 'btn btn-secondary';
-          authBtn.onclick = function(e) {
-            e.preventDefault();
-            localStorage.removeItem('token');
-            localStorage.removeItem('jwtToken');
-            localStorage.removeItem('user');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('tokenExpiresAt');
-            window.location.reload();
-          };
-        } catch (e) {
-          // Invalid user data, clear it
-          localStorage.removeItem('token');
-          localStorage.removeItem('jwtToken');
-          localStorage.removeItem('user');
-        }
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+
+    function hideMessages() {
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessages();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showError('Please enter both email and password');
+        return;
       }
-    })();
+
+      // Disable button and show loading
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+      loading.classList.add('active');
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        showSuccess('Login successful! Redirecting...');
+        setTimeout(() => {
+          window.location.href = 'chat.html';
+        }, 500);
+
+      } catch (error) {
+        console.error('Login error:', error);
+        showError(error.message || 'Login failed. Please check your credentials.');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+        loading.classList.remove('active');
+      }
+    });
+
+    // Auto-fill email from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email');
+    if (emailParam) {
+      emailInput.value = emailParam;
+      passwordInput.focus();
+    }
   </script>
 </body>
 </html>
