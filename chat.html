@@ -216,29 +216,53 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      text-align: center;
+      text-align: left;
       color: #9ca3af;
       padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    .welcome-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
-
-    .welcome-title {
-      font-size: 28px;
-      font-weight: 700;
+    .welcome-greeting {
+      font-size: 32px;
+      font-weight: 400;
       color: #e5e7eb;
       margin-bottom: 8px;
     }
 
-    .welcome-subtitle {
-      font-size: 16px;
-      color: #9ca3af;
-      max-width: 500px;
+    .welcome-title {
+      font-size: 48px;
+      font-weight: 400;
+      color: #e5e7eb;
+      margin-bottom: 48px;
+    }
+
+    .suggested-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .prompt-chip {
+      padding: 14px 20px;
+      background: #1a1f2e;
+      border: 1px solid #2d3748;
+      border-radius: 24px;
+      color: #d1d5db;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .prompt-chip:hover {
+      background: #2d3748;
+      border-color: #4b5563;
+      transform: translateY(-2px);
     }
 
     .message {
@@ -571,11 +595,15 @@
 
       <div class="messages-container" id="messagesContainer">
         <div class="welcome-screen" id="welcomeScreen">
-          <div class="welcome-icon">💬</div>
-          <h2 class="welcome-title">Welcome to NoteFlow</h2>
-          <p class="welcome-subtitle">
-            Ask me anything about your notes! I can help you study, explain concepts, and answer questions based on your uploaded materials.
-          </p>
+          <div class="welcome-greeting" id="welcomeGreeting">Hi</div>
+          <h1 class="welcome-title">Where should we start?</h1>
+          <div class="suggested-prompts">
+            <div class="prompt-chip" onclick="sendPrompt('Explain this concept in simple terms')">Explain a concept</div>
+            <div class="prompt-chip" onclick="sendPrompt('Help me study for my exam')">Study for exam</div>
+            <div class="prompt-chip" onclick="sendPrompt('Quiz me on this topic')">Quiz me</div>
+            <div class="prompt-chip" onclick="sendPrompt('Summarize my notes')">Summarize notes</div>
+            <div class="prompt-chip" onclick="sendPrompt('What are the key points?')">Key points</div>
+          </div>
         </div>
       </div>
 
@@ -649,6 +677,14 @@
       // Update UI with user info
       userEmail.textContent = currentUser.email;
       userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+
+      // Update welcome greeting with user's name
+      const firstName = currentUser.email.split('@')[0];
+      const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+      const welcomeGreeting = document.getElementById('welcomeGreeting');
+      if (welcomeGreeting) {
+        welcomeGreeting.textContent = `Hi ${capitalizedName}`;
+      }
 
       // Load conversation history
       await loadConversations();
@@ -744,6 +780,12 @@
       } catch (error) {
         console.error('Error loading conversation:', error);
       }
+    }
+
+    // Send suggested prompt
+    function sendPrompt(prompt) {
+      messageInput.value = prompt;
+      sendMessage();
     }
 
     // Send Message
@@ -881,12 +923,18 @@
       const welcomeDiv = document.createElement('div');
       welcomeDiv.className = 'welcome-screen';
       welcomeDiv.id = 'welcomeScreen';
+      const firstName = currentUser?.email?.split('@')[0] || 'there';
+      const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
       welcomeDiv.innerHTML = `
-        <div class="welcome-icon">💬</div>
-        <h2 class="welcome-title">New Conversation</h2>
-        <p class="welcome-subtitle">
-          Ask me anything about your notes! I can help you study, explain concepts, and answer questions.
-        </p>
+        <div class="welcome-greeting">Hi ${capitalizedName}</div>
+        <h1 class="welcome-title">Where should we start?</h1>
+        <div class="suggested-prompts">
+          <div class="prompt-chip" onclick="sendPrompt('Explain this concept in simple terms')">Explain a concept</div>
+          <div class="prompt-chip" onclick="sendPrompt('Help me study for my exam')">Study for exam</div>
+          <div class="prompt-chip" onclick="sendPrompt('Quiz me on this topic')">Quiz me</div>
+          <div class="prompt-chip" onclick="sendPrompt('Summarize my notes')">Summarize notes</div>
+          <div class="prompt-chip" onclick="sendPrompt('What are the key points?')">Key points</div>
+        </div>
       `;
       messagesContainer.appendChild(welcomeDiv);
       messageInput.focus();
