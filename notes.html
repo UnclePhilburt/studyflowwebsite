@@ -812,9 +812,9 @@
     <div class="impact-panel" id="impactPanel">
       <div class="impact-header" onclick="toggleImpactPanel()">
         <div class="impact-summary">
-          <span class="impact-icon">🌱</span>
+          <span class="impact-icon" id="impactIcon">🌱</span>
           <div>
-            <div class="impact-text">Your notes have helped <span class="impact-count" id="totalUsage">0</span> students</div>
+            <div class="impact-text" id="impactText">Your notes have helped <span class="impact-count" id="totalUsage">0</span> students</div>
           </div>
         </div>
         <div class="impact-toggle">
@@ -1031,7 +1031,31 @@
 
     // Update impact panel with stats
     function updateImpactPanel(stats) {
-      document.getElementById('totalUsage').textContent = stats.totalUsage || 0;
+      const totalUsage = stats.totalUsage || 0;
+
+      // Update message based on usage
+      const impactIcon = document.getElementById('impactIcon');
+      const impactText = document.getElementById('impactText');
+
+      if (totalUsage === 0) {
+        // Inspiring message for zero usage
+        const inspiringMessages = [
+          'Your knowledge library is growing - ready to help students',
+          'Building your collection - every note is a seed for future learning',
+          'Your notes are here, waiting to inspire others',
+          'Creating a foundation of knowledge for the community',
+          'Your study materials are ready to make an impact'
+        ];
+        const randomMessage = inspiringMessages[Math.floor(Math.random() * inspiringMessages.length)];
+        impactIcon.textContent = '📚';
+        impactText.innerHTML = randomMessage;
+      } else {
+        // Show actual usage stats
+        impactIcon.textContent = '🌱';
+        impactText.innerHTML = `Your notes have helped <span class="impact-count">${totalUsage}</span> students`;
+      }
+
+      document.getElementById('totalUsage').textContent = totalUsage;
       document.getElementById('weeklyUsage').textContent = stats.weeklyUsage || 0;
       document.getElementById('activeNotes').textContent = stats.activeNotes || 0;
 
@@ -1045,6 +1069,9 @@
             <span class="top-note-count">${note.count}x</span>
           </div>
         `).join('');
+      } else {
+        document.getElementById('topNote').textContent = '-';
+        document.getElementById('topNotesList').innerHTML = '<div style="text-align: center; color: #9ca3af; font-size: 13px; padding: 16px;">Upload and share notes to start helping others</div>';
       }
 
       // Add usage counts to notes
