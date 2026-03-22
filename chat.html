@@ -713,6 +713,7 @@
 
     // State
     let currentUser = null;
+    let userProfile = null;
     let authToken = null;
     let conversationId = null;
     let conversations = [];
@@ -752,13 +753,23 @@
       currentUser = session.user;
       authToken = session.access_token;
 
+      // Fetch user profile from backend to get their name
+      try {
+        const profileResponse = await fetch(`${BACKEND_URL}/api/current-user`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (profileResponse.ok) {
+          userProfile = await profileResponse.json();
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+
       // Update UI with user info
       userEmail.textContent = currentUser.email;
 
-      // Get user's actual name from metadata, or fall back to email
-      const userName = currentUser.user_metadata?.full_name ||
-                       currentUser.user_metadata?.name ||
-                       currentUser.email.split('@')[0];
+      // Get user's actual name from profile, or fall back to email
+      const userName = userProfile?.name || currentUser.email.split('@')[0];
       const firstName = userName.split(' ')[0];
       const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
@@ -1140,10 +1151,8 @@
       welcomeDiv.className = 'welcome-screen';
       welcomeDiv.id = 'welcomeScreen';
 
-      // Get user's actual name from metadata, or fall back to email
-      const userName = currentUser?.user_metadata?.full_name ||
-                       currentUser?.user_metadata?.name ||
-                       currentUser?.email?.split('@')[0] || 'there';
+      // Get user's actual name from profile, or fall back to email
+      const userName = userProfile?.name || currentUser?.email?.split('@')[0] || 'there';
       const firstName = userName.split(' ')[0];
       const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
