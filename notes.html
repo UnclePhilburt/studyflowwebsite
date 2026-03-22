@@ -1323,7 +1323,9 @@
 
         if (!response.ok) throw new Error('Failed to load preview');
 
-        const blob = await response.blob();
+        const blobData = await response.blob();
+        // Ensure the blob has the correct MIME type for inline display
+        const blob = new Blob([blobData], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
 
         // Display in iframe
