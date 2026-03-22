@@ -1109,18 +1109,13 @@
       const subtitle = document.getElementById('nexus-toggle-subtitle');
       const container = document.getElementById('nexus-toggle-container');
 
-      // Set default based on user's signup preference
-      const defaultEnabled = userProfile?.collective_brain_opt_in !== false;
-      toggle.checked = defaultEnabled;
+      // Always default to enabled (sharing with Nexus ON by default)
+      toggle.checked = true;
 
-      // Update UI to show it's based on settings
-      if (defaultEnabled) {
-        subtitle.textContent = '✓ Shared to Nexus by default (based on your settings)';
-        subtitle.classList.add('default-on');
-        container.classList.add('enabled');
-      } else {
-        subtitle.textContent = 'Keep uploads private (change in settings)';
-      }
+      // Update UI to show it's enabled by default
+      subtitle.textContent = '✓ Shared to Nexus by default';
+      subtitle.classList.add('default-on');
+      container.classList.add('enabled');
 
       // Update UI when toggled
       toggle.addEventListener('change', () => {
