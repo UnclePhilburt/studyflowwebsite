@@ -120,7 +120,7 @@
       text-align: center;
     }
 
-    /* Zen Minimal Design */
+    /* Stats Section */
     .brain-animation-container {
       position: relative;
       min-height: 280px;
@@ -128,21 +128,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 50px;
+      gap: 40px;
       padding: 60px 40px;
     }
 
-    /* Zen Number Display */
-    .zen-number {
+    /* Suite Title */
+    .suite-title {
       font-family: 'Lora', serif;
-      font-size: 72px;
-      font-weight: 400;
+      font-size: 48px;
+      font-weight: 600;
       background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -2px;
-      animation: fadeIn 1.2s ease both;
+      letter-spacing: -1px;
+      animation: fadeIn 0.8s ease both;
     }
 
     @keyframes fadeIn {
@@ -150,54 +150,33 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Zen Dots */
-    .zen-dots {
+    /* Live Stats */
+    .live-stats {
       display: flex;
-      gap: 16px;
+      gap: 80px;
       align-items: center;
-      animation: fadeIn 1.5s ease 0.3s both;
+      animation: fadeIn 1s ease 0.3s both;
     }
 
-    .zen-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
-      opacity: 0.4;
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    .zen-dot:nth-child(1) { animation-delay: 0s; }
-    .zen-dot:nth-child(2) { animation-delay: 0.5s; }
-    .zen-dot:nth-child(3) { animation-delay: 1s; }
-    .zen-dot:nth-child(4) { animation-delay: 1.5s; }
-    .zen-dot:nth-child(5) { animation-delay: 2s; }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50% { opacity: 0.8; transform: scale(1.3); }
-    }
-
-    /* Zen Text */
-    .zen-text {
+    .stat-item {
       text-align: center;
-      max-width: 500px;
-      animation: fadeIn 1.8s ease 0.6s both;
     }
 
-    .zen-text-main {
+    .stat-number {
       font-family: 'Lora', serif;
-      font-size: 20px;
+      font-size: 56px;
       font-weight: 400;
-      color: #5a5a5a;
-      margin-bottom: 12px;
-      line-height: 1.6;
+      color: #7c9885;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
     }
 
-    .zen-text-sub {
+    .stat-label {
       font-size: 14px;
       color: #8a8a8a;
-      font-weight: 400;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
 
@@ -405,28 +384,24 @@
       .brain-animation-container {
         padding: 40px 20px;
         min-height: auto;
-        gap: 40px;
+        gap: 30px;
       }
 
-      .zen-number {
-        font-size: 56px;
+      .suite-title {
+        font-size: 36px;
       }
 
-      .zen-dots {
-        gap: 12px;
+      .live-stats {
+        flex-direction: column;
+        gap: 30px;
       }
 
-      .zen-dot {
-        width: 6px;
-        height: 6px;
+      .stat-number {
+        font-size: 44px;
       }
 
-      .zen-text-main {
-        font-size: 18px;
-      }
-
-      .zen-text-sub {
-        font-size: 13px;
+      .stat-label {
+        font-size: 12px;
       }
     }
   </style>
@@ -444,28 +419,22 @@
         <p>StudyFlow learns from thousands of students' notes to give you accurate, course-specific answers.</p>
       </div>
 
-      <!-- Collective Brain - Main Feature -->
+      <!-- Stats Section -->
       <div class="collective-brain">
-        <h2>Collective Intelligence</h2>
-        <p>Thousands of students' knowledge, unified into one learning experience.</p>
-
         <div class="brain-animation-container">
-          <!-- Zen Number -->
-          <div class="zen-number">12,847</div>
+          <!-- Suite Title -->
+          <div class="suite-title">StudyFlow Suite</div>
 
-          <!-- Zen Dots -->
-          <div class="zen-dots">
-            <div class="zen-dot"></div>
-            <div class="zen-dot"></div>
-            <div class="zen-dot"></div>
-            <div class="zen-dot"></div>
-            <div class="zen-dot"></div>
-          </div>
-
-          <!-- Zen Text -->
-          <div class="zen-text">
-            <div class="zen-text-main">notes from students across 300 universities</div>
-            <div class="zen-text-sub">One collective intelligence growing smarter every day</div>
+          <!-- Live Stats -->
+          <div class="live-stats">
+            <div class="stat-item">
+              <div class="stat-number">4,293</div>
+              <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">12,847</div>
+              <div class="stat-label">Notes</div>
+            </div>
           </div>
         </div>
 
