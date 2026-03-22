@@ -1015,18 +1015,21 @@
       if (!message) return;
 
       // If sending from welcome screen, switch to bottom input
-      if (welcomeScreen && welcomeScreen.style.display !== 'none') {
-        welcomeScreen.style.display = 'none';
+      const currentWelcomeScreen = document.getElementById('welcomeScreen');
+      if (currentWelcomeScreen && currentWelcomeScreen.style.display !== 'none') {
+        currentWelcomeScreen.style.display = 'none';
         bottomInputContainer.classList.remove('hidden');
       }
 
       // Clear inputs and disable
       messageInput.value = '';
-      welcomeMessageInput.value = '';
+      const currentWelcomeInput = document.getElementById('welcomeMessageInput');
+      const currentWelcomeSendBtn = document.getElementById('welcomeSendBtn');
+      if (currentWelcomeInput) currentWelcomeInput.value = '';
       messageInput.disabled = true;
       sendBtn.disabled = true;
-      welcomeMessageInput.disabled = true;
-      welcomeSendBtn.disabled = true;
+      if (currentWelcomeInput) currentWelcomeInput.disabled = true;
+      if (currentWelcomeSendBtn) currentWelcomeSendBtn.disabled = true;
 
       // Add user message
       addMessage(message, 'user');
