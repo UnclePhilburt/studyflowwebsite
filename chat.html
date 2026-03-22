@@ -41,255 +41,45 @@
       background: linear-gradient(180deg, #f8f7f3 0%, #f1ede8 100%);
     }
 
-    /* Dark Mode Theme - Warm Charcoal */
-    body.dark-mode {
-      background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
-      color: #e8e6e3;
-    }
 
-    body.dark-mode.chat-started {
-      background: linear-gradient(180deg, #282828 0%, #1f1f1f 100%);
-    }
 
-    body.dark-mode .sidebar {
-      background: rgba(30, 30, 30, 0.98);
-      border-right: 1px solid rgba(232, 155, 95, 0.1);
-      box-shadow: 8px 0 40px rgba(0, 0, 0, 0.5);
-    }
 
-    body.dark-mode .search-input {
-      background: rgba(50, 50, 50, 0.9);
-      border: 1px solid rgba(232, 155, 95, 0.15);
-      color: #e8e6e3;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-    }
 
-    body.dark-mode .search-input::placeholder {
-      color: rgba(232, 230, 227, 0.3);
-    }
 
-    body.dark-mode .search-input:focus {
-      background: rgba(60, 60, 60, 0.95);
-      border-color: rgba(232, 155, 95, 0.3);
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-    }
 
-    body.dark-mode .message-content {
-      background: rgba(50, 50, 50, 0.9);
-      color: #e8e6e3;
-      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3),
-                  0 8px 32px rgba(0, 0, 0, 0.2);
-    }
 
-    body.dark-mode .message.user .message-content {
-      box-shadow: 0 2px 16px rgba(232, 155, 95, 0.2),
-                  0 8px 32px rgba(232, 155, 95, 0.1);
-    }
 
-    body.dark-mode .message.assistant .message-content {
-      border-left-color: rgba(232, 230, 227, 0.1);
-    }
 
-    body.dark-mode .message.assistant::before {
-      color: rgba(232, 230, 227, 0.3);
-    }
 
-    body.dark-mode .menu-btn {
-      background: rgba(70, 70, 70, 0.8);
-      border: 1px solid rgba(232, 155, 95, 0.15);
-      color: rgba(232, 230, 227, 0.6);
-    }
 
-    body.dark-mode .menu-btn:hover {
-      background: rgba(80, 80, 80, 0.95);
-      border-color: rgba(232, 155, 95, 0.3);
-      color: #e8e6e3;
-    }
 
-    body.light-mode .welcome-hint h1 {
-      color: #1a1a1a;
-    }
 
-    body.light-mode .welcome-hint p {
-      color: rgba(0, 0, 0, 0.4);
-    }
 
-    body.light-mode .sidebar-header {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      background: rgba(0, 0, 0, 0.02);
-    }
 
-    body.light-mode .logo-text {
-      color: #1a202c;
-    }
 
-    body.light-mode .icon-btn {
-      color: #4a5568;
-    }
 
-    body.light-mode .icon-btn:hover {
-      background: rgba(124, 152, 133, 0.08);
-      color: #1a202c;
-      box-shadow: 0 0 20px rgba(124, 152, 133, 0.2);
-    }
 
-    body.light-mode .delete-chat-btn {
-      color: #4a5568;
-    }
 
-    body.light-mode .delete-chat-btn:hover {
-      background: #fff5f5;
-      color: #e53e3e;
-    }
 
-    body.light-mode .new-chat-btn {
-      color: #2d3748;
-      background: linear-gradient(135deg, #ececed 0%, #e0e2e5 100%);
-      border: 1px solid #d1d5db;
-    }
 
-    body.light-mode .new-chat-btn:hover {
-      background: linear-gradient(135deg, #e0e2e5 0%, #d6d9dd 100%);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
 
-    body.light-mode .conversation-item {
-      color: #2d3748;
-    }
 
-    body.light-mode .conversation-item:hover {
-      background: #ececed;
-    }
 
-    body.light-mode .conversation-item.active {
-      background: linear-gradient(135deg, #e0e2e5 0%, #d6d9dd 100%);
-      color: #1a202c;
-      border-left: 3px solid #7c9885;
-    }
 
-    body.light-mode .sidebar-footer {
-      border-top: 1px solid #e0e4e8;
-    }
 
-    body.light-mode .user-avatar {
-      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
-    }
 
-    body.light-mode .user-email {
-      color: #4a5568;
-    }
 
-    body.light-mode .logout-btn {
-      color: #e53e3e;
-    }
 
-    body.light-mode .logout-btn:hover {
-      background: #fff5f5;
-    }
 
-    body.light-mode .chat-container {
-      background: linear-gradient(135deg, #e8eaed 0%, #d6d9dd 100%);
-    }
 
-    body.light-mode .chat-header {
-      border-bottom: 1px solid #d1d5db;
-      background: rgba(245, 246, 247, 0.8);
-      backdrop-filter: blur(10px);
-    }
 
-    body.light-mode .chat-title {
-      color: #1a202c;
-    }
 
-    body.light-mode .welcome-greeting {
-      color: rgba(0, 0, 0, 0.4);
-    }
 
-    body.light-mode .welcome-title {
-      color: #1a202c;
-    }
 
-    body.light-mode .prompt-chip {
-      background: transparent;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      color: rgba(0, 0, 0, 0.5);
-    }
 
-    body.light-mode .prompt-chip:hover {
-      background: rgba(124, 152, 133, 0.08);
-      border-color: rgba(124, 152, 133, 0.3);
-      color: rgba(0, 0, 0, 0.9);
-      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.15);
-    }
 
-    body.dark-mode .input-box {
-      background: rgba(50, 50, 50, 0.95);
-      color: #e8e6e3;
-      border: 1px solid rgba(232, 155, 95, 0.15);
-      box-shadow: 0 6px 32px rgba(0, 0, 0, 0.4);
-    }
 
-    body.dark-mode .input-box::placeholder {
-      color: rgba(232, 230, 227, 0.3);
-    }
 
-    body.dark-mode .input-box:focus {
-      border-color: rgba(232, 155, 95, 0.3);
-      background: rgba(60, 60, 60, 0.98);
-      box-shadow: 0 8px 48px rgba(0, 0, 0, 0.5);
-    }
-
-    body.dark-mode .welcome-hint h1 {
-      color: #e8e6e3;
-    }
-
-    body.dark-mode .welcome-hint p {
-      color: rgba(232, 230, 227, 0.4);
-    }
-
-    body.light-mode .message.user::before {
-      color: #7c9885;
-      opacity: 0.8;
-    }
-
-    body.light-mode .message.assistant::before {
-      color: rgba(0, 0, 0, 0.4);
-    }
-
-    body.light-mode .typing-dot {
-      background: #7c9885;
-    }
-
-    body.light-mode .input-container {
-      border-top: 1px solid #d1d5db;
-      background: rgba(245, 246, 247, 0.8);
-      backdrop-filter: blur(10px);
-    }
-
-    body.light-mode .settings-popup {
-      background: #f5f6f7;
-      border: 1px solid #d1d5db;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    }
-
-    body.light-mode .settings-popup-header {
-      color: #1a202c;
-      border-bottom: 1px solid #d1d5db;
-    }
-
-    body.light-mode .settings-option-label {
-      color: #2d3748;
-    }
-
-    body.light-mode .settings-option-description {
-      color: #4a5568;
-    }
-
-    body.light-mode .error-message {
-      background: #fef0f0;
-      color: #e53e3e;
-      border: 1px solid #f8b4b4;
-    }
 
     /* Main Layout */
     .app-container {
@@ -1209,33 +999,10 @@
       transform: translateX(24px);
     }
 
-    body.light-mode .toggle-switch {
-      background: #cbd5e0;
-    }
 
-    body.light-mode .toggle-switch.active {
-      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
-    }
 
-    body.light-mode .floating-chats-btn {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      color: rgba(0, 0, 0, 0.5);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    }
 
-    body.light-mode .floating-chats-btn:hover {
-      background: rgba(124, 152, 133, 0.12);
-      border-color: rgba(124, 152, 133, 0.3);
-      color: #1a202c;
-      box-shadow: 0 12px 40px rgba(124, 152, 133, 0.2);
-    }
 
-    body.light-mode .mobile-menu-toggle {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      color: #1a202c;
-    }
   </style>
 </head>
 <body>
@@ -1275,15 +1042,6 @@
     <!-- Settings Popup -->
     <div class="settings-popup" id="settingsPopup">
       <div class="settings-popup-header">Settings</div>
-      <div class="settings-option">
-        <div>
-          <div class="settings-option-label">Light Mode</div>
-          <div class="settings-option-description">Premium chrome-inspired light theme</div>
-        </div>
-        <div class="toggle-switch" id="themeToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
       <div class="settings-option">
         <div>
           <div class="settings-option-label">Collective Brain</div>
@@ -1387,25 +1145,13 @@
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsPopup = document.getElementById('settingsPopup');
     const collectiveBrainToggle = document.getElementById('collectiveBrainToggle');
-    const themeToggle = document.getElementById('themeToggle');
     const uploadBtn = document.getElementById('uploadBtn');
     const myNotesBtn = document.getElementById('myNotesBtn');
 
     // Theme Management
     function loadTheme() {
-      const savedTheme = localStorage.getItem('studyflow-theme');
-      if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        themeToggle.classList.add('active');
-      }
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle('light-mode');
-      const isLight = document.body.classList.contains('light-mode');
-      localStorage.setItem('studyflow-theme', isLight ? 'light' : 'dark');
-      themeToggle.classList.toggle('active', isLight);
-    }
 
     // Initialize
     async function init() {
@@ -2009,7 +1755,6 @@
     });
 
     // Theme toggle
-    themeToggle.addEventListener('click', toggleTheme);
 
     // Collective Brain toggle
     collectiveBrainToggle.addEventListener('click', () => {
