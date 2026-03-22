@@ -34,7 +34,7 @@
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 60px 40px;
       position: relative;
@@ -44,7 +44,7 @@
     /* Hero Section */
     .hero {
       text-align: center;
-      margin-bottom: 80px;
+      margin-bottom: 100px;
       animation: fadeIn 0.8s ease;
     }
 
@@ -55,46 +55,200 @@
 
     .hero h1 {
       font-family: 'Lora', serif;
-      font-size: 56px;
+      font-size: 64px;
       font-weight: 600;
       color: #2d2d2d;
-      margin-bottom: 20px;
-      line-height: 1.2;
-      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+      line-height: 1.1;
+      letter-spacing: -1px;
     }
 
     .hero .highlight {
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
       padding: 4px 12px;
       border-radius: 8px;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
     }
 
     .hero p {
-      font-size: 20px;
+      font-size: 22px;
       color: #5a5a5a;
-      max-width: 700px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto 60px;
+      line-height: 1.7;
     }
 
-    .hero .subtitle {
-      font-size: 24px;
+    /* Collective Brain - Main Feature */
+    .collective-brain {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+      backdrop-filter: blur(30px);
+      border-radius: 24px;
+      padding: 60px;
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
+      box-shadow: 0 12px 48px rgba(124, 152, 133, 0.12);
+      margin-bottom: 80px;
+      text-align: center;
+      animation: slideUp 0.8s ease 0.2s both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .collective-brain h2 {
+      font-family: 'Lora', serif;
+      font-size: 36px;
       color: #2d2d2d;
-      font-weight: 600;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
     }
 
-    /* Content Grid */
-    .content-grid {
+    .collective-brain p {
+      font-size: 18px;
+      color: #5a5a5a;
+      margin-bottom: 50px;
+      line-height: 1.7;
+    }
+
+    /* Brain Network Visual */
+    .brain-network {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      margin: 60px 0;
+    }
+
+    .brain-center {
+      position: relative;
+      z-index: 10;
+    }
+
+    .brain-core {
+      width: 180px;
+      height: 180px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
+      border: 3px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 3s ease-in-out infinite;
+      position: relative;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .brain-core-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .brain-core-sublabel {
+      font-size: 13px;
+      color: #7c9885;
+      font-weight: 600;
+    }
+
+    .notes-orbit {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border: 2px dashed rgba(124, 152, 133, 0.15);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .note-node {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #5a5a5a;
+      font-weight: 600;
+      text-align: center;
+      padding: 8px;
+      line-height: 1.3;
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.15);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .note-node:nth-child(1) {
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 0s;
+    }
+
+    .note-node:nth-child(2) {
+      top: 50px;
+      right: -40px;
+      animation-delay: 0.5s;
+    }
+
+    .note-node:nth-child(3) {
+      bottom: 50px;
+      right: 30px;
+      animation-delay: 1s;
+    }
+
+    .note-node:nth-child(4) {
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 1.5s;
+    }
+
+    .note-node:nth-child(5) {
+      bottom: 50px;
+      left: 30px;
+      animation-delay: 2s;
+    }
+
+    .note-node:nth-child(6) {
+      top: 50px;
+      left: -40px;
+      animation-delay: 2.5s;
+    }
+
+    .connector-line {
+      position: absolute;
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.2), rgba(232, 155, 95, 0.2));
+      height: 2px;
+      transform-origin: left center;
+    }
+
+    /* Features Grid */
+    .features {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 40px;
-      margin-bottom: 60px;
+      margin-bottom: 80px;
+      animation: slideUp 0.8s ease 0.4s both;
     }
 
-    .content-card {
+    .feature-card {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
       backdrop-filter: blur(20px);
       border-radius: 20px;
@@ -102,212 +256,36 @@
       border: 2px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
       box-shadow: 0 8px 32px rgba(124, 152, 133, 0.1);
-      animation: slideUp 0.8s ease;
-      animation-fill-mode: both;
+      transition: all 0.3s ease;
     }
 
-    .content-card:nth-child(1) { animation-delay: 0.1s; }
-    .content-card:nth-child(2) { animation-delay: 0.2s; }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px rgba(124, 152, 133, 0.18);
     }
 
-    .content-card h3 {
-      font-size: 22px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .content-card .icon {
-      width: 32px;
-      height: 32px;
+    .feature-icon {
+      width: 56px;
+      height: 56px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
-      border-radius: 8px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
+      margin-bottom: 24px;
     }
 
-    /* Notes Demo */
-    .notes-demo {
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid rgba(124, 152, 133, 0.2);
-    }
-
-    .folder {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 8px;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .folder:hover {
-      background: rgba(124, 152, 133, 0.1);
-      transform: translateX(4px);
-    }
-
-    .folder-icon {
-      color: #7c9885;
-      font-size: 18px;
-    }
-
-    .folder-name {
-      font-size: 14px;
+    .feature-card h3 {
+      font-size: 24px;
+      font-weight: 600;
       color: #2d2d2d;
-      font-weight: 500;
-    }
-
-    .note-count {
-      margin-left: auto;
-      font-size: 12px;
-      color: #8a8a8a;
-      background: rgba(124, 152, 133, 0.1);
-      padding: 2px 8px;
-      border-radius: 12px;
-    }
-
-    /* Chat Demo */
-    .chat-demo {
-      background: rgba(255, 255, 255, 0.4);
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid rgba(232, 155, 95, 0.2);
-    }
-
-    .message {
       margin-bottom: 16px;
-      animation: messageSlide 0.5s ease;
     }
 
-    @keyframes messageSlide {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.user {
-      text-align: right;
-    }
-
-    .message-bubble {
-      display: inline-block;
-      padding: 12px 16px;
-      border-radius: 12px;
-      max-width: 80%;
-      text-align: left;
-    }
-
-    .message.user .message-bubble {
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
-      border: 1px solid rgba(124, 152, 133, 0.3);
-    }
-
-    .message.ai .message-bubble {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(124, 152, 133, 0.2);
-    }
-
-    .message-text {
-      font-size: 14px;
-      color: #2d2d2d;
-      line-height: 1.5;
-      margin-bottom: 8px;
-    }
-
-    .citation {
-      font-size: 12px;
-      color: #7c9885;
-      font-weight: 500;
-      display: inline-block;
-      margin-top: 4px;
-      padding: 4px 8px;
-      background: rgba(124, 152, 133, 0.1);
-      border-radius: 6px;
-    }
-
-    /* Collective Brain Visualization */
-    .collective-brain {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 50px;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.1);
-      margin-bottom: 60px;
-      text-align: center;
-      animation: slideUp 0.8s ease 0.3s both;
-    }
-
-    .collective-brain h3 {
-      font-family: 'Lora', serif;
-      font-size: 28px;
-      color: #2d2d2d;
-      margin-bottom: 30px;
-    }
-
-    .brain-visual {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 40px;
-      margin: 40px 0;
-      position: relative;
-    }
-
-    .brain-node {
-      width: 120px;
-      height: 120px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.4) 0%, rgba(232, 155, 95, 0.4) 100%) 1;
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    .brain-node:nth-child(1) { animation-delay: 0s; }
-    .brain-node:nth-child(2) { animation-delay: 0.3s; }
-    .brain-node:nth-child(3) { animation-delay: 0.6s; }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    .brain-node-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-top: 8px;
-    }
-
-    .brain-node-count {
-      font-size: 11px;
-      color: #7c9885;
-    }
-
-    .brain-connector {
-      position: absolute;
-      width: 2px;
-      height: 60px;
-      background: linear-gradient(to bottom, rgba(124, 152, 133, 0.3), rgba(232, 155, 95, 0.3));
+    .feature-card p {
+      font-size: 16px;
+      color: #5a5a5a;
+      line-height: 1.7;
     }
 
     /* Login Section */
@@ -321,7 +299,7 @@
       border: 2px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
       box-shadow: 0 12px 48px rgba(124, 152, 133, 0.15);
-      animation: slideUp 0.8s ease 0.4s both;
+      animation: slideUp 0.8s ease 0.6s both;
     }
 
     .login-section h2 {
@@ -333,7 +311,7 @@
       text-align: center;
     }
 
-    .login-section p {
+    .login-section > p {
       text-align: center;
       color: #5a5a5a;
       font-size: 15px;
@@ -471,12 +449,32 @@
     .loading.active { display: block; }
 
     @media (max-width: 968px) {
-      .content-grid {
+      .features {
         grid-template-columns: 1fr;
       }
 
       .hero h1 {
-        font-size: 40px;
+        font-size: 42px;
+      }
+
+      .brain-network {
+        min-height: 300px;
+      }
+
+      .notes-orbit {
+        width: 350px;
+        height: 350px;
+      }
+
+      .note-node {
+        width: 60px;
+        height: 60px;
+        font-size: 9px;
+      }
+
+      .brain-core {
+        width: 140px;
+        height: 140px;
       }
 
       .container {
@@ -485,16 +483,6 @@
 
       .login-section {
         padding: 40px 30px;
-      }
-
-      .brain-visual {
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .brain-node {
-        width: 100px;
-        height: 100px;
       }
     }
   </style>
@@ -507,135 +495,53 @@
     <!-- Hero Section -->
     <div class="hero">
       <h1>Stop getting <span class="highlight">generic AI answers</span><br>that don't match your course</h1>
-      <p>StudyFlow learns from your notes AND everyone else's notes to give you accurate, course-specific answers with citations.</p>
+      <p>StudyFlow learns from thousands of students' notes to give you accurate, course-specific answers.</p>
     </div>
 
-    <!-- Content Grid -->
-    <div class="content-grid">
-      <!-- Notes Management Demo -->
-      <div class="content-card">
-        <h3>
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </div>
-          Your Notes, Organized
-        </h3>
-        <div class="notes-demo">
-          <div class="folder">
-            <span class="folder-icon">📁</span>
-            <span class="folder-name">Biology 201</span>
-            <span class="note-count">24 notes</span>
-          </div>
-          <div class="folder">
-            <span class="folder-icon">📁</span>
-            <span class="folder-name">Chemistry 301</span>
-            <span class="note-count">18 notes</span>
-          </div>
-          <div class="folder">
-            <span class="folder-icon">📁</span>
-            <span class="folder-name">Psychology 101</span>
-            <span class="note-count">31 notes</span>
-          </div>
-          <div class="folder">
-            <span class="folder-icon">📁</span>
-            <span class="folder-name">Calculus II</span>
-            <span class="note-count">15 notes</span>
-          </div>
-          <div class="folder">
-            <span class="folder-icon">📁</span>
-            <span class="folder-name">History 205</span>
-            <span class="note-count">22 notes</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chat Demo -->
-      <div class="content-card">
-        <h3>
-          <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </div>
-          AI That Cites Your Notes
-        </h3>
-        <div class="chat-demo">
-          <div class="message user">
-            <div class="message-bubble">
-              <div class="message-text">What is the Krebs cycle?</div>
-            </div>
-          </div>
-          <div class="message ai">
-            <div class="message-bubble">
-              <div class="message-text">The Krebs cycle (also called the citric acid cycle) is a series of chemical reactions that generates energy through the oxidation of acetyl-CoA. It produces 3 NADH, 1 FADH2, and 1 ATP per cycle.</div>
-              <div class="citation">📄 Biology_201_Lecture_8.pdf</div>
-              <div class="citation">📄 Cell_Respiration_Notes.txt</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Collective Brain -->
+    <!-- Collective Brain - Main Feature -->
     <div class="collective-brain">
-      <h3>The Collective Brain</h3>
-      <p style="color: #5a5a5a; margin-bottom: 40px;">Your notes combine with thousands of other students' materials to create a smarter AI that understands your specific courses.</p>
+      <h2>The Collective Brain</h2>
+      <p>Your notes combine with everyone else's to create an AI that actually understands your specific courses and curriculum.</p>
 
-      <div class="brain-visual">
-        <div class="brain-node">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <div class="brain-node-label">Your Notes</div>
-          <div class="brain-node-count">52 documents</div>
+      <div class="brain-network">
+        <div class="notes-orbit">
+          <div class="note-node">Biology 201 Notes</div>
+          <div class="note-node">Chemistry Formulas</div>
+          <div class="note-node">Psych Lecture</div>
+          <div class="note-node">Calculus Review</div>
+          <div class="note-node">History Essay</div>
+          <div class="note-node">Physics Lab</div>
         </div>
 
-        <svg width="60" height="60" viewBox="0 0 60 60" style="position: absolute; left: 50%; transform: translateX(-50%);">
-          <line x1="0" y1="30" x2="60" y2="30" stroke="url(#grad1)" stroke-width="2" stroke-dasharray="5,5">
-            <animate attributeName="stroke-dashoffset" from="10" to="0" dur="1s" repeatCount="indefinite"/>
-          </line>
-          <defs>
-            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:rgba(124, 152, 133, 0.5);stop-opacity:1" />
-              <stop offset="100%" style="stop-color:rgba(232, 155, 95, 0.5);stop-opacity:1" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <div class="brain-node">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          <div class="brain-node-label">Everyone's Notes</div>
-          <div class="brain-node-count">12,847 documents</div>
+        <div class="brain-center">
+          <div class="brain-core">
+            <div class="brain-core-label">Smarter AI</div>
+            <div class="brain-core-sublabel">Learns from 12,000+ notes</div>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <svg width="60" height="60" viewBox="0 0 60 60" style="position: absolute; right: 0; transform: translateX(30%);">
-          <line x1="0" y1="30" x2="60" y2="30" stroke="url(#grad2)" stroke-width="2" stroke-dasharray="5,5">
-            <animate attributeName="stroke-dashoffset" from="10" to="0" dur="1s" repeatCount="indefinite"/>
-          </line>
-          <defs>
-            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" style="stop-color:rgba(232, 155, 95, 0.5);stop-opacity:1" />
-              <stop offset="100%" style="stop-color:rgba(124, 152, 133, 0.5);stop-opacity:1" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <div class="brain-node">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M12 1v6m0 6v6M5.6 5.6l4.2 4.2m4.2 4.2l4.2 4.2M1 12h6m6 0h6M5.6 18.4l4.2-4.2m4.2-4.2l4.2-4.2"></path>
+    <!-- Features -->
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
-          <div class="brain-node-label">Smarter AI</div>
-          <div class="brain-node-count">Course-specific</div>
         </div>
+        <h3>AI Chat Assistant</h3>
+        <p>Ask questions and get answers that actually match your course material. The AI learns from the collective knowledge of thousands of students.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <h3>Organize Your Notes</h3>
+        <p>Upload and organize your study materials in a beautiful grid layout. Drag and drop to create your perfect study space.</p>
       </div>
     </div>
 
