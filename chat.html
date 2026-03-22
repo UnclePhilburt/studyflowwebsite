@@ -17,6 +17,203 @@
       background: #0f1419;
       height: 100vh;
       overflow: hidden;
+      transition: background 0.3s ease;
+    }
+
+    /* Light Mode Theme */
+    body.light-mode {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    body.light-mode .sidebar {
+      background: #ffffff;
+      border-right: 1px solid #e0e4e8;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.04);
+    }
+
+    body.light-mode .sidebar-header {
+      border-bottom: 1px solid #e0e4e8;
+    }
+
+    body.light-mode .logo-text {
+      color: #1a202c;
+    }
+
+    body.light-mode .icon-btn {
+      color: #4a5568;
+    }
+
+    body.light-mode .icon-btn:hover {
+      background: #f7fafc;
+      color: #1a202c;
+    }
+
+    body.light-mode .delete-chat-btn {
+      color: #4a5568;
+    }
+
+    body.light-mode .delete-chat-btn:hover {
+      background: #fff5f5;
+      color: #e53e3e;
+    }
+
+    body.light-mode .new-chat-btn {
+      color: #2d3748;
+      background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      border: 1px solid #e0e4e8;
+    }
+
+    body.light-mode .new-chat-btn:hover {
+      background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    body.light-mode .conversation-item {
+      color: #2d3748;
+    }
+
+    body.light-mode .conversation-item:hover {
+      background: #f7fafc;
+    }
+
+    body.light-mode .conversation-item.active {
+      background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+      color: #1a202c;
+      border-left: 3px solid #667eea;
+    }
+
+    body.light-mode .sidebar-footer {
+      border-top: 1px solid #e0e4e8;
+    }
+
+    body.light-mode .user-avatar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    body.light-mode .user-email {
+      color: #4a5568;
+    }
+
+    body.light-mode .logout-btn {
+      color: #e53e3e;
+    }
+
+    body.light-mode .logout-btn:hover {
+      background: #fff5f5;
+    }
+
+    body.light-mode .chat-container {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+
+    body.light-mode .chat-header {
+      border-bottom: 1px solid #e0e4e8;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    body.light-mode .chat-title {
+      color: #1a202c;
+    }
+
+    body.light-mode .welcome-greeting,
+    body.light-mode .welcome-title {
+      color: #1a202c;
+    }
+
+    body.light-mode .prompt-chip {
+      background: #ffffff;
+      border: 1px solid #e0e4e8;
+      color: #2d3748;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode .prompt-chip:hover {
+      background: #f7fafc;
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    body.light-mode .welcome-input-box,
+    body.light-mode .input-box {
+      background: #ffffff;
+      color: #1a202c;
+      border: 2px solid #e0e4e8;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode .welcome-input-box:focus,
+    body.light-mode .input-box:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    body.light-mode .welcome-send-btn,
+    body.light-mode .send-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    body.light-mode .welcome-send-btn:hover:not(:disabled),
+    body.light-mode .send-btn:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    body.light-mode .message.user .message-avatar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    body.light-mode .message.assistant .message-avatar {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    body.light-mode .message.user .message-content {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+
+    body.light-mode .message.assistant .message-content {
+      background: #ffffff;
+      border: 1px solid #e0e4e8;
+      color: #1a202c;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    body.light-mode .typing-dot {
+      background: #667eea;
+    }
+
+    body.light-mode .input-container {
+      border-top: 1px solid #e0e4e8;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    body.light-mode .settings-popup {
+      background: #ffffff;
+      border: 1px solid #e0e4e8;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    body.light-mode .settings-popup-header {
+      color: #1a202c;
+      border-bottom: 1px solid #e0e4e8;
+    }
+
+    body.light-mode .settings-option-label {
+      color: #2d3748;
+    }
+
+    body.light-mode .settings-option-description {
+      color: #4a5568;
+    }
+
+    body.light-mode .error-message {
+      background: #fff5f5;
+      color: #e53e3e;
+      border: 1px solid #feb2b2;
     }
 
     /* Main Layout */
@@ -625,6 +822,20 @@
     .toggle-switch.active .toggle-slider {
       transform: translateX(24px);
     }
+
+    body.light-mode .toggle-switch {
+      background: #cbd5e0;
+    }
+
+    body.light-mode .toggle-switch.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    body.light-mode .mobile-menu-toggle {
+      background: #ffffff;
+      border: 1px solid #e0e4e8;
+      color: #1a202c;
+    }
   </style>
 </head>
 <body>
@@ -664,6 +875,15 @@
     <!-- Settings Popup -->
     <div class="settings-popup" id="settingsPopup">
       <div class="settings-popup-header">Settings</div>
+      <div class="settings-option">
+        <div>
+          <div class="settings-option-label">Light Mode</div>
+          <div class="settings-option-description">Premium chrome-inspired light theme</div>
+        </div>
+        <div class="toggle-switch" id="themeToggle">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
       <div class="settings-option">
         <div>
           <div class="settings-option-label">Collective Brain</div>
@@ -771,11 +991,30 @@
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsPopup = document.getElementById('settingsPopup');
     const collectiveBrainToggle = document.getElementById('collectiveBrainToggle');
+    const themeToggle = document.getElementById('themeToggle');
     const uploadBtn = document.getElementById('uploadBtn');
     const myNotesBtn = document.getElementById('myNotesBtn');
 
+    // Theme Management
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('studyflow-theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        themeToggle.classList.add('active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      const isLight = document.body.classList.contains('light-mode');
+      localStorage.setItem('studyflow-theme', isLight ? 'light' : 'dark');
+      themeToggle.classList.toggle('active', isLight);
+    }
+
     // Initialize
     async function init() {
+      // Load theme preference
+      loadTheme();
       // Check authentication
       const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -1388,6 +1627,9 @@
     myNotesBtn.addEventListener('click', () => {
       window.location.href = 'notes.html';
     });
+
+    // Theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
 
     // Collective Brain toggle
     collectiveBrainToggle.addEventListener('click', () => {
