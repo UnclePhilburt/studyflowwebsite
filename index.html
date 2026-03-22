@@ -34,17 +34,26 @@
     }
 
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 40px;
+      display: flex;
+      height: 100vh;
       position: relative;
       z-index: 1;
+      overflow: hidden;
+    }
+
+    /* Left Content Area */
+    .content-area {
+      flex: 1;
+      padding: 60px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: auto;
     }
 
     /* Hero Section */
     .hero {
-      text-align: center;
-      margin-bottom: 100px;
+      margin-bottom: 50px;
       animation: fadeIn 0.8s ease;
     }
 
@@ -55,38 +64,38 @@
 
     .hero h1 {
       font-family: 'Lora', serif;
-      font-size: 64px;
+      font-size: 48px;
       font-weight: 600;
       color: #2d2d2d;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       line-height: 1.1;
-      letter-spacing: -1px;
+      letter-spacing: -0.5px;
     }
 
     .hero .highlight {
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
-      padding: 4px 12px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
     }
 
     .hero p {
-      font-size: 22px;
+      font-size: 18px;
       color: #5a5a5a;
-      max-width: 800px;
-      margin: 0 auto 60px;
-      line-height: 1.7;
+      max-width: 600px;
+      line-height: 1.6;
+      margin-bottom: 0;
     }
 
     /* Collective Brain - Main Feature */
     .collective-brain {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
       backdrop-filter: blur(30px);
-      border-radius: 24px;
-      padding: 60px;
+      border-radius: 20px;
+      padding: 40px;
       border: 2px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
       box-shadow: 0 12px 48px rgba(124, 152, 133, 0.12);
-      margin-bottom: 80px;
+      margin-bottom: 40px;
       text-align: center;
       animation: slideUp 0.8s ease 0.2s both;
     }
@@ -98,16 +107,16 @@
 
     .collective-brain h2 {
       font-family: 'Lora', serif;
-      font-size: 36px;
+      font-size: 28px;
       color: #2d2d2d;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
     .collective-brain p {
-      font-size: 18px;
+      font-size: 15px;
       color: #5a5a5a;
-      margin-bottom: 50px;
-      line-height: 1.7;
+      margin-bottom: 30px;
+      line-height: 1.6;
     }
 
     /* Brain Network Visual */
@@ -116,8 +125,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 400px;
-      margin: 60px 0;
+      min-height: 280px;
+      margin: 30px 0;
     }
 
     .brain-center {
@@ -126,8 +135,8 @@
     }
 
     .brain-core {
-      width: 180px;
-      height: 180px;
+      width: 140px;
+      height: 140px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
       border: 3px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
@@ -146,22 +155,22 @@
     }
 
     .brain-core-label {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: #2d2d2d;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .brain-core-sublabel {
-      font-size: 13px;
+      font-size: 11px;
       color: #7c9885;
       font-weight: 600;
     }
 
     .notes-orbit {
       position: absolute;
-      width: 500px;
-      height: 500px;
+      width: 380px;
+      height: 380px;
       border: 2px dashed rgba(124, 152, 133, 0.15);
       border-radius: 50%;
       top: 50%;
@@ -171,20 +180,20 @@
 
     .note-node {
       position: absolute;
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       background: rgba(255, 255, 255, 0.95);
       border: 2px solid rgba(124, 152, 133, 0.3);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 10px;
       color: #5a5a5a;
       font-weight: 600;
       text-align: center;
-      padding: 8px;
-      line-height: 1.3;
+      padding: 6px;
+      line-height: 1.2;
       box-shadow: 0 4px 16px rgba(124, 152, 133, 0.15);
       animation: float 3s ease-in-out infinite;
     }
@@ -243,16 +252,15 @@
     .features {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      margin-bottom: 80px;
+      gap: 24px;
       animation: slideUp 0.8s ease 0.4s both;
     }
 
     .feature-card {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
       backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 40px;
+      border-radius: 16px;
+      padding: 28px;
       border: 2px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
       box-shadow: 0 8px 32px rgba(124, 152, 133, 0.1);
@@ -260,66 +268,72 @@
     }
 
     .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 48px rgba(124, 152, 133, 0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(124, 152, 133, 0.15);
     }
 
     .feature-icon {
-      width: 56px;
-      height: 56px;
+      width: 48px;
+      height: 48px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 24px;
-    }
-
-    .feature-card h3 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #2d2d2d;
       margin-bottom: 16px;
     }
 
-    .feature-card p {
-      font-size: 16px;
-      color: #5a5a5a;
-      line-height: 1.7;
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 10px;
     }
 
-    /* Login Section */
+    .feature-card p {
+      font-size: 14px;
+      color: #5a5a5a;
+      line-height: 1.6;
+    }
+
+    /* Login Section - Right Side */
     .login-section {
-      max-width: 480px;
-      margin: 0 auto;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
-      backdrop-filter: blur(30px);
-      border-radius: 24px;
-      padding: 50px;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
-      box-shadow: 0 12px 48px rgba(124, 152, 133, 0.15);
-      animation: slideUp 0.8s ease 0.6s both;
+      flex: 0 0 440px;
+      background: linear-gradient(to bottom, rgba(245, 243, 240, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      backdrop-filter: blur(60px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 50px;
+      border-left: 3px solid transparent;
+      border-image: linear-gradient(to bottom, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      box-shadow: -12px 0 60px rgba(124, 152, 133, 0.1);
+      animation: slideInRight 0.8s ease 0.3s both;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     .login-section h2 {
       font-family: 'Lora', serif;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 600;
       color: #2d2d2d;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       text-align: center;
     }
 
     .login-section > p {
       text-align: center;
       color: #5a5a5a;
-      font-size: 15px;
-      margin-bottom: 32px;
+      font-size: 14px;
+      margin-bottom: 28px;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .form-group label {
@@ -449,40 +463,49 @@
     .loading.active { display: block; }
 
     @media (max-width: 968px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .content-area {
+        padding: 40px 30px;
+      }
+
+      .login-section {
+        flex: 0 0 auto;
+        padding: 40px 30px;
+        border-left: none;
+        border-top: 3px solid transparent;
+        border-image: linear-gradient(to right, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      }
+
       .features {
         grid-template-columns: 1fr;
       }
 
       .hero h1 {
-        font-size: 42px;
+        font-size: 36px;
       }
 
       .brain-network {
-        min-height: 300px;
+        min-height: 250px;
       }
 
       .notes-orbit {
-        width: 350px;
-        height: 350px;
+        width: 300px;
+        height: 300px;
       }
 
       .note-node {
-        width: 60px;
-        height: 60px;
+        width: 55px;
+        height: 55px;
         font-size: 9px;
       }
 
       .brain-core {
-        width: 140px;
-        height: 140px;
-      }
-
-      .container {
-        padding: 40px 20px;
-      }
-
-      .login-section {
-        padding: 40px 30px;
+        width: 120px;
+        height: 120px;
       }
     }
   </style>
@@ -492,60 +515,63 @@
 </head>
 <body>
   <div class="container">
-    <!-- Hero Section -->
-    <div class="hero">
-      <h1>Stop getting <span class="highlight">generic AI answers</span><br>that don't match your course</h1>
-      <p>StudyFlow learns from thousands of students' notes to give you accurate, course-specific answers.</p>
-    </div>
+    <!-- Left Content Area -->
+    <div class="content-area">
+      <!-- Hero Section -->
+      <div class="hero">
+        <h1>Stop getting <span class="highlight">generic AI answers</span> that don't match your course</h1>
+        <p>StudyFlow learns from thousands of students' notes to give you accurate, course-specific answers.</p>
+      </div>
 
-    <!-- Collective Brain - Main Feature -->
-    <div class="collective-brain">
-      <h2>The Collective Brain</h2>
-      <p>Your notes combine with everyone else's to create an AI that actually understands your specific courses and curriculum.</p>
+      <!-- Collective Brain - Main Feature -->
+      <div class="collective-brain">
+        <h2>The Collective Brain</h2>
+        <p>Your notes combine with everyone else's to create an AI that actually understands your specific courses and curriculum.</p>
 
-      <div class="brain-network">
-        <div class="notes-orbit">
-          <div class="note-node">Biology 201 Notes</div>
-          <div class="note-node">Chemistry Formulas</div>
-          <div class="note-node">Psych Lecture</div>
-          <div class="note-node">Calculus Review</div>
-          <div class="note-node">History Essay</div>
-          <div class="note-node">Physics Lab</div>
-        </div>
+        <div class="brain-network">
+          <div class="notes-orbit">
+            <div class="note-node">Biology 201 Notes</div>
+            <div class="note-node">Chemistry Formulas</div>
+            <div class="note-node">Psych Lecture</div>
+            <div class="note-node">Calculus Review</div>
+            <div class="note-node">History Essay</div>
+            <div class="note-node">Physics Lab</div>
+          </div>
 
-        <div class="brain-center">
-          <div class="brain-core">
-            <div class="brain-core-label">Smarter AI</div>
-            <div class="brain-core-sublabel">Learns from 12,000+ notes</div>
+          <div class="brain-center">
+            <div class="brain-core">
+              <div class="brain-core-label">Smarter AI</div>
+              <div class="brain-core-sublabel">Learns from 12,000+ notes</div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Features -->
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h3>AI Chat Assistant</h3>
+          <p>Ask questions and get answers that actually match your course material.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h3>Organize Your Notes</h3>
+          <p>Upload and organize your study materials in a beautiful grid layout.</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Features -->
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </div>
-        <h3>AI Chat Assistant</h3>
-        <p>Ask questions and get answers that actually match your course material. The AI learns from the collective knowledge of thousands of students.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </div>
-        <h3>Organize Your Notes</h3>
-        <p>Upload and organize your study materials in a beautiful grid layout. Drag and drop to create your perfect study space.</p>
-      </div>
-    </div>
-
-    <!-- Login Section -->
+    <!-- Right Login Section -->
     <div class="login-section">
       <h2>Get Started</h2>
       <p>Sign in to access your personalized AI study assistant</p>
