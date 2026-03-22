@@ -115,172 +115,101 @@
     .collective-brain > p {
       font-size: 15px;
       color: #5a5a5a;
-      margin-bottom: 35px;
+      margin-bottom: 30px;
       line-height: 1.6;
       text-align: center;
     }
 
-    /* Horizontal Flow Pipeline */
-    .brain-flow {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    /* Notes Preview Grid */
+    .notes-preview {
+      background: rgba(245, 244, 240, 0.6);
+      border-radius: 12px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
-      position: relative;
     }
 
-    .flow-column {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 2;
-    }
-
-    .flow-note {
-      background: rgba(255, 255, 255, 0.95);
-      border: 2px solid rgba(124, 152, 133, 0.25);
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 12px;
-      color: #5a5a5a;
-      font-weight: 600;
-      text-align: center;
-      box-shadow: 0 3px 12px rgba(124, 152, 133, 0.12);
-      animation: slideInLeft 0.6s ease both;
-    }
-
-    .flow-note:nth-child(1) { animation-delay: 0.1s; }
-    .flow-note:nth-child(2) { animation-delay: 0.2s; }
-    .flow-note:nth-child(3) { animation-delay: 0.3s; }
-
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    /* Center Brain */
-    .flow-brain {
-      flex: 0 0 160px;
+    .preview-note {
       display: flex;
       flex-direction: column;
       align-items: center;
-      z-index: 3;
-      position: relative;
+      gap: 10px;
+      animation: fadeInUp 0.5s ease both;
     }
 
-    .brain-circle {
-      width: 160px;
-      height: 160px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
-      border: 3px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
-      border-radius: 50%;
+    .preview-note:nth-child(1) { animation-delay: 0.1s; }
+    .preview-note:nth-child(2) { animation-delay: 0.2s; }
+    .preview-note:nth-child(3) { animation-delay: 0.3s; }
+    .preview-note:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .preview-note-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
+      border-radius: 12px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      animation: pulse 3s ease-in-out infinite;
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.2);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.15);
+      position: relative;
+      transition: all 0.3s ease;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(124, 152, 133, 0.2); }
-      50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(124, 152, 133, 0.3); }
+    .preview-note:hover .preview-note-icon {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.25);
     }
 
-    .brain-circle-label {
-      font-size: 18px;
+    .preview-note-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .usage-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      font-size: 10px;
       font-weight: 700;
-      color: #2d2d2d;
-      margin-bottom: 8px;
+      padding: 3px 7px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.3);
     }
 
-    .brain-circle-sublabel {
-      font-size: 11px;
-      color: #7c9885;
+    .preview-note-label {
+      font-size: 12px;
       font-weight: 600;
+      color: #2d2d2d;
       text-align: center;
       line-height: 1.3;
     }
 
-    /* Flow Arrows */
-    .flow-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      animation: flowPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes flowPulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.7; }
-    }
-
-    .flow-arrow-left {
-      left: 25%;
-      right: auto;
-    }
-
-    .flow-arrow-right {
-      left: auto;
-      right: 25%;
-    }
-
-    .arrow-line {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.3), rgba(232, 155, 95, 0.3));
-      position: relative;
-    }
-
-    .arrow-line::after {
-      content: '';
-      position: absolute;
-      right: -6px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 0;
-      height: 0;
-      border-left: 8px solid rgba(124, 152, 133, 0.4);
-      border-top: 5px solid transparent;
-      border-bottom: 5px solid transparent;
-    }
-
-    /* Output Column */
-    .flow-output {
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
-      border: 2px solid rgba(124, 152, 133, 0.3);
-      border-radius: 12px;
-      padding: 20px;
+    .collective-stat {
+      margin-top: 20px;
       text-align: center;
-      animation: slideInRight 0.6s ease 0.4s both;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.08) 100%);
+      border-radius: 10px;
     }
 
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .flow-output-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
-
-    .flow-output h3 {
-      font-size: 16px;
+    .collective-stat strong {
+      color: #7c9885;
+      font-size: 20px;
       font-weight: 700;
-      color: #2d2d2d;
-      margin-bottom: 8px;
     }
 
-    .flow-output p {
-      font-size: 12px;
+    .collective-stat-text {
+      font-size: 14px;
       color: #5a5a5a;
-      line-height: 1.5;
+      margin-top: 4px;
     }
 
     /* Features Grid */
@@ -523,22 +452,24 @@
         font-size: 36px;
       }
 
-      .brain-flow {
-        flex-direction: column;
-        gap: 30px;
+      .notes-preview {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        padding: 20px;
       }
 
-      .flow-arrow {
-        display: none;
+      .preview-note-icon {
+        width: 60px;
+        height: 60px;
       }
 
-      .brain-circle {
-        width: 140px;
-        height: 140px;
+      .preview-note-icon svg {
+        width: 28px;
+        height: 28px;
       }
 
-      .brain-circle-label {
-        font-size: 16px;
+      .preview-note-label {
+        font-size: 11px;
       }
     }
   </style>
@@ -559,42 +490,55 @@
       <!-- Collective Brain - Main Feature -->
       <div class="collective-brain">
         <h2>The Collective Brain</h2>
-        <p>Your notes combine with everyone else's to create an AI that actually understands your specific courses and curriculum.</p>
+        <p>Your notes combine with thousands of other students' materials to power course-specific AI answers.</p>
 
-        <div class="brain-flow">
-          <!-- Left: Student Notes -->
-          <div class="flow-column">
-            <div class="flow-note">Biology 201 Notes</div>
-            <div class="flow-note">Chemistry Formulas</div>
-            <div class="flow-note">Calculus Review</div>
-          </div>
-
-          <!-- Left Arrow -->
-          <div class="flow-arrow flow-arrow-left">
-            <div class="arrow-line"></div>
-          </div>
-
-          <!-- Center: Collective Brain -->
-          <div class="flow-brain">
-            <div class="brain-circle">
-              <div class="brain-circle-label">Collective Brain</div>
-              <div class="brain-circle-sublabel">12,000+ notes combined</div>
+        <div class="notes-preview">
+          <div class="preview-note">
+            <div class="preview-note-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <div class="usage-badge">247</div>
             </div>
+            <div class="preview-note-label">Biology 201<br>Lecture Notes</div>
           </div>
 
-          <!-- Right Arrow -->
-          <div class="flow-arrow flow-arrow-right">
-            <div class="arrow-line"></div>
-          </div>
-
-          <!-- Right: Smart Output -->
-          <div class="flow-column">
-            <div class="flow-output">
-              <div class="flow-output-icon">&#10024;</div>
-              <h3>Course-Specific Answers</h3>
-              <p>Get answers that match YOUR curriculum</p>
+          <div class="preview-note">
+            <div class="preview-note-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <div class="usage-badge">183</div>
             </div>
+            <div class="preview-note-label">Chemistry<br>Formulas</div>
           </div>
+
+          <div class="preview-note">
+            <div class="preview-note-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <div class="usage-badge">329</div>
+            </div>
+            <div class="preview-note-label">Calculus<br>Review</div>
+          </div>
+
+          <div class="preview-note">
+            <div class="preview-note-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <div class="usage-badge">156</div>
+            </div>
+            <div class="preview-note-label">Psychology<br>Textbook</div>
+          </div>
+        </div>
+
+        <div class="collective-stat">
+          <div><strong>12,847 notes</strong></div>
+          <div class="collective-stat-text">from students across 300+ universities power your AI assistant</div>
         </div>
       </div>
 
