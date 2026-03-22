@@ -68,17 +68,15 @@
     }
 
     body.light-mode .message.user .message-content {
-      background: rgba(0, 0, 0, 0.02);
-      border: 1px solid rgba(0, 0, 0, 0.08);
       color: #1a1a1a;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
 
     body.light-mode .message.assistant .message-content {
-      background: rgba(0, 0, 0, 0.03);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      color: #1a1a1a;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      color: rgba(0, 0, 0, 0.85);
+    }
+
+    body.light-mode .message.assistant {
+      border-left-color: rgba(0, 0, 0, 0.12);
     }
 
     body.light-mode .menu-btn {
@@ -209,53 +207,39 @@
     }
 
     body.light-mode .input-box {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.95);
       color: #1a202c;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
     }
 
     body.light-mode .input-box::placeholder {
-      color: rgba(0, 0, 0, 0.3);
+      color: rgba(0, 0, 0, 0.35);
     }
 
     body.light-mode .input-box:focus {
-      border-color: rgba(102, 126, 234, 0.4);
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(102, 126, 234, 0.3), 0 0 40px rgba(102, 126, 234, 0.1);
+      border-color: rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
     }
 
     body.light-mode .send-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+      color: rgba(0, 0, 0, 0.5);
     }
 
     body.light-mode .send-btn:hover:not(:disabled) {
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+      background: rgba(0, 0, 0, 0.06);
+      color: #1a1a1a;
     }
 
     body.light-mode .message.user::before {
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 0 12px rgba(102, 126, 234, 0.4);
+      color: #667eea;
+      opacity: 0.8;
     }
 
     body.light-mode .message.assistant::before {
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 100%);
-    }
-
-    body.light-mode .message.user .message-content {
-      color: #1a202c;
-    }
-
-    body.light-mode .message.assistant .message-content {
-      color: rgba(0, 0, 0, 0.75);
-    }
-
-    body.light-mode .message.user::after {
-      color: #667eea;
-    }
-
-    body.light-mode .message.assistant::after {
       color: rgba(0, 0, 0, 0.4);
     }
 
@@ -303,7 +287,7 @@
       position: relative;
     }
 
-    /* Top search bar - starts centered, moves to top on first message */
+    /* Welcome screen - centered search bar */
     .search-bar-container {
       position: absolute;
       top: 50%;
@@ -316,11 +300,7 @@
     }
 
     body.chat-started .search-bar-container {
-      position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: 720px;
+      display: none;
     }
 
     .search-bar-wrapper {
@@ -734,7 +714,7 @@
 
     body.chat-started .messages-container {
       display: block;
-      padding: 110px 24px 40px 24px;
+      padding: 80px 24px 180px 24px;
     }
 
     .messages-container::-webkit-scrollbar {
@@ -754,13 +734,14 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
-    /* Message - Conversational layout */
+    /* Zen Garden Messages - Centered, minimal, with gradient accent */
     .message {
-      max-width: 700px;
-      margin: 0 auto 24px auto;
-      display: flex;
-      gap: 12px;
-      animation: messageSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 680px;
+      margin: 0 auto 48px auto;
+      padding-left: 16px;
+      border-left: 3px solid transparent;
+      position: relative;
+      animation: messageSlideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       opacity: 0;
       animation-fill-mode: forwards;
     }
@@ -768,7 +749,7 @@
     @keyframes messageSlideIn {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
       }
       to {
         opacity: 1;
@@ -776,69 +757,52 @@
       }
     }
 
-    /* User messages - right aligned */
+    /* Gradient accent line for user messages */
     .message.user {
-      flex-direction: row-reverse;
-      margin-left: auto;
-      margin-right: 24px;
+      border-left-color: transparent;
+      border-image: linear-gradient(to bottom, #667eea, #764ba2) 1;
     }
 
-    /* AI messages - left aligned */
+    /* Subtle accent line for AI messages */
     .message.assistant {
-      margin-left: 24px;
-      margin-right: auto;
+      border-left-color: rgba(255, 255, 255, 0.15);
     }
 
-    /* Avatar styling - modern minimal */
-    .message-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
+    /* Role label - small text above message */
+    .message::before {
+      content: attr(data-role);
+      display: block;
+      font-size: 11px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      opacity: 0.4;
     }
 
-    .message.user .message-avatar {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    .message.user::before {
+      content: "You";
+      color: #667eea;
+      opacity: 0.6;
     }
 
-    .message.assistant .message-avatar {
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .message.assistant::before {
+      content: "StudyFlow";
+      color: rgba(255, 255, 255, 0.4);
     }
 
-    /* User message bubble */
-    .message.user .message-content {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 20px 20px 4px 20px;
-      padding: 14px 18px;
-      color: white;
-      font-size: 15px;
-      line-height: 1.6;
-      font-weight: 400;
-      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-      max-width: 480px;
-    }
-
-    /* AI message bubble */
-    .message.assistant .message-content {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px 20px 20px 4px;
-      padding: 14px 18px;
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 15px;
-      line-height: 1.7;
+    /* Message content - clean typography, no background */
+    .message-content {
+      font-size: 16px;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.92);
       font-weight: 300;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-      max-width: 520px;
+      letter-spacing: 0.01em;
+    }
+
+    .message.user .message-content {
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 400;
     }
 
     .typing-indicator {
@@ -922,9 +886,95 @@
       cursor: not-allowed;
     }
 
-    /* Hidden input container at bottom */
+    /* Floating input at bottom - appears when chat starts */
     .input-container {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 680px;
       display: none;
+      z-index: 100;
+    }
+
+    body.chat-started .input-container {
+      display: block;
+      animation: slideUpFade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .input-box {
+      width: 100%;
+      padding: 16px 56px 16px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 32px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      resize: none;
+      min-height: 54px;
+      max-height: 200px;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-box::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .input-box:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(15, 15, 15, 0.98);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+    }
+
+    .send-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
 
     /* Mobile Menu Toggle */
@@ -1197,6 +1247,24 @@
     <div class="messages-container" id="messagesContainer">
       <!-- Messages will be added here as cards -->
     </div>
+
+    <!-- Bottom Input (appears when chat starts) -->
+    <div class="input-container" id="bottomInputContainer">
+      <div class="input-wrapper">
+        <textarea
+          class="input-box"
+          id="bottomInput"
+          placeholder="Ask a follow-up..."
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="bottomSendBtn" disabled>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1221,6 +1289,9 @@
     const messagesContainer = document.getElementById('messagesContainer');
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
+    const bottomInput = document.getElementById('bottomInput');
+    const bottomSendBtn = document.getElementById('bottomSendBtn');
+    const bottomInputContainer = document.getElementById('bottomInputContainer');
     const menuBtn = document.getElementById('menuBtn');
     const welcomeHint = document.getElementById('welcomeHint');
     const newChatBtn = document.getElementById('newChatBtn');
@@ -1618,20 +1689,77 @@
       }
     }
 
+    async function sendMessageFromBottom() {
+      const message = bottomInput.value.trim();
+      if (!message) return;
+
+      // Clear and disable bottom input
+      bottomInput.value = '';
+      bottomInput.disabled = true;
+      bottomSendBtn.disabled = true;
+
+      // Add user message
+      addMessage(message, 'user');
+
+      // Show typing indicator
+      const typingId = addTypingIndicator();
+
+      try {
+        // Call backend
+        const requestBody = { message };
+        if (conversationId) {
+          requestBody.conversation_id = conversationId;
+        }
+
+        const response = await fetch(`${BACKEND_URL}/api/notes/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Remove typing indicator
+        removeTypingIndicator(typingId);
+
+        // Store conversation ID
+        if (data.conversation_id) {
+          conversationId = data.conversation_id;
+        }
+
+        // Add AI response
+        addMessage(data.response || 'Sorry, I couldn\'t generate a response.', 'assistant');
+
+        // Refresh conversation list (to show new chat or updated title)
+        await loadConversations();
+
+      } catch (error) {
+        console.error('Error sending message:', error);
+        removeTypingIndicator(typingId);
+        addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+      } finally {
+        // Re-enable bottom input
+        bottomInput.disabled = false;
+        bottomInput.focus();
+      }
+    }
+
     // Add Message to UI
     function addMessage(content, role) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${role}`;
 
-      const avatar = document.createElement('div');
-      avatar.className = 'message-avatar';
-      avatar.textContent = role === 'user' ? currentUser.email.charAt(0).toUpperCase() : 'AI';
-
       const contentDiv = document.createElement('div');
       contentDiv.className = 'message-content';
       contentDiv.textContent = content;
 
-      messageDiv.appendChild(avatar);
       messageDiv.appendChild(contentDiv);
 
       messagesContainer.appendChild(messageDiv);
@@ -1644,10 +1772,6 @@
       messageDiv.className = 'message assistant';
       messageDiv.id = 'typing-indicator';
 
-      const avatar = document.createElement('div');
-      avatar.className = 'message-avatar';
-      avatar.textContent = 'AI';
-
       const contentDiv = document.createElement('div');
       contentDiv.className = 'message-content';
 
@@ -1656,7 +1780,6 @@
       typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
 
       contentDiv.appendChild(typingDiv);
-      messageDiv.appendChild(avatar);
       messageDiv.appendChild(contentDiv);
 
       messagesContainer.appendChild(messageDiv);
@@ -1706,6 +1829,26 @@
         if (searchInput.value.trim()) {
           sendMessage();
         }
+      }
+    });
+
+    // Bottom input handlers
+    bottomInput.addEventListener('input', () => {
+      bottomSendBtn.disabled = !bottomInput.value.trim();
+    });
+
+    bottomInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (bottomInput.value.trim()) {
+          sendMessageFromBottom();
+        }
+      }
+    });
+
+    bottomSendBtn.addEventListener('click', () => {
+      if (bottomInput.value.trim()) {
+        sendMessageFromBottom();
       }
     });
 
