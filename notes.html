@@ -646,9 +646,9 @@
 
   <!-- Context Menu -->
   <div class="context-menu" id="contextMenu">
-    <div class="context-menu-item" onclick="renameItem()">Rename</div>
-    <div class="context-menu-item" onclick="downloadItem()">Download</div>
-    <div class="context-menu-item danger" onclick="deleteItem()">Delete</div>
+    <div class="context-menu-item" onclick="event.stopPropagation(); renameItem()">Rename</div>
+    <div class="context-menu-item" onclick="event.stopPropagation(); downloadItem()">Download</div>
+    <div class="context-menu-item danger" onclick="event.stopPropagation(); deleteItem()">Delete</div>
   </div>
 
   <!-- New Folder Modal -->
