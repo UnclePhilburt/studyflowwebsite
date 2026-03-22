@@ -672,11 +672,17 @@
 
       // Update UI with user info
       userEmail.textContent = currentUser.email;
-      userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+
+      // Get user's actual name from metadata, or fall back to email
+      const userName = currentUser.user_metadata?.full_name ||
+                       currentUser.user_metadata?.name ||
+                       currentUser.email.split('@')[0];
+      const firstName = userName.split(' ')[0];
+      const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+      userAvatar.textContent = capitalizedName.charAt(0).toUpperCase();
 
       // Update welcome greeting with user's name
-      const firstName = currentUser.email.split('@')[0];
-      const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
       const welcomeGreeting = document.getElementById('welcomeGreeting');
       if (welcomeGreeting) {
         welcomeGreeting.textContent = `Hi ${capitalizedName}`;
@@ -1033,7 +1039,12 @@
       const welcomeDiv = document.createElement('div');
       welcomeDiv.className = 'welcome-screen';
       welcomeDiv.id = 'welcomeScreen';
-      const firstName = currentUser?.email?.split('@')[0] || 'there';
+
+      // Get user's actual name from metadata, or fall back to email
+      const userName = currentUser?.user_metadata?.full_name ||
+                       currentUser?.user_metadata?.name ||
+                       currentUser?.email?.split('@')[0] || 'there';
+      const firstName = userName.split(' ')[0];
       const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
       // Generate random academic questions
