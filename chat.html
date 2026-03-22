@@ -817,6 +817,43 @@
                   0 12px 48px rgba(124, 152, 133, 0.12);
     }
 
+    /* Link styling for Wikipedia citations and other links */
+    .message-content a {
+      color: #7c9885;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .message-content a:hover {
+      color: #6b8575;
+      border-bottom-color: #6b8575;
+    }
+
+    /* Italic text for attribution */
+    .message-content em {
+      font-style: italic;
+      color: #5d5d5d;
+      font-size: 0.95em;
+    }
+
+    /* Horizontal rules for separating attribution */
+    .message-content hr {
+      border: none;
+      border-top: 1px solid rgba(124, 152, 133, 0.2);
+      margin: 20px 0;
+    }
+
+    /* Paragraph spacing in messages */
+    .message-content p {
+      margin-bottom: 1em;
+    }
+
+    .message-content p:last-child {
+      margin-bottom: 0;
+    }
+
     .typing-indicator {
       display: flex;
       gap: 6px;
@@ -1332,6 +1369,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Configuration
@@ -1923,7 +1961,28 @@
 
       const contentDiv = document.createElement('div');
       contentDiv.className = 'message-content';
-      contentDiv.textContent = content;
+
+      // Convert markdown to HTML for assistant messages (which may contain Wikipedia links)
+      if (role === 'assistant') {
+        // Configure marked to open links in new tabs
+        const renderer = new marked.Renderer();
+        const originalLinkRenderer = renderer.link;
+        renderer.link = function(href, title, text) {
+          const html = originalLinkRenderer.call(this, href, title, text);
+          return html.replace(/^<a /, '<a target="_blank" rel="noopener noreferrer" ');
+        };
+
+        marked.setOptions({
+          renderer: renderer,
+          breaks: true,
+          gfm: true
+        });
+
+        contentDiv.innerHTML = marked.parse(content);
+      } else {
+        // User messages are plain text
+        contentDiv.textContent = content;
+      }
 
       messageDiv.appendChild(contentDiv);
 
