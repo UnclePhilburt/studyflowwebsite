@@ -106,16 +106,16 @@
 
     .collective-brain h2 {
       font-family: 'Lora', serif;
-      font-size: 28px;
+      font-size: 36px;
       color: #2d2d2d;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       text-align: center;
     }
 
     .collective-brain > p {
-      font-size: 15px;
+      font-size: 18px;
       color: #5a5a5a;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
       line-height: 1.6;
       text-align: center;
     }
@@ -123,18 +123,18 @@
     /* Collective Brain Animation */
     .brain-animation-container {
       position: relative;
-      height: 180px;
+      height: 320px;
       display: flex;
       align-items: center;
       justify-content: center;
-      max-width: 600px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
     /* Center Brain */
     .center-brain {
-      width: 120px;
-      height: 120px;
+      width: 180px;
+      height: 180px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
       border: 3px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
@@ -154,14 +154,14 @@
     }
 
     .center-brain-label {
-      font-size: 14px;
+      font-size: 20px;
       font-weight: 700;
       color: #2d2d2d;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
 
     .center-brain-count {
-      font-size: 11px;
+      font-size: 14px;
       color: #7c9885;
       font-weight: 600;
     }
@@ -176,8 +176,8 @@
     }
 
     .student-avatar {
-      width: 45px;
-      height: 45px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
       display: flex;
@@ -185,12 +185,12 @@
       justify-content: center;
       color: white;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 22px;
       box-shadow: 0 4px 16px rgba(124, 152, 133, 0.25);
     }
 
     .student-label {
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 600;
       color: #5a5a5a;
       white-space: nowrap;
@@ -223,8 +223,8 @@
     /* Animated Note */
     .animated-note {
       position: absolute;
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.25) 100%);
       border-radius: 8px;
       display: flex;
@@ -235,23 +235,23 @@
     }
 
     .animated-note svg {
-      width: 24px;
-      height: 24px;
+      width: 30px;
+      height: 30px;
     }
 
     /* Animation: Upload */
     .note-upload {
-      bottom: 55px;
+      bottom: 75px;
       left: 50%;
       transform: translateX(-50%);
       animation: uploadToBrain 4s ease-in-out infinite;
     }
 
     @keyframes uploadToBrain {
-      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.8); }
+      0% { opacity: 0; transform: translate(-50%, 30px) scale(0.8); }
       10% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-      25% { opacity: 1; transform: translate(-50%, -60px) scale(0.9); }
-      35% { opacity: 0; transform: translate(-50%, -60px) scale(0.5); }
+      25% { opacity: 1; transform: translate(-50%, -95px) scale(0.9); }
+      35% { opacity: 0; transform: translate(-50%, -95px) scale(0.5); }
       100% { opacity: 0; }
     }
 
@@ -283,94 +283,47 @@
     @keyframes toReader1 {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-      25% { opacity: 1; transform: translate(-200px, -50%) scale(1); }
-      35% { opacity: 0; transform: translate(-200px, -50%) scale(0.6); }
+      25% { opacity: 1; transform: translate(-280px, -50%) scale(1); }
+      35% { opacity: 0; transform: translate(-280px, -50%) scale(0.6); }
       100% { opacity: 0; }
     }
 
     @keyframes toReader2 {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-      25% { opacity: 1; transform: translate(-50%, -120px) scale(1); }
-      35% { opacity: 0; transform: translate(-50%, -120px) scale(0.6); }
+      25% { opacity: 1; transform: translate(-50%, -180px) scale(1); }
+      35% { opacity: 0; transform: translate(-50%, -180px) scale(0.6); }
       100% { opacity: 0; }
     }
 
     @keyframes toReader3 {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-      25% { opacity: 1; transform: translate(100px, -50%) scale(1); }
-      35% { opacity: 0; transform: translate(100px, -50%) scale(0.6); }
+      25% { opacity: 1; transform: translate(180px, -50%) scale(1); }
+      35% { opacity: 0; transform: translate(180px, -50%) scale(0.6); }
       100% { opacity: 0; }
     }
 
     .collective-stat {
-      margin-top: 20px;
+      margin-top: 30px;
       text-align: center;
-      padding: 16px;
+      padding: 24px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.08) 100%);
-      border-radius: 10px;
+      border-radius: 12px;
     }
 
     .collective-stat strong {
       color: #7c9885;
-      font-size: 20px;
+      font-size: 26px;
       font-weight: 700;
     }
 
     .collective-stat-text {
-      font-size: 14px;
+      font-size: 16px;
       color: #5a5a5a;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
-    /* Features Grid */
-    .features {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      animation: slideUp 0.8s ease 0.4s both;
-    }
-
-    .feature-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      padding: 28px;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(124, 152, 133, 0.15);
-    }
-
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
-    .feature-card h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 10px;
-    }
-
-    .feature-card p {
-      font-size: 14px;
-      color: #5a5a5a;
-      line-height: 1.6;
-    }
 
     /* Login Section - Right Side */
     .login-section {
@@ -556,40 +509,36 @@
         border-image: linear-gradient(to right, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
       }
 
-      .features {
-        grid-template-columns: 1fr;
-      }
-
       .hero h1 {
         font-size: 36px;
       }
 
       .brain-animation-container {
-        height: 160px;
+        height: 240px;
         max-width: 100%;
       }
 
       .center-brain {
-        width: 100px;
-        height: 100px;
+        width: 130px;
+        height: 130px;
       }
 
       .center-brain-label {
-        font-size: 12px;
+        font-size: 16px;
       }
 
       .center-brain-count {
-        font-size: 9px;
+        font-size: 12px;
       }
 
       .student-avatar {
-        width: 38px;
-        height: 38px;
-        font-size: 14px;
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
       }
 
       .student-label {
-        font-size: 9px;
+        font-size: 11px;
       }
 
       .student.reader-1 {
@@ -605,13 +554,29 @@
       }
 
       .animated-note {
-        width: 35px;
-        height: 35px;
+        width: 45px;
+        height: 45px;
       }
 
       .animated-note svg {
-        width: 18px;
-        height: 18px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .collective-brain h2 {
+        font-size: 28px;
+      }
+
+      .collective-brain > p {
+        font-size: 16px;
+      }
+
+      .collective-stat strong {
+        font-size: 22px;
+      }
+
+      .collective-stat-text {
+        font-size: 14px;
       }
     }
   </style>
@@ -699,28 +664,6 @@
         </div>
       </div>
 
-      <!-- Features -->
-      <div class="features">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </div>
-          <h3>AI Chat Assistant</h3>
-          <p>Ask questions and get answers that actually match your course material.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </div>
-          <h3>Organize Your Notes</h3>
-          <p>Upload and organize your study materials in a beautiful grid layout.</p>
-        </div>
-      </div>
     </div>
 
     <!-- Right Login Section -->
