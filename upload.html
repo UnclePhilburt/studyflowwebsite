@@ -406,201 +406,77 @@
       border-radius: 10px;
     }
 
-    /* Notes Section */
-    .notes-section {
+    /* Library Summary */
+    .library-summary {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 243, 0.9) 100%);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
     }
 
-    .notes-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 32px;
+    .library-summary:hover {
+      border-color: rgba(124, 152, 133, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.1);
     }
 
-    .notes-title {
-      font-family: 'Lora', Georgia, serif;
-      font-size: 28px;
-      font-weight: 500;
-      color: #2d2d2d;
-    }
-
-    .notes-count {
-      font-size: 13px;
-      color: #5d5d5d;
-      background: rgba(124, 152, 133, 0.1);
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .notes-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .note-card {
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 243, 0.9) 100%);
-      border: 2px solid rgba(124, 152, 133, 0.12);
-      border-radius: 16px;
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      animation: floatIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-    }
-
-    @keyframes floatIn {
-      from {
-        opacity: 0;
-        transform: translateY(-20px) scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    .note-card:hover {
-      border-color: rgba(124, 152, 133, 0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(124, 152, 133, 0.15);
-    }
-
-    .note-icon {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
-      color: #7c9885;
-      flex-shrink: 0;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .note-card:hover .note-icon {
-      transform: rotate(5deg) scale(1.1);
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
-    }
-
-    .note-info {
-      flex: 1;
-    }
-
-    .note-name {
-      font-weight: 600;
-      color: #2d2d2d;
-      font-size: 15px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .processing-badge {
-      background: rgba(232, 155, 95, 0.15);
-      color: #e89b5f;
-      padding: 3px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.6;
-      }
-    }
-
-    .note-course {
-      color: #7c9885;
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-
-    .note-meta {
-      font-size: 13px;
-      color: #9ca3af;
-    }
-
-    /* Delete Stone */
-    .delete-stone {
-      position: absolute;
-      right: 24px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 240, 235, 0.8) 100%);
-      border: 2px solid rgba(220, 100, 80, 0.3);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .note-card:hover .delete-stone {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .delete-stone:hover {
-      background: linear-gradient(135deg, rgba(220, 100, 80, 0.15) 0%, rgba(220, 100, 80, 0.1) 100%);
-      border-color: rgba(220, 100, 80, 0.6);
-      transform: translateY(-50%) scale(1.15);
-      box-shadow: 0 4px 16px rgba(220, 100, 80, 0.2);
-    }
-
-    .delete-stone svg {
-      width: 16px;
-      height: 16px;
-      stroke: #dc6450;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-    }
-
-    .empty-icon {
-      width: 100px;
-      height: 100px;
+    .library-icon {
+      width: 80px;
+      height: 80px;
       margin: 0 auto 24px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(232, 155, 95, 0.05) 100%);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.12) 0%, rgba(232, 155, 95, 0.08) 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.6;
     }
 
-    .empty-icon svg {
-      width: 50px;
-      height: 50px;
+    .library-icon svg {
+      width: 40px;
+      height: 40px;
       stroke: #7c9885;
-      opacity: 0.5;
     }
 
-    .empty-text {
-      font-size: 15px;
-      color: #9ca3af;
+    .library-count {
       font-family: 'Lora', Georgia, serif;
+      font-size: 48px;
+      font-weight: 500;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .library-label {
+      font-size: 16px;
+      color: #5d5d5d;
+      margin-bottom: 32px;
+      font-weight: 500;
+    }
+
+    .manage-library-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.4) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      border-radius: 12px;
+      color: #2d2d2d;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .manage-library-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.2);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
     }
 
     /* Loading Overlay */
@@ -751,23 +627,17 @@
       </div>
     </div>
 
-    <!-- Notes Section -->
-    <div class="notes-section">
-      <div class="notes-header">
-        <h2 class="notes-title">Your Library</h2>
-        <span class="notes-count" id="notes-count">0 notes</span>
+    <!-- Library Summary -->
+    <div class="library-summary">
+      <div class="library-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
       </div>
-      <div class="notes-grid" id="notes-list">
-        <div class="empty-state">
-          <div class="empty-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-          </div>
-          <p class="empty-text">Your library awaits your first notes</p>
-        </div>
-      </div>
+      <div class="library-count" id="library-count">0</div>
+      <div class="library-label" id="library-label">notes in your library</div>
+      <a href="notes.html" class="manage-library-btn">Manage Library</a>
     </div>
   </div>
 
@@ -930,24 +800,10 @@
     }
 
     async function pollForProcessing() {
-      let attempts = 0;
-      const maxAttempts = 30;
-
-      const pollInterval = setInterval(async () => {
-        attempts++;
+      // Just wait a bit then reload the count
+      setTimeout(async () => {
         await loadNotes();
-
-        const processingBadges = document.querySelectorAll('.processing-badge');
-
-        if (processingBadges.length === 0) {
-          clearInterval(pollInterval);
-          return;
-        }
-
-        if (attempts >= maxAttempts) {
-          clearInterval(pollInterval);
-        }
-      }, 1000);
+      }, 2000);
     }
 
     async function loadNotes() {
@@ -973,85 +829,11 @@
     }
 
     function displayNotes(notes) {
-      const notesList = document.getElementById('notes-list');
-      const notesCount = document.getElementById('notes-count');
+      const libraryCount = document.getElementById('library-count');
+      const libraryLabel = document.getElementById('library-label');
 
-      notesCount.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
-
-      if (notes.length === 0) {
-        notesList.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              </svg>
-            </div>
-            <p class="empty-text">Your library awaits your first notes</p>
-          </div>
-        `;
-        return;
-      }
-
-      notesList.innerHTML = notes.map((note, index) => {
-        const icon = getFileIcon(note.filename);
-        const date = new Date(note.uploaded_at).toLocaleDateString();
-        const courseInfo = [];
-        if (note.university) courseInfo.push(note.university);
-        if (note.course_code) courseInfo.push(note.course_code);
-        const courseLine = courseInfo.length > 0 ? `<div class="note-course">${courseInfo.join(' - ')}</div>` : '';
-        const processingBadge = note.processed ? '' : '<span class="processing-badge">Processing</span>';
-        return `
-          <div class="note-card" style="animation-delay: ${index * 0.1}s">
-            <div class="note-icon">${icon}</div>
-            <div class="note-info">
-              <div class="note-name">
-                ${note.filename}
-                ${processingBadge}
-              </div>
-              ${courseLine}
-              <div class="note-meta">${date} • ${note.pages || '?'} pages</div>
-            </div>
-            <div class="delete-stone" onclick="deleteNote('${note.id}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function getFileIcon(filename) {
-      const ext = filename.split('.').pop().toLowerCase();
-      if (ext === 'pdf') return 'PDF';
-      if (['jpg', 'jpeg', 'png'].includes(ext)) return 'IMG';
-      if (['doc', 'docx'].includes(ext)) return 'DOC';
-      if (ext === 'txt') return 'TXT';
-      return 'FILE';
-    }
-
-    async function deleteNote(noteId) {
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-
-        if (!response.ok) throw new Error('Delete failed');
-
-        // Fade out the card before removing
-        const card = event.target.closest('.note-card');
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(-20px)';
-
-        setTimeout(() => {
-          loadNotes();
-        }, 400);
-      } catch (error) {
-        console.error('Delete error:', error);
-      }
+      libraryCount.textContent = notes.length;
+      libraryLabel.textContent = notes.length === 1 ? 'note in your library' : 'notes in your library';
     }
 
     async function logout() {
