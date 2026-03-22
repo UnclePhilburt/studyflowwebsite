@@ -29,13 +29,13 @@
       width: 100%;
       height: 100%;
       background-image:
-        radial-gradient(circle at 20% 30%, rgba(124, 152, 133, 0.04) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(232, 155, 95, 0.03) 0%, transparent 40%),
-        radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.015) 0%, transparent 50%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+        radial-gradient(circle at 20% 30%, rgba(124, 152, 133, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(232, 155, 95, 0.05) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
       mix-blend-mode: multiply;
+      opacity: 0.8;
     }
 
     body::after {
@@ -46,11 +46,11 @@
       width: 100%;
       height: 100%;
       background:
-        repeating-linear-gradient(0deg, transparent 0px, rgba(124, 152, 133, 0.008) 1px, transparent 2px, transparent 4px),
-        repeating-linear-gradient(90deg, transparent 0px, rgba(232, 155, 95, 0.006) 1px, transparent 2px, transparent 6px);
+        repeating-linear-gradient(0deg, transparent 0px, rgba(107, 133, 117, 0.02) 1px, transparent 2px, transparent 3px),
+        repeating-linear-gradient(90deg, transparent 0px, rgba(232, 155, 95, 0.015) 1px, transparent 2px, transparent 5px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.5;
+      opacity: 0.7;
     }
 
     .container {
@@ -108,33 +108,14 @@
 
     /* Stats Section */
     .collective-brain {
-      background:
-        linear-gradient(135deg, rgba(124, 152, 133, 0.05) 0%, rgba(232, 155, 95, 0.04) 100%),
-        radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
-        #ebe6db;
-      border-radius: 20px;
-      padding: 50px 60px;
-      border: 1px solid rgba(124, 152, 133, 0.15);
-      box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4),
-        inset 0 0 60px rgba(232, 155, 95, 0.02);
+      background: transparent;
+      border-radius: 0;
+      padding: 60px 60px;
+      border: none;
+      box-shadow: none;
       margin-bottom: 40px;
       animation: slideUp 0.8s ease 0.2s both;
       position: relative;
-    }
-
-    .collective-brain::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)' opacity='0.04'/%3E%3C/svg%3E");
-      border-radius: 20px;
-      pointer-events: none;
-      mix-blend-mode: multiply;
     }
 
     @keyframes slideUp {
@@ -173,14 +154,12 @@
     /* Suite Title */
     .suite-title {
       font-family: 'Lora', serif;
-      font-size: 48px;
+      font-size: 64px;
       font-weight: 600;
-      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -1px;
+      color: #6b8575;
+      letter-spacing: -2px;
       animation: fadeIn 0.8s ease both;
+      text-align: center;
     }
 
     @keyframes fadeIn {
@@ -222,32 +201,15 @@
     /* Login Section - Right Side */
     .login-section {
       flex: 0 0 440px;
-      background:
-        linear-gradient(to bottom, rgba(124, 152, 133, 0.04) 0%, rgba(232, 155, 95, 0.03) 100%),
-        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 60%),
-        #ebe6db;
+      background: rgba(235, 230, 219, 0.5);
       display: flex;
       flex-direction: column;
       justify-content: center;
       padding: 60px 50px;
-      border-left: 2px solid rgba(124, 152, 133, 0.2);
-      box-shadow:
-        -8px 0 40px rgba(0, 0, 0, 0.06),
-        inset 0 0 60px rgba(232, 155, 95, 0.02);
+      border-left: 2px solid rgba(107, 133, 117, 0.2);
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.04);
       animation: slideInRight 0.8s ease 0.3s both;
       position: relative;
-    }
-
-    .login-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='loginNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23loginNoise)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      mix-blend-mode: multiply;
     }
 
     @keyframes slideInRight {
@@ -442,7 +404,8 @@
       }
 
       .suite-title {
-        font-size: 36px;
+        font-size: 48px;
+        letter-spacing: -1px;
       }
 
       .live-stats {
