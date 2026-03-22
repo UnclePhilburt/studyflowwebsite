@@ -196,6 +196,80 @@
       letter-spacing: 1px;
     }
 
+    /* Network Flow */
+    .network-flow {
+      margin-top: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      animation: fadeIn 1.2s ease 0.6s both;
+    }
+
+    .flow-step {
+      text-align: center;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .flow-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+    }
+
+    .flow-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .flow-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #6b8575;
+      margin-bottom: 8px;
+    }
+
+    .flow-desc {
+      font-size: 13px;
+      color: #8a8a8a;
+      line-height: 1.5;
+    }
+
+    .flow-arrow {
+      font-size: 24px;
+      color: rgba(124, 152, 133, 0.4);
+      flex-shrink: 0;
+    }
+
+    /* Info Text */
+    .info-text {
+      margin-top: 50px;
+      text-align: center;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeIn 1.4s ease 0.8s both;
+    }
+
+    .info-text p {
+      font-size: 16px;
+      color: #6b8575;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .info-highlight {
+      font-weight: 600;
+      color: #7c9885;
+    }
+
 
 
     /* Login Section - Right Side */
@@ -413,6 +487,25 @@
         gap: 30px;
       }
 
+      .network-flow {
+        flex-direction: column;
+        gap: 30px;
+        margin-top: 40px;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+
+      .info-text {
+        margin-top: 40px;
+        padding: 0 20px;
+      }
+
+      .info-text p {
+        font-size: 15px;
+      }
+
       .stat-number {
         font-size: 44px;
       }
@@ -452,6 +545,50 @@
               <div class="stat-number" id="noteCount">...</div>
               <div class="stat-label">Notes</div>
             </div>
+          </div>
+
+          <!-- Network Flow -->
+          <div class="network-flow">
+            <div class="flow-step">
+              <div class="flow-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="flow-title">Upload Notes</div>
+              <div class="flow-desc">Students share their study materials</div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 6v6l4 2"></path>
+                </svg>
+              </div>
+              <div class="flow-title">Network Forms</div>
+              <div class="flow-desc">Notes interconnect into collective knowledge</div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+              </div>
+              <div class="flow-title">Everyone Benefits</div>
+              <div class="flow-desc">Smarter AI helps all students succeed</div>
+            </div>
+          </div>
+
+          <!-- Info Text -->
+          <div class="info-text">
+            <p>Every note becomes part of a <span class="info-highlight">living network of knowledge</span>. When you upload your materials, they connect with thousands of others, creating an AI that truly understands your courses.</p>
+            <p>The more students contribute, the smarter the system becomes for everyone.</p>
           </div>
         </div>
 
