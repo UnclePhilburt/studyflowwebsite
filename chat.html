@@ -258,25 +258,6 @@
       transform: translateY(-1px) scale(1.02);
     }
 
-    .delete-chat-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 8px 14px;
-      border-radius: 8px;
-      color: #5d5d5d;
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .delete-chat-btn:hover {
-      background: #3a1a1a;
-      color: #fca5a5;
-    }
 
     .new-chat-btn {
       margin: 16px;
@@ -311,7 +292,7 @@
     }
 
     .conversation-item {
-      padding: 12px 14px;
+      padding: 12px 40px 12px 14px;
       margin-bottom: 6px;
       border-radius: 10px;
       cursor: pointer;
@@ -339,6 +320,54 @@
       font-weight: 600;
       border-color: #e89b5f;
       box-shadow: 0 4px 16px rgba(124, 152, 133, 0.15), 0 2px 12px rgba(232, 155, 95, 0.1);
+    }
+
+    /* Zen Delete Stone - appears on hover */
+    .delete-stone {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 240, 235, 0.8) 100%);
+      border: 1.5px solid rgba(220, 100, 80, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 6px rgba(45, 45, 45, 0.1);
+      z-index: 10;
+    }
+
+    .delete-stone svg {
+      width: 12px;
+      height: 12px;
+      stroke: #dc6450;
+      stroke-width: 2.5;
+    }
+
+    .conversation-item:hover .delete-stone {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .delete-stone:hover {
+      background: linear-gradient(135deg, rgba(220, 100, 80, 0.15) 0%, rgba(220, 100, 80, 0.1) 100%);
+      border-color: rgba(220, 100, 80, 0.6);
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 3px 10px rgba(220, 100, 80, 0.25);
+    }
+
+    .delete-stone:hover svg {
+      stroke: #c43a28;
+    }
+
+    .delete-stone:active {
+      transform: translateY(-50%) scale(0.95);
     }
 
     .sidebar-footer {
@@ -1288,13 +1317,79 @@
         }
 
         const title = conv.title || 'New conversation';
-        item.textContent = title.length > 40 ? title.substring(0, 40) + '...' : title;
-        item.title = title;
+        const titleText = document.createElement('span');
+        titleText.textContent = title.length > 40 ? title.substring(0, 40) + '...' : title;
+        titleText.style.display = 'block';
+        titleText.style.pointerEvents = 'none';
 
-        item.addEventListener('click', (e) => loadConversation(conv.id, e.currentTarget));
+        item.title = title;
+        item.appendChild(titleText);
+
+        // Add delete stone
+        const deleteStone = document.createElement('button');
+        deleteStone.className = 'delete-stone';
+        deleteStone.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        `;
+        deleteStone.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteConversation(conv.id, item);
+        });
+        item.appendChild(deleteStone);
+
+        item.addEventListener('click', (e) => {
+          if (!e.target.closest('.delete-stone')) {
+            loadConversation(conv.id, e.currentTarget);
+          }
+        });
 
         conversationList.appendChild(item);
       });
+    }
+
+    // Delete Conversation with zen fade-out
+    async function deleteConversation(convId, itemElement) {
+      if (!confirm('Delete this conversation?')) {
+        return;
+      }
+
+      try {
+        // Zen fade-out animation
+        itemElement.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        itemElement.style.opacity = '0';
+        itemElement.style.transform = 'translateX(-20px)';
+
+        const response = await fetch(`${BACKEND_URL}/api/conversations/${convId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        // Wait for animation to complete
+        setTimeout(() => {
+          if (convId === conversationId) {
+            // If deleting current conversation, start a new chat
+            startNewChat();
+          }
+          // Reload conversation list
+          loadConversations();
+        }, 500);
+
+      } catch (error) {
+        console.error('Error deleting conversation:', error);
+        // Restore element on error
+        itemElement.style.opacity = '1';
+        itemElement.style.transform = 'translateX(0)';
+        alert('Failed to delete conversation. Please try again.');
+      }
     }
 
     // Load Specific Conversation
@@ -1367,11 +1462,6 @@
         // Start a new chat
         startNewChat();
 
-        // Hide delete button
-        const deleteBtn = document.getElementById('deleteChatBtn');
-        if (deleteBtn) {
-          deleteBtn.style.display = 'none';
-        }
 
       } catch (error) {
         console.error('Error deleting conversation:', error);
@@ -1775,11 +1865,6 @@
     });
 
     newChatBtn.addEventListener('click', startNewChat);
-
-    const deleteChatBtn = document.getElementById('deleteChatBtn');
-    if (deleteChatBtn) {
-      deleteChatBtn.addEventListener('click', deleteCurrentConversation);
-    }
 
     logoutBtn.addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
