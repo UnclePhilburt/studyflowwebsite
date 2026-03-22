@@ -728,6 +728,8 @@
     let previewedNote = null;
     let mouseDownPos = { x: 0, y: 0 };
     let hasMoved = false;
+    let clickTimer = null;
+    let preventClick = false;
 
     // Check authentication
     async function checkAuth() {
@@ -877,12 +879,23 @@
         // Single click for preview (only in grid mode, free-form handles in mouseup)
         if (isGridMode) {
           item.addEventListener('click', () => {
-            showPreview(item.dataset.id);
+            if (preventClick) {
+              preventClick = false;
+              return;
+            }
+
+            // Delay showing preview to detect double-click
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => {
+              showPreview(item.dataset.id);
+            }, 250);
           });
         }
 
         // Double click for download (both modes)
         item.addEventListener('dblclick', () => {
+          clearTimeout(clickTimer); // Cancel single-click preview
+          preventClick = true;
           downloadNote(item.dataset.id, item.dataset.filename);
         });
       });
@@ -1197,9 +1210,13 @@
 
           isDraggingFreeForm = false;
         } else {
-          // This was a click - trigger preview for notes
+          // This was a click - trigger preview for notes (with delay for double-click detection)
           if (draggedItem.type === 'note') {
-            showPreview(draggedItem.id);
+            const noteId = draggedItem.id;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => {
+              showPreview(noteId);
+            }, 250);
           } else if (draggedItem.type === 'folder') {
             // For folders, check if it's a double-click or single click
             // We'll ignore single clicks on folders for now
