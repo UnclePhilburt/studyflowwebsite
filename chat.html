@@ -1906,6 +1906,42 @@
       sidebar.classList.toggle('active');
     });
 
+    // Auto-open sidebar when mouse approaches left edge
+    let sidebarAutoOpened = false;
+    document.addEventListener('mousemove', (e) => {
+      const edgeThreshold = 50; // pixels from left edge
+      const isNearEdge = e.clientX <= edgeThreshold;
+      const isChatStarted = document.body.classList.contains('chat-started');
+
+      if (isNearEdge && isChatStarted && !sidebar.classList.contains('active')) {
+        sidebar.classList.add('active');
+        sidebarAutoOpened = true;
+      } else if (!isNearEdge && sidebarAutoOpened && sidebar.classList.contains('active')) {
+        // Only auto-close if it was auto-opened (not manually clicked)
+        const sidebarRect = sidebar.getBoundingClientRect();
+        const isOverSidebar = e.clientX <= sidebarRect.right;
+
+        if (!isOverSidebar) {
+          sidebar.classList.remove('active');
+          sidebarAutoOpened = false;
+        }
+      }
+    });
+
+    // Close sidebar when clicking outside of it
+    document.addEventListener('click', (e) => {
+      if (sidebar.classList.contains('active')) {
+        const sidebarRect = sidebar.getBoundingClientRect();
+        const isClickInSidebar = e.clientX <= sidebarRect.right;
+        const isMenuBtn = e.target.closest('#menuBtn');
+
+        if (!isClickInSidebar && !isMenuBtn) {
+          sidebar.classList.remove('active');
+          sidebarAutoOpened = false;
+        }
+      }
+    });
+
     newChatBtn.addEventListener('click', startNewChat);
 
     const deleteChatBtn = document.getElementById('deleteChatBtn');
