@@ -856,9 +856,8 @@
           <div class="note-item"
                data-id="${note.id}"
                data-type="note"
+               data-filename="${escapeQuotes(note.filename)}"
                draggable="${isGridMode}"
-               onclick="showPreview('${note.id}')"
-               ondblclick="downloadNote('${note.id}', '${escapeQuotes(note.filename)}')"
                oncontextmenu="showContextMenu(event, '${note.id}', 'note')"
                ${isGridMode ? 'ondragstart="handleDragStart(event)"' : ''}
                ${style}>
@@ -871,6 +870,22 @@
       });
 
       desktop.innerHTML = html;
+
+      // Add event listeners to notes (for both grid and free-form mode)
+      const noteItems = desktop.querySelectorAll('.note-item');
+      noteItems.forEach(item => {
+        // Single click for preview (only in grid mode, free-form handles in mouseup)
+        if (isGridMode) {
+          item.addEventListener('click', () => {
+            showPreview(item.dataset.id);
+          });
+        }
+
+        // Double click for download (both modes)
+        item.addEventListener('dblclick', () => {
+          downloadNote(item.dataset.id, item.dataset.filename);
+        });
+      });
 
       // Add free-form drag listeners in free mode
       if (!isGridMode) {
