@@ -265,6 +265,69 @@
       transform: translateY(-2px);
     }
 
+    /* Centered input for welcome screen */
+    .welcome-input-container {
+      width: 100%;
+      max-width: 800px;
+      margin-top: 32px;
+    }
+
+    .welcome-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .welcome-input-box {
+      width: 100%;
+      padding: 16px 60px 16px 20px;
+      border: 2px solid #2d3748;
+      border-radius: 28px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      resize: none;
+      min-height: 56px;
+      max-height: 200px;
+      transition: border-color 0.2s;
+      background: #1a1f2e;
+      color: #e5e7eb;
+    }
+
+    .welcome-input-box:focus {
+      outline: none;
+      border-color: #4b5563;
+    }
+
+    .welcome-send-btn {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      background: #4b5563;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .welcome-send-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+
+    .welcome-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Hide bottom input when on welcome screen */
+    .input-container.hidden {
+      display: none;
+    }
+
     .message {
       display: flex;
       gap: 12px;
@@ -600,10 +663,26 @@
           <div class="suggested-prompts" id="suggestedPrompts">
             <!-- Random questions will be inserted here -->
           </div>
+          <div class="welcome-input-container">
+            <div class="welcome-input-wrapper">
+              <textarea
+                class="welcome-input-box"
+                id="welcomeMessageInput"
+                placeholder="Ask me anything..."
+                rows="1"
+              ></textarea>
+              <button class="welcome-send-btn" id="welcomeSendBtn" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="input-container">
+      <div class="input-container hidden" id="bottomInputContainer">
         <div class="input-wrapper">
           <textarea
             class="input-box"
@@ -644,6 +723,9 @@
     const welcomeScreen = document.getElementById('welcomeScreen');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
+    const welcomeMessageInput = document.getElementById('welcomeMessageInput');
+    const welcomeSendBtn = document.getElementById('welcomeSendBtn');
+    const bottomInputContainer = document.getElementById('bottomInputContainer');
     const newChatBtn = document.getElementById('newChatBtn');
     const conversationList = document.getElementById('conversationList');
     const userEmail = document.getElementById('userEmail');
@@ -694,7 +776,8 @@
       // Load conversation history
       await loadConversations();
 
-      // Enable input
+      // Enable inputs (welcome input is visible by default, bottom is hidden)
+      welcomeMessageInput.disabled = false;
       messageInput.disabled = false;
     }
 
@@ -900,24 +983,34 @@
 
     // Send suggested prompt
     function sendPrompt(prompt) {
-      messageInput.value = prompt;
-      sendMessage();
+      // Use the welcome input if it's visible, otherwise use bottom input
+      const welcomeInputElement = document.getElementById('welcomeMessageInput');
+      if (welcomeInputElement && !bottomInputContainer.classList.contains('hidden') === false) {
+        welcomeInputElement.value = prompt;
+      } else {
+        messageInput.value = prompt;
+      }
+      sendMessage(prompt);
     }
 
     // Send Message
-    async function sendMessage() {
-      const message = messageInput.value.trim();
+    async function sendMessage(messageText = null) {
+      const message = messageText || messageInput.value.trim();
       if (!message) return;
 
-      // Clear input and disable
+      // If sending from welcome screen, switch to bottom input
+      if (welcomeScreen && welcomeScreen.style.display !== 'none') {
+        welcomeScreen.style.display = 'none';
+        bottomInputContainer.classList.remove('hidden');
+      }
+
+      // Clear inputs and disable
       messageInput.value = '';
+      welcomeMessageInput.value = '';
       messageInput.disabled = true;
       sendBtn.disabled = true;
-
-      // Hide welcome screen
-      if (welcomeScreen) {
-        welcomeScreen.style.display = 'none';
-      }
+      welcomeMessageInput.disabled = true;
+      welcomeSendBtn.disabled = true;
 
       // Add user message
       addMessage(message, 'user');
@@ -966,9 +1059,16 @@
         removeTypingIndicator(typingId);
         addMessage('Sorry, something went wrong. Please try again.', 'assistant');
       } finally {
-        // Re-enable input
+        // Re-enable inputs
         messageInput.disabled = false;
-        messageInput.focus();
+        welcomeMessageInput.disabled = false;
+
+        // Focus on the visible input
+        if (!bottomInputContainer.classList.contains('hidden')) {
+          messageInput.focus();
+        } else {
+          welcomeMessageInput.focus();
+        }
       }
     }
 
@@ -1059,13 +1159,66 @@
         <div class="suggested-prompts">
           ${promptChipsHTML}
         </div>
+        <div class="welcome-input-container">
+          <div class="welcome-input-wrapper">
+            <textarea
+              class="welcome-input-box"
+              id="welcomeMessageInput"
+              placeholder="Ask me anything..."
+              rows="1"
+            ></textarea>
+            <button class="welcome-send-btn" id="welcomeSendBtn" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
       `;
       messagesContainer.appendChild(welcomeDiv);
-      messageInput.focus();
+
+      // Hide bottom input, show welcome
+      bottomInputContainer.classList.add('hidden');
+
+      // Re-attach event listeners to new welcome input
+      const newWelcomeInput = document.getElementById('welcomeMessageInput');
+      const newWelcomeSendBtn = document.getElementById('welcomeSendBtn');
+
+      newWelcomeInput.addEventListener('input', () => {
+        newWelcomeSendBtn.disabled = !newWelcomeInput.value.trim();
+        newWelcomeInput.style.height = 'auto';
+        newWelcomeInput.style.height = Math.min(newWelcomeInput.scrollHeight, 200) + 'px';
+      });
+
+      newWelcomeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          const message = newWelcomeInput.value.trim();
+          if (message) {
+            sendMessage(message);
+          }
+        }
+      });
+
+      newWelcomeSendBtn.addEventListener('click', () => {
+        const message = newWelcomeInput.value.trim();
+        if (message) {
+          sendMessage(message);
+        }
+      });
+
+      newWelcomeInput.focus();
     }
 
     // Event Listeners
     sendBtn.addEventListener('click', sendMessage);
+    welcomeSendBtn.addEventListener('click', () => {
+      const message = welcomeMessageInput.value.trim();
+      if (message) {
+        sendMessage(message);
+      }
+    });
 
     messageInput.addEventListener('input', () => {
       sendBtn.disabled = !messageInput.value.trim();
@@ -1075,11 +1228,29 @@
       messageInput.style.height = Math.min(messageInput.scrollHeight, 200) + 'px';
     });
 
+    welcomeMessageInput.addEventListener('input', () => {
+      welcomeSendBtn.disabled = !welcomeMessageInput.value.trim();
+
+      // Auto-resize textarea
+      welcomeMessageInput.style.height = 'auto';
+      welcomeMessageInput.style.height = Math.min(welcomeMessageInput.scrollHeight, 200) + 'px';
+    });
+
     messageInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         if (messageInput.value.trim()) {
           sendMessage();
+        }
+      }
+    });
+
+    welcomeMessageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const message = welcomeMessageInput.value.trim();
+        if (message) {
+          sendMessage(message);
         }
       }
     });
