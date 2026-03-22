@@ -625,23 +625,37 @@
     /* Welcome hint text - above search bar */
     .welcome-hint {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       animation: fadeIn 0.6s ease;
     }
 
     .welcome-hint h1 {
-      font-size: 48px;
+      font-size: 52px;
       font-weight: 300;
       color: rgba(255, 255, 255, 0.95);
-      margin: 0 0 12px 0;
+      margin: 0 0 16px 0;
       letter-spacing: -0.02em;
     }
 
     .welcome-hint p {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 400;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.5);
       margin: 0;
+    }
+
+    .welcome-hint .greeting-emoji {
+      display: inline-block;
+      font-size: 52px;
+      margin-right: 8px;
+      animation: wave 2s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: rotate(0deg); }
+      10%, 30% { transform: rotate(14deg); }
+      20%, 40% { transform: rotate(-8deg); }
+      50% { transform: rotate(0deg); }
     }
 
     body.chat-started .welcome-hint {
@@ -740,16 +754,18 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
-    /* Message Card - Notion/Linear style */
+    /* Message - Conversational layout */
     .message {
-      max-width: 720px;
-      margin: 0 auto 16px auto;
-      animation: cardSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      max-width: 700px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      gap: 12px;
+      animation: messageSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       opacity: 0;
       animation-fill-mode: forwards;
     }
 
-    @keyframes cardSlideIn {
+    @keyframes messageSlideIn {
       from {
         opacity: 0;
         transform: translateY(20px);
@@ -760,56 +776,69 @@
       }
     }
 
-    /* Hide avatars */
-    .message-avatar {
-      display: none;
+    /* User messages - right aligned */
+    .message.user {
+      flex-direction: row-reverse;
+      margin-left: auto;
+      margin-right: 24px;
     }
 
-    /* User message card - minimal */
+    /* AI messages - left aligned */
+    .message.assistant {
+      margin-left: 24px;
+      margin-right: auto;
+    }
+
+    /* Avatar styling - modern minimal */
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .message.user .message-avatar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .message.assistant .message-avatar {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* User message bubble */
     .message.user .message-content {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 16px 20px;
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px 20px 4px 20px;
+      padding: 14px 18px;
+      color: white;
+      font-size: 15px;
       line-height: 1.6;
       font-weight: 400;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+      max-width: 480px;
     }
 
-    /* AI message card - slightly different */
+    /* AI message bubble */
     .message.assistant .message-content {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 20px 24px;
+      border-radius: 20px 20px 20px 4px;
+      padding: 14px 18px;
       color: rgba(255, 255, 255, 0.95);
       font-size: 15px;
       line-height: 1.7;
       font-weight: 300;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      position: relative;
-      padding-left: 52px;
-    }
-
-    /* Small AI icon for assistant messages */
-    .message.assistant .message-content::before {
-      content: 'AI';
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 700;
-      color: white;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      max-width: 520px;
     }
 
     .typing-indicator {
@@ -1145,7 +1174,7 @@
     <!-- Search Bar Container (starts centered, moves to top) -->
     <div class="search-bar-container">
       <div class="welcome-hint" id="welcomeHint">
-        <h1>Ask anything</h1>
+        <h1><span class="greeting-emoji">👋</span>Ask anything</h1>
         <p>Your AI study assistant</p>
       </div>
       <div class="search-bar-wrapper">
