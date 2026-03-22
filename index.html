@@ -53,59 +53,6 @@
       opacity: 0.7;
     }
 
-    /* Waterfall Effect */
-    .waterfall {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 120px;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 2;
-      overflow: hidden;
-    }
-
-    .waterfall-stream {
-      position: absolute;
-      width: 2px;
-      height: 100px;
-      background: linear-gradient(to bottom,
-        transparent,
-        rgba(124, 152, 133, 0.15),
-        rgba(124, 152, 133, 0.25),
-        rgba(124, 152, 133, 0.15),
-        transparent
-      );
-      animation: fall linear infinite;
-      opacity: 0.6;
-    }
-
-    @keyframes fall {
-      0% {
-        transform: translateY(-100px);
-        opacity: 0;
-      }
-      10% {
-        opacity: 0.6;
-      }
-      90% {
-        opacity: 0.6;
-      }
-      100% {
-        transform: translateY(100vh);
-        opacity: 0;
-      }
-    }
-
-    .waterfall-stream:nth-child(1) { left: 20px; animation-duration: 3s; animation-delay: 0s; height: 80px; }
-    .waterfall-stream:nth-child(2) { left: 45px; animation-duration: 4s; animation-delay: 0.5s; height: 120px; }
-    .waterfall-stream:nth-child(3) { left: 70px; animation-duration: 3.5s; animation-delay: 1s; height: 90px; }
-    .waterfall-stream:nth-child(4) { left: 95px; animation-duration: 4.5s; animation-delay: 1.5s; height: 110px; }
-    .waterfall-stream:nth-child(5) { left: 30px; animation-duration: 5s; animation-delay: 2s; height: 100px; }
-    .waterfall-stream:nth-child(6) { left: 55px; animation-duration: 3.8s; animation-delay: 2.5s; height: 85px; }
-    .waterfall-stream:nth-child(7) { left: 80px; animation-duration: 4.2s; animation-delay: 0.8s; height: 95px; }
-    .waterfall-stream:nth-child(8) { left: 35px; animation-duration: 4.8s; animation-delay: 1.8s; height: 105px; }
-
     .container {
       display: flex;
       height: 100vh;
@@ -508,10 +455,6 @@
     .loading.active { display: block; }
 
     @media (max-width: 968px) {
-      .waterfall {
-        display: none;
-      }
-
       .container {
         flex-direction: column;
         height: auto;
@@ -594,18 +537,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Waterfall Animation -->
-  <div class="waterfall">
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-    <div class="waterfall-stream"></div>
-  </div>
-
   <div class="container">
     <!-- Left Content Area -->
     <div class="content-area">
