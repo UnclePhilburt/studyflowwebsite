@@ -14,17 +14,31 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(180deg, #f5f3f0 0%, #ebe8e3 100%);
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       height: 100vh;
       overflow: hidden;
       transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       margin: 0;
       padding: 0;
       color: #2d2d2d;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(232, 155, 95, 0.02) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     body.chat-started {
-      background: linear-gradient(180deg, #f8f6f3 0%, #f0ede8 100%);
+      background: linear-gradient(180deg, #f8f7f3 0%, #f1ede8 100%);
     }
 
     /* Dark Mode Theme - Warm Charcoal */
@@ -314,15 +328,16 @@
       top: 0;
       width: 320px;
       height: 100vh;
-      background: rgba(245, 243, 240, 0.98);
+      background: linear-gradient(to bottom, rgba(245, 243, 240, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
       backdrop-filter: blur(60px);
       -webkit-backdrop-filter: blur(60px);
-      border-right: 1px solid rgba(232, 155, 95, 0.15);
+      border-right: 3px solid transparent;
+      border-image: linear-gradient(to bottom, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
       display: flex;
       flex-direction: column;
       transform: translateX(-100%);
       transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 12px 0 60px rgba(45, 45, 45, 0.08);
+      box-shadow: 12px 0 60px rgba(124, 152, 133, 0.1), 8px 0 40px rgba(232, 155, 95, 0.05);
       z-index: 1000;
       opacity: 1;
     }
@@ -339,17 +354,18 @@
       width: 48px;
       height: 48px;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(232, 155, 95, 0.2);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
       display: none;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 99;
-      color: rgba(45, 45, 45, 0.6);
+      color: #7c9885;
       font-size: 18px;
-      box-shadow: 0 4px 20px rgba(45, 45, 45, 0.06);
+      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
     }
 
     body.chat-started .menu-btn {
@@ -370,10 +386,11 @@
     }
 
     .menu-btn:hover {
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 6px 30px rgba(45, 45, 45, 0.12);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
+      box-shadow: 0 6px 30px rgba(124, 152, 133, 0.2), 0 4px 20px rgba(232, 155, 95, 0.15);
       transform: translateY(-2px);
-      border-color: rgba(232, 155, 95, 0.3);
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
+      color: #d88850;
     }
 
     .sidebar-header {
@@ -491,17 +508,18 @@
     }
 
     .conversation-item:hover {
-      background: rgba(255, 255, 255, 0.05);
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.08) 0%, rgba(232, 155, 95, 0.05) 100%);
       transform: translateX(4px);
-      border-color: rgba(124, 152, 133, 0.2);
+      border-color: rgba(232, 155, 95, 0.3);
+      box-shadow: 0 2px 8px rgba(232, 155, 95, 0.1);
     }
 
     .conversation-item.active {
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(107, 133, 117, 0.15) 100%);
-      color: #fff;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      color: #2d2d2d;
       font-weight: 600;
-      border-color: rgba(124, 152, 133, 0.4);
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.2);
+      border-color: #e89b5f;
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.15), 0 2px 12px rgba(232, 155, 95, 0.1);
     }
 
     .sidebar-footer {
@@ -590,20 +608,22 @@
     }
 
     .messages-container::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     .messages-container::-webkit-scrollbar-track {
-      background: transparent;
+      background: rgba(124, 152, 133, 0.05);
+      border-radius: 4px;
     }
 
     .messages-container::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%);
+      border-radius: 4px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     .messages-container::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(180deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%);
     }
 
     /* Welcome hint text - above search bar */
@@ -627,7 +647,10 @@
     .welcome-hint h1 {
       font-size: 48px;
       font-weight: 400;
-      color: #2d2d2d;
+      background: linear-gradient(135deg, #2d2d2d 0%, #3d4d3d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin: 0 0 12px 0;
       letter-spacing: -0.01em;
       font-family: 'Lora', Georgia, serif;
@@ -636,7 +659,7 @@
     .welcome-hint p {
       font-size: 16px;
       font-weight: 400;
-      color: rgba(45, 45, 45, 0.45);
+      color: rgba(124, 152, 133, 0.6);
       margin: 0;
       font-style: italic;
     }
@@ -729,20 +752,22 @@
     }
 
     .messages-container::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     .messages-container::-webkit-scrollbar-track {
-      background: transparent;
+      background: rgba(124, 152, 133, 0.05);
+      border-radius: 4px;
     }
 
     .messages-container::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%);
+      border-radius: 4px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     .messages-container::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: linear-gradient(180deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%);
     }
 
     /* Paper Card Messages - Like notes on a desk */
@@ -786,7 +811,8 @@
 
     .message.assistant::before {
       content: "StudyFlow";
-      color: rgba(45, 45, 45, 0.4);
+      color: #7c9885;
+      opacity: 0.5;
     }
 
     /* Paper card with ribbon bookmark */
@@ -814,7 +840,8 @@
     }
 
     .message.assistant .message-content {
-      border-left-color: rgba(45, 45, 45, 0.15);
+      border-left-color: #7c9885;
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.02) 0%, rgba(255, 255, 255, 0.9) 100%);
     }
 
     .message-content:hover {
@@ -823,9 +850,18 @@
       transform: translateY(-2px);
     }
 
+    .message.user .message-content {
+      background: linear-gradient(to right, rgba(232, 155, 95, 0.04) 0%, rgba(255, 255, 255, 0.9) 100%);
+    }
+
     .message.user .message-content:hover {
       box-shadow: 0 4px 24px rgba(232, 155, 95, 0.2),
                   0 12px 48px rgba(232, 155, 95, 0.12);
+    }
+
+    .message.assistant .message-content:hover {
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.2),
+                  0 12px 48px rgba(124, 152, 133, 0.12);
     }
 
     .typing-indicator {
@@ -867,7 +903,8 @@
     .search-input {
       width: 100%;
       padding: 18px 64px 18px 28px;
-      border: 1px solid rgba(232, 155, 95, 0.2);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
       border-radius: 16px;
       font-size: 17px;
       font-family: 'Lora', Georgia, serif;
@@ -877,21 +914,21 @@
       max-height: 64px;
       overflow: hidden;
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      background: rgba(255, 255, 255, 0.85);
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.02) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(232, 155, 95, 0.02) 100%);
       color: #2d2d2d;
       box-shadow: 0 4px 24px rgba(45, 45, 45, 0.08);
     }
 
     .search-input::placeholder {
-      color: rgba(45, 45, 45, 0.35);
+      color: rgba(124, 152, 133, 0.4);
       font-style: italic;
     }
 
     .search-input:focus {
       outline: none;
-      border-color: rgba(232, 155, 95, 0.4);
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 8px 40px rgba(45, 45, 45, 0.12);
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.04) 0%, rgba(255, 255, 255, 1) 50%, rgba(232, 155, 95, 0.04) 100%);
+      box-shadow: 0 8px 40px rgba(124, 152, 133, 0.15), 0 4px 20px rgba(232, 155, 95, 0.1);
       transform: translateY(-2px);
     }
 
@@ -963,7 +1000,8 @@
     .input-box {
       width: 100%;
       padding: 18px 64px 18px 24px;
-      border: 1px solid rgba(232, 155, 95, 0.2);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
       border-radius: 16px;
       font-size: 15px;
       font-family: 'Lora', Georgia, serif;
@@ -971,7 +1009,7 @@
       resize: none;
       min-height: 58px;
       max-height: 200px;
-      background: rgba(255, 255, 255, 0.95);
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.02) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(232, 155, 95, 0.02) 100%);
       backdrop-filter: blur(60px);
       -webkit-backdrop-filter: blur(60px);
       color: #2d2d2d;
@@ -980,15 +1018,15 @@
     }
 
     .input-box::placeholder {
-      color: rgba(45, 45, 45, 0.35);
+      color: rgba(124, 152, 133, 0.4);
       font-style: italic;
     }
 
     .input-box:focus {
       outline: none;
-      border-color: rgba(232, 155, 95, 0.4);
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 8px 48px rgba(45, 45, 45, 0.15);
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.04) 0%, rgba(255, 255, 255, 1) 50%, rgba(232, 155, 95, 0.04) 100%);
+      box-shadow: 0 8px 48px rgba(124, 152, 133, 0.15), 0 4px 24px rgba(232, 155, 95, 0.1);
       transform: translateY(-3px);
     }
 
