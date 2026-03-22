@@ -184,61 +184,78 @@
     }
 
     .sidebar-header {
-      padding: 20px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 28px 16px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      justify-content: center;
+      background: linear-gradient(to bottom, rgba(124, 152, 133, 0.03) 0%, transparent 100%);
     }
 
     .logo-text {
-      font-size: 16px;
-      font-weight: 700;
-      color: #2d2d2d;
-      font-size: 16px;
-      font-weight: 700;
-      
+      font-size: 20px;
+      font-weight: 400;
+      font-family: 'Lora', Georgia, serif;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #7c9885 0%, #d88850 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .header-actions {
+    /* Zen Action Stones - Bottom navigation */
+    .zen-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 16px;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+      background: linear-gradient(to bottom, rgba(124, 152, 133, 0.02) 0%, transparent 100%);
     }
 
-    .icon-btn {
-      background: transparent;
-      border: none;
+    .zen-stone {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(245, 243, 240, 0.6) 100%);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 10px;
-      color: #5d5d5d;
-      font-size: 13px;
-      font-weight: 500;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 10px;
-      
-      font-size: 13px;
-      font-weight: 500;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      box-shadow: 0 2px 8px rgba(45, 45, 45, 0.08),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.5);
     }
 
-    .icon-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: #2d2d2d;
-      box-shadow: 0 0 20px rgba(124, 152, 133, 0.3);
-      transform: translateY(-1px);
+    .zen-stone svg {
+      width: 20px;
+      height: 20px;
+      stroke: #7c9885;
+      stroke-width: 2;
+      fill: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .zen-stone:hover {
+      transform: translateY(-3px) scale(1.05);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
+      box-shadow: 0 6px 20px rgba(124, 152, 133, 0.2),
+                  0 4px 12px rgba(232, 155, 95, 0.15),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.7);
+    }
+
+    .zen-stone:hover svg {
+      stroke: #e89b5f;
+      transform: scale(1.1);
+    }
+
+    .zen-stone:active {
+      transform: translateY(-1px) scale(1.02);
     }
 
     .delete-chat-btn {
@@ -1026,11 +1043,7 @@
     <!-- Left Sidebar - Hidden until chat starts -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="header-actions">
-          <button class="icon-btn" id="uploadBtn">Upload</button>
-          <button class="icon-btn" id="myNotesBtn">Notes</button>
-          <button class="icon-btn" id="settingsBtn">Settings</button>
-        </div>
+        <div class="logo-text">StudyFlow</div>
       </div>
 
       <button class="new-chat-btn" id="newChatBtn">
@@ -1039,6 +1052,32 @@
 
       <div class="conversation-list" id="conversationList">
         <!-- Conversations will be loaded here -->
+      </div>
+
+      <!-- Zen Action Stones -->
+      <div class="zen-actions">
+        <button class="zen-stone" id="uploadBtn" title="Upload Notes">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </button>
+        <button class="zen-stone" id="myNotesBtn" title="My Notes">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </button>
+        <button class="zen-stone" id="settingsBtn" title="Settings">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6m9-9h-6M7 12H1m17.66-6.34l-4.24 4.24m-7.08 0L3.34 5.66m13.32 13.32l-4.24-4.24m-7.08 0l-4.24 4.24"></path>
+          </svg>
+        </button>
       </div>
 
       <div class="sidebar-footer">
