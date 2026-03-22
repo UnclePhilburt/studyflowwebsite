@@ -120,76 +120,183 @@
       text-align: center;
     }
 
-    /* Notes Preview Grid */
-    .notes-preview {
-      background: rgba(245, 244, 240, 0.6);
-      border-radius: 12px;
-      padding: 24px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-    }
-
-    .preview-note {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      animation: fadeInUp 0.5s ease both;
-    }
-
-    .preview-note:nth-child(1) { animation-delay: 0.1s; }
-    .preview-note:nth-child(2) { animation-delay: 0.2s; }
-    .preview-note:nth-child(3) { animation-delay: 0.3s; }
-    .preview-note:nth-child(4) { animation-delay: 0.4s; }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .preview-note-icon {
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
-      border-radius: 12px;
+    /* Collective Brain Animation */
+    .brain-animation-container {
+      position: relative;
+      height: 240px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.15);
-      position: relative;
-      transition: all 0.3s ease;
     }
 
-    .preview-note:hover .preview-note-icon {
-      transform: translateY(-4px) scale(1.05);
-      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.25);
+    /* Center Brain */
+    .center-brain {
+      width: 130px;
+      height: 130px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
+      border: 3px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.2);
+      animation: brainPulse 3s ease-in-out infinite;
     }
 
-    .preview-note-icon svg {
-      width: 32px;
-      height: 32px;
+    @keyframes brainPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
     }
 
-    .usage-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
-      color: white;
-      font-size: 10px;
+    .center-brain-label {
+      font-size: 15px;
       font-weight: 700;
-      padding: 3px 7px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.3);
+      color: #2d2d2d;
+      margin-bottom: 6px;
     }
 
-    .preview-note-label {
-      font-size: 12px;
+    .center-brain-count {
+      font-size: 11px;
+      color: #7c9885;
       font-weight: 600;
-      color: #2d2d2d;
-      text-align: center;
-      line-height: 1.3;
+    }
+
+    /* Students */
+    .student {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .student-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.25);
+    }
+
+    .student-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #5a5a5a;
+      white-space: nowrap;
+    }
+
+    .student.uploader {
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .student.reader-1 {
+      top: 20px;
+      left: 20px;
+    }
+
+    .student.reader-2 {
+      top: 20px;
+      right: 20px;
+    }
+
+    .student.reader-3 {
+      bottom: 30px;
+      right: 40px;
+    }
+
+    /* Animated Note */
+    .animated-note {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.25) 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+      opacity: 0;
+    }
+
+    .animated-note svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Animation: Upload */
+    .note-upload {
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: uploadToBrain 4s ease-in-out infinite;
+    }
+
+    @keyframes uploadToBrain {
+      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.8); }
+      10% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      25% { opacity: 1; transform: translate(-50%, -80px) scale(0.9); }
+      35% { opacity: 0; transform: translate(-50%, -80px) scale(0.5); }
+      100% { opacity: 0; }
+    }
+
+    /* Animation: Distribute to readers */
+    .note-to-reader-1 {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: toReader1 4s ease-in-out infinite;
+      animation-delay: 1.5s;
+    }
+
+    .note-to-reader-2 {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: toReader2 4s ease-in-out infinite;
+      animation-delay: 2s;
+    }
+
+    .note-to-reader-3 {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: toReader3 4s ease-in-out infinite;
+      animation-delay: 2.5s;
+    }
+
+    @keyframes toReader1 {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+      25% { opacity: 1; transform: translate(-200px, -100px) scale(1); }
+      35% { opacity: 0; transform: translate(-200px, -100px) scale(0.6); }
+      100% { opacity: 0; }
+    }
+
+    @keyframes toReader2 {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+      25% { opacity: 1; transform: translate(150px, -100px) scale(1); }
+      35% { opacity: 0; transform: translate(150px, -100px) scale(0.6); }
+      100% { opacity: 0; }
+    }
+
+    @keyframes toReader3 {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+      25% { opacity: 1; transform: translate(120px, 60px) scale(1); }
+      35% { opacity: 0; transform: translate(120px, 60px) scale(0.6); }
+      100% { opacity: 0; }
     }
 
     .collective-stat {
@@ -452,24 +559,41 @@
         font-size: 36px;
       }
 
-      .notes-preview {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        padding: 20px;
+      .brain-animation-container {
+        height: 200px;
       }
 
-      .preview-note-icon {
-        width: 60px;
-        height: 60px;
+      .center-brain {
+        width: 110px;
+        height: 110px;
       }
 
-      .preview-note-icon svg {
-        width: 28px;
-        height: 28px;
+      .center-brain-label {
+        font-size: 13px;
       }
 
-      .preview-note-label {
-        font-size: 11px;
+      .center-brain-count {
+        font-size: 10px;
+      }
+
+      .student-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+
+      .student-label {
+        font-size: 10px;
+      }
+
+      .animated-note {
+        width: 40px;
+        height: 40px;
+      }
+
+      .animated-note svg {
+        width: 20px;
+        height: 20px;
       }
     }
   </style>
@@ -490,55 +614,70 @@
       <!-- Collective Brain - Main Feature -->
       <div class="collective-brain">
         <h2>The Collective Brain</h2>
-        <p>Your notes combine with thousands of other students' materials to power course-specific AI answers.</p>
+        <p>One student uploads notes. Thousands of others benefit instantly.</p>
 
-        <div class="notes-preview">
-          <div class="preview-note">
-            <div class="preview-note-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <div class="usage-badge">247</div>
-            </div>
-            <div class="preview-note-label">Biology 201<br>Lecture Notes</div>
+        <div class="brain-animation-container">
+          <!-- Center Brain -->
+          <div class="center-brain">
+            <div class="center-brain-label">Collective Brain</div>
+            <div class="center-brain-count">12,847 notes</div>
           </div>
 
-          <div class="preview-note">
-            <div class="preview-note-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-              <div class="usage-badge">183</div>
-            </div>
-            <div class="preview-note-label">Chemistry<br>Formulas</div>
+          <!-- Student uploading (bottom) -->
+          <div class="student uploader">
+            <div class="student-avatar">A</div>
+            <div class="student-label">Uploads Bio notes</div>
           </div>
 
-          <div class="preview-note">
-            <div class="preview-note-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-              <div class="usage-badge">329</div>
-            </div>
-            <div class="preview-note-label">Calculus<br>Review</div>
+          <!-- Students reading (top/sides) -->
+          <div class="student reader-1">
+            <div class="student-avatar">B</div>
+            <div class="student-label">Gets answer</div>
           </div>
 
-          <div class="preview-note">
-            <div class="preview-note-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <div class="usage-badge">156</div>
-            </div>
-            <div class="preview-note-label">Psychology<br>Textbook</div>
+          <div class="student reader-2">
+            <div class="student-avatar">C</div>
+            <div class="student-label">Gets answer</div>
+          </div>
+
+          <div class="student reader-3">
+            <div class="student-avatar">D</div>
+            <div class="student-label">Gets answer</div>
+          </div>
+
+          <!-- Animated notes -->
+          <div class="animated-note note-upload">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+
+          <div class="animated-note note-to-reader-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+
+          <div class="animated-note note-to-reader-2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+
+          <div class="animated-note note-to-reader-3">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
           </div>
         </div>
 
         <div class="collective-stat">
-          <div><strong>12,847 notes</strong></div>
-          <div class="collective-stat-text">from students across 300+ universities power your AI assistant</div>
+          <div><strong>1 upload helps thousands</strong></div>
+          <div class="collective-stat-text">Every note you share makes the AI smarter for everyone</div>
         </div>
       </div>
 
