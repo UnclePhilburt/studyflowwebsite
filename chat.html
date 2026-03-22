@@ -1485,6 +1485,7 @@
 
         // Transform to chat mode
         document.body.classList.add('chat-started');
+        enableMouseProximity();
 
         // Display all messages
         data.messages.forEach(msg => {
@@ -1678,6 +1679,7 @@
       // Transform to chat mode on first message
       if (!document.body.classList.contains('chat-started')) {
         document.body.classList.add('chat-started');
+        enableMouseProximity();
       }
 
       // Clear and disable input
@@ -1908,12 +1910,21 @@
 
     // Auto-open sidebar when mouse approaches left edge
     let sidebarAutoOpened = false;
-    document.addEventListener('mousemove', (e) => {
-      const edgeThreshold = 50; // pixels from left edge
-      const isNearEdge = e.clientX <= edgeThreshold;
-      const isChatStarted = document.body.classList.contains('chat-started');
+    let mouseProximityEnabled = false;
 
-      if (isNearEdge && isChatStarted && !sidebar.classList.contains('active')) {
+    // Wait for chat to start before enabling proximity detection
+    const enableMouseProximity = () => {
+      mouseProximityEnabled = true;
+    };
+
+    document.addEventListener('mousemove', (e) => {
+      if (!mouseProximityEnabled) return;
+
+      const edgeThreshold = 80; // pixels from left edge (increased from 50)
+      const isNearEdge = e.clientX <= edgeThreshold;
+
+      if (isNearEdge && !sidebar.classList.contains('active')) {
+        console.log('Opening sidebar - mouse at x:', e.clientX);
         sidebar.classList.add('active');
         sidebarAutoOpened = true;
       } else if (!isNearEdge && sidebarAutoOpened && sidebar.classList.contains('active')) {
@@ -1922,6 +1933,7 @@
         const isOverSidebar = e.clientX <= sidebarRect.right;
 
         if (!isOverSidebar) {
+          console.log('Closing sidebar - mouse moved away');
           sidebar.classList.remove('active');
           sidebarAutoOpened = false;
         }
