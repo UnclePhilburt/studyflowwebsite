@@ -78,6 +78,26 @@
       color: #e5e7eb;
     }
 
+    .delete-chat-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: #9ca3af;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .delete-chat-btn:hover {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+
     .new-chat-btn {
       margin: 16px;
       padding: 12px;
@@ -659,6 +679,15 @@
     <main class="chat-container">
       <header class="chat-header">
         <h1 class="chat-title">StudyFlow</h1>
+        <button class="delete-chat-btn" id="deleteChatBtn" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          Delete Chat
+        </button>
       </header>
 
       <div class="messages-container" id="messagesContainer">
@@ -830,6 +859,7 @@
       conversations.forEach(conv => {
         const item = document.createElement('div');
         item.className = 'conversation-item';
+        item.setAttribute('data-conversation-id', conv.id);
         if (conv.id === conversationId) {
           item.classList.add('active');
         }
@@ -875,6 +905,12 @@
         // Set active conversation
         conversationId = convId;
 
+        // Show delete button
+        const deleteBtn = document.getElementById('deleteChatBtn');
+        if (deleteBtn) {
+          deleteBtn.style.display = 'flex';
+        }
+
         // Update active state in sidebar
         document.querySelectorAll('.conversation-item').forEach(item => {
           item.classList.remove('active');
@@ -883,6 +919,46 @@
 
       } catch (error) {
         console.error('Error loading conversation:', error);
+      }
+    }
+
+    async function deleteCurrentConversation() {
+      if (!conversationId) return;
+
+      if (!confirm('Are you sure you want to delete this chat?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/conversations/${conversationId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        // Remove conversation from sidebar
+        const conversationElement = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
+        if (conversationElement) {
+          conversationElement.remove();
+        }
+
+        // Start a new chat
+        startNewChat();
+
+        // Hide delete button
+        const deleteBtn = document.getElementById('deleteChatBtn');
+        if (deleteBtn) {
+          deleteBtn.style.display = 'none';
+        }
+
+      } catch (error) {
+        console.error('Error deleting conversation:', error);
+        alert('Failed to delete conversation. Please try again.');
       }
     }
 
@@ -1150,6 +1226,12 @@
       conversationId = null;
       messagesContainer.innerHTML = '';
 
+      // Hide delete button
+      const deleteBtn = document.getElementById('deleteChatBtn');
+      if (deleteBtn) {
+        deleteBtn.style.display = 'none';
+      }
+
       // Remove active state from all conversations
       document.querySelectorAll('.conversation-item').forEach(item => {
         item.classList.remove('active');
@@ -1273,6 +1355,11 @@
     });
 
     newChatBtn.addEventListener('click', startNewChat);
+
+    const deleteChatBtn = document.getElementById('deleteChatBtn');
+    if (deleteChatBtn) {
+      deleteChatBtn.addEventListener('click', deleteCurrentConversation);
+    }
 
     logoutBtn.addEventListener('click', async () => {
       await supabaseClient.auth.signOut();
