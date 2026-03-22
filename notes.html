@@ -1001,10 +1001,15 @@
       if (renameTarget.type === 'folder') {
         const folder = folders.find(f => f.id === renameTarget.id);
         if (folder) {
+          console.log('Renaming folder from', folder.name, 'to', newName);
           folder.name = newName;
           saveFolders();
+          console.log('Saved folders:', folders);
           closeRenameModal();
+          updateBreadcrumb(); // Update breadcrumb if we're inside the renamed folder
           renderDesktop();
+        } else {
+          console.error('Folder not found:', renameTarget.id);
         }
       } else if (renameTarget.type === 'note') {
         try {
