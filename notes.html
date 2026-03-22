@@ -975,11 +975,11 @@
       const modal = document.getElementById('renameModal');
       const input = document.getElementById('renameInput');
 
-      if (contextMenuItem.type === 'folder') {
-        const folder = folders.find(f => f.id === contextMenuItem.id);
+      if (renameTarget.type === 'folder') {
+        const folder = folders.find(f => f.id === renameTarget.id);
         input.value = folder ? folder.name : '';
       } else {
-        const note = allNotes.find(n => n.id === contextMenuItem.id);
+        const note = allNotes.find(n => n.id === renameTarget.id);
         input.value = note ? note.filename : '';
       }
 
