@@ -897,6 +897,9 @@
           welcomeScreen.style.display = 'none';
         }
 
+        // Show bottom input container
+        bottomInputContainer.classList.remove('hidden');
+
         // Display all messages
         data.messages.forEach(msg => {
           addMessage(msg.content, msg.role);
