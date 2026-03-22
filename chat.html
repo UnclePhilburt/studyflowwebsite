@@ -332,6 +332,7 @@
       display: flex;
       gap: 12px;
       max-width: 700px;
+      margin: 0 auto;
       animation: fadeIn 0.3s ease;
     }
 
@@ -340,8 +341,12 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .message.assistant {
+      margin-right: 100px;
+    }
+
     .message.user {
-      margin-left: auto;
+      margin-left: 100px;
       flex-direction: row-reverse;
     }
 
