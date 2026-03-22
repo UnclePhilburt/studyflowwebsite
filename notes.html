@@ -726,7 +726,8 @@
     let isDraggingFreeForm = false;
     let dragOffset = { x: 0, y: 0 };
     let previewedNote = null;
-    let justFinishedDrag = false;
+    let mouseDownPos = { x: 0, y: 0 };
+    let hasMoved = false;
 
     // Check authentication
     async function checkAuth() {
@@ -1072,8 +1073,11 @@
 
     // Free-form drag handlers
     function handleFreeFormMouseDown(event, element) {
-      if (!isGridMode) {
-        isDraggingFreeForm = true;
+      if (!isGridMode && event.button === 0) { // Only left click
+        // Track initial mouse position
+        mouseDownPos = { x: event.clientX, y: event.clientY };
+        hasMoved = false;
+
         draggedItem = {
           element: element,
           id: element.dataset.id,
@@ -1086,53 +1090,74 @@
         dragOffset.x = event.clientX - rect.left;
         dragOffset.y = event.clientY - rect.top;
 
-        element.style.zIndex = '1000';
-        element.style.cursor = 'grabbing';
-
         event.preventDefault();
       }
     }
 
     function handleFreeFormMouseMove(event) {
-      if (isDraggingFreeForm && draggedItem && draggedItem.element) {
-        const desktop = document.getElementById('desktop');
-        const desktopRect = desktop.getBoundingClientRect();
+      if (draggedItem && draggedItem.element && !isGridMode) {
+        // Check if mouse has moved enough to start dragging (5px threshold)
+        const dx = event.clientX - mouseDownPos.x;
+        const dy = event.clientY - mouseDownPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-        let x = event.clientX - desktopRect.left - dragOffset.x;
-        let y = event.clientY - desktopRect.top - dragOffset.y;
+        if (distance > 5) {
+          hasMoved = true;
 
-        // Keep within bounds
-        x = Math.max(0, Math.min(x, desktopRect.width - 140));
-        y = Math.max(0, Math.min(y, desktopRect.height - 140));
+          // Start visual drag
+          if (!isDraggingFreeForm) {
+            isDraggingFreeForm = true;
+            draggedItem.element.style.zIndex = '1000';
+            draggedItem.element.style.cursor = 'grabbing';
+          }
 
-        draggedItem.element.style.left = x + 'px';
-        draggedItem.element.style.top = y + 'px';
+          const desktop = document.getElementById('desktop');
+          const desktopRect = desktop.getBoundingClientRect();
+
+          let x = event.clientX - desktopRect.left - dragOffset.x;
+          let y = event.clientY - desktopRect.top - dragOffset.y;
+
+          // Keep within bounds
+          x = Math.max(0, Math.min(x, desktopRect.width - 140));
+          y = Math.max(0, Math.min(y, desktopRect.height - 140));
+
+          draggedItem.element.style.left = x + 'px';
+          draggedItem.element.style.top = y + 'px';
+        }
       }
     }
 
     function handleFreeFormMouseUp(event) {
-      if (isDraggingFreeForm && draggedItem && draggedItem.element) {
-        draggedItem.element.style.zIndex = '';
-        draggedItem.element.style.cursor = 'move';
+      if (draggedItem && !isGridMode) {
+        if (hasMoved && isDraggingFreeForm) {
+          // This was a drag - save position
+          draggedItem.element.style.zIndex = '';
+          draggedItem.element.style.cursor = 'move';
 
-        // Save position
-        const rect = draggedItem.element.getBoundingClientRect();
-        const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+          const rect = draggedItem.element.getBoundingClientRect();
+          const desktopRect = document.getElementById('desktop').getBoundingClientRect();
 
-        const position = {
-          x: rect.left - desktopRect.left,
-          y: rect.top - desktopRect.top
-        };
+          const position = {
+            x: rect.left - desktopRect.left,
+            y: rect.top - desktopRect.top
+          };
 
-        const posKey = `${draggedItem.type}_${draggedItem.id}_position_${currentFolder || 'root'}`;
-        localStorage.setItem(posKey, JSON.stringify(position));
+          const posKey = `${draggedItem.type}_${draggedItem.id}_position_${currentFolder || 'root'}`;
+          localStorage.setItem(posKey, JSON.stringify(position));
 
-        // Mark that we just finished dragging to prevent click event
-        justFinishedDrag = true;
-        setTimeout(() => { justFinishedDrag = false; }, 100);
+          isDraggingFreeForm = false;
+        } else {
+          // This was a click - trigger preview for notes
+          if (draggedItem.type === 'note') {
+            showPreview(draggedItem.id);
+          } else if (draggedItem.type === 'folder') {
+            // For folders, check if it's a double-click or single click
+            // We'll ignore single clicks on folders for now
+          }
+        }
 
-        isDraggingFreeForm = false;
         draggedItem = null;
+        hasMoved = false;
       }
     }
 
@@ -1206,12 +1231,6 @@
 
     // Preview note
     function showPreview(noteId) {
-      // Don't show preview if we just finished dragging
-      if (justFinishedDrag) {
-        justFinishedDrag = false;
-        return;
-      }
-
       const note = allNotes.find(n => n.id === noteId);
       if (!note) return;
 
