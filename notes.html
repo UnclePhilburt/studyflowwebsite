@@ -155,6 +155,12 @@
       gap: 24px;
       padding: 20px;
       min-height: 500px;
+      position: relative;
+    }
+
+    .desktop.free-mode {
+      display: block;
+      min-height: 600px;
     }
 
     /* Folder Item */
@@ -169,6 +175,12 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       user-select: none;
       position: relative;
+    }
+
+    .desktop.free-mode .folder-item,
+    .desktop.free-mode .note-item {
+      position: absolute;
+      cursor: move;
     }
 
     .folder-item:hover, .note-item:hover {
@@ -465,6 +477,7 @@
         <span class="breadcrumb-item" onclick="navigateToRoot()">My Library</span>
       </div>
       <div class="toolbar-actions">
+        <button class="toolbar-btn" id="gridToggle" onclick="toggleGridMode()">Grid: On</button>
         <button class="toolbar-btn" onclick="showNewFolderModal()">New Folder</button>
       </div>
     </div>
@@ -522,6 +535,9 @@
     let contextMenuItem = null;
     let renameTarget = null;
     let draggedItem = null;
+    let isGridMode = true;
+    let isDraggingFreeForm = false;
+    let dragOffset = { x: 0, y: 0 };
 
     // Check authentication
     async function checkAuth() {
@@ -607,20 +623,25 @@
       }
 
       let html = '';
+      let itemIndex = 0;
 
       // Render folders
       currentFolders.forEach(folder => {
+        const posKey = `folder_${folder.id}_position_${currentFolder || 'root'}`;
+        const savedPos = localStorage.getItem(posKey);
+        const position = savedPos ? JSON.parse(savedPos) : { x: (itemIndex % 6) * 160 + 20, y: Math.floor(itemIndex / 6) * 160 + 20 };
+
+        const style = isGridMode ? '' : `style="left: ${position.x}px; top: ${position.y}px;"`;
+
         html += `
           <div class="folder-item"
                data-id="${folder.id}"
                data-type="folder"
-               draggable="true"
+               draggable="${isGridMode}"
                ondblclick="openFolder('${folder.id}')"
                oncontextmenu="showContextMenu(event, '${folder.id}', 'folder')"
-               ondragstart="handleDragStart(event)"
-               ondragover="handleDragOver(event)"
-               ondrop="handleDrop(event)"
-               ondragleave="handleDragLeave(event)">
+               ${isGridMode ? 'ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)"' : ''}
+               ${style}>
             <div class="folder-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -629,27 +650,44 @@
             <div class="item-name">${escapeHtml(folder.name)}</div>
           </div>
         `;
+        itemIndex++;
       });
 
       // Render notes
       currentNotes.forEach(note => {
         const icon = getFileIcon(note.filename);
+        const posKey = `note_${note.id}_position_${currentFolder || 'root'}`;
+        const savedPos = localStorage.getItem(posKey);
+        const position = savedPos ? JSON.parse(savedPos) : { x: (itemIndex % 6) * 160 + 20, y: Math.floor(itemIndex / 6) * 160 + 20 };
+
+        const style = isGridMode ? '' : `style="left: ${position.x}px; top: ${position.y}px;"`;
+
         html += `
           <div class="note-item"
                data-id="${note.id}"
                data-type="note"
-               draggable="true"
+               draggable="${isGridMode}"
                ondblclick="downloadNote('${note.id}', '${escapeQuotes(note.filename)}')"
                oncontextmenu="showContextMenu(event, '${note.id}', 'note')"
-               ondragstart="handleDragStart(event)">
+               ${isGridMode ? 'ondragstart="handleDragStart(event)"' : ''}
+               ${style}>
             <div class="note-icon">${icon}</div>
             <div class="item-name">${escapeHtml(note.filename)}</div>
             <div class="item-meta">${note.pages || '?'} pages</div>
           </div>
         `;
+        itemIndex++;
       });
 
       desktop.innerHTML = html;
+
+      // Add free-form drag listeners in free mode
+      if (!isGridMode) {
+        const items = desktop.querySelectorAll('.folder-item, .note-item');
+        items.forEach(item => {
+          item.addEventListener('mousedown', (e) => handleFreeFormMouseDown(e, item));
+        });
+      }
     }
 
     // Folder operations
@@ -824,7 +862,87 @@
       contextMenuItem = null;
     }
 
-    // Drag and drop
+    // Grid mode toggle
+    function toggleGridMode() {
+      isGridMode = !isGridMode;
+      const desktop = document.getElementById('desktop');
+      const toggleBtn = document.getElementById('gridToggle');
+
+      if (isGridMode) {
+        desktop.classList.remove('free-mode');
+        toggleBtn.textContent = 'Grid: On';
+      } else {
+        desktop.classList.add('free-mode');
+        toggleBtn.textContent = 'Grid: Off';
+      }
+
+      localStorage.setItem('studyflow_grid_mode', isGridMode);
+      renderDesktop();
+    }
+
+    // Free-form drag handlers
+    function handleFreeFormMouseDown(event, element) {
+      if (!isGridMode) {
+        isDraggingFreeForm = true;
+        draggedItem = {
+          element: element,
+          id: element.dataset.id,
+          type: element.dataset.type
+        };
+
+        const rect = element.getBoundingClientRect();
+        const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+
+        dragOffset.x = event.clientX - rect.left;
+        dragOffset.y = event.clientY - rect.top;
+
+        element.style.zIndex = '1000';
+        element.style.cursor = 'grabbing';
+
+        event.preventDefault();
+      }
+    }
+
+    function handleFreeFormMouseMove(event) {
+      if (isDraggingFreeForm && draggedItem && draggedItem.element) {
+        const desktop = document.getElementById('desktop');
+        const desktopRect = desktop.getBoundingClientRect();
+
+        let x = event.clientX - desktopRect.left - dragOffset.x;
+        let y = event.clientY - desktopRect.top - dragOffset.y;
+
+        // Keep within bounds
+        x = Math.max(0, Math.min(x, desktopRect.width - 140));
+        y = Math.max(0, Math.min(y, desktopRect.height - 140));
+
+        draggedItem.element.style.left = x + 'px';
+        draggedItem.element.style.top = y + 'px';
+      }
+    }
+
+    function handleFreeFormMouseUp(event) {
+      if (isDraggingFreeForm && draggedItem && draggedItem.element) {
+        draggedItem.element.style.zIndex = '';
+        draggedItem.element.style.cursor = 'move';
+
+        // Save position
+        const rect = draggedItem.element.getBoundingClientRect();
+        const desktopRect = document.getElementById('desktop').getBoundingClientRect();
+
+        const position = {
+          x: rect.left - desktopRect.left,
+          y: rect.top - desktopRect.top
+        };
+
+        const posKey = `${draggedItem.type}_${draggedItem.id}_position_${currentFolder || 'root'}`;
+        localStorage.setItem(posKey, JSON.stringify(position));
+
+        isDraggingFreeForm = false;
+        draggedItem = null;
+      }
+    }
+
+    // Drag and drop (grid mode)
     function handleDragStart(event) {
       draggedItem = {
         id: event.target.dataset.id,
@@ -920,6 +1038,10 @@
     // Close context menu when clicking elsewhere
     document.addEventListener('click', closeContextMenu);
 
+    // Document-level event listeners for free-form dragging
+    document.addEventListener('mousemove', handleFreeFormMouseMove);
+    document.addEventListener('mouseup', handleFreeFormMouseUp);
+
     // Close modals when clicking overlay
     document.getElementById('newFolderModal').addEventListener('click', (e) => {
       if (e.target.id === 'newFolderModal') closeNewFolderModal();
@@ -938,7 +1060,26 @@
       if (e.key === 'Enter') confirmRename();
     });
 
+    // Load saved grid mode preference
+    function loadGridModePreference() {
+      const savedMode = localStorage.getItem('studyflow_grid_mode');
+      if (savedMode !== null) {
+        isGridMode = savedMode === 'true';
+        const desktop = document.getElementById('desktop');
+        const toggleBtn = document.getElementById('gridToggle');
+
+        if (isGridMode) {
+          desktop.classList.remove('free-mode');
+          toggleBtn.textContent = 'Grid: On';
+        } else {
+          desktop.classList.add('free-mode');
+          toggleBtn.textContent = 'Grid: Off';
+        }
+      }
+    }
+
     // Initialize
+    loadGridModePreference();
     checkAuth();
   </script>
 </body>
