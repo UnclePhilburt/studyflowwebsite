@@ -587,7 +587,14 @@
       const currentFolders = folders.filter(f => f.parentId === currentFolder);
       const currentNotes = allNotes.filter(note => {
         const noteFolder = localStorage.getItem(`note_folder_${note.id}`);
-        return noteFolder === (currentFolder || 'root');
+
+        // At root level, show notes without a folder or explicitly assigned to root
+        if (currentFolder === null) {
+          return noteFolder === null || noteFolder === 'root';
+        }
+
+        // Inside a folder, only show notes assigned to this folder
+        return noteFolder === currentFolder;
       });
 
       if (currentFolders.length === 0 && currentNotes.length === 0) {
