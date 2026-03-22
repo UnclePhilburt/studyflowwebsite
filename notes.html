@@ -1230,7 +1230,7 @@
     }
 
     // Preview note
-    function showPreview(noteId) {
+    async function showPreview(noteId) {
       const note = allNotes.find(n => n.id === noteId);
       if (!note) return;
 
@@ -1242,13 +1242,12 @@
       document.getElementById('previewDate').textContent = new Date(note.uploaded_at).toLocaleDateString();
       document.getElementById('previewType').textContent = note.filename.split('.').pop().toUpperCase();
 
-      // Load PDF in iframe
+      // Show loading state
       const viewer = document.getElementById('previewViewer');
       viewer.innerHTML = `
         <div class="preview-loading">
           <div class="loading-spinner"></div>
         </div>
-        <iframe src="${BACKEND_URL}/api/notes/${note.id}/download#toolbar=0" onload="this.previousElementSibling.style.display='none'"></iframe>
       `;
 
       // Show preview panel
@@ -1263,9 +1262,41 @@
           item.classList.remove('selected');
         }
       });
+
+      // Fetch PDF with authorization header
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${note.id}/download`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load preview');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // Display in iframe
+        viewer.innerHTML = `<iframe src="${url}#toolbar=0"></iframe>`;
+
+        // Clean up object URL when preview is closed
+        viewer.dataset.blobUrl = url;
+      } catch (error) {
+        console.error('Preview error:', error);
+        viewer.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #9ca3af; font-size: 14px;">
+            Failed to load preview
+          </div>
+        `;
+      }
     }
 
     function closePreview() {
+      // Clean up blob URL to prevent memory leaks
+      const viewer = document.getElementById('previewViewer');
+      if (viewer.dataset.blobUrl) {
+        window.URL.revokeObjectURL(viewer.dataset.blobUrl);
+        delete viewer.dataset.blobUrl;
+      }
+
       document.getElementById('previewPanel').classList.remove('active');
       document.querySelector('.container').classList.remove('preview-open');
       document.querySelectorAll('.note-item').forEach(item => {
