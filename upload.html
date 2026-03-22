@@ -994,13 +994,13 @@
           and grant StudyFlow LLC a license to anonymize and use your notes in the Nexus.
         </p>
 
-        <div class="modal-checkbox" onclick="document.getElementById('modal-agree-checkbox').click()">
+        <label class="modal-checkbox" for="modal-agree-checkbox">
           <input type="checkbox" id="modal-agree-checkbox">
-          <label for="modal-agree-checkbox" class="modal-checkbox-label">
+          <span class="modal-checkbox-label">
             I understand and agree to the Community Guidelines and grant StudyFlow a non-exclusive,
             perpetual license to use my uploaded notes to improve the Nexus.
-          </label>
-        </div>
+          </span>
+        </label>
       </div>
 
       <div class="modal-actions">
@@ -1089,7 +1089,8 @@
       });
 
       // Continue button closes modal and processes pending files
-      continueBtn.addEventListener('click', async () => {
+      continueBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
         modal.classList.remove('active');
 
         // Mark modal as seen
