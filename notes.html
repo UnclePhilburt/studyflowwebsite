@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Notes - StudyFlow NoteFlow</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>My Library - StudyFlowSuite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -15,347 +14,343 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f8f9fa;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
     }
 
-    /* Navigation */
-    .top-nav {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 16px 0;
-      position: sticky;
+    body::before {
+      content: '';
+      position: fixed;
       top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .nav-container {
-      max-width: 1200px;
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 60px 24px;
     }
 
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 700;
-      color: #1f2937;
-      text-decoration: none;
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .nav-logo span {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 42px;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .nav-links {
+    .header-subtitle {
+      font-size: 16px;
+      color: #5d5d5d;
+      font-weight: 400;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
       display: flex;
-      gap: 24px;
+      gap: 16px;
       align-items: center;
+      z-index: 1000;
     }
 
     .nav-link {
-      color: #6b7280;
+      color: #5d5d5d;
       text-decoration: none;
       font-size: 14px;
       font-weight: 500;
-      transition: color 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 16px;
+      border-radius: 8px;
     }
 
     .nav-link:hover {
-      color: #667eea;
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
     }
 
-    .nav-link.active {
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .btn-logout {
-      background: #ef4444;
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.2);
     }
 
-    .btn-logout:hover {
-      background: #dc2626;
+    .user-avatar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
     }
 
-    /* Main Content */
-    .main-container {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 0 24px;
+    /* Search Bar */
+    .search-container {
+      margin-bottom: 40px;
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
     }
 
-    .page-header {
-      margin-bottom: 32px;
-    }
-
-    .page-title {
-      font-size: 32px;
-      font-weight: 800;
-      color: #1f2937;
-      margin-bottom: 8px;
-    }
-
-    .page-subtitle {
-      color: #6b7280;
-      font-size: 16px;
-    }
-
-    /* Filter Bar */
-    .filter-bar {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 24px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      align-items: center;
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .search-input {
-      flex: 1;
-      min-width: 250px;
-      padding: 10px 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 14px;
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      border-radius: 12px;
+      font-size: 15px;
       font-family: 'Inter', sans-serif;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #2d2d2d;
     }
 
     .search-input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: rgba(124, 152, 133, 0.4);
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.1);
     }
 
-    .filter-select {
-      padding: 10px 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
+    .search-input::placeholder {
+      color: #9ca3af;
     }
 
-    .filter-select:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    /* Notes Grid */
-    .notes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+    /* Notes List */
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
     }
 
     .note-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      transition: all 0.2s;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 243, 0.9) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.12);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
       cursor: pointer;
+      animation: floatIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    }
+
+    @keyframes floatIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .note-card:hover {
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-      transform: translateY(-2px);
-    }
-
-    .note-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
+      border-color: rgba(124, 152, 133, 0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(124, 152, 133, 0.15);
     }
 
     .note-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 10px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 700;
+      color: #7c9885;
+      flex-shrink: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .note-status {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-end;
+    .note-card:hover .note-icon {
+      transform: rotate(5deg) scale(1.1);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
     }
 
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .status-badge.processing {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-badge.ready {
-      background: #d1fae5;
-      color: #065f46;
+    .note-info {
+      flex: 1;
     }
 
     .note-name {
-      font-size: 16px;
       font-weight: 600;
-      color: #1f2937;
+      color: #2d2d2d;
+      font-size: 15px;
       margin-bottom: 8px;
-      word-break: break-word;
-    }
-
-    .note-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      color: #6b7280;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
-
-    .note-meta-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .note-course {
-      background: #f3f4f6;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #4b5563;
-      margin-bottom: 12px;
-      display: inline-block;
-    }
-
-    .note-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
+      color: #7c9885;
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .note-meta {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    /* Delete Stone */
+    .delete-stone {
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 240, 235, 0.8) 100%);
+      border: 2px solid rgba(220, 100, 80, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      cursor: pointer;
     }
 
-    .btn-download {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+    .note-card:hover .delete-stone {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .btn-download:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    .delete-stone:hover {
+      background: linear-gradient(135deg, rgba(220, 100, 80, 0.15) 0%, rgba(220, 100, 80, 0.1) 100%);
+      border-color: rgba(220, 100, 80, 0.6);
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 4px 16px rgba(220, 100, 80, 0.2);
     }
 
-    .btn-delete {
-      background: #fee;
-      color: #dc2626;
-      border: 1px solid #fcc;
-    }
-
-    .btn-delete:hover {
-      background: #fcc;
+    .delete-stone svg {
+      width: 16px;
+      height: 16px;
+      stroke: #dc6450;
     }
 
     /* Empty State */
     .empty-state {
       text-align: center;
       padding: 80px 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .empty-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(232, 155, 95, 0.05) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.6;
     }
 
-    .empty-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 8px;
+    .empty-icon svg {
+      width: 50px;
+      height: 50px;
+      stroke: #7c9885;
+      opacity: 0.5;
     }
 
     .empty-text {
-      color: #6b7280;
-      font-size: 16px;
+      font-size: 15px;
+      color: #9ca3af;
+      font-family: 'Lora', Georgia, serif;
       margin-bottom: 24px;
     }
 
-    .btn-upload-link {
+    .upload-link {
       display: inline-block;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 10px;
-      text-decoration: none;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.4) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      border-radius: 12px;
+      color: #2d2d2d;
       font-weight: 600;
-      transition: all 0.2s;
+      font-size: 15px;
+      text-decoration: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Inter', sans-serif;
     }
 
-    .btn-upload-link:hover {
+    .upload-link:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.2);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
     }
 
     /* Loading State */
     .loading-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
     }
 
     .loading-spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid #e5e7eb;
-      border-top-color: #667eea;
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(124, 152, 133, 0.15);
+      border-top-color: #7c9885;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 16px;
+      animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      margin: 0 auto 24px;
     }
 
     @keyframes spin {
@@ -363,145 +358,25 @@
     }
 
     .loading-text {
-      color: #6b7280;
-      font-size: 16px;
+      font-size: 15px;
+      color: #9ca3af;
+      font-family: 'Lora', Georgia, serif;
     }
 
-    /* Stats Bar */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 40px 20px;
+      }
 
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
+      .header-title {
+        font-size: 32px;
+      }
 
-    .stat-label {
-      color: #6b7280;
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      color: #1f2937;
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    .stat-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    /* Preview Modal */
-    .preview-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .preview-modal.active {
-      display: flex;
-    }
-
-    .preview-container {
-      background: white;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 900px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    }
-
-    .preview-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .preview-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1f2937;
-      word-break: break-word;
-      flex: 1;
-      margin-right: 16px;
-    }
-
-    .preview-close {
-      background: #f3f4f6;
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 20px;
-      color: #6b7280;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .preview-close:hover {
-      background: #e5e7eb;
-      color: #1f2937;
-    }
-
-    .preview-body {
-      padding: 24px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .preview-content {
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      line-height: 1.8;
-      color: #1f2937;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .preview-pdf-container {
-      width: 100%;
-      height: 100%;
-      min-height: 500px;
-    }
-
-    .preview-pdf-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 8px;
-    }
-
-    .preview-loading {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .preview-error {
-      text-align: center;
-      padding: 60px 20px;
-      color: #dc2626;
+      .top-nav {
+        top: 16px;
+        right: 16px;
+      }
     }
   </style>
 
@@ -509,68 +384,31 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="top-nav">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        <span>StudyFlow</span>
-      </a>
-      <div class="nav-links">
-        <a href="upload.html" class="nav-link">Upload Notes</a>
-        <a href="notes.html" class="nav-link active">My Notes</a>
-        <a href="account.html" class="nav-link">Account</a>
-        <button class="btn-logout" onclick="logout()">Logout</button>
-      </div>
-    </div>
-  </nav>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <div class="user-avatar" id="userAvatar" onclick="logout()"></div>
+  </div>
 
-  <!-- Main Content -->
-  <div class="main-container">
-    <div class="page-header">
-      <h1 class="page-title">My Notes</h1>
-      <p class="page-subtitle">View, download, and manage all your uploaded study materials</p>
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="header-title">My Library</h1>
+      <p class="header-subtitle">All your study materials in one place</p>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-bar" id="stats-bar">
-      <div class="stat-card">
-        <div class="stat-icon">📄</div>
-        <div class="stat-label">Total Notes</div>
-        <div class="stat-value" id="total-notes">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-label">Total Pages</div>
-        <div class="stat-value" id="total-pages">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">💾</div>
-        <div class="stat-label">Total Size</div>
-        <div class="stat-value" id="total-size">-</div>
-      </div>
+    <!-- Search -->
+    <div class="search-container">
+      <input type="text" class="search-input" id="search-input" placeholder="Search your library...">
     </div>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <input type="text" class="search-input" id="search-input" placeholder="Search notes...">
-      <select class="filter-select" id="filter-status">
-        <option value="all">All Status</option>
-        <option value="ready">Ready</option>
-        <option value="processing">Processing</option>
-      </select>
-      <select class="filter-select" id="filter-type">
-        <option value="all">All Types</option>
-        <option value="pdf">PDF</option>
-        <option value="txt">Text</option>
-        <option value="docx">Word</option>
-      </select>
-    </div>
-
-    <!-- Notes Grid -->
+    <!-- Notes List -->
     <div id="notes-container">
       <div class="loading-state">
         <div class="loading-spinner"></div>
-        <div class="loading-text">Loading your notes...</div>
+        <div class="loading-text">Loading your library...</div>
       </div>
     </div>
   </div>
@@ -594,43 +432,41 @@
       }
 
       authToken = session.access_token;
+
+      // Set user avatar
+      const userAvatar = document.getElementById('userAvatar');
+      if (session.user.email) {
+        userAvatar.textContent = session.user.email.charAt(0).toUpperCase();
+      }
+
       loadNotes();
     }
 
     // Load notes
     async function loadNotes() {
-      
-
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         });
+
+        if (response.status === 401) {
+          await supabaseClient.auth.signOut();
+          window.location.href = 'index.html';
+          return;
+        }
 
         if (!response.ok) throw new Error('Failed to load notes');
 
         allNotes = await response.json();
-        updateStats();
+
+        // Sort by date, newest first
+        allNotes.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+
         displayNotes(allNotes);
       } catch (error) {
         console.error('Load error:', error);
-        document.getElementById('notes-container').innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">⚠️</div>
-            <div class="empty-title">Error Loading Notes</div>
-            <div class="empty-text">Could not load your notes. Please try again.</div>
-          </div>
-        `;
+        displayNotes([]);
       }
-    }
-
-    // Update statistics
-    function updateStats() {
-      const totalPages = allNotes.reduce((sum, note) => sum + (note.pages || 0), 0);
-      const totalSize = allNotes.reduce((sum, note) => sum + (note.file_size || 0), 0);
-
-      document.getElementById('total-notes').textContent = allNotes.length;
-      document.getElementById('total-pages').textContent = totalPages;
-      document.getElementById('total-size').textContent = formatFileSize(totalSize);
     }
 
     // Display notes
@@ -640,67 +476,53 @@
       if (notes.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <div class="empty-icon">📚</div>
-            <div class="empty-title">No Notes Yet</div>
-            <div class="empty-text">Upload your first study material to get started!</div>
-            <a href="upload.html" class="btn-upload-link">Upload Notes</a>
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <p class="empty-text">Your library is empty</p>
+            <a href="upload.html" class="upload-link">Upload Notes</a>
           </div>
         `;
         return;
       }
 
-      const notesHTML = notes.map(note => {
-        const fileExt = note.filename.split('.').pop().toUpperCase();
-        const isProcessed = note.processed;
-        const statusBadge = isProcessed
-          ? '<span class="status-badge ready">Ready</span>'
-          : '<span class="status-badge processing">Processing</span>';
-
-        const courseInfo = note.university && note.course_code
-          ? `<div class="note-course">${note.university} - ${note.course_code}</div>`
-          : '';
+      const notesHTML = notes.map((note, index) => {
+        const icon = getFileIcon(note.filename);
+        const date = formatDate(note.uploaded_at);
+        const courseInfo = [];
+        if (note.university) courseInfo.push(note.university);
+        if (note.course_code) courseInfo.push(note.course_code);
+        const courseLine = courseInfo.length > 0 ? `<div class="note-course">${courseInfo.join(' - ')}</div>` : '';
 
         return `
-          <div class="note-card" onclick="previewNote('${note.id}', '${note.filename.replace(/'/g, "\\'")}')">
-            <div class="note-header">
-              <div class="note-icon">${fileExt.substring(0, 3)}</div>
-              <div class="note-status">${statusBadge}</div>
+          <div class="note-card" style="animation-delay: ${index * 0.05}s" onclick="downloadNote('${note.id}', '${escapeQuotes(note.filename)}')">
+            <div class="note-icon">${icon}</div>
+            <div class="note-info">
+              <div class="note-name">${escapeHtml(note.filename)}</div>
+              ${courseLine}
+              <div class="note-meta">${date} • ${note.pages || '?'} pages</div>
             </div>
-            <div class="note-name">${note.filename}</div>
-            ${courseInfo}
-            <div class="note-meta">
-              <div class="note-meta-item">
-                📄 ${note.pages || 1} page${note.pages !== 1 ? 's' : ''}
-              </div>
-              <div class="note-meta-item">
-                💾 ${formatFileSize(note.file_size)}
-              </div>
-              <div class="note-meta-item">
-                📅 ${formatDate(note.uploaded_at)}
-              </div>
-            </div>
-            <div class="note-actions" onclick="event.stopPropagation()">
-              <button class="btn-action btn-download" onclick="downloadNote('${note.id}', '${note.filename.replace(/'/g, "\\'")}')">
-                ⬇️ Download
-              </button>
-              <button class="btn-action btn-delete" onclick="deleteNote('${note.id}', '${note.filename.replace(/'/g, "\\'")}')">
-                🗑️ Delete
-              </button>
+            <div class="delete-stone" onclick="event.stopPropagation(); deleteNote('${note.id}', '${escapeQuotes(note.filename)}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </div>
           </div>
         `;
       }).join('');
 
-      container.innerHTML = `<div class="notes-grid">${notesHTML}</div>`;
+      container.innerHTML = `<div class="notes-list">${notesHTML}</div>`;
     }
 
     // Download note
     async function downloadNote(noteId, filename) {
-      
-
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
         if (!response.ok) throw new Error('Download failed');
@@ -716,22 +538,15 @@
         document.body.removeChild(a);
       } catch (error) {
         console.error('Download error:', error);
-        alert('Failed to download note. Please try again.');
       }
     }
 
     // Delete note
     async function deleteNote(noteId, filename) {
-      if (!confirm(`Are you sure you want to delete "${filename}"? This cannot be undone.`)) {
-        return;
-      }
-
-      
-
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}`, {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
         if (!response.ok) throw new Error('Delete failed');
@@ -740,127 +555,48 @@
         loadNotes();
       } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to delete note. Please try again.');
       }
     }
 
-    // Filter notes
-    function filterNotes() {
-      const searchTerm = document.getElementById('search-input').value.toLowerCase();
-      const statusFilter = document.getElementById('filter-status').value;
-      const typeFilter = document.getElementById('filter-type').value;
+    // Search functionality
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+
+      if (!searchTerm) {
+        displayNotes(allNotes);
+        return;
+      }
 
       const filtered = allNotes.filter(note => {
-        const matchesSearch = note.filename.toLowerCase().includes(searchTerm) ||
-                             (note.university && note.university.toLowerCase().includes(searchTerm)) ||
-                             (note.course_code && note.course_code.toLowerCase().includes(searchTerm));
-
-        const matchesStatus = statusFilter === 'all' ||
-                             (statusFilter === 'ready' && note.processed) ||
-                             (statusFilter === 'processing' && !note.processed);
-
-        const fileExt = note.filename.split('.').pop().toLowerCase();
-        const matchesType = typeFilter === 'all' || fileExt === typeFilter;
-
-        return matchesSearch && matchesStatus && matchesType;
+        return note.filename.toLowerCase().includes(searchTerm) ||
+               (note.university && note.university.toLowerCase().includes(searchTerm)) ||
+               (note.course_code && note.course_code.toLowerCase().includes(searchTerm));
       });
 
       displayNotes(filtered);
-    }
-
-    // Event listeners
-    document.getElementById('search-input').addEventListener('input', filterNotes);
-    document.getElementById('filter-status').addEventListener('change', filterNotes);
-    document.getElementById('filter-type').addEventListener('change', filterNotes);
+    });
 
     // Utility functions
-    function formatFileSize(bytes) {
-      if (!bytes) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      if (ext === 'pdf') return 'PDF';
+      if (['jpg', 'jpeg', 'png'].includes(ext)) return 'IMG';
+      if (['doc', 'docx'].includes(ext)) return 'DOC';
+      if (ext === 'txt') return 'TXT';
+      return 'FILE';
     }
 
     function formatDate(dateString) {
       const date = new Date(dateString);
       const now = new Date();
       const diffMs = now - date;
-      const diffMins = Math.floor(diffMs / 60000);
-      const diffHours = Math.floor(diffMs / 3600000);
       const diffDays = Math.floor(diffMs / 86400000);
 
-      if (diffMins < 1) return 'Just now';
-      if (diffMins < 60) return `${diffMins}m ago`;
-      if (diffHours < 24) return `${diffHours}h ago`;
-      if (diffDays < 7) return `${diffDays}d ago`;
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
 
       return date.toLocaleDateString();
-    }
-
-    async function logout() {
-      await supabaseClient.auth.signOut();
-      window.location.href = 'index.html';
-    }
-
-    // Preview note
-    async function previewNote(noteId, filename) {
-      const modal = document.getElementById('preview-modal');
-      const titleEl = document.getElementById('preview-modal-title');
-      const bodyEl = document.getElementById('preview-modal-body');
-
-      // Show modal
-      modal.classList.add('active');
-      titleEl.textContent = filename;
-      bodyEl.innerHTML = '<div class="preview-loading"><div class="loading-spinner"></div><div class="loading-text">Loading preview...</div></div>';
-
-      
-      const fileExt = filename.split('.').pop().toLowerCase();
-
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) throw new Error('Failed to load preview');
-
-        if (fileExt === 'pdf') {
-          // PDF preview using iframe
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          bodyEl.innerHTML = `
-            <div class="preview-pdf-container">
-              <iframe src="${url}"></iframe>
-            </div>
-          `;
-        } else if (fileExt === 'txt') {
-          // Text file preview
-          const text = await response.text();
-          bodyEl.innerHTML = `<div class="preview-content">${escapeHtml(text)}</div>`;
-        } else {
-          // Unsupported format
-          bodyEl.innerHTML = `
-            <div class="preview-error">
-              <div style="font-size: 48px; margin-bottom: 16px;">📄</div>
-              <div style="font-size: 16px; margin-bottom: 8px;">Preview not available for ${fileExt.toUpperCase()} files</div>
-              <div style="font-size: 14px; color: #6b7280;">Download the file to view it</div>
-            </div>
-          `;
-        }
-      } catch (error) {
-        console.error('Preview error:', error);
-        bodyEl.innerHTML = `
-          <div class="preview-error">
-            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
-            <div style="font-size: 16px;">Failed to load preview</div>
-          </div>
-        `;
-      }
-    }
-
-    function closePreview() {
-      const modal = document.getElementById('preview-modal');
-      modal.classList.remove('active');
     }
 
     function escapeHtml(text) {
@@ -869,36 +605,17 @@
       return div.innerHTML;
     }
 
+    function escapeQuotes(text) {
+      return text.replace(/'/g, "\\'");
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
     // Initialize
     checkAuth();
-
-    // Auto-refresh every 10 seconds to update processing status
-    setInterval(() => {
-      loadNotes();
-    }, 10000);
-
-    // Close modal on background click
-    document.getElementById('preview-modal').addEventListener('click', (e) => {
-      if (e.target.id === 'preview-modal') {
-        closePreview();
-      }
-    });
   </script>
-
-  <!-- Preview Modal -->
-  <div class="preview-modal" id="preview-modal">
-    <div class="preview-container">
-      <div class="preview-header">
-        <div class="preview-title" id="preview-modal-title">Note Preview</div>
-        <button class="preview-close" onclick="closePreview()">×</button>
-      </div>
-      <div class="preview-body" id="preview-modal-body">
-        <div class="preview-loading">
-          <div class="loading-spinner"></div>
-          <div class="loading-text">Loading preview...</div>
-        </div>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
