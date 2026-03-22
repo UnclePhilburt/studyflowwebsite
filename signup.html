@@ -18,6 +18,7 @@
       min-height: 100vh;
       color: #2d2d2d;
       overflow-x: hidden;
+      overflow-y: auto;
       position: relative;
       display: flex;
       align-items: center;
@@ -157,13 +158,31 @@
       background: #7c9885;
     }
 
+    .legal-section {
+      margin-bottom: 24px;
+    }
+
+    .legal-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b8575;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .terms-checkbox {
       display: flex;
       align-items: start;
       gap: 10px;
-      margin-bottom: 24px;
+      margin-bottom: 14px;
       font-size: 13px;
       color: #5a5a5a;
+      line-height: 1.5;
+    }
+
+    .terms-checkbox:last-child {
+      margin-bottom: 0;
     }
 
     .terms-checkbox input[type="checkbox"] {
@@ -175,6 +194,10 @@
       flex-shrink: 0;
     }
 
+    .terms-checkbox label {
+      margin-bottom: 0;
+    }
+
     .terms-checkbox a {
       color: #7c9885;
       text-decoration: none;
@@ -183,6 +206,11 @@
 
     .terms-checkbox a:hover {
       color: #e89b5f;
+    }
+
+    .checkbox-highlight {
+      font-weight: 600;
+      color: #6b8575;
     }
 
     .btn-primary {
@@ -312,11 +340,43 @@
         </div>
       </div>
 
-      <div class="terms-checkbox">
-        <input type="checkbox" id="terms" required>
-        <label for="terms">
-          I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>
-        </label>
+      <div class="legal-section">
+        <div class="legal-section-title">Required Certifications</div>
+
+        <div class="terms-checkbox">
+          <input type="checkbox" id="ageGate" required>
+          <label for="ageGate">
+            I certify that I am <span class="checkbox-highlight">18 years of age or older</span>.
+          </label>
+        </div>
+
+        <div class="terms-checkbox">
+          <input type="checkbox" id="aiTransparency" required>
+          <label for="aiTransparency">
+            I understand that StudyFlow Suite uses <span class="checkbox-highlight">Artificial Intelligence (Gemini 1.5 Flash)</span> to generate study aids and that outputs may contain inaccuracies.
+          </label>
+        </div>
+
+        <div class="terms-checkbox">
+          <input type="checkbox" id="noteLicense" required>
+          <label for="noteLicense">
+            I grant StudyFlow LLC a <span class="checkbox-highlight">non-exclusive, perpetual license</span> to anonymize and use my uploaded notes to improve the Collective Brain.
+          </label>
+        </div>
+
+        <div class="terms-checkbox">
+          <input type="checkbox" id="academicIntegrity" required>
+          <label for="academicIntegrity">
+            I agree to use StudyFlow Suite as a <span class="checkbox-highlight">supplemental study tool</span> and will not use it to violate my institution's academic integrity policies.
+          </label>
+        </div>
+
+        <div class="terms-checkbox">
+          <input type="checkbox" id="terms" required>
+          <label for="terms">
+            I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.
+          </label>
+        </div>
       </div>
 
       <button type="submit" class="btn-primary" id="submitBtn">
@@ -395,6 +455,10 @@
       const name = nameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
+      const ageGate = document.getElementById('ageGate').checked;
+      const aiTransparency = document.getElementById('aiTransparency').checked;
+      const noteLicense = document.getElementById('noteLicense').checked;
+      const academicIntegrity = document.getElementById('academicIntegrity').checked;
       const terms = termsInput.checked;
 
       if (!name || !email || !password) {
@@ -402,8 +466,28 @@
         return;
       }
 
+      if (!ageGate) {
+        showError('You must certify that you are 18 years of age or older');
+        return;
+      }
+
+      if (!aiTransparency) {
+        showError('You must acknowledge that StudyFlow uses AI');
+        return;
+      }
+
+      if (!noteLicense) {
+        showError('You must grant permission to use your notes for the Collective Brain');
+        return;
+      }
+
+      if (!academicIntegrity) {
+        showError('You must agree to use StudyFlow as a supplemental study tool');
+        return;
+      }
+
       if (!terms) {
-        showError('You must agree to the Terms of Service');
+        showError('You must agree to the Terms of Service and Privacy Policy');
         return;
       }
 
