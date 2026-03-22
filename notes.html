@@ -951,19 +951,46 @@
         userAvatar.textContent = session.user.email.charAt(0).toUpperCase();
       }
 
-      loadFolders();
-      loadNotes();
+      await loadFolders();
+      await loadNotes();
     }
 
-    // Load folders from localStorage
-    function loadFolders() {
-      const stored = localStorage.getItem('studyflow_folders');
-      folders = stored ? JSON.parse(stored) : [];
+    // Load folders from API
+    async function loadFolders() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/folders/list`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+          folders = await response.json();
+        } else {
+          console.error('Failed to load folders');
+          folders = [];
+        }
+      } catch (error) {
+        console.error('Error loading folders:', error);
+        folders = [];
+      }
     }
 
-    // Save folders to localStorage
-    function saveFolders() {
-      localStorage.setItem('studyflow_folders', JSON.stringify(folders));
+    // Save folder to API
+    async function saveFolder(folder) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/folders/${folder.id}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(folder)
+        });
+
+        return response.ok;
+      } catch (error) {
+        console.error('Error saving folder:', error);
+        return false;
+      }
     }
 
     // Toggle impact panel
@@ -1071,13 +1098,13 @@
       const desktop = document.getElementById('desktop');
 
       // Get items in current folder
-      const currentFolders = folders.filter(f => f.parentId === currentFolder);
+      const currentFolders = folders.filter(f => f.parentId === currentFolder || f.parent_id === currentFolder);
       const currentNotes = allNotes.filter(note => {
-        const noteFolder = localStorage.getItem(`note_folder_${note.id}`);
+        const noteFolder = note.folder_id;  // Now from API response
 
         // At root level, show notes without a folder or explicitly assigned to root
         if (currentFolder === null) {
-          return noteFolder === null || noteFolder === 'root';
+          return noteFolder === null || noteFolder === undefined;
         }
 
         // Inside a folder, only show notes assigned to this folder
@@ -1200,21 +1227,34 @@
       document.getElementById('newFolderModal').classList.remove('active');
     }
 
-    function createFolder() {
+    async function createFolder() {
       const name = document.getElementById('folderNameInput').value.trim();
       if (!name) return;
 
-      const folder = {
-        id: Date.now().toString(),
-        name: name,
-        parentId: currentFolder,
-        createdAt: new Date().toISOString()
-      };
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/folders/create`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: name,
+            parent_id: currentFolder
+          })
+        });
 
-      folders.push(folder);
-      saveFolders();
-      closeNewFolderModal();
-      renderDesktop();
+        if (response.ok) {
+          const folder = await response.json();
+          folders.push(folder);
+          closeNewFolderModal();
+          renderDesktop();
+        } else {
+          console.error('Failed to create folder');
+        }
+      } catch (error) {
+        console.error('Error creating folder:', error);
+      }
     }
 
     function openFolder(folderId) {
@@ -1307,17 +1347,31 @@
       if (!newName) return;
 
       if (renameTarget.type === 'folder') {
-        const folder = folders.find(f => f.id === renameTarget.id);
-        if (folder) {
-          console.log('Renaming folder from', folder.name, 'to', newName);
-          folder.name = newName;
-          saveFolders();
-          console.log('Saved folders:', folders);
-          closeRenameModal();
-          updateBreadcrumb(); // Update breadcrumb if we're inside the renamed folder
-          renderDesktop();
-        } else {
-          console.error('Folder not found:', renameTarget.id);
+        // Rename folder via API
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/folders/${renameTarget.id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: newName })
+          });
+
+          if (response.ok) {
+            const folder = folders.find(f => f.id === renameTarget.id);
+            if (folder) {
+              folder.name = newName;
+            }
+            closeRenameModal();
+            updateBreadcrumb(); // Update breadcrumb if we're inside the renamed folder
+            renderDesktop();
+          } else {
+            alert('Failed to rename folder');
+          }
+        } catch (error) {
+          console.error('Error renaming folder:', error);
+          alert('Failed to rename folder');
         }
       } else if (renameTarget.type === 'note') {
         try {
@@ -1363,10 +1417,23 @@
       closeContextMenu();
 
       if (contextMenuItem.type === 'folder') {
-        // Delete folder
-        folders = folders.filter(f => f.id !== contextMenuItem.id);
-        saveFolders();
-        renderDesktop();
+        // Delete folder via API
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/folders/${contextMenuItem.id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+
+          if (response.ok) {
+            folders = folders.filter(f => f.id !== contextMenuItem.id);
+            renderDesktop();
+          } else {
+            alert('Failed to delete folder');
+          }
+        } catch (error) {
+          console.error('Error deleting folder:', error);
+          alert('Failed to delete folder');
+        }
       } else {
         // Delete note
         try {
@@ -1376,7 +1443,6 @@
           });
 
           if (response.ok) {
-            localStorage.removeItem(`note_folder_${contextMenuItem.id}`);
             loadNotes();
           }
         } catch (error) {
@@ -1525,7 +1591,7 @@
       }
     }
 
-    function handleDrop(event) {
+    async function handleDrop(event) {
       event.preventDefault();
       const target = event.target.closest('.folder-item');
 
@@ -1534,8 +1600,29 @@
 
         if (draggedItem && draggedItem.type === 'note') {
           const folderId = target.dataset.id;
-          localStorage.setItem(`note_folder_${draggedItem.id}`, folderId);
-          renderDesktop();
+
+          // Update note folder via API
+          try {
+            const response = await fetch(`${BACKEND_URL}/api/notes/${draggedItem.id}/folder`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ folder_id: folderId })
+            });
+
+            if (response.ok) {
+              // Update local note object
+              const note = allNotes.find(n => n.id === draggedItem.id);
+              if (note) {
+                note.folder_id = folderId;
+              }
+              renderDesktop();
+            }
+          } catch (error) {
+            console.error('Error moving note to folder:', error);
+          }
         }
       }
 
@@ -1693,7 +1780,6 @@
         });
 
         if (response.ok) {
-          localStorage.removeItem(`note_folder_${noteId}`);
           loadNotes();
         }
       } catch (error) {
