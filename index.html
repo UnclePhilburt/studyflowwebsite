@@ -120,142 +120,108 @@
       text-align: center;
     }
 
-    /* Spider Web Network */
+    /* Beautiful Note Cloud */
     .brain-animation-container {
       position: relative;
-      height: 400px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    /* SVG Web Lines */
-    .web-svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    .web-line {
-      stroke: rgba(124, 152, 133, 0.25);
-      stroke-width: 2;
-      fill: none;
-      stroke-dasharray: 600;
-      stroke-dashoffset: 600;
-      animation: drawLine 2s ease forwards;
-    }
-
-    .web-line:nth-child(1) { animation-delay: 0.2s; }
-    .web-line:nth-child(2) { animation-delay: 0.4s; }
-    .web-line:nth-child(3) { animation-delay: 0.6s; }
-    .web-line:nth-child(4) { animation-delay: 0.8s; }
-    .web-line:nth-child(5) { animation-delay: 1s; }
-    .web-line:nth-child(6) { animation-delay: 1.2s; }
-    .web-line:nth-child(7) { animation-delay: 1.4s; }
-    .web-line:nth-child(8) { animation-delay: 1.6s; }
-
-    @keyframes drawLine {
-      to { stroke-dashoffset: 0; }
-    }
-
-    /* Center Brain Node */
-    .center-brain {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 140px;
-      height: 140px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.25) 0%, rgba(232, 155, 95, 0.25) 100%);
-      border: 3px solid rgba(124, 152, 133, 0.6);
-      border-radius: 50%;
+      min-height: 350px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 10;
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.3);
-      animation: brainPulse 3s ease-in-out infinite;
+      gap: 40px;
+      padding: 40px 20px;
     }
 
-    @keyframes brainPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.08); }
+    /* Floating Notes Grid */
+    .floating-notes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 700px;
     }
 
-    .center-brain-label {
-      font-size: 16px;
-      font-weight: 700;
+    .floating-note {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.12);
+      animation: floatUp 0.8s ease both, gentleFloat 4s ease-in-out infinite;
+      transition: all 0.4s ease;
+    }
+
+    .floating-note:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 16px 48px rgba(124, 152, 133, 0.2);
+      border-color: rgba(124, 152, 133, 0.4);
+    }
+
+    @keyframes floatUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .floating-note:nth-child(1) { animation-delay: 0.1s, 0s; }
+    .floating-note:nth-child(2) { animation-delay: 0.2s, 1s; }
+    .floating-note:nth-child(3) { animation-delay: 0.3s, 2s; }
+    .floating-note:nth-child(4) { animation-delay: 0.4s, 3s; }
+
+    .floating-note-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    .floating-note-label {
+      font-size: 13px;
+      font-weight: 600;
       color: #2d2d2d;
       margin-bottom: 6px;
     }
 
-    .center-brain-count {
-      font-size: 12px;
+    .floating-note-count {
+      font-size: 11px;
       color: #7c9885;
       font-weight: 600;
     }
 
-    /* Note Nodes */
-    .note-node {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 2px solid rgba(124, 152, 133, 0.4);
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 10px;
-      z-index: 5;
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.2);
-      animation: fadeInNode 0.6s ease both;
-    }
-
-    @keyframes fadeInNode {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .note-node:nth-child(1) { animation-delay: 0.3s; }
-    .note-node:nth-child(2) { animation-delay: 0.5s; }
-    .note-node:nth-child(3) { animation-delay: 0.7s; }
-    .note-node:nth-child(4) { animation-delay: 0.9s; }
-    .note-node:nth-child(5) { animation-delay: 1.1s; }
-    .note-node:nth-child(6) { animation-delay: 1.3s; }
-    .note-node:nth-child(7) { animation-delay: 1.5s; }
-    .note-node:nth-child(8) { animation-delay: 1.7s; }
-
-    .note-node svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .note-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: #5a5a5a;
+    /* Center Message */
+    .brain-message {
       text-align: center;
-      line-height: 1.2;
+      max-width: 600px;
+      animation: fadeIn 1s ease 0.6s both;
     }
 
-    /* Positions for 8 nodes around center */
-    .note-node:nth-child(1) { top: 10%; left: 50%; transform: translateX(-50%); }
-    .note-node:nth-child(2) { top: 25%; right: 10%; }
-    .note-node:nth-child(3) { top: 50%; right: 5%; transform: translateY(-50%); }
-    .note-node:nth-child(4) { bottom: 25%; right: 10%; }
-    .note-node:nth-child(5) { bottom: 10%; left: 50%; transform: translateX(-50%); }
-    .note-node:nth-child(6) { bottom: 25%; left: 10%; }
-    .note-node:nth-child(7) { top: 50%; left: 5%; transform: translateY(-50%); }
-    .note-node:nth-child(8) { top: 25%; left: 10%; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .brain-message h3 {
+      font-family: 'Lora', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brain-message p {
+      font-size: 15px;
+      color: #5a5a5a;
+      line-height: 1.6;
+    }
 
     .collective-stat {
       margin-top: 30px;
@@ -466,39 +432,6 @@
         font-size: 36px;
       }
 
-      .brain-animation-container {
-        height: 300px;
-        max-width: 100%;
-      }
-
-      .center-brain {
-        width: 110px;
-        height: 110px;
-      }
-
-      .center-brain-label {
-        font-size: 14px;
-      }
-
-      .center-brain-count {
-        font-size: 11px;
-      }
-
-      .note-node {
-        width: 65px;
-        height: 65px;
-        padding: 8px;
-      }
-
-      .note-node svg {
-        width: 20px;
-        height: 20px;
-      }
-
-      .note-label {
-        font-size: 9px;
-      }
-
       .collective-brain {
         padding: 40px 30px;
       }
@@ -509,6 +442,42 @@
 
       .collective-brain > p {
         font-size: 16px;
+      }
+
+      .brain-animation-container {
+        padding: 30px 15px;
+        min-height: auto;
+      }
+
+      .floating-notes {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        max-width: 100%;
+      }
+
+      .floating-note {
+        padding: 20px 12px;
+      }
+
+      .floating-note-icon {
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .floating-note-label {
+        font-size: 12px;
+      }
+
+      .floating-note-count {
+        font-size: 10px;
+      }
+
+      .brain-message h3 {
+        font-size: 22px;
+      }
+
+      .brain-message p {
+        font-size: 14px;
       }
 
       .collective-stat strong {
@@ -540,90 +509,43 @@
         <p>Notes from thousands of students interconnect to create a smarter AI for everyone.</p>
 
         <div class="brain-animation-container">
-          <!-- SVG Web Lines -->
-          <svg class="web-svg" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet">
-            <line class="web-line" x1="450" y1="40" x2="450" y2="200" />
-            <line class="web-line" x1="750" y1="100" x2="450" y2="200" />
-            <line class="web-line" x1="810" y1="200" x2="450" y2="200" />
-            <line class="web-line" x1="750" y1="300" x2="450" y2="200" />
-            <line class="web-line" x1="450" y1="360" x2="450" y2="200" />
-            <line class="web-line" x1="150" y1="300" x2="450" y2="200" />
-            <line class="web-line" x1="90" y1="200" x2="450" y2="200" />
-            <line class="web-line" x1="150" y1="100" x2="450" y2="200" />
-          </svg>
+          <!-- Floating Notes -->
+          <div class="floating-notes">
+            <div class="floating-note">
+              <div class="floating-note-icon">📚</div>
+              <div class="floating-note-label">Biology</div>
+              <div class="floating-note-count">2,847 notes</div>
+            </div>
 
-          <!-- Center Brain -->
-          <div class="center-brain">
-            <div class="center-brain-label">Collective Brain</div>
-            <div class="center-brain-count">12,847 notes</div>
+            <div class="floating-note">
+              <div class="floating-note-icon">🧪</div>
+              <div class="floating-note-label">Chemistry</div>
+              <div class="floating-note-count">1,923 notes</div>
+            </div>
+
+            <div class="floating-note">
+              <div class="floating-note-icon">📐</div>
+              <div class="floating-note-label">Mathematics</div>
+              <div class="floating-note-count">3,421 notes</div>
+            </div>
+
+            <div class="floating-note">
+              <div class="floating-note-icon">🧠</div>
+              <div class="floating-note-label">Psychology</div>
+              <div class="floating-note-count">1,656 notes</div>
+            </div>
           </div>
 
-          <!-- Note Nodes -->
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <div class="note-label">Biology 201</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <div class="note-label">Chemistry</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <div class="note-label">Calculus</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <div class="note-label">Psychology</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <div class="note-label">History</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <div class="note-label">Physics</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <div class="note-label">English Lit</div>
-          </div>
-
-          <div class="note-node">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <div class="note-label">Economics</div>
+          <!-- Center Message -->
+          <div class="brain-message">
+            <h3>12,847 notes power your answers</h3>
+            <p>Every student's contribution creates a smarter AI that understands your specific courses and curriculum</p>
           </div>
         </div>
 
         <div class="collective-stat">
-          <div><strong>Every note connects to thousands more</strong></div>
-          <div class="collective-stat-text">The more notes uploaded, the smarter the AI becomes for everyone</div>
+          <div><strong>Growing smarter every day</strong></div>
+          <div class="collective-stat-text">300+ universities • 12,847 notes • One collective intelligence</div>
         </div>
       </div>
 
