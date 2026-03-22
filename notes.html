@@ -1077,8 +1077,14 @@
       }
     }
 
-    function closeContextMenu() {
-      document.getElementById('contextMenu').classList.remove('active');
+    function closeContextMenu(event) {
+      // Don't close if clicking inside the context menu
+      const menu = document.getElementById('contextMenu');
+      if (event && menu.contains(event.target)) {
+        return;
+      }
+
+      menu.classList.remove('active');
       contextMenuItem = null;
     }
 
