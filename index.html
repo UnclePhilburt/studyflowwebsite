@@ -203,18 +203,21 @@
     }
 
     .student.reader-1 {
-      top: 10px;
-      left: 80px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
     }
 
     .student.reader-2 {
-      top: 10px;
-      right: 80px;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .student.reader-3 {
-      bottom: 10px;
-      right: 70px;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
     }
 
     /* Animated Note */
@@ -280,24 +283,24 @@
     @keyframes toReader1 {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-      25% { opacity: 1; transform: translate(-140px, -70px) scale(1); }
-      35% { opacity: 0; transform: translate(-140px, -70px) scale(0.6); }
+      25% { opacity: 1; transform: translate(-200px, -50%) scale(1); }
+      35% { opacity: 0; transform: translate(-200px, -50%) scale(0.6); }
       100% { opacity: 0; }
     }
 
     @keyframes toReader2 {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-      25% { opacity: 1; transform: translate(140px, -70px) scale(1); }
-      35% { opacity: 0; transform: translate(140px, -70px) scale(0.6); }
+      25% { opacity: 1; transform: translate(-50%, -120px) scale(1); }
+      35% { opacity: 0; transform: translate(-50%, -120px) scale(0.6); }
       100% { opacity: 0; }
     }
 
     @keyframes toReader3 {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       10% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
-      25% { opacity: 1; transform: translate(110px, 45px) scale(1); }
-      35% { opacity: 0; transform: translate(110px, 45px) scale(0.6); }
+      25% { opacity: 1; transform: translate(100px, -50%) scale(1); }
+      35% { opacity: 0; transform: translate(100px, -50%) scale(0.6); }
       100% { opacity: 0; }
     }
 
@@ -590,15 +593,15 @@
       }
 
       .student.reader-1 {
-        left: 50px;
+        left: 10px;
       }
 
       .student.reader-2 {
-        right: 50px;
+        top: 5px;
       }
 
       .student.reader-3 {
-        right: 40px;
+        right: 10px;
       }
 
       .animated-note {
