@@ -1154,10 +1154,22 @@
     const courseInfo = document.getElementById('course-info');
     let courseInfoVisible = false;
 
-    toggleCourseInfo.addEventListener('click', () => {
+    toggleCourseInfo.addEventListener('click', (e) => {
+      e.stopPropagation();  // Don't trigger file upload
       courseInfoVisible = !courseInfoVisible;
       courseInfo.classList.toggle('active');
       toggleCourseInfo.textContent = courseInfoVisible ? 'Hide course information' : 'Add course information (optional)';
+    });
+
+    // Stop propagation on course info form itself
+    courseInfo.addEventListener('click', (e) => {
+      e.stopPropagation();  // Don't trigger file upload when clicking inside form
+    });
+
+    // Stop propagation on Nexus toggle
+    const nexusToggleContainer = document.getElementById('nexus-toggle-container');
+    nexusToggleContainer.addEventListener('click', (e) => {
+      e.stopPropagation();  // Don't trigger file upload when clicking toggle
     });
 
     // File upload
