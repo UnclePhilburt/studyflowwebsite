@@ -992,7 +992,7 @@
       renameTarget = null;
     }
 
-    function confirmRename() {
+    async function confirmRename() {
       if (!renameTarget) return;
 
       const newName = document.getElementById('renameInput').value.trim();
@@ -1003,12 +1003,36 @@
         if (folder) {
           folder.name = newName;
           saveFolders();
+          closeRenameModal();
+          renderDesktop();
+        }
+      } else if (renameTarget.type === 'note') {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/notes/${renameTarget.id}/rename`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filename: newName })
+          });
+
+          if (response.ok) {
+            const note = allNotes.find(n => n.id === renameTarget.id);
+            if (note) {
+              note.filename = newName;
+            }
+            closeRenameModal();
+            renderDesktop();
+          } else {
+            const error = await response.json();
+            alert('Failed to rename note: ' + (error.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Rename error:', error);
+          alert('Failed to rename note');
         }
       }
-      // Note: For notes, we'd need a backend API to rename files
-
-      closeRenameModal();
-      renderDesktop();
     }
 
     async function downloadItem() {
