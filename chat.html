@@ -258,6 +258,111 @@
       transform: translateY(-1px) scale(1.02);
     }
 
+    /* Zen Confirmation Modal */
+    .zen-confirm-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(45, 45, 45, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .zen-confirm-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .zen-confirm-card {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(45, 45, 45, 0.2),
+                  0 8px 32px rgba(124, 152, 133, 0.15);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      transform: scale(0.9);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .zen-confirm-overlay.active .zen-confirm-card {
+      transform: scale(1);
+    }
+
+    .zen-confirm-title {
+      font-size: 20px;
+      font-weight: 500;
+      font-family: 'Lora', Georgia, serif;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .zen-confirm-message {
+      font-size: 15px;
+      color: #5d5d5d;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .zen-confirm-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .zen-confirm-btn {
+      padding: 12px 28px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .zen-confirm-btn.cancel {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+      border-color: rgba(124, 152, 133, 0.3);
+    }
+
+    .zen-confirm-btn.cancel:hover {
+      background: rgba(124, 152, 133, 0.2);
+      border-color: rgba(124, 152, 133, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.2);
+    }
+
+    .zen-confirm-btn.confirm {
+      background: linear-gradient(135deg, rgba(220, 100, 80, 0.15) 0%, rgba(220, 100, 80, 0.1) 100%);
+      color: #dc6450;
+      border-color: rgba(220, 100, 80, 0.4);
+    }
+
+    .zen-confirm-btn.confirm:hover {
+      background: linear-gradient(135deg, rgba(220, 100, 80, 0.25) 0%, rgba(220, 100, 80, 0.15) 100%);
+      border-color: rgba(220, 100, 80, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(220, 100, 80, 0.3);
+    }
+
+    .zen-confirm-btn:active {
+      transform: translateY(0);
+    }
+
 
     .new-chat-btn {
       margin: 16px;
@@ -1134,6 +1239,18 @@
       </div>
     </div>
 
+    <!-- Zen Confirmation Modal -->
+    <div class="zen-confirm-overlay" id="zenConfirmOverlay">
+      <div class="zen-confirm-card">
+        <div class="zen-confirm-title" id="zenConfirmTitle"></div>
+        <div class="zen-confirm-message" id="zenConfirmMessage"></div>
+        <div class="zen-confirm-actions">
+          <button class="zen-confirm-btn cancel" id="zenConfirmCancel">Cancel</button>
+          <button class="zen-confirm-btn confirm" id="zenConfirmOk">Delete</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Menu Button (appears after chat starts) -->
     <button class="menu-btn" id="menuBtn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1350,9 +1467,56 @@
       });
     }
 
+    // Zen Confirmation Dialog
+    function showZenConfirm(title, message) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('zenConfirmOverlay');
+        const titleEl = document.getElementById('zenConfirmTitle');
+        const messageEl = document.getElementById('zenConfirmMessage');
+        const cancelBtn = document.getElementById('zenConfirmCancel');
+        const okBtn = document.getElementById('zenConfirmOk');
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+
+        overlay.classList.add('active');
+
+        const handleCancel = () => {
+          overlay.classList.remove('active');
+          cancelBtn.removeEventListener('click', handleCancel);
+          okBtn.removeEventListener('click', handleOk);
+          overlay.removeEventListener('click', handleOverlayClick);
+          resolve(false);
+        };
+
+        const handleOk = () => {
+          overlay.classList.remove('active');
+          cancelBtn.removeEventListener('click', handleCancel);
+          okBtn.removeEventListener('click', handleOk);
+          overlay.removeEventListener('click', handleOverlayClick);
+          resolve(true);
+        };
+
+        const handleOverlayClick = (e) => {
+          if (e.target === overlay) {
+            handleCancel();
+          }
+        };
+
+        cancelBtn.addEventListener('click', handleCancel);
+        okBtn.addEventListener('click', handleOk);
+        overlay.addEventListener('click', handleOverlayClick);
+      });
+    }
+
     // Delete Conversation with zen fade-out
     async function deleteConversation(convId, itemElement) {
-      if (!confirm('Delete this conversation?')) {
+      const confirmed = await showZenConfirm(
+        'Delete Conversation',
+        'This conversation will be permanently removed. Are you sure?'
+      );
+
+      if (!confirmed) {
         return;
       }
 
@@ -1388,7 +1552,10 @@
         // Restore element on error
         itemElement.style.opacity = '1';
         itemElement.style.transform = 'translateX(0)';
-        alert('Failed to delete conversation. Please try again.');
+        await showZenConfirm(
+          'Error',
+          'Failed to delete conversation. Please try again.'
+        );
       }
     }
 
