@@ -96,7 +96,6 @@
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
       box-shadow: 0 12px 48px rgba(124, 152, 133, 0.12);
       margin-bottom: 40px;
-      text-align: center;
       animation: slideUp 0.8s ease 0.2s both;
     }
 
@@ -110,142 +109,178 @@
       font-size: 28px;
       color: #2d2d2d;
       margin-bottom: 12px;
+      text-align: center;
     }
 
-    .collective-brain p {
+    .collective-brain > p {
       font-size: 15px;
       color: #5a5a5a;
-      margin-bottom: 30px;
+      margin-bottom: 35px;
       line-height: 1.6;
+      text-align: center;
     }
 
-    /* Brain Network Visual */
-    .brain-network {
-      position: relative;
+    /* Horizontal Flow Pipeline */
+    .brain-flow {
       display: flex;
-      justify-content: center;
       align-items: center;
-      min-height: 280px;
-      margin: 30px 0;
-    }
-
-    .brain-center {
+      justify-content: space-between;
+      gap: 20px;
       position: relative;
-      z-index: 10;
     }
 
-    .brain-core {
-      width: 140px;
-      height: 140px;
+    .flow-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 2;
+    }
+
+    .flow-note {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(124, 152, 133, 0.25);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #5a5a5a;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 3px 12px rgba(124, 152, 133, 0.12);
+      animation: slideInLeft 0.6s ease both;
+    }
+
+    .flow-note:nth-child(1) { animation-delay: 0.1s; }
+    .flow-note:nth-child(2) { animation-delay: 0.2s; }
+    .flow-note:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Center Brain */
+    .flow-brain {
+      flex: 0 0 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 3;
+      position: relative;
+    }
+
+    .brain-circle {
+      width: 160px;
+      height: 160px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
       border: 3px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
       border-radius: 50%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       animation: pulse 3s ease-in-out infinite;
-      position: relative;
+      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.2);
     }
 
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 32px rgba(124, 152, 133, 0.2); }
+      50% { transform: scale(1.05); box-shadow: 0 12px 40px rgba(124, 152, 133, 0.3); }
     }
 
-    .brain-core-label {
-      font-size: 16px;
+    .brain-circle-label {
+      font-size: 18px;
       font-weight: 700;
       color: #2d2d2d;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
-    .brain-core-sublabel {
+    .brain-circle-sublabel {
       font-size: 11px;
       color: #7c9885;
       font-weight: 600;
+      text-align: center;
+      line-height: 1.3;
     }
 
-    .notes-orbit {
+    /* Flow Arrows */
+    .flow-arrow {
       position: absolute;
-      width: 380px;
-      height: 380px;
-      border: 2px dashed rgba(124, 152, 133, 0.15);
-      border-radius: 50%;
       top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .note-node {
-      position: absolute;
-      width: 70px;
-      height: 70px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 2px solid rgba(124, 152, 133, 0.3);
-      border-radius: 10px;
+      transform: translateY(-50%);
+      z-index: 1;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: #5a5a5a;
-      font-weight: 600;
-      text-align: center;
-      padding: 6px;
-      line-height: 1.2;
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.15);
-      animation: float 3s ease-in-out infinite;
+      animation: flowPulse 2s ease-in-out infinite;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
+    @keyframes flowPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.7; }
     }
 
-    .note-node:nth-child(1) {
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation-delay: 0s;
+    .flow-arrow-left {
+      left: 25%;
+      right: auto;
     }
 
-    .note-node:nth-child(2) {
-      top: 50px;
-      right: -40px;
-      animation-delay: 0.5s;
+    .flow-arrow-right {
+      left: auto;
+      right: 25%;
     }
 
-    .note-node:nth-child(3) {
-      bottom: 50px;
-      right: 30px;
-      animation-delay: 1s;
-    }
-
-    .note-node:nth-child(4) {
-      bottom: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation-delay: 1.5s;
-    }
-
-    .note-node:nth-child(5) {
-      bottom: 50px;
-      left: 30px;
-      animation-delay: 2s;
-    }
-
-    .note-node:nth-child(6) {
-      top: 50px;
-      left: -40px;
-      animation-delay: 2.5s;
-    }
-
-    .connector-line {
-      position: absolute;
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.2), rgba(232, 155, 95, 0.2));
+    .arrow-line {
+      width: 60px;
       height: 2px;
-      transform-origin: left center;
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.3), rgba(232, 155, 95, 0.3));
+      position: relative;
+    }
+
+    .arrow-line::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid rgba(124, 152, 133, 0.4);
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+
+    /* Output Column */
+    .flow-output {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      animation: slideInRight 0.6s ease 0.4s both;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .flow-output-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .flow-output h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .flow-output p {
+      font-size: 12px;
+      color: #5a5a5a;
+      line-height: 1.5;
     }
 
     /* Features Grid */
@@ -488,24 +523,22 @@
         font-size: 36px;
       }
 
-      .brain-network {
-        min-height: 250px;
+      .brain-flow {
+        flex-direction: column;
+        gap: 30px;
       }
 
-      .notes-orbit {
-        width: 300px;
-        height: 300px;
+      .flow-arrow {
+        display: none;
       }
 
-      .note-node {
-        width: 55px;
-        height: 55px;
-        font-size: 9px;
+      .brain-circle {
+        width: 140px;
+        height: 140px;
       }
 
-      .brain-core {
-        width: 120px;
-        height: 120px;
+      .brain-circle-label {
+        font-size: 16px;
       }
     }
   </style>
@@ -528,20 +561,38 @@
         <h2>The Collective Brain</h2>
         <p>Your notes combine with everyone else's to create an AI that actually understands your specific courses and curriculum.</p>
 
-        <div class="brain-network">
-          <div class="notes-orbit">
-            <div class="note-node">Biology 201 Notes</div>
-            <div class="note-node">Chemistry Formulas</div>
-            <div class="note-node">Psych Lecture</div>
-            <div class="note-node">Calculus Review</div>
-            <div class="note-node">History Essay</div>
-            <div class="note-node">Physics Lab</div>
+        <div class="brain-flow">
+          <!-- Left: Student Notes -->
+          <div class="flow-column">
+            <div class="flow-note">Biology 201 Notes</div>
+            <div class="flow-note">Chemistry Formulas</div>
+            <div class="flow-note">Calculus Review</div>
           </div>
 
-          <div class="brain-center">
-            <div class="brain-core">
-              <div class="brain-core-label">Smarter AI</div>
-              <div class="brain-core-sublabel">Learns from 12,000+ notes</div>
+          <!-- Left Arrow -->
+          <div class="flow-arrow flow-arrow-left">
+            <div class="arrow-line"></div>
+          </div>
+
+          <!-- Center: Collective Brain -->
+          <div class="flow-brain">
+            <div class="brain-circle">
+              <div class="brain-circle-label">Collective Brain</div>
+              <div class="brain-circle-sublabel">12,000+ notes combined</div>
+            </div>
+          </div>
+
+          <!-- Right Arrow -->
+          <div class="flow-arrow flow-arrow-right">
+            <div class="arrow-line"></div>
+          </div>
+
+          <!-- Right: Smart Output -->
+          <div class="flow-column">
+            <div class="flow-output">
+              <div class="flow-output-icon">&#10024;</div>
+              <h3>Course-Specific Answers</h3>
+              <p>Get answers that match YOUR curriculum</p>
             </div>
           </div>
         </div>
