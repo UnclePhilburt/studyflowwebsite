@@ -658,9 +658,9 @@
     // Fetch live stats
     (async function() {
       try {
-        // Count total users from auth
+        // Count total users from user_profiles
         const { count: userCount, error: userError } = await supabaseClient
-          .from('users')
+          .from('user_profiles')
           .select('*', { count: 'exact', head: true });
 
         if (!userError && userCount !== null) {
