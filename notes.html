@@ -390,46 +390,30 @@
       transform: scale(1.05);
     }
 
-    /* Usage Badge */
-    .usage-badge {
+    /* Usage Counter */
+    .usage-counter {
       position: absolute;
-      bottom: -6px;
-      right: -6px;
-      min-width: 24px;
-      height: 24px;
-      padding: 0 6px;
-      border-radius: 12px;
-      font-size: 11px;
+      bottom: -8px;
+      right: -8px;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 14px;
+      font-size: 12px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(107, 133, 117, 0.95) 100%);
+      color: white;
+      box-shadow: 0 3px 10px rgba(124, 152, 133, 0.4);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid white;
     }
 
-    .usage-badge.bronze {
-      background: linear-gradient(135deg, #cd7f32 0%, #b8722d 100%);
-      color: white;
-    }
-
-    .usage-badge.silver {
-      background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
-      color: white;
-    }
-
-    .usage-badge.gold {
-      background: linear-gradient(135deg, #ffd700 0%, #e8c547 100%);
-      color: #2d2d2d;
-    }
-
-    .usage-badge.emerald {
-      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
-      color: white;
-    }
-
-    .note-item:hover .usage-badge {
+    .note-item:hover .usage-counter {
       transform: scale(1.15);
+      box-shadow: 0 4px 14px rgba(124, 152, 133, 0.5);
     }
 
     .item-name {
@@ -1081,14 +1065,6 @@
       });
     }
 
-    // Get badge tier based on usage count
-    function getUsageBadgeTier(count) {
-      if (count === 0) return null;
-      if (count >= 50) return 'emerald';
-      if (count >= 20) return 'gold';
-      if (count >= 5) return 'silver';
-      return 'bronze';
-    }
 
     // Render desktop
     function renderDesktop() {
@@ -1157,10 +1133,9 @@
 
         const style = isGridMode ? '' : `style="left: ${position.x}px; top: ${position.y}px;"`;
 
-        // Usage badge
+        // Usage counter (only show if > 0)
         const usageCount = note.usageCount || 0;
-        const badgeTier = getUsageBadgeTier(usageCount);
-        const badgeHtml = badgeTier ? `<div class="usage-badge ${badgeTier}" title="Helped ${usageCount} students">${usageCount}</div>` : '';
+        const counterHtml = usageCount > 0 ? `<div class="usage-counter" title="Helped ${usageCount} student${usageCount === 1 ? '' : 's'}">${usageCount}</div>` : '';
 
         html += `
           <div class="note-item"
@@ -1173,7 +1148,7 @@
                ${style}>
             <div class="note-icon">
               ${icon}
-              ${badgeHtml}
+              ${counterHtml}
             </div>
             <div class="item-name">${escapeHtml(note.filename)}</div>
             <div class="item-meta">${note.pages || '?'} pages</div>
