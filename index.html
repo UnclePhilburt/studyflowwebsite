@@ -428,11 +428,11 @@
           <!-- Live Stats -->
           <div class="live-stats">
             <div class="stat-item">
-              <div class="stat-number">4,293</div>
+              <div class="stat-number" id="studentCount">...</div>
               <div class="stat-label">Students</div>
             </div>
             <div class="stat-item">
-              <div class="stat-number">12,847</div>
+              <div class="stat-number" id="noteCount">...</div>
               <div class="stat-label">Notes</div>
             </div>
           </div>
@@ -487,6 +487,33 @@
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) {
         window.location.href = 'chat.html';
+      }
+    })();
+
+    // Fetch live stats
+    (async function() {
+      try {
+        // Count total users from auth
+        const { count: userCount, error: userError } = await supabaseClient
+          .from('users')
+          .select('*', { count: 'exact', head: true });
+
+        if (!userError && userCount !== null) {
+          document.getElementById('studentCount').textContent = userCount.toLocaleString();
+        }
+
+        // Count total notes
+        const { count: noteCount, error: noteError } = await supabaseClient
+          .from('notes')
+          .select('*', { count: 'exact', head: true });
+
+        if (!noteError && noteCount !== null) {
+          document.getElementById('noteCount').textContent = noteCount.toLocaleString();
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        document.getElementById('studentCount').textContent = '---';
+        document.getElementById('noteCount').textContent = '---';
       }
     })();
 
