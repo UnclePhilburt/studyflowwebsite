@@ -646,9 +646,9 @@
 
   <!-- Context Menu -->
   <div class="context-menu" id="contextMenu">
-    <div class="context-menu-item" onclick="event.stopPropagation(); renameItem()">Rename</div>
-    <div class="context-menu-item" onclick="event.stopPropagation(); downloadItem()">Download</div>
-    <div class="context-menu-item danger" onclick="event.stopPropagation(); deleteItem()">Delete</div>
+    <div class="context-menu-item" id="contextRename">Rename</div>
+    <div class="context-menu-item" id="contextDownload">Download</div>
+    <div class="context-menu-item danger" id="contextDelete">Delete</div>
   </div>
 
   <!-- New Folder Modal -->
@@ -1385,6 +1385,22 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
+
+    // Context menu item event listeners
+    document.getElementById('contextRename').addEventListener('click', (e) => {
+      e.stopPropagation();
+      renameItem();
+    });
+
+    document.getElementById('contextDownload').addEventListener('click', (e) => {
+      e.stopPropagation();
+      downloadItem();
+    });
+
+    document.getElementById('contextDelete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteItem();
+    });
 
     // Close context menu when clicking elsewhere
     document.addEventListener('click', closeContextMenu);
