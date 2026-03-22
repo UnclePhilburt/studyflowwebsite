@@ -1315,7 +1315,7 @@
         }
       });
 
-      // Fetch PDF with authorization header
+      // Fetch file with authorization header
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${note.id}/download`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
@@ -1324,15 +1324,42 @@
         if (!response.ok) throw new Error('Failed to load preview');
 
         const blobData = await response.blob();
-        // Ensure the blob has the correct MIME type for inline display
-        const blob = new Blob([blobData], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
+        const fileExt = note.filename.split('.').pop().toLowerCase();
 
-        // Display in iframe
-        viewer.innerHTML = `<iframe src="${url}#toolbar=0"></iframe>`;
+        // Handle different file types
+        let blob, url, viewerHTML;
+
+        if (fileExt === 'pdf') {
+          // PDF - display in iframe
+          blob = new Blob([blobData], { type: 'application/pdf' });
+          url = window.URL.createObjectURL(blob);
+          viewerHTML = `<iframe src="${url}#toolbar=0"></iframe>`;
+        } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExt)) {
+          // Images - display as image
+          blob = new Blob([blobData], { type: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}` });
+          url = window.URL.createObjectURL(blob);
+          viewerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; background: #f5f5f5;">`;
+        } else if (fileExt === 'txt') {
+          // Text files - display as text
+          const text = await blobData.text();
+          viewerHTML = `<pre style="padding: 20px; white-space: pre-wrap; word-wrap: break-word; font-family: 'Courier New', monospace; font-size: 13px; color: #2d2d2d; overflow: auto; height: 100%;">${escapeHtml(text)}</pre>`;
+        } else {
+          // Unsupported format - show message
+          viewerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #9ca3af; font-size: 14px; gap: 16px;">
+              <div style="font-size: 48px;">📄</div>
+              <div>Preview not available for ${fileExt.toUpperCase()} files</div>
+              <div style="font-size: 12px; color: #b0b0b0;">Use the Download button to view this file</div>
+            </div>
+          `;
+        }
+
+        viewer.innerHTML = viewerHTML;
 
         // Clean up object URL when preview is closed
-        viewer.dataset.blobUrl = url;
+        if (url) {
+          viewer.dataset.blobUrl = url;
+        }
       } catch (error) {
         console.error('Preview error:', error);
         viewer.innerHTML = `
