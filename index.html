@@ -617,8 +617,8 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="your@email.com" required>
+          <label for="email">Email or Username</label>
+          <input type="text" id="email" placeholder="your@email.com or username" required>
         </div>
 
         <div class="form-group">
@@ -711,11 +711,11 @@
       e.preventDefault();
       hideMessages();
 
-      const email = emailInput.value.trim();
+      const emailOrUsername = emailInput.value.trim();
       const password = passwordInput.value;
 
-      if (!email || !password) {
-        showError('Please enter both email and password');
+      if (!emailOrUsername || !password) {
+        showError('Please enter both email/username and password');
         return;
       }
 
@@ -724,8 +724,27 @@
       loading.classList.add('active');
 
       try {
+        let loginEmail = emailOrUsername;
+
+        // Check if input is a username (doesn't contain @)
+        if (!emailOrUsername.includes('@')) {
+          // Look up the email from the username
+          const { data: profileData, error: profileError } = await supabaseClient
+            .from('user_profiles')
+            .select('email')
+            .eq('username', emailOrUsername)
+            .single();
+
+          if (profileError || !profileData) {
+            throw new Error('Username not found. Please check your username or use your email.');
+          }
+
+          loginEmail = profileData.email;
+        }
+
+        // Now login with the email
         const { data, error } = await supabaseClient.auth.signInWithPassword({
-          email: email,
+          email: loginEmail,
           password: password
         });
 
@@ -745,11 +764,15 @@
       }
     });
 
-    // Auto-fill email from URL
+    // Auto-fill email or username from URL
     const urlParams = new URLSearchParams(window.location.search);
     const emailParam = urlParams.get('email');
+    const usernameParam = urlParams.get('username');
     if (emailParam) {
       emailInput.value = emailParam;
+      passwordInput.focus();
+    } else if (usernameParam) {
+      emailInput.value = usernameParam;
       passwordInput.focus();
     }
   </script>
