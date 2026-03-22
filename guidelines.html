@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Guidelines - StudyFlow Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #e8e3d8;
+            color: #2c2c2c;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Bamboo paper texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(90deg, rgba(124, 152, 133, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(124, 152, 133, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="600" height="600" filter="url(%23noise)" opacity="0.06"/></svg>');
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .container {
+            position: relative;
+            z-index: 3;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo {
+            font-family: 'Lora', serif;
+            font-size: 32px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #7c9885 0%, #6b8575 50%, #e89b5f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            font-family: 'Lora', serif;
+            font-size: 36px;
+            font-weight: 600;
+            color: #2c2c2c;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .intro {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+
+        .guideline {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+        }
+
+        .guideline:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .guideline-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-right: 12px;
+            margin-bottom: 8px;
+        }
+
+        .guideline-title {
+            font-family: 'Lora', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c2c2c;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .guideline-description {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.7;
+            margin-left: 44px;
+        }
+
+        .guideline-example {
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: rgba(124, 152, 133, 0.08);
+            border-left: 3px solid #7c9885;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #555;
+            font-style: italic;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 2px solid rgba(124, 152, 133, 0.2);
+            font-size: 15px;
+            color: #555;
+            line-height: 1.7;
+        }
+
+        .footer-note strong {
+            color: #7c9885;
+            font-weight: 600;
+        }
+
+        .last-updated {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            padding: 12px 24px;
+            background: #7c9885;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .back-link:hover {
+            background: #6b8575;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .content-card {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .guideline-title {
+                font-size: 19px;
+            }
+
+            .guideline-description {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">StudyFlow Suite</div>
+            <div class="subtitle">Community Guidelines</div>
+        </div>
+
+        <div class="content-card">
+            <h1>Community Guidelines</h1>
+            <p class="intro">
+                To keep the Nexus safe, legal, and helpful for everyone, all uploads must follow these rules.
+                By uploading content to StudyFlow, you agree to these community standards.
+            </p>
+
+            <div class="guideline">
+                <div class="guideline-number">1</div>
+                <div class="guideline-title">No copyrighted textbooks or exams</div>
+                <div class="guideline-description">
+                    Your personal notes are fine—published books, exam keys, and copyrighted materials are not.
+                    <div class="guideline-example">
+                        ✓ Your handwritten notes from a textbook chapter<br>
+                        ✗ Scanned pages from the actual textbook
+                    </div>
+                </div>
+            </div>
+
+            <div class="guideline">
+                <div class="guideline-number">2</div>
+                <div class="guideline-title">No hate speech or harassment</div>
+                <div class="guideline-description">
+                    Keep it professional and respectful. StudyFlow is a collaborative learning environment for everyone.
+                    <div class="guideline-example">
+                        ✓ Collaborative study notes and helpful explanations<br>
+                        ✗ Offensive language, slurs, or targeted harassment
+                    </div>
+                </div>
+            </div>
+
+            <div class="guideline">
+                <div class="guideline-number">3</div>
+                <div class="guideline-title">No Personal Identifiable Information (PII)</div>
+                <div class="guideline-description">
+                    Remove SSNs, credit cards, addresses, and other sensitive information before uploading.
+                    <div class="guideline-example">
+                        ✓ Notes with your initials or first name<br>
+                        ✗ Documents containing full SSN, address, or financial data
+                    </div>
+                </div>
+            </div>
+
+            <div class="guideline">
+                <div class="guideline-number">4</div>
+                <div class="guideline-title">Academic integrity only</div>
+                <div class="guideline-description">
+                    Use StudyFlow as a study aid, not to cheat. Respect your institution's honor code and academic policies.
+                    <div class="guideline-example">
+                        ✓ Using StudyFlow to prepare for exams and understand concepts<br>
+                        ✗ Uploading current exam questions or using AI to complete graded assignments
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                <strong>StudyFlow LLC reserves the right</strong> to remove any content that violates these guidelines,
+                Missouri state law (SB 1324, SB 1455), or federal regulations. Repeated violations may result in
+                account suspension.
+            </div>
+
+            <div class="last-updated">
+                Last updated: March 22, 2026
+            </div>
+
+            <div class="button-container">
+                <a href="upload.html" class="back-link">← Back to Upload</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

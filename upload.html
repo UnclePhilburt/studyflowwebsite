@@ -534,6 +534,292 @@
       font-family: 'Lora', Georgia, serif;
     }
 
+    /* First-Time Upload Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(45, 45, 45, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      border-radius: 24px;
+      padding: 48px;
+      max-width: 560px;
+      width: 90%;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 24px 80px rgba(45, 45, 45, 0.3);
+      animation: modalSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-icon svg {
+      width: 32px;
+      height: 32px;
+      stroke: #7c9885;
+    }
+
+    .modal-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .modal-subtitle {
+      font-size: 15px;
+      color: #5d5d5d;
+      line-height: 1.6;
+    }
+
+    .modal-body {
+      margin-bottom: 32px;
+    }
+
+    .modal-text {
+      font-size: 15px;
+      color: #5d5d5d;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .modal-link {
+      color: #7c9885;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .modal-link:hover {
+      color: #6b8575;
+      border-bottom-color: #7c9885;
+    }
+
+    .modal-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(124, 152, 133, 0.05);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-checkbox:hover {
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .modal-checkbox input[type="checkbox"] {
+      margin-top: 2px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #7c9885;
+    }
+
+    .modal-checkbox-label {
+      flex: 1;
+      font-size: 14px;
+      color: #2d2d2d;
+      line-height: 1.6;
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-btn-primary {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+    }
+
+    .modal-btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.3);
+    }
+
+    .modal-btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .modal-btn-secondary {
+      background: rgba(124, 152, 133, 0.1);
+      color: #2d2d2d;
+    }
+
+    .modal-btn-secondary:hover {
+      background: rgba(124, 152, 133, 0.15);
+    }
+
+    /* Share with Nexus Toggle */
+    .nexus-toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 32px;
+      padding: 20px 24px;
+      background: rgba(124, 152, 133, 0.08);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .nexus-toggle-container.enabled {
+      background: rgba(124, 152, 133, 0.12);
+    }
+
+    .nexus-toggle-label {
+      flex: 1;
+      text-align: left;
+    }
+
+    .nexus-toggle-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+    }
+
+    .nexus-toggle-subtitle {
+      font-size: 12px;
+      color: #5d5d5d;
+    }
+
+    .nexus-toggle-subtitle.default-on {
+      color: #7c9885;
+      font-weight: 500;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(124, 152, 133, 0.2);
+      transition: 0.3s;
+      border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    input:checked + .toggle-slider {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    /* Batch Upload Summary */
+    .batch-summary {
+      background: linear-gradient(to bottom, rgba(124, 152, 133, 0.08) 0%, rgba(124, 152, 133, 0.05) 100%);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .batch-summary-text {
+      font-size: 14px;
+      color: #2d2d2d;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .batch-summary-count {
+      color: #7c9885;
+      font-weight: 700;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .container {
@@ -555,6 +841,24 @@
       .top-nav {
         top: 16px;
         right: 16px;
+      }
+
+      .modal-content {
+        padding: 32px 24px;
+      }
+
+      .modal-title {
+        font-size: 24px;
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      .nexus-toggle-container {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
       }
     }
   </style>
@@ -595,6 +899,25 @@
       <button class="upload-btn" id="browse-btn">Choose Files</button>
       <p class="file-types">PDF, Images, Word Docs, Text Files</p>
       <input type="file" id="file-input" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt,image/*">
+
+      <!-- Share with Nexus Toggle -->
+      <div class="nexus-toggle-container" id="nexus-toggle-container">
+        <div class="nexus-toggle-label">
+          <div class="nexus-toggle-title">Share with Nexus</div>
+          <div class="nexus-toggle-subtitle" id="nexus-toggle-subtitle">Help other students with your notes</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="nexus-toggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- Batch Upload Summary (hidden by default) -->
+      <div class="batch-summary" id="batch-summary" style="display: none;">
+        <div class="batch-summary-text">
+          Uploading <span class="batch-summary-count" id="batch-count">0</span> files
+        </div>
+      </div>
 
       <div class="course-info-toggle">
         <a class="toggle-link" id="toggle-course-info">Add course information (optional)</a>
@@ -649,6 +972,45 @@
     </div>
   </div>
 
+  <!-- First-Time Upload Modal -->
+  <div class="modal-overlay" id="first-upload-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <h2 class="modal-title">Welcome to the Nexus</h2>
+        <p class="modal-subtitle">Before you upload, please review our community guidelines</p>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-text">
+          By uploading files to StudyFlow, you agree to follow our
+          <a href="guidelines.html" target="_blank" class="modal-link">Community Guidelines</a>
+          and grant StudyFlow LLC a license to anonymize and use your notes in the Nexus.
+        </p>
+
+        <div class="modal-checkbox" onclick="document.getElementById('modal-agree-checkbox').click()">
+          <input type="checkbox" id="modal-agree-checkbox">
+          <label for="modal-agree-checkbox" class="modal-checkbox-label">
+            I understand and agree to the Community Guidelines and grant StudyFlow a non-exclusive,
+            perpetual license to use my uploaded notes to improve the Nexus.
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-primary" id="modal-continue-btn" disabled>
+          Continue to Upload
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
     const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
@@ -657,6 +1019,9 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentUser = null;
     let authToken = null;
+    let userProfile = null;
+    let hasSeenModal = false;
+    let pendingFiles = null;
 
     // Check authentication
     async function checkAuth() {
@@ -676,7 +1041,112 @@
         userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
       }
 
+      // Load user profile
+      await loadUserProfile();
+
+      // Initialize modal and toggle
+      initializeModal();
+      initializeNexusToggle();
+
       loadNotes();
+    }
+
+    // Load user profile from Supabase
+    async function loadUserProfile() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('user_profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (error) throw error;
+
+        userProfile = data;
+        hasSeenModal = data.has_seen_upload_modal || false;
+
+        console.log('User profile loaded:', userProfile);
+      } catch (error) {
+        console.error('Error loading user profile:', error);
+        // Default values if profile not found
+        userProfile = {
+          collective_brain_opt_in: true,
+          has_seen_upload_modal: false
+        };
+        hasSeenModal = false;
+      }
+    }
+
+    // Initialize first-time modal
+    function initializeModal() {
+      const modal = document.getElementById('first-upload-modal');
+      const agreeCheckbox = document.getElementById('modal-agree-checkbox');
+      const continueBtn = document.getElementById('modal-continue-btn');
+
+      // Enable/disable continue button based on checkbox
+      agreeCheckbox.addEventListener('change', () => {
+        continueBtn.disabled = !agreeCheckbox.checked;
+      });
+
+      // Continue button closes modal and processes pending files
+      continueBtn.addEventListener('click', async () => {
+        modal.classList.remove('active');
+
+        // Mark modal as seen
+        await markModalAsSeen();
+
+        // Process pending files if any
+        if (pendingFiles) {
+          await handleFiles(pendingFiles);
+          pendingFiles = null;
+        }
+      });
+    }
+
+    // Initialize Nexus toggle with smart default
+    function initializeNexusToggle() {
+      const toggle = document.getElementById('nexus-toggle');
+      const subtitle = document.getElementById('nexus-toggle-subtitle');
+      const container = document.getElementById('nexus-toggle-container');
+
+      // Set default based on user's signup preference
+      const defaultEnabled = userProfile?.collective_brain_opt_in !== false;
+      toggle.checked = defaultEnabled;
+
+      // Update UI to show it's based on settings
+      if (defaultEnabled) {
+        subtitle.textContent = '✓ Shared to Nexus by default (based on your settings)';
+        subtitle.classList.add('default-on');
+        container.classList.add('enabled');
+      } else {
+        subtitle.textContent = 'Keep uploads private (change in settings)';
+      }
+
+      // Update UI when toggled
+      toggle.addEventListener('change', () => {
+        if (toggle.checked) {
+          container.classList.add('enabled');
+        } else {
+          container.classList.remove('enabled');
+        }
+      });
+    }
+
+    // Mark modal as seen in database
+    async function markModalAsSeen() {
+      try {
+        const { error } = await supabaseClient
+          .from('user_profiles')
+          .update({ has_seen_upload_modal: true })
+          .eq('id', currentUser.id);
+
+        if (error) throw error;
+
+        hasSeenModal = true;
+        console.log('Modal marked as seen');
+      } catch (error) {
+        console.error('Error marking modal as seen:', error);
+      }
     }
 
     // Course info toggle
@@ -723,6 +1193,23 @@
     async function handleFiles(files) {
       if (files.length === 0) return;
 
+      // Show modal if first time uploading
+      if (!hasSeenModal) {
+        pendingFiles = files;
+        document.getElementById('first-upload-modal').classList.add('active');
+        return;
+      }
+
+      // Show batch summary if multiple files
+      const batchSummary = document.getElementById('batch-summary');
+      const batchCount = document.getElementById('batch-count');
+      if (files.length > 1) {
+        batchCount.textContent = files.length;
+        batchSummary.style.display = 'block';
+      } else {
+        batchSummary.style.display = 'none';
+      }
+
       const progressContainer = document.getElementById('upload-progress');
       progressContainer.classList.add('active');
       progressContainer.innerHTML = '';
@@ -734,6 +1221,7 @@
       setTimeout(() => {
         loadNotes();
         progressContainer.classList.remove('active');
+        batchSummary.style.display = 'none';
       }, 1000);
     }
 
@@ -768,6 +1256,10 @@
         if (courseCode) formData.append('course_code', courseCode);
         if (professor) formData.append('professor', professor);
         if (semester) formData.append('semester', semester);
+
+        // Add Nexus sharing preference
+        const shareWithNexus = document.getElementById('nexus-toggle').checked;
+        formData.append('share_with_nexus', shareWithNexus);
 
         let progress = 0;
         const interval = setInterval(() => {
