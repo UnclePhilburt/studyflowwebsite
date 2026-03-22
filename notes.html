@@ -90,6 +90,147 @@
       box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
     }
 
+    /* Impact Panel */
+    .impact-panel {
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(232, 155, 95, 0.06) 100%);
+      border-radius: 12px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .impact-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .impact-header:hover {
+      background: rgba(124, 152, 133, 0.05);
+    }
+
+    .impact-summary {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .impact-icon {
+      font-size: 24px;
+    }
+
+    .impact-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: #2d2d2d;
+      font-family: 'Lora', Georgia, serif;
+    }
+
+    .impact-count {
+      font-size: 20px;
+      font-weight: 700;
+      color: #7c9885;
+    }
+
+    .impact-toggle {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: rgba(124, 152, 133, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .impact-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: #7c9885;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .impact-panel.expanded .impact-toggle svg {
+      transform: rotate(180deg);
+    }
+
+    .impact-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .impact-panel.expanded .impact-details {
+      max-height: 400px;
+    }
+
+    .impact-content {
+      padding: 0 20px 20px;
+    }
+
+    .impact-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .impact-stat {
+      background: rgba(255, 255, 255, 0.6);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .impact-stat-label {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .impact-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #7c9885;
+      font-family: 'Lora', Georgia, serif;
+    }
+
+    .top-notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .top-note-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .top-note-name {
+      color: #2d2d2d;
+      font-weight: 500;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-right: 12px;
+    }
+
+    .top-note-count {
+      color: #7c9885;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
     /* Toolbar */
     .toolbar {
       display: flex;
@@ -241,11 +382,54 @@
       color: #7c9885;
       box-shadow: 0 4px 12px rgba(124, 152, 133, 0.1);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
     }
 
     .note-item:hover .note-icon {
       box-shadow: 0 8px 24px rgba(124, 152, 133, 0.2);
       transform: scale(1.05);
+    }
+
+    /* Usage Badge */
+    .usage-badge {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .usage-badge.bronze {
+      background: linear-gradient(135deg, #cd7f32 0%, #b8722d 100%);
+      color: white;
+    }
+
+    .usage-badge.silver {
+      background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
+      color: white;
+    }
+
+    .usage-badge.gold {
+      background: linear-gradient(135deg, #ffd700 0%, #e8c547 100%);
+      color: #2d2d2d;
+    }
+
+    .usage-badge.emerald {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+    }
+
+    .note-item:hover .usage-badge {
+      transform: scale(1.15);
     }
 
     .item-name {
@@ -624,6 +808,44 @@
 
   <!-- Main Container -->
   <div class="container">
+    <!-- Impact Panel -->
+    <div class="impact-panel" id="impactPanel">
+      <div class="impact-header" onclick="toggleImpactPanel()">
+        <div class="impact-summary">
+          <span class="impact-icon">🌱</span>
+          <div>
+            <div class="impact-text">Your notes have helped <span class="impact-count" id="totalUsage">0</span> students</div>
+          </div>
+        </div>
+        <div class="impact-toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </div>
+      <div class="impact-details">
+        <div class="impact-content">
+          <div class="impact-stats">
+            <div class="impact-stat">
+              <div class="impact-stat-label">This Week</div>
+              <div class="impact-stat-value" id="weeklyUsage">0</div>
+            </div>
+            <div class="impact-stat">
+              <div class="impact-stat-label">Active Notes</div>
+              <div class="impact-stat-value" id="activeNotes">0</div>
+            </div>
+            <div class="impact-stat">
+              <div class="impact-stat-label">Top Contributor</div>
+              <div class="impact-stat-value" id="topNote">-</div>
+            </div>
+          </div>
+          <div class="top-notes-list" id="topNotesList">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Toolbar -->
     <div class="toolbar">
       <div class="breadcrumb" id="breadcrumb">
@@ -760,6 +982,11 @@
       localStorage.setItem('studyflow_folders', JSON.stringify(folders));
     }
 
+    // Toggle impact panel
+    function toggleImpactPanel() {
+      document.getElementById('impactPanel').classList.toggle('expanded');
+    }
+
     // Load notes
     async function loadNotes() {
       try {
@@ -778,11 +1005,62 @@
         allNotes = await response.json();
         allNotes.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
 
+        loadUsageStats();
         renderDesktop();
       } catch (error) {
         console.error('Load error:', error);
         renderDesktop();
       }
+    }
+
+    // Load usage stats for notes
+    async function loadUsageStats() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/usage-stats`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+          const stats = await response.json();
+          updateImpactPanel(stats);
+        }
+      } catch (error) {
+        console.error('Usage stats error:', error);
+      }
+    }
+
+    // Update impact panel with stats
+    function updateImpactPanel(stats) {
+      document.getElementById('totalUsage').textContent = stats.totalUsage || 0;
+      document.getElementById('weeklyUsage').textContent = stats.weeklyUsage || 0;
+      document.getElementById('activeNotes').textContent = stats.activeNotes || 0;
+
+      if (stats.topNotes && stats.topNotes.length > 0) {
+        document.getElementById('topNote').textContent = stats.topNotes[0].count || 0;
+
+        const topList = document.getElementById('topNotesList');
+        topList.innerHTML = stats.topNotes.slice(0, 5).map(note => `
+          <div class="top-note-item">
+            <span class="top-note-name">${escapeHtml(note.filename)}</span>
+            <span class="top-note-count">${note.count}x</span>
+          </div>
+        `).join('');
+      }
+
+      // Add usage counts to notes
+      stats.noteUsage = stats.noteUsage || {};
+      allNotes.forEach(note => {
+        note.usageCount = stats.noteUsage[note.id] || 0;
+      });
+    }
+
+    // Get badge tier based on usage count
+    function getUsageBadgeTier(count) {
+      if (count === 0) return null;
+      if (count >= 50) return 'emerald';
+      if (count >= 20) return 'gold';
+      if (count >= 5) return 'silver';
+      return 'bronze';
     }
 
     // Render desktop
@@ -852,6 +1130,11 @@
 
         const style = isGridMode ? '' : `style="left: ${position.x}px; top: ${position.y}px;"`;
 
+        // Usage badge
+        const usageCount = note.usageCount || 0;
+        const badgeTier = getUsageBadgeTier(usageCount);
+        const badgeHtml = badgeTier ? `<div class="usage-badge ${badgeTier}" title="Helped ${usageCount} students">${usageCount}</div>` : '';
+
         html += `
           <div class="note-item"
                data-id="${note.id}"
@@ -861,7 +1144,10 @@
                oncontextmenu="showContextMenu(event, '${note.id}', 'note')"
                ${isGridMode ? 'ondragstart="handleDragStart(event)"' : ''}
                ${style}>
-            <div class="note-icon">${icon}</div>
+            <div class="note-icon">
+              ${icon}
+              ${badgeHtml}
+            </div>
             <div class="item-name">${escapeHtml(note.filename)}</div>
             <div class="item-meta">${note.pages || '?'} pages</div>
           </div>
