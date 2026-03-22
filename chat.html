@@ -597,12 +597,8 @@
         <div class="welcome-screen" id="welcomeScreen">
           <div class="welcome-greeting" id="welcomeGreeting">Hi</div>
           <h1 class="welcome-title">Where should we start?</h1>
-          <div class="suggested-prompts">
-            <div class="prompt-chip" onclick="sendPrompt('Explain this concept in simple terms')">Explain a concept</div>
-            <div class="prompt-chip" onclick="sendPrompt('Help me study for my exam')">Study for exam</div>
-            <div class="prompt-chip" onclick="sendPrompt('Quiz me on this topic')">Quiz me</div>
-            <div class="prompt-chip" onclick="sendPrompt('Summarize my notes')">Summarize notes</div>
-            <div class="prompt-chip" onclick="sendPrompt('What are the key points?')">Key points</div>
+          <div class="suggested-prompts" id="suggestedPrompts">
+            <!-- Random questions will be inserted here -->
           </div>
         </div>
       </div>
@@ -685,6 +681,9 @@
       if (welcomeGreeting) {
         welcomeGreeting.textContent = `Hi ${capitalizedName}`;
       }
+
+      // Populate random academic questions
+      populateSuggestedPrompts();
 
       // Load conversation history
       await loadConversations();
@@ -780,6 +779,117 @@
       } catch (error) {
         console.error('Error loading conversation:', error);
       }
+    }
+
+    // Academic questions across different subjects
+    const academicQuestions = [
+      // History
+      "What caused World War I?",
+      "How did the Industrial Revolution change society?",
+      "What were the main causes of the French Revolution?",
+      "Explain the significance of the Renaissance",
+      "What led to the fall of the Roman Empire?",
+      "How did the Cold War begin?",
+      "What was the impact of colonialism?",
+      "Explain the causes of the American Civil War",
+
+      // Science - Biology
+      "How does DNA replication work?",
+      "Explain the process of photosynthesis",
+      "What is cellular respiration?",
+      "How does natural selection work?",
+      "Explain the structure and function of cells",
+      "What are the stages of mitosis?",
+      "How does the immune system work?",
+      "Explain the difference between prokaryotes and eukaryotes",
+
+      // Science - Chemistry
+      "What are ionic and covalent bonds?",
+      "Explain the periodic table trends",
+      "How does pH affect chemical reactions?",
+      "What is the difference between acids and bases?",
+      "Explain oxidation and reduction reactions",
+      "What are the laws of thermodynamics?",
+      "How do catalysts work?",
+
+      // Science - Physics
+      "What are Newton's laws of motion?",
+      "Explain the theory of relativity",
+      "How does gravity work?",
+      "What is quantum mechanics?",
+      "Explain electromagnetic waves",
+      "How do electric circuits work?",
+      "What is the difference between kinetic and potential energy?",
+
+      // Mathematics
+      "How do you solve quadratic equations?",
+      "Explain the Pythagorean theorem",
+      "What is calculus used for?",
+      "How do derivatives work?",
+      "Explain probability and statistics",
+      "What are imaginary numbers?",
+      "How do you calculate integrals?",
+      "Explain the concept of limits",
+
+      // Literature & English
+      "What are the main themes in Shakespeare's works?",
+      "Explain symbolism in literature",
+      "What is the Hero's Journey?",
+      "How do you analyze poetry?",
+      "What are literary devices?",
+      "Explain narrative perspectives",
+      "What is the difference between denotation and connotation?",
+
+      // Economics
+      "What is supply and demand?",
+      "Explain how inflation works",
+      "What causes economic recessions?",
+      "How do interest rates affect the economy?",
+      "What is GDP and how is it measured?",
+      "Explain market structures",
+
+      // Psychology
+      "What are the stages of cognitive development?",
+      "Explain classical vs operant conditioning",
+      "How does memory work?",
+      "What are defense mechanisms?",
+      "Explain Maslow's hierarchy of needs",
+
+      // Computer Science
+      "What is object-oriented programming?",
+      "Explain how algorithms work",
+      "What are data structures?",
+      "How does machine learning work?",
+      "What is Big O notation?",
+
+      // Geography
+      "How do tectonic plates move?",
+      "What causes climate change?",
+      "Explain the water cycle",
+      "How are mountains formed?",
+
+      // Philosophy
+      "What is the mind-body problem?",
+      "Explain utilitarianism vs deontology",
+      "What is epistemology?",
+      "How does logic work in philosophy?"
+    ];
+
+    // Get random academic questions
+    function getRandomQuestions(count = 5) {
+      const shuffled = [...academicQuestions].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count);
+    }
+
+    // Populate suggested prompts
+    function populateSuggestedPrompts() {
+      const promptsContainer = document.getElementById('suggestedPrompts');
+      if (!promptsContainer) return;
+
+      const randomQuestions = getRandomQuestions(5);
+      promptsContainer.innerHTML = randomQuestions.map(q =>
+        `<div class="prompt-chip" onclick="sendPrompt('${q.replace(/'/g, "\\'")}')">${q}</div>`
+      ).join('');
     }
 
     // Send suggested prompt
@@ -925,15 +1035,18 @@
       welcomeDiv.id = 'welcomeScreen';
       const firstName = currentUser?.email?.split('@')[0] || 'there';
       const capitalizedName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+      // Generate random academic questions
+      const randomQuestions = getRandomQuestions(5);
+      const promptChipsHTML = randomQuestions.map(q =>
+        `<div class="prompt-chip" onclick="sendPrompt('${q.replace(/'/g, "\\'")}')">${q}</div>`
+      ).join('');
+
       welcomeDiv.innerHTML = `
         <div class="welcome-greeting">Hi ${capitalizedName}</div>
         <h1 class="welcome-title">Where should we start?</h1>
         <div class="suggested-prompts">
-          <div class="prompt-chip" onclick="sendPrompt('Explain this concept in simple terms')">Explain a concept</div>
-          <div class="prompt-chip" onclick="sendPrompt('Help me study for my exam')">Study for exam</div>
-          <div class="prompt-chip" onclick="sendPrompt('Quiz me on this topic')">Quiz me</div>
-          <div class="prompt-chip" onclick="sendPrompt('Summarize my notes')">Summarize notes</div>
-          <div class="prompt-chip" onclick="sendPrompt('What are the key points?')">Key points</div>
+          ${promptChipsHTML}
         </div>
       `;
       messagesContainer.appendChild(welcomeDiv);
