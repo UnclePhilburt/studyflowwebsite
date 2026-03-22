@@ -328,6 +328,14 @@
       </div>
 
       <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="OzarkCoder" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]{3,20}">
+        <div style="font-size: 12px; color: #6b8575; margin-top: 6px;">
+          3-20 characters, letters, numbers, and underscores only. This will be shown when you contribute to the Nexus!
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="email">Email</label>
         <input type="email" id="email" placeholder="your@email.com" required>
       </div>
@@ -424,6 +432,7 @@
 
     const signupForm = document.getElementById('signupForm');
     const nameInput = document.getElementById('name');
+    const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const termsInput = document.getElementById('terms');
@@ -453,6 +462,7 @@
       hideMessages();
 
       const name = nameInput.value.trim();
+      const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
       const ageGate = document.getElementById('ageGate').checked;
@@ -461,8 +471,14 @@
       const academicIntegrity = document.getElementById('academicIntegrity').checked;
       const terms = termsInput.checked;
 
-      if (!name || !email || !password) {
+      if (!name || !username || !email || !password) {
         showError('Please fill in all fields');
+        return;
+      }
+
+      // Validate username format
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+        showError('Username must be 3-20 characters (letters, numbers, underscores only)');
         return;
       }
 
@@ -501,7 +517,8 @@
           password: password,
           options: {
             data: {
-              full_name: name
+              full_name: name,
+              username: username
             }
           }
         });
