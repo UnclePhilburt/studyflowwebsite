@@ -120,128 +120,86 @@
       text-align: center;
     }
 
-    /* Beautiful Note Cloud */
+    /* Zen Minimal Design */
     .brain-animation-container {
       position: relative;
-      min-height: 350px;
+      min-height: 280px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 40px;
-      padding: 40px 20px;
+      gap: 50px;
+      padding: 60px 40px;
     }
 
-    /* Floating Notes Grid */
-    .floating-notes {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      width: 100%;
-      max-width: 700px;
-    }
-
-    .floating-note {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(124, 152, 133, 0.2);
-      border-radius: 16px;
-      padding: 24px 16px;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.12);
-      animation: floatUp 0.8s ease both, gentleFloat 4s ease-in-out infinite;
-      transition: all 0.4s ease;
-    }
-
-    .floating-note:hover {
-      transform: translateY(-8px) scale(1.05);
-      box-shadow: 0 16px 48px rgba(124, 152, 133, 0.2);
-      border-color: rgba(124, 152, 133, 0.4);
-    }
-
-    @keyframes floatUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes gentleFloat {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .floating-note:nth-child(1) { animation-delay: 0.1s, 0s; }
-    .floating-note:nth-child(2) { animation-delay: 0.2s, 1s; }
-    .floating-note:nth-child(3) { animation-delay: 0.3s, 2s; }
-    .floating-note:nth-child(4) { animation-delay: 0.4s, 3s; }
-
-    .floating-note-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-      opacity: 0.8;
-    }
-
-    .floating-note-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 6px;
-    }
-
-    .floating-note-count {
-      font-size: 11px;
-      color: #7c9885;
-      font-weight: 600;
-    }
-
-    /* Center Message */
-    .brain-message {
-      text-align: center;
-      max-width: 600px;
-      animation: fadeIn 1s ease 0.6s both;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .brain-message h3 {
+    /* Zen Number Display */
+    .zen-number {
       font-family: 'Lora', serif;
-      font-size: 28px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 12px;
+      font-size: 72px;
+      font-weight: 400;
       background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      letter-spacing: -2px;
+      animation: fadeIn 1.2s ease both;
     }
 
-    .brain-message p {
-      font-size: 15px;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Zen Dots */
+    .zen-dots {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      animation: fadeIn 1.5s ease 0.3s both;
+    }
+
+    .zen-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      opacity: 0.4;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .zen-dot:nth-child(1) { animation-delay: 0s; }
+    .zen-dot:nth-child(2) { animation-delay: 0.5s; }
+    .zen-dot:nth-child(3) { animation-delay: 1s; }
+    .zen-dot:nth-child(4) { animation-delay: 1.5s; }
+    .zen-dot:nth-child(5) { animation-delay: 2s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.3); }
+    }
+
+    /* Zen Text */
+    .zen-text {
+      text-align: center;
+      max-width: 500px;
+      animation: fadeIn 1.8s ease 0.6s both;
+    }
+
+    .zen-text-main {
+      font-family: 'Lora', serif;
+      font-size: 20px;
+      font-weight: 400;
       color: #5a5a5a;
+      margin-bottom: 12px;
       line-height: 1.6;
     }
 
-    .collective-stat {
-      margin-top: 30px;
-      text-align: center;
-      padding: 24px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.08) 100%);
-      border-radius: 12px;
+    .zen-text-sub {
+      font-size: 14px;
+      color: #8a8a8a;
+      font-weight: 400;
     }
 
-    .collective-stat strong {
-      color: #7c9885;
-      font-size: 26px;
-      font-weight: 700;
-    }
-
-    .collective-stat-text {
-      font-size: 16px;
-      color: #5a5a5a;
-      margin-top: 6px;
-    }
 
 
     /* Login Section - Right Side */
@@ -445,47 +403,30 @@
       }
 
       .brain-animation-container {
-        padding: 30px 15px;
+        padding: 40px 20px;
         min-height: auto;
+        gap: 40px;
       }
 
-      .floating-notes {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        max-width: 100%;
+      .zen-number {
+        font-size: 56px;
       }
 
-      .floating-note {
-        padding: 20px 12px;
+      .zen-dots {
+        gap: 12px;
       }
 
-      .floating-note-icon {
-        font-size: 28px;
-        margin-bottom: 10px;
+      .zen-dot {
+        width: 6px;
+        height: 6px;
       }
 
-      .floating-note-label {
-        font-size: 12px;
+      .zen-text-main {
+        font-size: 18px;
       }
 
-      .floating-note-count {
-        font-size: 10px;
-      }
-
-      .brain-message h3 {
-        font-size: 22px;
-      }
-
-      .brain-message p {
-        font-size: 14px;
-      }
-
-      .collective-stat strong {
-        font-size: 22px;
-      }
-
-      .collective-stat-text {
-        font-size: 14px;
+      .zen-text-sub {
+        font-size: 13px;
       }
     }
   </style>
@@ -505,48 +446,29 @@
 
       <!-- Collective Brain - Main Feature -->
       <div class="collective-brain">
-        <h2>The Collective Brain</h2>
-        <p>Notes from thousands of students interconnect to create a smarter AI for everyone.</p>
+        <h2>Collective Intelligence</h2>
+        <p>Thousands of students' knowledge, unified into one learning experience.</p>
 
         <div class="brain-animation-container">
-          <!-- Floating Notes -->
-          <div class="floating-notes">
-            <div class="floating-note">
-              <div class="floating-note-icon">📚</div>
-              <div class="floating-note-label">Biology</div>
-              <div class="floating-note-count">2,847 notes</div>
-            </div>
+          <!-- Zen Number -->
+          <div class="zen-number">12,847</div>
 
-            <div class="floating-note">
-              <div class="floating-note-icon">🧪</div>
-              <div class="floating-note-label">Chemistry</div>
-              <div class="floating-note-count">1,923 notes</div>
-            </div>
-
-            <div class="floating-note">
-              <div class="floating-note-icon">📐</div>
-              <div class="floating-note-label">Mathematics</div>
-              <div class="floating-note-count">3,421 notes</div>
-            </div>
-
-            <div class="floating-note">
-              <div class="floating-note-icon">🧠</div>
-              <div class="floating-note-label">Psychology</div>
-              <div class="floating-note-count">1,656 notes</div>
-            </div>
+          <!-- Zen Dots -->
+          <div class="zen-dots">
+            <div class="zen-dot"></div>
+            <div class="zen-dot"></div>
+            <div class="zen-dot"></div>
+            <div class="zen-dot"></div>
+            <div class="zen-dot"></div>
           </div>
 
-          <!-- Center Message -->
-          <div class="brain-message">
-            <h3>12,847 notes power your answers</h3>
-            <p>Every student's contribution creates a smarter AI that understands your specific courses and curriculum</p>
+          <!-- Zen Text -->
+          <div class="zen-text">
+            <div class="zen-text-main">notes from students across 300 universities</div>
+            <div class="zen-text-sub">One collective intelligence growing smarter every day</div>
           </div>
         </div>
 
-        <div class="collective-stat">
-          <div><strong>Growing smarter every day</strong></div>
-          <div class="collective-stat-text">300+ universities • 12,847 notes • One collective intelligence</div>
-        </div>
       </div>
 
     </div>
