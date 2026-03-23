@@ -370,9 +370,9 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="email">College Email (.edu)</label>
-              <input type="email" id="email" placeholder="your@university.edu" required>
-              <div class="form-hint">Required per <a href="age-safety.html" target="_blank">Missouri law</a></div>
+              <label for="email">Email</label>
+              <input type="email" id="email" placeholder="you@example.com" required>
+              <div class="form-hint">.edu email needed later for <a href="age-safety.html" target="_blank">Nexus access</a></div>
             </div>
             <div class="form-group">
               <label for="password">Password</label>
@@ -564,12 +564,6 @@
 
       if (!legalName || !username || !email || !address || !city || !state || !zipCode || !password || !birthdate) {
         showError('Please fill in all fields');
-        return;
-      }
-
-      // Validate .edu email (Missouri SB 1455 age verification)
-      if (!email.toLowerCase().endsWith('.edu')) {
-        showError('StudyFlow requires a valid .edu email address. This helps us verify you are a college student (18+) as required by Missouri law.');
         return;
       }
 
