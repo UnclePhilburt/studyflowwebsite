@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Calendar - StudyFlow Suite</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Calendar - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -13,50 +13,346 @@
     }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e8ede8 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       min-height: 100vh;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .header {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .header-title {
-      font-size: 28px;
-      font-weight: 700;
       color: #2d2d2d;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(232, 155, 95, 0.02) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .nav-link {
+      color: #5d5d5d;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .nav-link:hover {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .nav-link.active {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.12);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .header-left h1 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 8px;
     }
 
-    .header-subtitle {
+    .header-left p {
+      font-size: 1rem;
       color: #5d5d5d;
-      font-size: 15px;
     }
 
-    .upload-section {
+    .header-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .upload-syllabus-btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .upload-syllabus-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .month-nav button {
       background: white;
-      padding: 24px;
-      border-radius: 16px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #5d5d5d;
+      font-size: 18px;
     }
 
-    .section-title {
-      font-size: 20px;
+    .month-nav button:hover {
+      border-color: #7c9885;
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.05);
+    }
+
+    .current-month {
+      font-size: 1.25rem;
       font-weight: 600;
       color: #2d2d2d;
-      margin-bottom: 16px;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    /* Calendar Grid */
+    .calendar-wrapper {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      flex: 1;
+    }
+
+    .day-header {
+      text-align: center;
+      padding: 12px 0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #7c9885;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .calendar-day {
+      background: rgba(124, 152, 133, 0.03);
+      border: 2px solid rgba(124, 152, 133, 0.1);
+      border-radius: 12px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .calendar-day:hover {
+      border-color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .calendar-day.other-month {
+      opacity: 0.3;
+    }
+
+    .calendar-day.today {
+      border-color: #e89b5f;
+      background: rgba(232, 155, 95, 0.08);
+    }
+
+    .day-number {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+    }
+
+    .day-events {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      max-height: 100%;
+    }
+
+    .event-dot {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      background: rgba(124, 152, 133, 0.15);
+      color: #6b8575;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .event-dot:hover {
+      background: rgba(124, 152, 133, 0.25);
+      transform: scale(1.02);
+    }
+
+    .event-dot.assignment { background: rgba(124, 152, 133, 0.15); color: #6b8575; }
+    .event-dot.exam { background: rgba(217, 83, 79, 0.15); color: #d9534f; }
+    .event-dot.quiz { background: rgba(240, 173, 78, 0.15); color: #f0ad4e; }
+    .event-dot.project { background: rgba(91, 192, 222, 0.15); color: #5bc0de; }
+    .event-dot.reading { background: rgba(138, 109, 183, 0.15); color: #8a6db7; }
+
+    /* Upload Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #5d5d5d;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+
+    .close-btn:hover {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
     }
 
     .upload-form {
@@ -70,6 +366,10 @@
       flex-direction: column;
     }
 
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
     .form-group label {
       font-size: 14px;
       font-weight: 500;
@@ -77,7 +377,7 @@
       margin-bottom: 8px;
     }
 
-    .form-group input, .form-group select {
+    .form-group input {
       padding: 12px 16px;
       border: 2px solid rgba(124, 152, 133, 0.2);
       border-radius: 10px;
@@ -86,7 +386,7 @@
       transition: all 0.3s ease;
     }
 
-    .form-group input:focus, .form-group select:focus {
+    .form-group input:focus {
       outline: none;
       border-color: #7c9885;
       box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.1);
@@ -123,7 +423,7 @@
       border-color: #7c9885;
     }
 
-    .upload-btn {
+    .submit-btn {
       grid-column: 1 / -1;
       padding: 14px 32px;
       background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
@@ -134,91 +434,94 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      margin-top: 8px;
     }
 
-    .upload-btn:hover {
+    .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
     }
 
-    .calendar-section {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .events-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .event-card {
-      background: rgba(124, 152, 133, 0.05);
-      border: 2px solid rgba(124, 152, 133, 0.15);
-      border-radius: 12px;
-      padding: 16px;
-      transition: all 0.3s ease;
-    }
-
-    .event-card:hover {
-      border-color: #7c9885;
-      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.15);
-    }
-
-    .event-card.completed {
+    .submit-btn:disabled {
       opacity: 0.6;
-      background: rgba(0, 0, 0, 0.02);
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .event-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      margin-bottom: 8px;
+    /* Event Details Modal */
+    .event-details-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2001;
+      animation: fadeIn 0.3s ease;
     }
 
-    .event-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #2d2d2d;
+    .event-details-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
 
-    .event-type {
+    .event-type-badge {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 6px 12px;
       background: rgba(124, 152, 133, 0.15);
       color: #6b8575;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
+      margin-bottom: 16px;
     }
 
-    .event-details {
+    .event-type-badge.assignment { background: rgba(124, 152, 133, 0.15); color: #6b8575; }
+    .event-type-badge.exam { background: rgba(217, 83, 79, 0.15); color: #d9534f; }
+    .event-type-badge.quiz { background: rgba(240, 173, 78, 0.15); color: #f0ad4e; }
+    .event-type-badge.project { background: rgba(91, 192, 222, 0.15); color: #5bc0de; }
+    .event-type-badge.reading { background: rgba(138, 109, 183, 0.15); color: #8a6db7; }
+
+    .event-detail-row {
+      margin-bottom: 16px;
+    }
+
+    .event-detail-label {
+      font-size: 12px;
       color: #5d5d5d;
-      font-size: 14px;
-      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
     }
 
-    .event-date {
-      color: #7c9885;
-      font-weight: 600;
+    .event-detail-value {
+      font-size: 16px;
+      color: #2d2d2d;
+      font-weight: 500;
     }
 
     .event-actions {
       display: flex;
-      gap: 8px;
-      margin-top: 12px;
+      gap: 12px;
+      margin-top: 24px;
     }
 
     .event-btn {
-      padding: 6px 14px;
+      flex: 1;
+      padding: 10px 20px;
       border: none;
-      border-radius: 8px;
-      font-size: 13px;
+      border-radius: 10px;
+      font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -242,24 +545,41 @@
       background: rgba(217, 83, 79, 0.25);
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #9ca3af;
-    }
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
     .loading {
       text-align: center;
       padding: 40px;
       color: #5d5d5d;
+      font-size: 1.125rem;
     }
 
     @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .header-left h1 {
+        font-size: 2rem;
+      }
+
+      .calendar-grid {
+        gap: 4px;
+      }
+
+      .calendar-day {
+        padding: 4px;
+      }
+
+      .day-number {
+        font-size: 0.75rem;
+      }
+
+      .event-dot {
+        font-size: 0.6rem;
+        padding: 1px 4px;
+      }
+
       .upload-form {
         grid-template-columns: 1fr;
       }
@@ -267,15 +587,58 @@
   </style>
 </head>
 <body>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="notes.html" class="nav-link">Notes</a>
+    <a href="browse.html" class="nav-link">Browse</a>
+    <a href="calendar.html" class="nav-link active">Calendar</a>
+    <div class="user-avatar" id="userAvatar" onclick="logout()"></div>
+  </div>
+
   <div class="container">
+    <!-- Header -->
     <div class="header">
-      <h1 class="header-title">My Calendar</h1>
-      <p class="header-subtitle">Upload your syllabus to automatically extract assignments and exams</p>
+      <div class="header-left">
+        <h1>My Calendar</h1>
+        <p>Track assignments, exams, and important dates</p>
+      </div>
+      <div class="header-right">
+        <div class="month-nav">
+          <button onclick="previousMonth()">‹</button>
+          <div class="current-month" id="currentMonth">January 2026</div>
+          <button onclick="nextMonth()">›</button>
+        </div>
+        <button class="upload-syllabus-btn" onclick="openUploadModal()">
+          <span>📄</span>
+          Upload Syllabus
+        </button>
+      </div>
     </div>
 
-    <!-- Upload Syllabus Section -->
-    <div class="upload-section">
-      <h2 class="section-title">Upload Course Syllabus</h2>
+    <!-- Calendar Grid -->
+    <div class="calendar-wrapper">
+      <div class="calendar-grid" id="calendarGrid">
+        <div class="day-header">Sun</div>
+        <div class="day-header">Mon</div>
+        <div class="day-header">Tue</div>
+        <div class="day-header">Wed</div>
+        <div class="day-header">Thu</div>
+        <div class="day-header">Fri</div>
+        <div class="day-header">Sat</div>
+        <!-- Calendar days will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Syllabus Modal -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Upload Course Syllabus</h2>
+        <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+      </div>
       <form id="uploadForm" class="upload-form">
         <div class="form-group">
           <label>Course Name *</label>
@@ -297,7 +660,7 @@
           <input type="text" id="semester" placeholder="e.g., Fall 2026">
         </div>
 
-        <div class="form-group" style="grid-column: 1 / -1;">
+        <div class="form-group full-width">
           <label>Syllabus File (PDF or DOCX) *</label>
           <div class="file-input-wrapper">
             <input type="file" id="fileInput" accept=".pdf,.docx,.doc" required>
@@ -307,14 +670,48 @@
           </div>
         </div>
 
-        <button type="submit" class="upload-btn">Upload & Extract Calendar Events</button>
+        <button type="submit" class="submit-btn">Upload & Extract Calendar Events</button>
       </form>
     </div>
+  </div>
 
-    <!-- Calendar Events Section -->
-    <div class="calendar-section">
-      <h2 class="section-title">Upcoming Events</h2>
-      <div id="eventsContainer" class="loading">Loading events...</div>
+  <!-- Event Details Modal -->
+  <div class="event-details-modal" id="eventDetailsModal">
+    <div class="event-details-content">
+      <div class="modal-header">
+        <div>
+          <span class="event-type-badge" id="eventTypeBadge">Assignment</span>
+          <h2 class="modal-title" id="eventTitle">Event Title</h2>
+        </div>
+        <button class="close-btn" onclick="closeEventDetails()">&times;</button>
+      </div>
+
+      <div class="event-detail-row">
+        <div class="event-detail-label">Due Date</div>
+        <div class="event-detail-value" id="eventDueDate">January 15, 2026</div>
+      </div>
+
+      <div class="event-detail-row" id="eventTimeRow" style="display: none;">
+        <div class="event-detail-label">Due Time</div>
+        <div class="event-detail-value" id="eventDueTime">11:59 PM</div>
+      </div>
+
+      <div class="event-detail-row" id="eventCourseRow" style="display: none;">
+        <div class="event-detail-label">Course</div>
+        <div class="event-detail-value" id="eventCourse">PSY101</div>
+      </div>
+
+      <div class="event-detail-row" id="eventDescriptionRow" style="display: none;">
+        <div class="event-detail-label">Description</div>
+        <div class="event-detail-value" id="eventDescription">Event description</div>
+      </div>
+
+      <div class="event-actions">
+        <button class="event-btn complete-btn" id="completeBtn" onclick="toggleEventComplete()">
+          Mark Complete
+        </button>
+        <button class="event-btn delete-btn" onclick="deleteEvent()">Delete</button>
+      </div>
     </div>
   </div>
 
@@ -326,6 +723,9 @@
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let authToken = null;
+    let allEvents = [];
+    let currentDate = new Date();
+    let selectedEvent = null;
 
     // Check auth and load events
     (async function() {
@@ -336,8 +736,45 @@
       }
 
       authToken = session.access_token;
+
+      // Set user avatar
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user && user.email) {
+        document.getElementById('userAvatar').textContent = user.email.charAt(0).toUpperCase();
+      }
+
       await loadEvents();
+      renderCalendar();
     })();
+
+    // Logout function
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+
+    // Modal functions
+    function openUploadModal() {
+      document.getElementById('uploadModal').style.display = 'block';
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').style.display = 'none';
+      document.getElementById('uploadForm').reset();
+      document.getElementById('fileLabel').textContent = 'Choose File (PDF or DOCX)';
+    }
+
+    function closeEventDetails() {
+      document.getElementById('eventDetailsModal').style.display = 'none';
+      selectedEvent = null;
+    }
+
+    // Close modals on background click
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal') || event.target.classList.contains('event-details-modal')) {
+        event.target.style.display = 'none';
+      }
+    }
 
     // File input label update
     document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -356,9 +793,9 @@
       formData.append('professor_name', document.getElementById('professorName').value);
       formData.append('semester', document.getElementById('semester').value);
 
-      const uploadBtn = document.querySelector('.upload-btn');
-      uploadBtn.disabled = true;
-      uploadBtn.textContent = 'Uploading & Extracting...';
+      const submitBtn = document.querySelector('.submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading & Extracting...';
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/syllabus/upload`, {
@@ -373,9 +810,9 @@
 
         if (response.ok) {
           alert(`Success! Extracted ${data.events.length} calendar events`);
-          document.getElementById('uploadForm').reset();
-          document.getElementById('fileLabel').textContent = 'Choose File (PDF or DOCX)';
+          closeUploadModal();
           await loadEvents();
+          renderCalendar();
         } else {
           alert('Upload failed: ' + (data.error || 'Unknown error'));
         }
@@ -383,8 +820,8 @@
         console.error('Upload error:', error);
         alert('Upload failed: ' + error.message);
       } finally {
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = 'Upload & Extract Calendar Events';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Upload & Extract Calendar Events';
       }
     });
 
@@ -400,65 +837,167 @@
         const data = await response.json();
 
         if (response.ok) {
-          displayEvents(data.events);
+          allEvents = data.events || [];
         } else {
-          document.getElementById('eventsContainer').innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>Failed to load events</p></div>';
+          console.error('Failed to load events');
         }
       } catch (error) {
         console.error('Load events error:', error);
-        document.getElementById('eventsContainer').innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>Error loading events</p></div>';
       }
     }
 
-    // Display events
-    function displayEvents(events) {
-      const container = document.getElementById('eventsContainer');
+    // Calendar navigation
+    function previousMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    }
 
-      if (!events || events.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div><p>No events yet. Upload a syllabus to get started!</p></div>';
-        return;
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
+
+    // Render calendar
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      // Update month display
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+      document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+
+      // Get first day of month and number of days
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      // Get today's date for highlighting
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+      const todayDate = today.getDate();
+
+      // Clear existing calendar (keep headers)
+      const grid = document.getElementById('calendarGrid');
+      const headers = Array.from(grid.children).slice(0, 7);
+      grid.innerHTML = '';
+      headers.forEach(h => grid.appendChild(h));
+
+      // Add previous month's trailing days
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const day = daysInPrevMonth - i;
+        const dayDiv = createDayElement(day, year, month - 1, true);
+        grid.appendChild(dayDiv);
       }
 
-      container.innerHTML = '<div class="events-list">' +
-        events.map(event => `
-          <div class="event-card ${event.completed ? 'completed' : ''}">
-            <div class="event-header">
-              <div>
-                <div class="event-title">${event.title}</div>
-                <div class="event-details">
-                  <span class="event-date">${formatDate(event.due_date)}${event.due_time ? ' at ' + event.due_time : ''}</span>
-                  ${event.course_name ? ' • ' + event.course_name : ''}
-                  ${event.course_code ? ' (' + event.course_code + ')' : ''}
-                </div>
-                ${event.description ? '<div class="event-details">' + event.description + '</div>' : ''}
-              </div>
-              <span class="event-type">${event.event_type}</span>
-            </div>
-            <div class="event-actions">
-              <button class="event-btn complete-btn" onclick="toggleComplete('${event.id}', ${!event.completed})">
-                ${event.completed ? 'Mark Incomplete' : 'Mark Complete'}
-              </button>
-              <button class="event-btn delete-btn" onclick="deleteEvent('${event.id}')">Delete</button>
-            </div>
-          </div>
-        `).join('') +
-        '</div>';
+      // Add current month's days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const isToday = isCurrentMonth && day === todayDate;
+        const dayDiv = createDayElement(day, year, month, false, isToday);
+        grid.appendChild(dayDiv);
+      }
+
+      // Add next month's leading days
+      const remainingCells = 42 - (firstDay + daysInMonth); // 6 rows * 7 days
+      for (let day = 1; day <= remainingCells; day++) {
+        const dayDiv = createDayElement(day, year, month + 1, true);
+        grid.appendChild(dayDiv);
+      }
+    }
+
+    // Create day element
+    function createDayElement(day, year, month, isOtherMonth = false, isToday = false) {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'calendar-day';
+      if (isOtherMonth) dayDiv.classList.add('other-month');
+      if (isToday) dayDiv.classList.add('today');
+
+      const dayNumber = document.createElement('div');
+      dayNumber.className = 'day-number';
+      dayNumber.textContent = day;
+      dayDiv.appendChild(dayNumber);
+
+      const eventsContainer = document.createElement('div');
+      eventsContainer.className = 'day-events';
+
+      // Find events for this day
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const dayEvents = allEvents.filter(e => e.due_date === dateStr);
+
+      dayEvents.forEach(event => {
+        const eventDot = document.createElement('div');
+        eventDot.className = `event-dot ${event.event_type}`;
+        eventDot.textContent = event.title;
+        eventDot.onclick = (e) => {
+          e.stopPropagation();
+          showEventDetails(event);
+        };
+        eventsContainer.appendChild(eventDot);
+      });
+
+      dayDiv.appendChild(eventsContainer);
+      return dayDiv;
+    }
+
+    // Show event details
+    function showEventDetails(event) {
+      selectedEvent = event;
+
+      document.getElementById('eventTypeBadge').textContent = event.event_type;
+      document.getElementById('eventTypeBadge').className = `event-type-badge ${event.event_type}`;
+      document.getElementById('eventTitle').textContent = event.title;
+      document.getElementById('eventDueDate').textContent = formatDate(event.due_date);
+
+      // Due time
+      if (event.due_time) {
+        document.getElementById('eventTimeRow').style.display = 'block';
+        document.getElementById('eventDueTime').textContent = event.due_time;
+      } else {
+        document.getElementById('eventTimeRow').style.display = 'none';
+      }
+
+      // Course
+      if (event.course_name || event.course_code) {
+        document.getElementById('eventCourseRow').style.display = 'block';
+        const courseText = event.course_name + (event.course_code ? ` (${event.course_code})` : '');
+        document.getElementById('eventCourse').textContent = courseText;
+      } else {
+        document.getElementById('eventCourseRow').style.display = 'none';
+      }
+
+      // Description
+      if (event.description) {
+        document.getElementById('eventDescriptionRow').style.display = 'block';
+        document.getElementById('eventDescription').textContent = event.description;
+      } else {
+        document.getElementById('eventDescriptionRow').style.display = 'none';
+      }
+
+      // Complete button
+      const completeBtn = document.getElementById('completeBtn');
+      completeBtn.textContent = event.completed ? 'Mark Incomplete' : 'Mark Complete';
+
+      document.getElementById('eventDetailsModal').style.display = 'block';
     }
 
     // Toggle event completion
-    async function toggleComplete(eventId, completed) {
+    async function toggleEventComplete() {
+      if (!selectedEvent) return;
+
       try {
-        const response = await fetch(`${BACKEND_URL}/api/calendar/events/${eventId}`, {
+        const response = await fetch(`${BACKEND_URL}/api/calendar/events/${selectedEvent.id}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ completed: completed })
+          body: JSON.stringify({ completed: !selectedEvent.completed })
         });
 
         if (response.ok) {
           await loadEvents();
+          renderCalendar();
+          closeEventDetails();
         } else {
           alert('Failed to update event');
         }
@@ -469,11 +1008,12 @@
     }
 
     // Delete event
-    async function deleteEvent(eventId) {
+    async function deleteEvent() {
+      if (!selectedEvent) return;
       if (!confirm('Are you sure you want to delete this event?')) return;
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/calendar/events/${eventId}`, {
+        const response = await fetch(`${BACKEND_URL}/api/calendar/events/${selectedEvent.id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${authToken}`
@@ -482,6 +1022,8 @@
 
         if (response.ok) {
           await loadEvents();
+          renderCalendar();
+          closeEventDetails();
         } else {
           alert('Failed to delete event');
         }
@@ -493,11 +1035,11 @@
 
     // Format date helper
     function formatDate(dateStr) {
-      const date = new Date(dateStr);
+      const date = new Date(dateStr + 'T00:00:00');
       return date.toLocaleDateString('en-US', {
-        weekday: 'short',
+        weekday: 'long',
         year: 'numeric',
-        month: 'short',
+        month: 'long',
         day: 'numeric'
       });
     }
