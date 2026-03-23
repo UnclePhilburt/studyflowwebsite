@@ -1097,10 +1097,14 @@
       } else {
         // Show actual usage stats
         impactIcon.textContent = '🌱';
-        impactText.innerHTML = `Your notes have helped <span class="impact-count">${totalUsage}</span> students`;
+        impactText.innerHTML = `Your notes have helped <span class="impact-count" id="totalUsage">${totalUsage}</span> students`;
       }
 
-      document.getElementById('totalUsage').textContent = totalUsage;
+      // Only update if element exists (for when totalUsage > 0)
+      const totalUsageElem = document.getElementById('totalUsage');
+      if (totalUsageElem) {
+        totalUsageElem.textContent = totalUsage;
+      }
       document.getElementById('weeklyUsage').textContent = stats.weeklyUsage || 0;
       document.getElementById('activeNotes').textContent = stats.activeNotes || 0;
 
@@ -1466,16 +1470,19 @@
 
     async function toggleNoteVisibility() {
       if (!contextMenuItem || contextMenuItem.type !== 'note') return;
+
+      // Save the note ID before closing menu (which sets contextMenuItem to null)
+      const noteId = contextMenuItem.id;
       closeContextMenu();
 
-      const note = allNotes.find(n => n.id === contextMenuItem.id);
+      const note = allNotes.find(n => n.id === noteId);
       if (!note) return;
 
       const currentlyPublic = note.is_public !== false;
       const newPublicState = !currentlyPublic;
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/notes/${contextMenuItem.id}/visibility`, {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/visibility`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
