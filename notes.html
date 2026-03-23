@@ -589,6 +589,39 @@
       color: #dc6450;
     }
 
+    .context-menu-item.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      position: relative;
+    }
+
+    .context-menu-item.disabled:hover {
+      background: transparent;
+    }
+
+    .context-menu-item.disabled::after {
+      content: 'Good Standing required';
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 10px;
+      background: #2d2d2d;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 1000;
+    }
+
+    .context-menu-item.disabled:hover::after {
+      opacity: 1;
+    }
+
     /* Modal */
     .modal-overlay {
       position: fixed;
@@ -913,6 +946,37 @@
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
     }
 
+    .preview-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+      position: relative;
+    }
+
+    .preview-btn:disabled::before {
+      content: 'Good Standing required';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 8px;
+      background: #2d2d2d;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 1000;
+    }
+
+    .preview-btn:disabled:hover::before {
+      opacity: 1;
+    }
+
     .preview-loading {
       position: absolute;
       top: 50%;
@@ -1142,6 +1206,7 @@
     let isDraggingFreeForm = false;
     let dragOffset = { x: 0, y: 0 };
     let previewedNote = null;
+    let isInGoodStanding = false; // Track Good Standing status
     let mouseDownPos = { x: 0, y: 0 };
     let hasMoved = false;
 
@@ -1242,6 +1307,35 @@
         if (data.dmca_strikes > 0) {
           strikeDisplay.style.display = 'block';
           strikeCount.textContent = data.dmca_strikes;
+        }
+
+        // Update global Good Standing status
+        isInGoodStanding = data.good_standing && !data.permanent_bad_standing;
+
+        // Update download buttons based on Good Standing
+        const contextDownloadBtn = document.getElementById('contextDownload');
+        const previewDownloadBtns = document.querySelectorAll('.preview-btn');
+
+        if (!isInGoodStanding) {
+          // Disable download buttons when not in good standing
+          if (contextDownloadBtn) {
+            contextDownloadBtn.classList.add('disabled');
+          }
+          previewDownloadBtns.forEach(btn => {
+            if (btn.textContent.includes('Download')) {
+              btn.disabled = true;
+            }
+          });
+        } else {
+          // Enable download buttons when in good standing
+          if (contextDownloadBtn) {
+            contextDownloadBtn.classList.remove('disabled');
+          }
+          previewDownloadBtns.forEach(btn => {
+            if (btn.textContent.includes('Download')) {
+              btn.disabled = false;
+            }
+          });
         }
 
         // Update UI based on status
@@ -1716,6 +1810,14 @@
 
     async function downloadItem() {
       if (!contextMenuItem || contextMenuItem.type !== 'note') return;
+
+      // Check Good Standing status
+      if (!isInGoodStanding) {
+        alert('Good Standing required to download notes.\n\nUpload a verified note or subscribe to regain access.');
+        closeContextMenu();
+        return;
+      }
+
       closeContextMenu();
 
       const note = allNotes.find(n => n.id === contextMenuItem.id);
@@ -2197,6 +2299,12 @@
     }
 
     async function downloadPreviewedNote() {
+      // Check Good Standing status
+      if (!isInGoodStanding) {
+        alert('Good Standing required to download notes.\n\nUpload a verified note or subscribe to regain access.');
+        return;
+      }
+
       if (previewedNote) {
         await downloadNote(previewedNote.id, previewedNote.filename);
       }
