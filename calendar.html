@@ -670,6 +670,23 @@
           </div>
         </div>
 
+        <!-- Privacy Disclosure (SB 1324) -->
+        <div class="form-group full-width" style="margin-top: 16px;">
+          <div style="background: rgba(124, 152, 133, 0.08); padding: 12px; border-radius: 8px; font-size: 13px; color: #5d5d5d; line-height: 1.6;">
+            <strong>Privacy Notice:</strong> We extract only dates, times, and assignment names from your syllabus to generate your calendar. Your syllabus file is processed and immediately discarded - we do not store or share the original document. We do not use your syllabus to train AI models.
+          </div>
+        </div>
+
+        <!-- Academic Integrity Certification (HB 2271) -->
+        <div class="form-group full-width">
+          <label style="display: flex; align-items: start; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="certificationCheckbox" required style="margin-top: 4px;">
+            <span style="font-size: 13px; color: #2d2d2d; line-height: 1.5;">
+              I certify that my instructor allows the use of third-party planning tools. I am using this for personal time management only.
+            </span>
+          </label>
+        </div>
+
         <button type="submit" class="submit-btn">Upload & Extract Calendar Events</button>
       </form>
     </div>
@@ -704,6 +721,13 @@
       <div class="event-detail-row" id="eventDescriptionRow" style="display: none;">
         <div class="event-detail-label">Description</div>
         <div class="event-detail-value" id="eventDescription">Event description</div>
+      </div>
+
+      <!-- Attribution (Copyright Compliance) -->
+      <div class="event-detail-row" id="eventAttributionRow" style="margin-top: 16px;">
+        <div style="font-size: 11px; color: #9ca3af; font-style: italic;" id="eventAttribution">
+          Schedule derived from syllabus
+        </div>
       </div>
 
       <div class="event-actions">
@@ -972,6 +996,16 @@
       } else {
         document.getElementById('eventDescriptionRow').style.display = 'none';
       }
+
+      // Attribution (Copyright Compliance)
+      let attribution = 'Schedule derived from syllabus';
+      if (event.course_name) {
+        attribution = `Schedule derived from ${event.course_name}`;
+        if (event.course_code) {
+          attribution += ` (${event.course_code})`;
+        }
+      }
+      document.getElementById('eventAttribution').textContent = attribution;
 
       // Complete button
       const completeBtn = document.getElementById('completeBtn');
