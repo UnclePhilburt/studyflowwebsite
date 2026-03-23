@@ -1473,6 +1473,17 @@
       </div>
     </div>
 
+    <!-- AI Disclosure Modal (SB 1455 / GUARD Act) -->
+    <div class="zen-confirm-overlay" id="aiDisclosureOverlay">
+      <div class="zen-confirm-card">
+        <div class="zen-confirm-title">AI Disclosure Reminder</div>
+        <div class="zen-confirm-message">You are chatting with an AI assistant, not a human. StudyFlow's chatbot is powered by artificial intelligence (Gemini 3 Flash Lite). All responses are machine-generated and may contain errors. Please verify important information independently.</div>
+        <div class="zen-confirm-actions">
+          <button class="zen-confirm-btn confirm" id="aiDisclosureOk" style="background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(124, 152, 133, 0.1) 100%); color: #6b8575; border-color: rgba(124, 152, 133, 0.4);">I Understand</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Menu Button (appears after chat starts) -->
     <button class="menu-btn" id="menuBtn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1554,6 +1565,10 @@
     let conversations = [];
     let collectiveBrainEnabled = true;
 
+    // SB 1455 / GUARD Act: AI disclosure timer
+    let aiDisclosureTimerId = null;
+    const AI_DISCLOSURE_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+
     // DOM Elements
     const messagesContainer = document.getElementById('messagesContainer');
     const searchInput = document.getElementById('searchInput');
@@ -1614,6 +1629,9 @@
       } catch (error) {
         console.error('Error checking verification status:', error);
       }
+
+      // Start AI disclosure timer (SB 1455 / GUARD Act compliance)
+      startAiDisclosureTimer();
 
       // Fetch user profile from backend to get their name
       try {
@@ -2013,6 +2031,9 @@
       const message = messageText || searchInput.value.trim();
       if (!message) return;
 
+      // Reset AI disclosure timer on user activity (SB 1455)
+      startAiDisclosureTimer();
+
       // Transform to chat mode on first message
       if (!document.body.classList.contains('chat-started')) {
         document.body.classList.add('chat-started');
@@ -2136,6 +2157,33 @@
         bottomInput.disabled = false;
         bottomInput.focus();
       }
+    }
+
+    // ---- SB 1455 / GUARD Act: AI Disclosure Timer ----
+
+    function startAiDisclosureTimer() {
+      if (aiDisclosureTimerId) clearTimeout(aiDisclosureTimerId);
+      aiDisclosureTimerId = setTimeout(() => {
+        showAiDisclosure();
+      }, AI_DISCLOSURE_INTERVAL_MS);
+    }
+
+    function showAiDisclosure() {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('aiDisclosureOverlay');
+        const okBtn = document.getElementById('aiDisclosureOk');
+
+        overlay.classList.add('active');
+
+        const handleOk = () => {
+          overlay.classList.remove('active');
+          okBtn.removeEventListener('click', handleOk);
+          startAiDisclosureTimer();
+          resolve(true);
+        };
+
+        okBtn.addEventListener('click', handleOk);
+      });
     }
 
     // ---- SB 1324 Provenance Compliance ----

@@ -208,6 +208,118 @@
     .back-link:hover {
       text-decoration: underline;
     }
+
+    /* Modal (Missouri Legal Compliance) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(45, 45, 45, 0.4);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-card {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(45, 45, 45, 0.2);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 500;
+      font-family: 'Lora', Georgia, serif;
+      color: #2d2d2d;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 12px 28px;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+      border-color: rgba(124, 152, 133, 0.3);
+    }
+
+    .modal-btn.cancel:hover {
+      background: rgba(124, 152, 133, 0.2);
+    }
+
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
+      color: #2d2d2d;
+      border-color: rgba(124, 152, 133, 0.4);
+    }
+
+    .modal-btn.confirm:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.2) 100%);
+    }
+
+    .modal-btn.confirm:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .consent-body { margin-bottom: 24px; }
+
+    .consent-checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      line-height: 1.6;
+    }
+
+    .consent-checkbox-label input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: #7c9885;
+      cursor: pointer;
+    }
+
+    .consent-checkbox-text {
+      font-size: 13px;
+      color: #5d5d5d;
+    }
   </style>
 </head>
 <body>
@@ -219,6 +331,41 @@
       Source: <span id="watermark-username">@Loading...</span> - ID: <span id="watermark-id">#00000</span>
       <br>
       Not for Submission
+    </div>
+  </div>
+
+  <!-- Legal Consent Modal -->
+  <div class="modal-overlay" id="consentModal">
+    <div class="modal-card">
+      <div class="modal-title">Download Agreement</div>
+      <div class="consent-body">
+        <label class="consent-checkbox-label">
+          <input type="checkbox" id="consentCheckbox">
+          <span class="consent-checkbox-text">
+            I acknowledge this material may be AI-generated (SB 1324), is for personal study only
+            and not for submission as my own work (HB 2271), and I will not redistribute or sell
+            this file (DMCA).
+          </span>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="consentCancel">Cancel</button>
+        <button class="modal-btn confirm" id="consentDownload" disabled>Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Disclosure Modal -->
+  <div class="modal-overlay" id="aiNoticeModal">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-title">AI Content Notice</div>
+      <p style="font-size: 14px; color: #5d5d5d; text-align: center; line-height: 1.6; margin-bottom: 20px;">
+        This file may contain AI-generated content. AI outputs may be inaccurate
+        and should be independently verified. StudyFlow's AI is not human.
+      </p>
+      <div class="modal-actions">
+        <button class="modal-btn confirm" id="aiNoticeOk">Continue Download</button>
+      </div>
     </div>
   </div>
 
@@ -411,20 +558,97 @@
       }
     }
 
-    function downloadNote() {
-      // Show premium feature popup
-      const purpose = prompt('Why are you downloading this note? (Required for DMCA compliance)\n\nExample: "For personal study reference only"');
+    // ---- Missouri Compliance: Click-Wrap Consent ----
+    const LEGAL_VERSION = 'TOS_v2.4_2026';
 
-      if (!purpose || purpose.trim().length < 10) {
-        alert('Please provide a valid purpose (at least 10 characters).');
-        return;
-      }
+    function showConsentModal() {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('consentModal');
+        const checkbox = document.getElementById('consentCheckbox');
+        const downloadBtn = document.getElementById('consentDownload');
+        const cancelBtn = document.getElementById('consentCancel');
 
-      alert('Download feature coming soon!\n\nThis premium feature will:\n- Generate a watermarked PDF\n- Track the download for DMCA compliance\n- Require .edu verification and 5+ uploaded notes');
+        checkbox.checked = false;
+        downloadBtn.disabled = true;
+        overlay.classList.add('active');
+
+        const handleCheckbox = () => { downloadBtn.disabled = !checkbox.checked; };
+
+        const cleanup = () => {
+          overlay.classList.remove('active');
+          checkbox.removeEventListener('change', handleCheckbox);
+          downloadBtn.removeEventListener('click', handleDownload);
+          cancelBtn.removeEventListener('click', handleCancel);
+          overlay.removeEventListener('click', handleOverlay);
+        };
+
+        const handleDownload = async () => {
+          await logConsent(noteId);
+          cleanup();
+          resolve(true);
+        };
+
+        const handleCancel = () => { cleanup(); resolve(false); };
+        const handleOverlay = (e) => { if (e.target === overlay) handleCancel(); };
+
+        checkbox.addEventListener('change', handleCheckbox);
+        downloadBtn.addEventListener('click', handleDownload);
+        cancelBtn.addEventListener('click', handleCancel);
+        overlay.addEventListener('click', handleOverlay);
+      });
     }
 
-    function downloadFile() {
-      // Direct download for non-viewable formats
+    function showAiNotice() {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('aiNoticeModal');
+        const okBtn = document.getElementById('aiNoticeOk');
+        overlay.classList.add('active');
+
+        const handleOk = () => {
+          overlay.classList.remove('active');
+          okBtn.removeEventListener('click', handleOk);
+          resolve();
+        };
+        okBtn.addEventListener('click', handleOk);
+      });
+    }
+
+    async function logConsent(fileId) {
+      try {
+        await fetch(`${BACKEND_URL}/api/consent-log`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            file_id: fileId,
+            legal_version: LEGAL_VERSION,
+            action: 'download_consent'
+          })
+        });
+      } catch (error) {
+        console.error('Failed to log consent:', error);
+      }
+    }
+
+    async function downloadNote() {
+      if (!currentNote) return;
+
+      const consented = await showConsentModal();
+      if (!consented) return;
+
+      await showAiNotice();
+
+      alert('Download feature coming soon!\n\nYour consent has been recorded.');
+    }
+
+    async function downloadFile() {
+      const consented = await showConsentModal();
+      if (!consented) return;
+
+      await showAiNotice();
+
       window.location.href = `${BACKEND_URL}/api/notes/${noteId}/download`;
     }
 
