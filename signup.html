@@ -336,8 +336,11 @@
       </div>
 
       <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="your@email.com" required>
+        <label for="email">College Email (.edu)</label>
+        <input type="email" id="email" placeholder="your@university.edu" required>
+        <div style="font-size: 12px; color: #6b8575; margin-top: 6px;">
+          A valid .edu email is required to verify your student status and age per <a href="age-safety.html" target="_blank" style="color: #7c9885; font-weight: 600;">Missouri law</a>.
+        </div>
       </div>
 
       <div class="form-group">
@@ -354,14 +357,14 @@
         <div class="terms-checkbox">
           <input type="checkbox" id="ageGate" required>
           <label for="ageGate">
-            I certify that I am <span class="checkbox-highlight">18 years of age or older</span>.
+            I certify that I am <a href="age-safety.html" target="_blank">18 years of age or older</a>.
           </label>
         </div>
 
         <div class="terms-checkbox">
           <input type="checkbox" id="aiTransparency" required>
           <label for="aiTransparency">
-            I understand that StudyFlow Suite uses <span class="checkbox-highlight">Artificial Intelligence (Gemini 1.5 Flash)</span> to generate study aids and that outputs may contain inaccuracies.
+            I understand that StudyFlow Suite uses <a href="ai-transparency.html" target="_blank">Artificial Intelligence (Gemini 3 Flash Lite)</a> to generate study aids and that outputs may contain inaccuracies.
           </label>
         </div>
 
@@ -375,7 +378,7 @@
         <div class="terms-checkbox">
           <input type="checkbox" id="academicIntegrity" required>
           <label for="academicIntegrity">
-            I agree to use StudyFlow Suite as a <span class="checkbox-highlight">supplemental study tool</span> and will not use it to violate my institution's academic integrity policies.
+            I agree to use StudyFlow Suite as a <a href="academic-integrity.html" target="_blank">supplemental study tool</a> and will not use it to violate my institution's academic integrity policies.
           </label>
         </div>
 
@@ -473,6 +476,12 @@
 
       if (!name || !username || !email || !password) {
         showError('Please fill in all fields');
+        return;
+      }
+
+      // Validate .edu email (Missouri SB 1455 age verification)
+      if (!email.toLowerCase().endsWith('.edu')) {
+        showError('StudyFlow requires a valid .edu email address. This helps us verify you are a college student (18+) as required by Missouri law.');
         return;
       }
 
