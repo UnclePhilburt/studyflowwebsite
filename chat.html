@@ -193,7 +193,7 @@
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
       border: 2px solid transparent;
       border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -202,6 +202,8 @@
       color: #7c9885;
       font-size: 18px;
       box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
+      animation: gentleFadeIn 0.8s ease 0.2s forwards;
+      opacity: 0;
     }
 
     .settings-top-btn {
@@ -210,13 +212,6 @@
 
     .calendar-top-btn {
       right: 88px; /* Position to the left of settings button */
-    }
-
-    body.chat-started .settings-top-btn,
-    body.chat-started .calendar-top-btn {
-      display: flex;
-      animation: gentleFadeIn 0.8s ease 0.4s forwards;
-      opacity: 0;
     }
 
     .settings-top-btn:hover, .calendar-top-btn:hover {
