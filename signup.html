@@ -357,8 +357,9 @@
         <div class="form-left">
           <div class="form-row">
             <div class="form-group">
-              <label for="name">Full Name</label>
-              <input type="text" id="name" placeholder="Jane Doe" required>
+              <label for="legalName">Legal Name</label>
+              <input type="text" id="legalName" placeholder="Jane A. Doe" required>
+              <div class="form-hint">As it appears on official records</div>
             </div>
             <div class="form-group">
               <label for="username">Username</label>
@@ -367,10 +368,17 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="email">College Email (.edu)</label>
-            <input type="email" id="email" placeholder="your@university.edu" required>
-            <div class="form-hint">Required to verify student status per <a href="age-safety.html" target="_blank">Missouri law</a></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">College Email (.edu)</label>
+              <input type="email" id="email" placeholder="your@university.edu" required>
+              <div class="form-hint">Required per <a href="age-safety.html" target="_blank">Missouri law</a></div>
+            </div>
+            <div class="form-group">
+              <label for="zipCode">Zip Code</label>
+              <input type="text" id="zipCode" placeholder="65802" required pattern="[0-9]{5}(-[0-9]{4})?" maxlength="10">
+              <div class="form-hint">For age verification</div>
+            </div>
           </div>
 
           <div class="form-row">
@@ -384,7 +392,7 @@
             <div class="form-group">
               <label for="birthdate">Date of Birth</label>
               <input type="date" id="birthdate" required>
-              <div class="form-hint">Must be 18 or older to use StudyFlow</div>
+              <div class="form-hint">Must be 18 or older</div>
             </div>
           </div>
         </div>
@@ -476,9 +484,10 @@
     document.getElementById('birthdate').setAttribute('max', today);
 
     const signupForm = document.getElementById('signupForm');
-    const nameInput = document.getElementById('name');
+    const legalNameInput = document.getElementById('legalName');
     const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
+    const zipCodeInput = document.getElementById('zipCode');
     const passwordInput = document.getElementById('password');
     const birthdateInput = document.getElementById('birthdate');
     const termsInput = document.getElementById('terms');
@@ -519,9 +528,10 @@
       e.preventDefault();
       hideMessages();
 
-      const name = nameInput.value.trim();
+      const legalName = legalNameInput.value.trim();
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
+      const zipCode = zipCodeInput.value.trim();
       const password = passwordInput.value;
       const birthdate = birthdateInput.value;
       const ageGate = document.getElementById('ageGate').checked;
@@ -530,7 +540,7 @@
       const academicIntegrity = document.getElementById('academicIntegrity').checked;
       const terms = termsInput.checked;
 
-      if (!name || !username || !email || !password || !birthdate) {
+      if (!legalName || !username || !email || !zipCode || !password || !birthdate) {
         showError('Please fill in all fields');
         return;
       }
@@ -589,18 +599,23 @@
           password: password,
           options: {
             data: {
-              full_name: name,
+              full_name: legalName,
               username: username,
-              birthdate: birthdate
+              birthdate: birthdate,
+              legal_name: legalName,
+              zip_code: zipCode
             }
           }
         });
 
         if (error) throw error;
 
-        showSuccess('Account created! Redirecting to login...');
+        showSuccess('Account created! Redirecting to verify your age...');
         setTimeout(() => {
-          window.location.href = 'index.html?email=' + encodeURIComponent(email);
+          window.location.href = 'verify-age.html?email=' + encodeURIComponent(email) +
+            '&name=' + encodeURIComponent(legalName) +
+            '&zip=' + encodeURIComponent(zipCode) +
+            '&dob=' + encodeURIComponent(birthdate);
         }, 1500);
 
       } catch (error) {

@@ -1599,6 +1599,22 @@
       currentUser = session.user;
       authToken = session.access_token;
 
+      // Check if account is frozen (GUARD Act compliance)
+      try {
+        const verifyResponse = await fetch(`${BACKEND_URL}/api/user/verification-status`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (verifyResponse.ok) {
+          const verifyStatus = await verifyResponse.json();
+          if (verifyStatus.account_frozen || verifyStatus.needs_reverification) {
+            window.location.href = 'verify-age.html';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error checking verification status:', error);
+      }
+
       // Fetch user profile from backend to get their name
       try {
         const profileResponse = await fetch(`${BACKEND_URL}/api/current-user`, {
