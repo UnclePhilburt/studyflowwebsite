@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Note - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Header */
+    .viewer-header {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .note-info h1 {
+      font-size: 24px;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .note-meta {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .note-meta span {
+      margin-right: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #7c9885;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #6a8573;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #7c9885;
+      border: 2px solid #7c9885;
+    }
+
+    .btn-secondary:hover {
+      background: #f5f4f0;
+    }
+
+    .btn-danger {
+      background: #d9534f;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c9302c;
+    }
+
+    /* Watermark overlay */
+    .watermark-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .watermark-diagonal {
+      font-size: 32px;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.08);
+      transform: rotate(-45deg);
+      white-space: nowrap;
+      user-select: none;
+      text-align: center;
+      line-height: 1.8;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Note content area */
+    .note-viewer {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 40px;
+      min-height: 600px;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
+    .note-content {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #2d2d2d;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
+    .note-content::before {
+      content: 'FOR REFERENCE ONLY - NOT FOR SUBMISSION';
+      display: block;
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+
+    /* PDF viewer */
+    #pdf-viewer {
+      width: 100%;
+      height: 800px;
+      border: none;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #666;
+    }
+
+    /* Error state */
+    .error-message {
+      background: #fee;
+      color: #c00;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+
+    /* Source attribution */
+    .attribution {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #e0e0e0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .attribution strong {
+      color: #2d2d2d;
+    }
+
+    /* Back button */
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #7c9885;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Watermark overlay -->
+  <div class="watermark-overlay">
+    <div class="watermark-diagonal">
+      StudyFlow Suite - For Reference Only
+      <br>
+      Source: <span id="watermark-username">@Loading...</span> - ID: <span id="watermark-id">#00000</span>
+      <br>
+      Not for Submission
+    </div>
+  </div>
+
+  <div class="container">
+    <a href="browse.html" class="back-link">← Back to Browse</a>
+
+    <!-- Header with note info and actions -->
+    <div class="viewer-header">
+      <div class="note-info">
+        <h1 id="note-title">Loading...</h1>
+        <div class="note-meta">
+          <span id="note-university">University</span>
+          <span id="note-course">Course</span>
+          <span id="note-pages">0 pages</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" onclick="window.open('dmca.html', '_blank')">Report</button>
+        <button class="btn btn-primary" onclick="downloadNote()">Download (Premium)</button>
+      </div>
+    </div>
+
+    <!-- Note viewer area -->
+    <div class="note-viewer">
+      <div id="loading" class="loading">Loading note...</div>
+      <div id="error" class="error-message" style="display: none;"></div>
+
+      <!-- PDF viewer (shown when note is loaded) -->
+      <iframe id="pdf-viewer" style="display: none;"></iframe>
+
+      <!-- Attribution -->
+      <div class="attribution" id="attribution" style="display: none;">
+        <strong>Source:</strong> Uploaded by <span id="attr-username">@username</span> from <span id="attr-university">University</span> (<span id="attr-course">Course Code</span>)
+        <br>
+        <strong>Transaction ID:</strong> <span id="attr-transaction-id">#00000</span>
+        <br>
+        <strong>Notice:</strong> This note is provided for reference only. Do not submit as your own work.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    let currentNote = null;
+
+    // Get note ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const noteId = urlParams.get('id');
+
+    if (!noteId) {
+      showError('No note ID provided');
+    } else {
+      loadNote(noteId);
+    }
+
+    async function loadNote(noteId) {
+      try {
+        // Get auth token
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+          return;
+        }
+
+        // Fetch note metadata
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/metadata`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load note');
+        }
+
+        const data = await response.json();
+        currentNote = data.note;
+
+        // Update header
+        document.getElementById('note-title').textContent = currentNote.filename;
+        document.getElementById('note-university').textContent = currentNote.university || 'Unknown University';
+        document.getElementById('note-course').textContent = currentNote.course_code || 'Unknown Course';
+        document.getElementById('note-pages').textContent = `${currentNote.page_count || 0} pages`;
+
+        // Update watermark
+        document.getElementById('watermark-username').textContent = '@' + (currentNote.username || 'Anonymous');
+        document.getElementById('watermark-id').textContent = '#' + noteId.substring(0, 5);
+
+        // Update attribution
+        document.getElementById('attr-username').textContent = '@' + (currentNote.username || 'Anonymous');
+        document.getElementById('attr-university').textContent = currentNote.university || 'Unknown';
+        document.getElementById('attr-course').textContent = currentNote.course_code || 'Unknown';
+        document.getElementById('attr-transaction-id').textContent = '#' + noteId.substring(0, 5);
+        document.getElementById('attribution').style.display = 'block';
+
+        // Load PDF
+        const pdfUrl = `${BACKEND_URL}/api/notes/${noteId}/view-pdf`;
+        document.getElementById('pdf-viewer').src = pdfUrl;
+        document.getElementById('pdf-viewer').style.display = 'block';
+        document.getElementById('loading').style.display = 'none';
+
+        // Track view
+        trackView(noteId);
+
+      } catch (error) {
+        console.error('Error loading note:', error);
+        showError(error.message);
+      }
+    }
+
+    async function trackView(noteId) {
+      try {
+        const authToken = localStorage.getItem('authToken');
+        await fetch(`${BACKEND_URL}/api/notes/${noteId}/view`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+      } catch (error) {
+        console.error('Failed to track view:', error);
+      }
+    }
+
+    function downloadNote() {
+      // Show premium feature popup
+      const purpose = prompt('Why are you downloading this note? (Required for DMCA compliance)\n\nExample: "For personal study reference only"');
+
+      if (!purpose || purpose.trim().length < 10) {
+        alert('Please provide a valid purpose (at least 10 characters).');
+        return;
+      }
+
+      alert('Download feature coming soon!\n\nThis premium feature will:\n- Generate a watermarked PDF\n- Track the download for DMCA compliance\n- Require .edu verification and 5+ uploaded notes');
+    }
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').textContent = message;
+      document.getElementById('error').style.display = 'block';
+    }
+
+    // Disable right-click and keyboard shortcuts for copying
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      // Prevent Ctrl+C, Ctrl+A, Ctrl+P, Ctrl+S
+      if ((e.ctrlKey || e.metaKey) && ['c', 'a', 'p', 's'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
