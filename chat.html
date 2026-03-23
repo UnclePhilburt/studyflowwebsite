@@ -183,11 +183,10 @@
       color: #d88850;
     }
 
-    /* Settings button - Top right corner */
-    .settings-top-btn {
+    /* Top right buttons - Settings and Calendar */
+    .settings-top-btn, .calendar-top-btn {
       position: fixed;
       top: 28px;
-      right: 28px;
       width: 48px;
       height: 48px;
       border-radius: 12px;
@@ -205,13 +204,22 @@
       box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
     }
 
-    body.chat-started .settings-top-btn {
+    .settings-top-btn {
+      right: 28px;
+    }
+
+    .calendar-top-btn {
+      right: 88px; /* Position to the left of settings button */
+    }
+
+    body.chat-started .settings-top-btn,
+    body.chat-started .calendar-top-btn {
       display: flex;
       animation: gentleFadeIn 0.8s ease 0.4s forwards;
       opacity: 0;
     }
 
-    .settings-top-btn:hover {
+    .settings-top-btn:hover, .calendar-top-btn:hover {
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
       box-shadow: 0 6px 30px rgba(124, 152, 133, 0.2), 0 4px 20px rgba(232, 155, 95, 0.15);
       transform: translateY(-2px);
@@ -1523,6 +1531,16 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="13 17 18 12 13 7"></polyline>
         <polyline points="6 17 11 12 6 7"></polyline>
+      </svg>
+    </button>
+
+    <!-- Calendar Button (top right, before settings) -->
+    <button class="calendar-top-btn" onclick="window.location.href='calendar.html'" title="My Calendar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
       </svg>
     </button>
 
