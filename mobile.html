@@ -2,953 +2,840 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="AI-powered study assistant for Canvas and other learning platforms. Enhance your learning experience. Desktop only.">
-  <title>StudyFlow - AI Study Assistant</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlowSuite - AI Study Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #ffffff;
-      color: #1e293b;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #e8e3d8;
+      min-height: 100vh;
+      color: #2d2d2d;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    /* Navigation */
-    .nav {
-      background: rgba(255, 255, 255, 0.98);
-      border-bottom: 1px solid #e5e7eb;
-      padding: 14px 0;
-      position: sticky;
+    body::before {
+      content: '';
+      position: fixed;
       top: 0;
-      z-index: 1000;
-      backdrop-filter: blur(12px);
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(124, 152, 133, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(232, 155, 95, 0.05) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: multiply;
+      opacity: 0.8;
     }
 
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        repeating-linear-gradient(0deg, transparent 0px, rgba(107, 133, 117, 0.02) 1px, transparent 2px, transparent 3px),
+        repeating-linear-gradient(90deg, transparent 0px, rgba(232, 155, 95, 0.015) 1px, transparent 2px, transparent 5px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.7;
+    }
+
+    .container {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: #0f172a;
-    }
-
-    .logo-mark {
-      width: 32px;
-      height: 32px;
-      border-radius: 7px;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
       overflow: hidden;
     }
 
-    .logo-mark img {
-      width: 100%;
-      height: 100%;
-      display: block;
+    /* Left Content Area */
+    .content-area {
+      flex: 1;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: hidden;
     }
 
-    .logo-text {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-badge {
-      background: #f1f5f9;
-      color: #64748b;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    /* Hero */
+    /* Hero Section */
     .hero {
-      background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
-      padding: 60px 24px 80px;
-      text-align: center;
-      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 60px;
+      animation: fadeIn 0.8s ease;
     }
 
-    .hero-container {
-      max-width: 680px;
-      margin: 0 auto;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
+    .hero h1 {
+      font-family: 'Lora', serif;
+      font-size: 48px;
       font-weight: 600;
-      margin-bottom: 24px;
-    }
-
-    .hero-title {
-      font-size: 40px;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      color: #0f172a;
+      color: #2d2d2d;
       margin-bottom: 20px;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
     }
 
-    .hero-description {
+    .hero .highlight {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .hero p {
       font-size: 18px;
+      color: #5a5a5a;
+      max-width: 600px;
       line-height: 1.6;
-      color: #475569;
-      margin-bottom: 32px;
-      max-width: 560px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* Alert Box */
-    .alert-box {
-      background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
-      border: 1px solid #f59e0b;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 32px 24px;
-      display: flex;
-      align-items: start;
-      gap: 16px;
-    }
-
-    .alert-icon {
-      font-size: 28px;
-      flex-shrink: 0;
-    }
-
-    .alert-content {
-      flex: 1;
-    }
-
-    .alert-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #92400e;
-      margin-bottom: 4px;
-    }
-
-    .alert-text {
-      font-size: 14px;
-      color: #78350f;
-      line-height: 1.5;
-    }
-
-    /* Container */
-    .container {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Section */
-    .section {
-      padding: 64px 0;
-      border-bottom: 1px solid #f1f5f9;
-    }
-
-    .section:last-of-type {
-      border-bottom: none;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-
-    .section-label {
-      display: inline-block;
-      color: #667eea;
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-    }
-
-    .section-title {
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
-
-    .section-subtitle {
-      font-size: 17px;
-      color: #64748b;
-      max-width: 540px;
-      margin: 0 auto;
-    }
-
-    /* CTA Card */
-    .cta-card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 8px;
-    }
-
-    .input {
-      width: 100%;
-      padding: 12px 16px;
-      font-size: 16px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-family: inherit;
-      transition: all 0.2s;
-      background: white;
-    }
-
-    .input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 14px 24px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.15s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: white;
-      color: #475569;
-      border: 1px solid #e5e7eb;
-      padding: 12px 20px;
-    }
-
-    .btn-secondary:active {
-      background: #f8fafc;
-    }
-
-    .alert-message {
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      margin-top: 16px;
-      display: none;
-      font-weight: 500;
-    }
-
-    .alert-message.show {
-      display: block;
-    }
-
-    .alert-success {
-      background: #dcfce7;
-      color: #166534;
-      border: 1px solid #86efac;
-    }
-
-    .alert-error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 24px 0;
-      color: #9ca3af;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #e5e7eb;
-    }
-
-    .divider span {
-      padding: 0 16px;
-    }
-
-    .btn-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    /* Feature Cards */
-    .feature-grid {
-      display: grid;
-      gap: 20px;
-    }
-
-    .feature-card {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 24px;
-    }
-
-    .feature-header {
-      display: flex;
-      align-items: start;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-
-    .feature-icon {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    .feature-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 8px;
-    }
-
-    .feature-desc {
-      font-size: 15px;
-      color: #64748b;
-      line-height: 1.6;
-    }
-
-    /* Steps */
-    .steps {
-      counter-reset: step;
-    }
-
-    .step {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 32px;
-      position: relative;
-    }
-
-    .step:last-child {
       margin-bottom: 0;
     }
 
-    .step:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      left: 21px;
-      top: 44px;
-      bottom: -32px;
-      width: 2px;
-      background: #e5e7eb;
-    }
-
-    .step-number {
-      counter-increment: step;
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
-      flex-shrink: 0;
+    /* Stats Section */
+    .collective-brain {
+      background: transparent;
+      border-radius: 0;
+      padding: 20px 40px;
+      border: none;
+      box-shadow: none;
+      margin-bottom: 0;
+      animation: slideUp 0.8s ease 0.2s both;
       position: relative;
     }
 
-    .step-number::before {
-      content: counter(step);
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .step-content {
-      flex: 1;
-      padding-top: 2px;
-    }
-
-    .step-title {
-      font-size: 17px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 6px;
-    }
-
-    .step-desc {
-      font-size: 15px;
-      color: #64748b;
-      line-height: 1.6;
-    }
-
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-      text-align: center;
-      padding: 40px 0;
-    }
-
-    .stat-value {
+    .collective-brain h2 {
+      font-family: 'Lora', serif;
       font-size: 36px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #2d2d2d;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .collective-brain > p {
+      font-size: 18px;
+      color: #5a5a5a;
+      margin-bottom: 40px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    /* Stats Section */
+    .brain-animation-container {
+      position: relative;
+      min-height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      padding: 20px 40px;
+    }
+
+    /* Suite Title */
+    .suite-title {
+      font-family: 'Lora', serif;
+      font-size: 56px;
+      font-weight: 400;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 50%, #e89b5f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: block;
-      margin-bottom: 8px;
-      line-height: 1;
+      background-clip: text;
+      letter-spacing: -2px;
+      animation: fadeIn 0.8s ease both;
+      text-align: center;
+      position: relative;
+      padding-bottom: 12px;
+    }
+
+    .suite-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7c9885, transparent);
+      opacity: 0.4;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Live Stats */
+    .live-stats {
+      display: flex;
+      gap: 60px;
+      align-items: center;
+      animation: fadeIn 1s ease 0.3s both;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Lora', serif;
+      font-size: 44px;
+      font-weight: 400;
+      color: #7c9885;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
     }
 
     .stat-label {
       font-size: 14px;
-      color: #64748b;
+      color: #8a8a8a;
       font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    /* FAQ */
-    .faq-list {
-      max-width: 640px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 20px 24px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .faq-item:hover {
-      border-color: #d1d5db;
-    }
-
-    .faq-question {
-      font-size: 16px;
-      font-weight: 600;
-      color: #0f172a;
+    /* Network Flow */
+    .network-flow {
+      margin-top: 30px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      justify-content: center;
+      gap: 30px;
+      animation: fadeIn 1.2s ease 0.6s both;
     }
 
-    .faq-icon {
-      color: #667eea;
-      font-size: 16px;
-      transition: transform 0.3s;
+    .flow-step {
+      text-align: center;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .flow-icon {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto 12px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+    }
+
+    .flow-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .flow-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #6b8575;
+      margin-bottom: 8px;
+    }
+
+    .flow-desc {
+      font-size: 13px;
+      color: #8a8a8a;
+      line-height: 1.5;
+    }
+
+    .flow-arrow {
+      font-size: 24px;
+      color: rgba(124, 152, 133, 0.4);
       flex-shrink: 0;
     }
 
-    .faq-item.open .faq-icon {
-      transform: rotate(180deg);
+    /* Info Text */
+    .info-text {
+      margin-top: 30px;
+      text-align: center;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      animation: fadeIn 1.4s ease 0.8s both;
     }
 
-    .faq-answer {
-      font-size: 15px;
-      color: #64748b;
-      line-height: 1.7;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #f1f5f9;
-      display: none;
+    .info-text p {
+      font-size: 14px;
+      color: #6b8575;
+      line-height: 1.6;
+      margin-bottom: 8px;
     }
 
-    .faq-item.open .faq-answer {
-      display: block;
+    .info-highlight {
+      font-weight: 600;
+      color: #7c9885;
     }
 
-    /* Footer */
-    .footer {
-      background: #fafbfc;
-      border-top: 1px solid #e5e7eb;
-      padding: 48px 24px;
+
+
+    /* Login Section - Right Side */
+    .login-section {
+      flex: 0 0 420px;
+      background: rgba(235, 230, 219, 0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 40px;
+      border-left: 2px solid rgba(107, 133, 117, 0.2);
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.04);
+      animation: slideInRight 0.8s ease 0.3s both;
+      position: relative;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .login-section h2 {
+      font-family: 'Lora', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 10px;
       text-align: center;
     }
 
-    .footer-text {
+    .login-section > p {
+      text-align: center;
+      color: #5a5a5a;
       font-size: 14px;
-      color: #64748b;
-      margin-bottom: 12px;
+      margin-bottom: 28px;
     }
 
-    .footer-link {
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
       font-size: 14px;
-      color: #667eea;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.7);
+      color: #2d2d2d;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.15);
+    }
+
+    .form-group input::placeholder {
+      color: #9a9a9a;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(232, 155, 95, 0.95) 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 24px rgba(124, 152, 133, 0.25);
+      margin-top: 10px;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.35);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .auth-divider {
+      text-align: center;
+      margin: 28px 0;
+      color: #8a8a8a;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: linear-gradient(to right, rgba(124, 152, 133, 0.2), rgba(232, 155, 95, 0.2));
+    }
+
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 24px;
+      color: #5a5a5a;
+      font-size: 14px;
+    }
+
+    .auth-footer a {
+      color: #7c9885;
       text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
     }
 
-    .footer-link:active {
-      color: #5568d3;
+    .auth-footer a:hover {
+      color: #e89b5f;
     }
 
-    /* Loading */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .error-message, .success-message {
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
     }
 
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
+    .error-message {
+      background: rgba(232, 155, 95, 0.1);
+      color: #c45a2a;
+      border: 2px solid rgba(232, 155, 95, 0.3);
     }
 
-    /* Responsive */
-    @media (max-width: 480px) {
-      .hero-title {
-        font-size: 34px;
+    .success-message {
+      background: rgba(124, 152, 133, 0.1);
+      color: #4a7456;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #5a5a5a;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+
+    .loading.active { display: block; }
+
+    /* Mobile Optimization - Streamlined for all devices */
+    @media (max-width: 968px) {
+      body::before, body::after {
+        opacity: 0.3; /* Reduce visual complexity */
       }
 
-      .section-title {
+      .container {
+        flex-direction: column;
+        height: auto;
+        overflow-y: auto;
+      }
+
+      .content-area {
+        padding: 30px 20px;
+        overflow-y: visible;
+      }
+
+      .login-section {
+        flex: 0 0 auto;
+        padding: 30px 20px;
+        border-left: none;
+        border-top: 2px solid rgba(124, 152, 133, 0.2);
+        box-shadow: none;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .collective-brain {
+        padding: 30px 20px;
+      }
+
+      .collective-brain h2 {
+        font-size: 24px;
+      }
+
+      .collective-brain > p {
+        font-size: 15px;
+      }
+
+      .brain-animation-container {
+        padding: 30px 15px;
+        gap: 25px;
+      }
+
+      .suite-title {
+        font-size: 40px;
+        letter-spacing: -1px;
+      }
+
+      .live-stats {
+        gap: 40px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stat-number {
+        font-size: 36px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .network-flow {
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .flow-step {
+        max-width: 100%;
+      }
+
+      .flow-icon {
+        width: 45px;
+        height: 45px;
+      }
+
+      .flow-title {
+        font-size: 14px;
+      }
+
+      .flow-desc {
+        font-size: 12px;
+      }
+
+      .flow-arrow {
+        display: none; /* Hide arrows on mobile for cleaner look */
+      }
+
+      .info-text {
+        margin-top: 30px;
+        padding: 0 15px;
+      }
+
+      .info-text p {
+        font-size: 14px;
+      }
+    }
+
+    /* Extra small devices - ultra streamlined */
+    @media (max-width: 480px) {
+      .content-area, .login-section {
+        padding: 20px 16px;
+      }
+
+      .suite-title {
+        font-size: 32px;
+      }
+
+      .hero h1 {
         font-size: 28px;
       }
 
-      .stats-grid {
-        gap: 24px;
+      .collective-brain h2 {
+        font-size: 22px;
       }
 
-      .stat-value {
+      .stat-number {
         font-size: 32px;
+      }
+
+      .live-stats {
+        gap: 30px;
+      }
+
+      .network-flow {
+        gap: 15px;
+      }
+
+      .info-text p {
+        font-size: 13px;
       }
     }
   </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="nav">
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <div class="logo-mark">
-          <img src="icon128.png" alt="StudyFlow">
+  <div class="container">
+    <!-- Left Content Area -->
+    <div class="content-area">
+      <!-- Stats Section -->
+      <div class="collective-brain">
+        <div class="brain-animation-container">
+          <!-- Suite Title -->
+          <div class="suite-title">StudyFlow Suite</div>
+
+          <!-- Live Stats -->
+          <div class="live-stats">
+            <div class="stat-item">
+              <div class="stat-number" id="studentCount">...</div>
+              <div class="stat-label">Students</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="noteCount">...</div>
+              <div class="stat-label">Notes</div>
+            </div>
+          </div>
+
+          <!-- Network Flow -->
+          <div class="network-flow">
+            <div class="flow-step">
+              <div class="flow-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="flow-title">Upload Notes</div>
+              <div class="flow-desc">Students share their study materials</div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#7c9885" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 6v6l4 2"></path>
+                </svg>
+              </div>
+              <div class="flow-title">Network Forms</div>
+              <div class="flow-desc">Notes interconnect into collective knowledge</div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#e89b5f" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+              </div>
+              <div class="flow-title">Everyone Benefits</div>
+              <div class="flow-desc">Smarter AI helps all students succeed</div>
+            </div>
+          </div>
+
+          <!-- Info Text -->
+          <div class="info-text">
+            <p>Every note becomes part of a <span class="info-highlight">living network of knowledge</span>. When you upload your materials, they connect with thousands of others, creating an AI that truly understands your courses.</p>
+            <p>The more students contribute, the smarter the system becomes for everyone.</p>
+          </div>
         </div>
-        <span class="logo-text">StudyFlow</span>
-      </a>
-      <div class="nav-badge">Desktop Only</div>
-    </div>
-  </nav>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-container">
-      <div class="hero-badge">
-        <span>📚</span>
-        <span>Note Sharing Platform</span>
       </div>
-      <h1 class="hero-title">Access StudyFlow Suite on Desktop</h1>
-      <p class="hero-description">Upload, organize, and share study notes with students across universities. Browse thousands of notes in the Nexus library. Desktop recommended for best experience.</p>
-    </div>
-  </section>
 
-  <!-- Alert -->
-  <div class="alert-box">
-    <div class="alert-icon">💡</div>
-    <div class="alert-content">
-      <div class="alert-title">Mobile Device Detected</div>
-      <div class="alert-text">StudyFlow Suite works best on desktop or laptop computers. Access the full note library, upload tools, and AI study features on your computer.</div>
+    </div>
+
+    <!-- Right Login Section -->
+    <div class="login-section">
+      <h2>Get Started</h2>
+      <p>Sign in to access your personalized AI study assistant</p>
+
+      <div class="error-message" id="errorMessage"></div>
+      <div class="success-message" id="successMessage"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email or Username</label>
+          <input type="text" id="email" placeholder="your@email.com or username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="loading" id="loading">Signing you in...</div>
+
+      <div class="auth-divider">or</div>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="signup.html">Sign up free</a>
+      </div>
     </div>
   </div>
 
-  <!-- Email CTA -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Get Started</span>
-        <h2 class="section-title">Open on Desktop</h2>
-        <p class="section-subtitle">Email yourself the link to access StudyFlow Suite on your computer.</p>
-      </div>
-
-      <div class="cta-card">
-        <button class="btn" id="emailBtn" onclick="emailMyself()">
-          <span>📧</span>
-          <span>Email Desktop Link</span>
-        </button>
-
-        <div class="alert-message alert-success" id="successMessage">
-          <strong>✓ Email app opened!</strong> Send the email to yourself and open it on your computer.
-        </div>
-
-        <div class="divider">
-          <span>or share another way</span>
-        </div>
-
-        <div class="btn-group">
-          <button class="btn btn-secondary" onclick="copyLink()">
-            <span>📋</span>
-            <span>Copy Link</span>
-          </button>
-          <button class="btn btn-secondary" onclick="shareLink()">
-            <span>📤</span>
-            <span>Share</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Requirements -->
-  <section class="section" style="background: #fafbfc;">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Requirements</span>
-        <h2 class="section-title">What You'll Need</h2>
-        <p class="section-subtitle">Simple requirements to get started with StudyFlow</p>
-      </div>
-
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">💻</div>
-            <div>
-              <h3 class="feature-title">Desktop or Laptop</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Works best on Mac or Windows computers. Upload, organize, and browse notes with our full web interface.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">🎓</div>
-            <div>
-              <h3 class="feature-title">University Email</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Verify your .edu email to access the Nexus note library. Creates a trusted educational sandbox.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">📚</div>
-            <div>
-              <h3 class="feature-title">Share & Discover</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Upload your notes to help others, browse thousands of notes from students across universities.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Getting Started</span>
-        <h2 class="section-title">How It Works</h2>
-        <p class="section-subtitle">Get up and running in just a few minutes</p>
-      </div>
-
-      <div class="steps">
-        <div class="step">
-          <div class="step-number"></div>
-          <div class="step-content">
-            <h3 class="step-title">Open Link on Your Computer</h3>
-            <p class="step-desc">Use the email link or paste the URL into your browser on your desktop or laptop computer.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number"></div>
-          <div class="step-content">
-            <h3 class="step-title">Create Your Account</h3>
-            <p class="step-desc">Sign up with any email address. Free to use, no credit card required.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number"></div>
-          <div class="step-content">
-            <h3 class="step-title">Verify Your .edu Email</h3>
-            <p class="step-desc">Add your university email in account settings to unlock the Nexus note library.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-number"></div>
-          <div class="step-content">
-            <h3 class="step-title">Upload & Browse Notes</h3>
-            <p class="step-desc">Upload your study notes to share with others, or browse thousands of notes from students across universities.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features -->
-  <section class="section" style="background: #fafbfc;">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Features</span>
-        <h2 class="section-title">Why Use StudyFlow Suite?</h2>
-        <p class="section-subtitle">Everything you need to organize and share study materials</p>
-      </div>
-
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">📚</div>
-            <div>
-              <h3 class="feature-title">Nexus Note Library</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Browse thousands of study notes shared by students across universities. Filter by course, topic, and university.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">📤</div>
-            <div>
-              <h3 class="feature-title">Easy Upload</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Upload your notes in seconds. Support for PDF, DOCX, and images. Organize with tags and course codes.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">🎓</div>
-            <div>
-              <h3 class="feature-title">Verified Community</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Trusted educational sandbox. .edu email verification ensures all contributors are verified students.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-header">
-            <div class="feature-icon">💰</div>
-            <div>
-              <h3 class="feature-title">Free to Use</h3>
-            </div>
-          </div>
-          <p class="feature-desc">Completely free to upload, browse, and download notes. Help others while building your own library.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Growing Community</span>
-        <h2 class="section-title">Join Students Across Universities</h2>
-      </div>
-
-      <div class="stats-grid">
-        <div>
-          <div class="stat-value">1000+</div>
-          <div class="stat-label">Shared Notes</div>
-        </div>
-        <div>
-          <div class="stat-value">50+</div>
-          <div class="stat-label">Universities</div>
-        </div>
-        <div>
-          <div class="stat-value">100%</div>
-          <div class="stat-label">Free</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="section" style="background: #fafbfc;">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">FAQ</span>
-        <h2 class="section-title">Frequently Asked Questions</h2>
-        <p class="section-subtitle">Everything you need to know about StudyFlow</p>
-      </div>
-
-      <div class="faq-list">
-        <div class="faq-item" onclick="this.classList.toggle('open')">
-          <div class="faq-question">
-            <span>Why can't I install it on my phone?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            StudyFlow is a Chrome browser extension. Chrome extensions can only be installed on desktop or laptop computers - this is a Chrome platform limitation, not a StudyFlow restriction. You can email yourself the link and install it on any Mac or Windows computer.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="this.classList.toggle('open')">
-          <div class="faq-question">
-            <span>How much does it cost?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            StudyFlow offers a free plan with daily usage limits - perfect for testing it out. The Pro plan costs $4.99/month and includes unlimited access, full feature set, and priority support.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="this.classList.toggle('open')">
-          <div class="faq-question">
-            <span>What platforms are supported?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            StudyFlow works with Canvas, McGraw Hill Connect, Pearson MyLab, Cengage WebAssign, Top Hat, Wiley, and 100+ other learning management systems. If your school uses online quizzes, chances are StudyFlow supports it.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="this.classList.toggle('open')">
-          <div class="faq-question">
-            <span>Is my data secure?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            Absolutely. StudyFlow runs entirely in your Chrome browser using bank-level encryption. We never store your coursework content or personally identifiable information on our servers. Your privacy and security are our highest priorities.
-          </div>
-        </div>
-
-        <div class="faq-item" onclick="this.classList.toggle('open')">
-          <div class="faq-question">
-            <span>Can I try it for free?</span>
-            <span class="faq-icon">▼</span>
-          </div>
-          <div class="faq-answer">
-            Yes! The free plan includes daily usage limits with no credit card required. This lets you test StudyFlow with your actual coursework on your learning platform before deciding to upgrade. Try it completely risk-free.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <p class="footer-text">Visit on your computer to get started</p>
-      <a href="https://unclephilburt.github.io/studyflowwebsite/" class="footer-link">unclephilburt.github.io/studyflowwebsite</a>
-    </div>
-  </footer>
-
   <script>
-    function emailMyself() {
-      const subject = encodeURIComponent('StudyFlow Suite - Open on Desktop');
-      const body = encodeURIComponent(`Hi!
+    const supabaseClient = window.supabase.createClient(
+      'https://mxddgbpxjoltaimftpmn.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+    );
 
-I visited StudyFlow Suite on my mobile device. Open this link on your desktop for the best experience.
-
-🔗 Open this link on your desktop or laptop:
-https://unclephilburt.github.io/studyflowwebsite/
-
-What you can do:
-📝 Upload and organize your study notes
-📚 Browse thousands of notes from other students
-🎓 Verify your .edu email for Nexus access
-💬 Chat with AI tutors about your coursework
-
----
-StudyFlow Suite - Note Sharing Platform
-https://unclephilburt.github.io/studyflowwebsite/`);
-
-      // Open email app with pre-filled message
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
-
-      // Show success message
-      setTimeout(() => {
-        document.getElementById('successMessage').classList.add('show');
-        setTimeout(() => {
-          document.getElementById('successMessage').classList.remove('show');
-        }, 5000);
-      }, 500);
-    }
-
-    function copyLink() {
-      const link = 'https://unclephilburt.github.io/studyflowwebsite/';
-      navigator.clipboard.writeText(link).then(() => {
-        const btn = event.target.closest('button');
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<span>✓</span><span>Copied!</span>';
-        setTimeout(() => {
-          btn.innerHTML = originalHTML;
-        }, 2000);
-      });
-    }
-
-    function shareLink() {
-      if (navigator.share) {
-        navigator.share({
-          title: 'StudyFlow - AI Study Assistant',
-          text: 'Enhance your learning with AI-powered study tools',
-          url: 'https://unclephilburt.github.io/studyflowwebsite/'
-        });
-      } else {
-        copyLink();
+    // Check if already logged in
+    (async function() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        window.location.href = 'chat.html';
       }
+    })();
+
+    // Fetch live stats
+    (async function() {
+      try {
+        // Count total users from user_profiles
+        const { count: userCount, error: userError } = await supabaseClient
+          .from('user_profiles')
+          .select('*', { count: 'exact', head: true });
+
+        if (!userError && userCount !== null) {
+          document.getElementById('studentCount').textContent = userCount.toLocaleString();
+        }
+
+        // Count total notes
+        const { count: noteCount, error: noteError } = await supabaseClient
+          .from('notes')
+          .select('*', { count: 'exact', head: true });
+
+        if (!noteError && noteCount !== null) {
+          document.getElementById('noteCount').textContent = noteCount.toLocaleString();
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        document.getElementById('studentCount').textContent = '---';
+        document.getElementById('noteCount').textContent = '---';
+      }
+    })();
+
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const loading = document.getElementById('loading');
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      successMessage.style.display = 'none';
+    }
+
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.style.display = 'block';
+      errorMessage.style.display = 'none';
+    }
+
+    function hideMessages() {
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessages();
+
+      const emailOrUsername = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!emailOrUsername || !password) {
+        showError('Please enter both email/username and password');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+      loading.classList.add('active');
+
+      try {
+        let loginEmail = emailOrUsername;
+
+        // Check if input is a username (doesn't contain @)
+        if (!emailOrUsername.includes('@')) {
+          // Look up the email from the username
+          const { data: profileData, error: profileError } = await supabaseClient
+            .from('user_profiles')
+            .select('email')
+            .eq('username', emailOrUsername)
+            .single();
+
+          if (profileError || !profileData) {
+            throw new Error('Username not found. Please check your username or use your email.');
+          }
+
+          loginEmail = profileData.email;
+        }
+
+        // Now login with the email
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: loginEmail,
+          password: password
+        });
+
+        if (error) throw error;
+
+        showSuccess('Login successful! Redirecting...');
+        setTimeout(() => {
+          window.location.href = 'chat.html';
+        }, 500);
+
+      } catch (error) {
+        console.error('Login error:', error);
+        showError(error.message || 'Login failed. Please check your credentials.');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+        loading.classList.remove('active');
+      }
+    });
+
+    // Auto-fill email or username from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email');
+    const usernameParam = urlParams.get('username');
+    if (emailParam) {
+      emailInput.value = emailParam;
+      passwordInput.focus();
+    } else if (usernameParam) {
+      emailInput.value = usernameParam;
+      passwordInput.focus();
     }
   </script>
 </body>
