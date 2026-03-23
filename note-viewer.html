@@ -433,6 +433,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentNote = null;
     let authToken = null;
+    let isInGoodStanding = false; // Track Good Standing status
 
     // Get note ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -454,7 +455,52 @@
       }
 
       authToken = session.access_token;
+
+      // Check Good Standing status
+      await loadGoodStandingStatus();
+
       loadNote(noteId);
+    }
+
+    async function loadGoodStandingStatus() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/good-standing/status`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+          console.error('Failed to load Good Standing status');
+          return;
+        }
+
+        const data = await response.json();
+        isInGoodStanding = data.good_standing && !data.permanent_bad_standing;
+
+        console.log('[Good Standing] Status:', isInGoodStanding);
+
+        // Update download buttons
+        updateDownloadButtonStates();
+      } catch (error) {
+        console.error('Error loading Good Standing status:', error);
+      }
+    }
+
+    function updateDownloadButtonStates() {
+      const downloadBtns = document.querySelectorAll('button[onclick*="download"]');
+
+      downloadBtns.forEach(btn => {
+        if (!isInGoodStanding) {
+          btn.disabled = true;
+          btn.style.opacity = '0.4';
+          btn.style.cursor = 'not-allowed';
+          btn.title = 'Good Standing required - Upload a verified note to regain access';
+        } else {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor = 'pointer';
+          btn.title = '';
+        }
+      });
     }
 
     async function loadNote(noteId) {
@@ -635,6 +681,12 @@
     async function downloadNote() {
       if (!currentNote) return;
 
+      // Check Good Standing
+      if (!isInGoodStanding) {
+        alert('Good Standing Required\n\nYou must upload a verified note or subscribe to download from the community.\n\nThis helps maintain a peer-to-peer educational exchange.');
+        return;
+      }
+
       const consented = await showConsentModal();
       if (!consented) return;
 
@@ -645,7 +697,16 @@
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
-        if (!response.ok) throw new Error('Download failed');
+        if (!response.ok) {
+          if (response.status === 403) {
+            const errorData = await response.json();
+            if (errorData.good_standing_required) {
+              alert('Good Standing Required\n\nYou must upload a verified note or subscribe to download from the community.');
+              return;
+            }
+          }
+          throw new Error('Download failed');
+        }
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -664,6 +725,12 @@
     }
 
     async function downloadFile() {
+      // Check Good Standing
+      if (!isInGoodStanding) {
+        alert('Good Standing Required\n\nYou must upload a verified note or subscribe to download from the community.\n\nThis helps maintain a peer-to-peer educational exchange.');
+        return;
+      }
+
       const consented = await showConsentModal();
       if (!consented) return;
 
