@@ -287,7 +287,36 @@
       color: #7c9885;
     }
 
+    /* Footer Links */
+    .footer-links {
+      margin-top: auto;
+      padding-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      animation: fadeIn 1.6s ease 1s both;
+    }
 
+    .footer-links a {
+      color: #9a9a9a;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 400;
+      transition: color 0.2s ease;
+      padding: 4px 6px;
+    }
+
+    .footer-links a:hover {
+      color: #7c9885;
+    }
+
+    .footer-divider {
+      color: rgba(124, 152, 133, 0.25);
+      font-size: 12px;
+      line-height: 28px;
+      user-select: none;
+    }
 
     /* Login Section - Right Side */
     .login-section {
@@ -557,6 +586,11 @@
       .info-text p {
         font-size: 14px;
       }
+
+      .footer-links {
+        padding-top: 20px;
+        padding-bottom: 10px;
+      }
     }
 
     /* Extra small devices - ultra streamlined */
@@ -667,6 +701,17 @@
 
       </div>
 
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <span class="footer-divider">·</span>
+        <a href="privacy.html">Privacy</a>
+        <span class="footer-divider">·</span>
+        <a href="terms.html">Terms</a>
+        <span class="footer-divider">·</span>
+        <a href="dmca.html">DMCA</a>
+        <span class="footer-divider">·</span>
+        <a href="guidelines.html">Guidelines</a>
+      </div>
     </div>
 
     <!-- Right Login Section -->
