@@ -18,12 +18,11 @@
       min-height: 100vh;
       color: #2d2d2d;
       overflow-x: hidden;
-      overflow-y: auto;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 24px 20px;
     }
 
     body::before {
@@ -43,28 +42,13 @@
       opacity: 0.8;
     }
 
-    body::after {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background:
-        repeating-linear-gradient(0deg, transparent 0px, rgba(107, 133, 117, 0.02) 1px, transparent 2px, transparent 3px),
-        repeating-linear-gradient(90deg, transparent 0px, rgba(232, 155, 95, 0.015) 1px, transparent 2px, transparent 5px);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.7;
-    }
-
     .signup-container {
       background: rgba(235, 230, 219, 0.6);
-      border-radius: 16px;
+      border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-      max-width: 680px;
+      max-width: 920px;
       width: 100%;
-      padding: 40px 50px;
+      padding: 40px 48px 36px;
       position: relative;
       z-index: 1;
       border: 2px solid rgba(124, 152, 133, 0.2);
@@ -72,46 +56,85 @@
 
     .logo-section {
       text-align: center;
-      margin-bottom: 35px;
+      margin-bottom: 28px;
     }
 
     .logo-section h1 {
       font-family: 'Lora', serif;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 400;
       background: linear-gradient(135deg, #7c9885 0%, #6b8575 50%, #e89b5f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: -1px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     .logo-section p {
       color: #6b8575;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
     }
 
+    .error-message, .success-message {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .error-message {
+      background: rgba(232, 155, 95, 0.1);
+      color: #c45a2a;
+      border: 2px solid rgba(232, 155, 95, 0.3);
+    }
+
+    .success-message {
+      background: rgba(124, 152, 133, 0.1);
+      color: #4a7456;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+    }
+
+    /* Two-column layout */
+    .form-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .form-left {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-right {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Form fields */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 0;
     }
 
     .form-group label {
       display: block;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       color: #2d2d2d;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
     .form-group input {
       width: 100%;
-      padding: 14px 18px;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%) 1;
-      border-radius: 12px;
-      font-size: 15px;
+      padding: 11px 14px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 14px;
       font-family: 'Inter', sans-serif;
       transition: all 0.3s ease;
       background: rgba(255, 255, 255, 0.7);
@@ -120,20 +143,44 @@
 
     .form-group input:focus {
       outline: none;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%) 1;
+      border-color: rgba(124, 152, 133, 0.5);
       background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.15);
+      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.12);
     }
 
     .form-group input::placeholder {
       color: #9a9a9a;
     }
 
+    .form-hint {
+      font-size: 11px;
+      color: #8a8a8a;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .form-hint a {
+      color: #7c9885;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .form-hint a:hover {
+      color: #e89b5f;
+    }
+
+    /* Two small fields in a row */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
     .password-strength {
-      height: 3px;
+      height: 2px;
       background: rgba(124, 152, 133, 0.1);
       border-radius: 2px;
-      margin-top: 8px;
+      margin-top: 6px;
       overflow: hidden;
     }
 
@@ -143,25 +190,11 @@
       width: 0%;
     }
 
-    .password-strength-bar.weak {
-      width: 33%;
-      background: #e89b5f;
-    }
+    .password-strength-bar.weak { width: 33%; background: #e89b5f; }
+    .password-strength-bar.medium { width: 66%; background: #d4a574; }
+    .password-strength-bar.strong { width: 100%; background: #7c9885; }
 
-    .password-strength-bar.medium {
-      width: 66%;
-      background: #d4a574;
-    }
-
-    .password-strength-bar.strong {
-      width: 100%;
-      background: #7c9885;
-    }
-
-    .legal-section {
-      margin-bottom: 24px;
-    }
-
+    /* Right column: legal */
     .legal-section-title {
       font-size: 13px;
       font-weight: 600;
@@ -174,9 +207,9 @@
     .terms-checkbox {
       display: flex;
       align-items: start;
-      gap: 10px;
-      margin-bottom: 14px;
-      font-size: 13px;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 12px;
       color: #5a5a5a;
       line-height: 1.5;
     }
@@ -186,9 +219,9 @@
     }
 
     .terms-checkbox input[type="checkbox"] {
-      margin-top: 2px;
-      width: 18px;
-      height: 18px;
+      margin-top: 1px;
+      width: 16px;
+      height: 16px;
       cursor: pointer;
       accent-color: #7c9885;
       flex-shrink: 0;
@@ -196,6 +229,7 @@
 
     .terms-checkbox label {
       margin-bottom: 0;
+      cursor: pointer;
     }
 
     .terms-checkbox a {
@@ -213,24 +247,37 @@
       color: #6b8575;
     }
 
+    /* Divider between columns */
+    .form-right {
+      border-left: 1px solid rgba(124, 152, 133, 0.15);
+      padding-left: 36px;
+    }
+
+    /* Bottom section */
+    .form-bottom {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
     .btn-primary {
-      width: 100%;
-      padding: 16px;
+      padding: 13px 48px;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(232, 155, 95, 0.95) 100%);
       color: white;
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 6px 24px rgba(124, 152, 133, 0.25);
-      margin-top: 10px;
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.25);
+      white-space: nowrap;
     }
 
     .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.35);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(124, 152, 133, 0.35);
     }
 
     .btn-primary:disabled {
@@ -238,32 +285,9 @@
       cursor: not-allowed;
     }
 
-    .auth-divider {
-      text-align: center;
-      margin: 28px 0;
-      color: #8a8a8a;
-      font-size: 14px;
-      position: relative;
-    }
-
-    .auth-divider::before,
-    .auth-divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 40%;
-      height: 1px;
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.2), rgba(232, 155, 95, 0.2));
-    }
-
-    .auth-divider::before { left: 0; }
-    .auth-divider::after { right: 0; }
-
     .auth-footer {
-      text-align: center;
-      margin-top: 24px;
-      color: #5a5a5a;
-      font-size: 14px;
+      color: #8a8a8a;
+      font-size: 13px;
     }
 
     .auth-footer a {
@@ -277,33 +301,39 @@
       color: #e89b5f;
     }
 
-    .error-message, .success-message {
-      padding: 14px 18px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      display: none;
-    }
-
-    .error-message {
-      background: rgba(232, 155, 95, 0.1);
-      color: #c45a2a;
-      border: 2px solid rgba(232, 155, 95, 0.3);
-    }
-
-    .success-message {
-      background: rgba(124, 152, 133, 0.1);
-      color: #4a7456;
-      border: 2px solid rgba(124, 152, 133, 0.3);
-    }
-
-    @media (max-width: 600px) {
+    /* Mobile: stack columns */
+    @media (max-width: 740px) {
       .signup-container {
-        padding: 40px 30px;
+        padding: 32px 24px 28px;
       }
 
-      .logo-section h1 {
-        font-size: 28px;
+      .form-columns {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .form-right {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid rgba(124, 152, 133, 0.15);
+        padding-top: 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .form-bottom {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+
+      .auth-footer {
+        text-align: center;
       }
     }
   </style>
@@ -322,84 +352,92 @@
     <div class="success-message" id="successMessage"></div>
 
     <form id="signupForm">
-      <div class="form-group">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" placeholder="John Doe" required>
-      </div>
+      <div class="form-columns">
+        <!-- Left: Account Details -->
+        <div class="form-left">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" placeholder="Jane Doe" required>
+            </div>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" id="username" placeholder="StudyBuddy" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]{3,20}">
+              <div class="form-hint">Shown when you contribute to the Nexus</div>
+            </div>
+          </div>
 
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" placeholder="StudyBuddy" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]{3,20}">
-        <div style="font-size: 12px; color: #6b8575; margin-top: 6px;">
-          3-20 characters, letters, numbers, and underscores only. This will be shown when you contribute to the Nexus!
+          <div class="form-group">
+            <label for="email">College Email (.edu)</label>
+            <input type="email" id="email" placeholder="your@university.edu" required>
+            <div class="form-hint">Required to verify student status per <a href="age-safety.html" target="_blank">Missouri law</a></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" placeholder="8+ characters" required minlength="8">
+              <div class="password-strength">
+                <div class="password-strength-bar" id="passwordStrength"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="birthdate">Date of Birth</label>
+              <input type="date" id="birthdate" required>
+              <div class="form-hint">Must be 18 or older to use StudyFlow</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Legal Certifications -->
+        <div class="form-right">
+          <div class="legal-section-title">Required Certifications</div>
+
+          <div class="terms-checkbox">
+            <input type="checkbox" id="ageGate" required>
+            <label for="ageGate">
+              I certify that I am <a href="age-safety.html" target="_blank">18 years of age or older</a>.
+            </label>
+          </div>
+
+          <div class="terms-checkbox">
+            <input type="checkbox" id="aiTransparency" required>
+            <label for="aiTransparency">
+              I understand that StudyFlow Suite uses <a href="ai-transparency.html" target="_blank">Artificial Intelligence (Gemini 3 Flash Lite)</a> to generate study aids and that outputs may contain inaccuracies.
+            </label>
+          </div>
+
+          <div class="terms-checkbox">
+            <input type="checkbox" id="noteLicense" required>
+            <label for="noteLicense">
+              I grant StudyFlow LLC a <span class="checkbox-highlight">non-exclusive, perpetual license</span> to anonymize and use my uploaded notes to improve the Nexus.
+            </label>
+          </div>
+
+          <div class="terms-checkbox">
+            <input type="checkbox" id="academicIntegrity" required>
+            <label for="academicIntegrity">
+              I agree to use StudyFlow Suite as a <a href="academic-integrity.html" target="_blank">supplemental study tool</a> and will not use it to violate my institution's academic integrity policies.
+            </label>
+          </div>
+
+          <div class="terms-checkbox">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">
+              I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.
+            </label>
+          </div>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="email">College Email (.edu)</label>
-        <input type="email" id="email" placeholder="your@university.edu" required>
-        <div style="font-size: 12px; color: #6b8575; margin-top: 6px;">
-          A valid .edu email is required to verify your student status and age per <a href="age-safety.html" target="_blank" style="color: #7c9885; font-weight: 600;">Missouri law</a>.
+      <!-- Bottom bar -->
+      <div class="form-bottom">
+        <button type="submit" class="btn-primary" id="submitBtn">Create Account</button>
+        <div class="auth-footer">
+          Already have an account? <a href="index.html">Sign in</a>
         </div>
       </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="At least 8 characters" required minlength="8">
-        <div class="password-strength">
-          <div class="password-strength-bar" id="passwordStrength"></div>
-        </div>
-      </div>
-
-      <div class="legal-section">
-        <div class="legal-section-title">Required Certifications</div>
-
-        <div class="terms-checkbox">
-          <input type="checkbox" id="ageGate" required>
-          <label for="ageGate">
-            I certify that I am <a href="age-safety.html" target="_blank">18 years of age or older</a>.
-          </label>
-        </div>
-
-        <div class="terms-checkbox">
-          <input type="checkbox" id="aiTransparency" required>
-          <label for="aiTransparency">
-            I understand that StudyFlow Suite uses <a href="ai-transparency.html" target="_blank">Artificial Intelligence (Gemini 3 Flash Lite)</a> to generate study aids and that outputs may contain inaccuracies.
-          </label>
-        </div>
-
-        <div class="terms-checkbox">
-          <input type="checkbox" id="noteLicense" required>
-          <label for="noteLicense">
-            I grant StudyFlow LLC a <span class="checkbox-highlight">non-exclusive, perpetual license</span> to anonymize and use my uploaded notes to improve the Nexus.
-          </label>
-        </div>
-
-        <div class="terms-checkbox">
-          <input type="checkbox" id="academicIntegrity" required>
-          <label for="academicIntegrity">
-            I agree to use StudyFlow Suite as a <a href="academic-integrity.html" target="_blank">supplemental study tool</a> and will not use it to violate my institution's academic integrity policies.
-          </label>
-        </div>
-
-        <div class="terms-checkbox">
-          <input type="checkbox" id="terms" required>
-          <label for="terms">
-            I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.
-          </label>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-primary" id="submitBtn">
-        Create Account
-      </button>
     </form>
-
-    <div class="auth-divider">or</div>
-
-    <div class="auth-footer">
-      Already have an account? <a href="index.html">Sign in</a>
-    </div>
   </div>
 
   <script>
@@ -433,11 +471,16 @@
       }
     });
 
+    // Set max date for birthdate (today)
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('birthdate').setAttribute('max', today);
+
     const signupForm = document.getElementById('signupForm');
     const nameInput = document.getElementById('name');
     const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    const birthdateInput = document.getElementById('birthdate');
     const termsInput = document.getElementById('terms');
     const submitBtn = document.getElementById('submitBtn');
     const errorMessage = document.getElementById('errorMessage');
@@ -447,6 +490,7 @@
       errorMessage.textContent = message;
       errorMessage.style.display = 'block';
       successMessage.style.display = 'none';
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function showSuccess(message) {
@@ -460,6 +504,17 @@
       successMessage.style.display = 'none';
     }
 
+    function calculateAge(birthdate) {
+      const today = new Date();
+      const birth = new Date(birthdate);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age;
+    }
+
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       hideMessages();
@@ -468,13 +523,14 @@
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
+      const birthdate = birthdateInput.value;
       const ageGate = document.getElementById('ageGate').checked;
       const aiTransparency = document.getElementById('aiTransparency').checked;
       const noteLicense = document.getElementById('noteLicense').checked;
       const academicIntegrity = document.getElementById('academicIntegrity').checked;
       const terms = termsInput.checked;
 
-      if (!name || !username || !email || !password) {
+      if (!name || !username || !email || !password || !birthdate) {
         showError('Please fill in all fields');
         return;
       }
@@ -488,6 +544,13 @@
       // Validate username format
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
         showError('Username must be 3-20 characters (letters, numbers, underscores only)');
+        return;
+      }
+
+      // Validate age from birthdate (Missouri SB 1455)
+      const age = calculateAge(birthdate);
+      if (age < 18) {
+        showError('You must be 18 years of age or older to use StudyFlow Suite, as required by Missouri law (SB 1455).');
         return;
       }
 
@@ -527,7 +590,8 @@
           options: {
             data: {
               full_name: name,
-              username: username
+              username: username,
+              birthdate: birthdate
             }
           }
         });
