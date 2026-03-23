@@ -418,11 +418,14 @@
     <!-- Verification Gate (shown only if .edu not verified) -->
     <div class="verification-gate" id="verificationGate" style="display: none;">
       <div class="gate-icon">🎓</div>
-      <h2 class="gate-title">Verify Your .edu Email</h2>
+      <h2 class="gate-title">.edu Email Required</h2>
       <p class="gate-text">
-        To browse and download notes from other students, you need to verify your university email address (.edu). This creates a trusted educational sandbox and protects student contributors.
+        To browse and download notes from other students, you need a verified university email address (.edu). This creates a trusted educational sandbox and protects student contributors.
       </p>
-      <button class="verify-btn" onclick="window.location.href='settings.html'">Verify Email Address</button>
+      <p class="gate-text" style="margin-top: 16px; font-size: 14px; color: #7c9885;">
+        Sign up with your university email to access the Nexus note library.
+      </p>
+      <button class="verify-btn" onclick="window.location.href='signup.html'">Sign Up with .edu Email</button>
     </div>
 
     <!-- Main Browse Interface (hidden until verified) -->
@@ -512,19 +515,15 @@
       const firstLetter = userEmail.charAt(0).toUpperCase();
       document.getElementById('userAvatar').textContent = firstLetter;
 
-      // Check if user has verified .edu email
-      const { data: profile } = await supabaseClient
-        .from('user_profiles')
-        .select('edu_email_verified')
-        .eq('id', currentUser.id)
-        .single();
+      // Check if user has .edu email
+      const isEduEmail = userEmail.toLowerCase().endsWith('.edu');
 
-      if (!profile || !profile.edu_email_verified) {
-        // Show verification gate
+      if (!isEduEmail) {
+        // Show verification gate for non-.edu emails
         document.getElementById('verificationGate').style.display = 'block';
         document.getElementById('browseInterface').style.display = 'none';
       } else {
-        // Show browse interface
+        // Show browse interface for .edu emails
         document.getElementById('verificationGate').style.display = 'none';
         document.getElementById('browseInterface').style.display = 'block';
         await loadNotes();
