@@ -90,6 +90,92 @@
       box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
     }
 
+    /* Good Standing Status Widget */
+    .good-standing-widget {
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.06) 100%);
+      border-radius: 12px;
+      border: 2px solid rgba(16, 185, 129, 0.2);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    .good-standing-widget.bad-standing {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.06) 100%);
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .good-standing-widget.permanent-ban {
+      background: linear-gradient(135deg, rgba(127, 29, 29, 0.12) 0%, rgba(87, 13, 13, 0.08) 100%);
+      border-color: rgba(127, 29, 29, 0.3);
+    }
+
+    .standing-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .standing-icon {
+      font-size: 32px;
+    }
+
+    .standing-info h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0 0 4px 0;
+    }
+
+    .standing-info p {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .standing-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .standing-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .standing-badge.good {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+
+    .standing-badge.warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+    }
+
+    .standing-badge.danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #dc2626;
+    }
+
+    .strike-count {
+      font-size: 13px;
+      color: #6b7280;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
     /* Impact Panel */
     .impact-panel {
       margin-bottom: 24px;
@@ -861,6 +947,25 @@
 
   <!-- Main Container -->
   <div class="container">
+    <!-- Good Standing Status Widget -->
+    <div class="good-standing-widget" id="goodStandingWidget" style="display: none;">
+      <div class="standing-left">
+        <div class="standing-icon" id="standingIcon">✓</div>
+        <div class="standing-info">
+          <h3 id="standingTitle">Good Standing</h3>
+          <p id="standingMessage">You can download notes from the community</p>
+        </div>
+      </div>
+      <div class="standing-right">
+        <div class="standing-badge good" id="standingBadge">
+          <span id="badgeText">Active</span>
+        </div>
+        <div class="strike-count" id="strikeDisplay" style="display: none;">
+          Strikes: <span id="strikeCount">0</span>/3
+        </div>
+      </div>
+    </div>
+
     <!-- Impact Panel -->
     <div class="impact-panel" id="impactPanel">
       <div class="impact-header" onclick="toggleImpactPanel()">
@@ -1059,6 +1164,7 @@
         userAvatar.textContent = session.user.email.charAt(0).toUpperCase();
       }
 
+      await loadGoodStandingStatus();
       await loadFolders();
       await loadNotes();
     }
@@ -1107,6 +1213,82 @@
     }
 
     // Load notes
+    // Load Good Standing status
+    async function loadGoodStandingStatus() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/good-standing/status`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+          console.error('Failed to load Good Standing status');
+          return;
+        }
+
+        const data = await response.json();
+        const widget = document.getElementById('goodStandingWidget');
+        const icon = document.getElementById('standingIcon');
+        const title = document.getElementById('standingTitle');
+        const message = document.getElementById('standingMessage');
+        const badge = document.getElementById('standingBadge');
+        const badgeText = document.getElementById('badgeText');
+        const strikeDisplay = document.getElementById('strikeDisplay');
+        const strikeCount = document.getElementById('strikeCount');
+
+        // Show widget
+        widget.style.display = 'flex';
+
+        // Update strike count
+        if (data.dmca_strikes > 0) {
+          strikeDisplay.style.display = 'block';
+          strikeCount.textContent = data.dmca_strikes;
+        }
+
+        // Update UI based on status
+        if (data.permanent_bad_standing) {
+          // Permanent ban
+          widget.className = 'good-standing-widget permanent-ban';
+          icon.textContent = '⛔';
+          title.textContent = 'Account Suspended';
+          message.textContent = 'Permanent ban due to 3 DMCA strikes';
+          badge.className = 'standing-badge danger';
+          badgeText.textContent = 'Banned';
+        } else if (!data.good_standing) {
+          // Bad standing
+          widget.className = 'good-standing-widget bad-standing';
+          icon.textContent = '⚠';
+          title.textContent = 'Not in Good Standing';
+          message.textContent = 'Upload a verified note to download from the community';
+          badge.className = 'standing-badge warning';
+          badgeText.textContent = 'Inactive';
+        } else {
+          // Good standing
+          widget.className = 'good-standing-widget';
+          icon.textContent = '✓';
+          title.textContent = 'Good Standing';
+
+          if (data.reason === 'recent_upload') {
+            const daysLeft = data.days_until_expiry;
+            if (daysLeft <= 7) {
+              message.textContent = `Expires in ${daysLeft} days - upload soon!`;
+              badge.className = 'standing-badge warning';
+              badgeText.textContent = `${daysLeft} days left`;
+            } else {
+              message.textContent = 'You can download notes from the community';
+              badge.className = 'standing-badge good';
+              badgeText.textContent = `Active (${daysLeft} days)`;
+            }
+          } else if (data.reason === 'active_subscription') {
+            message.textContent = 'Active subscription - unlimited access';
+            badge.className = 'standing-badge good';
+            badgeText.textContent = 'Subscribed';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading Good Standing status:', error);
+      }
+    }
+
     async function loadNotes() {
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
