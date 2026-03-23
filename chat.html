@@ -948,6 +948,51 @@
       }
     }
 
+    /* SB 1455 Persistent AI Banner */
+    .ai-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: rgba(124, 152, 133, 0.08);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.12);
+      font-size: 11px;
+      font-weight: 500;
+      color: #7c9885;
+      letter-spacing: 0.03em;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    body.chat-started .ai-banner {
+      display: flex;
+    }
+
+    .ai-banner-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #7c9885;
+    }
+
+    /* SB 1455 Disclosure message in chat */
+    .message.disclosure {
+      display: flex;
+      justify-content: center;
+    }
+
+    .message.disclosure .message-content {
+      background: rgba(124, 152, 133, 0.06);
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      color: #6b8575;
+      font-size: 13px;
+      text-align: center;
+      max-width: 480px;
+      padding: 16px 24px;
+      box-shadow: none;
+    }
+
     .typing-indicator {
       display: flex;
       gap: 6px;
@@ -1473,17 +1518,6 @@
       </div>
     </div>
 
-    <!-- AI Disclosure Modal (SB 1455 / GUARD Act) -->
-    <div class="zen-confirm-overlay" id="aiDisclosureOverlay">
-      <div class="zen-confirm-card">
-        <div class="zen-confirm-title">AI Disclosure Reminder</div>
-        <div class="zen-confirm-message">You are chatting with an AI assistant, not a human. StudyFlow's chatbot is powered by artificial intelligence (Gemini 3 Flash Lite). All responses are machine-generated and may contain errors. Please verify important information independently.</div>
-        <div class="zen-confirm-actions">
-          <button class="zen-confirm-btn confirm" id="aiDisclosureOk" style="background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(124, 152, 133, 0.1) 100%); color: #6b8575; border-color: rgba(124, 152, 133, 0.4);">I Understand</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Menu Button (appears after chat starts) -->
     <button class="menu-btn" id="menuBtn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1520,6 +1554,12 @@
           </svg>
         </button>
       </div>
+    </div>
+
+    <!-- Persistent AI Banner (SB 1455) -->
+    <div class="ai-banner" id="aiBanner">
+      <span class="ai-banner-dot"></span>
+      AI Assistant -- You are chatting with an artificial intelligence, not a human.
     </div>
 
     <!-- Messages Container (hidden until chat starts) -->
@@ -1847,6 +1887,9 @@
         // Transform to chat mode
         document.body.classList.add('chat-started');
 
+        // SB 1455: Disclosure at initiation of each conversation
+        injectInitiationDisclosure();
+
         // Display all messages
         data.messages.forEach(msg => {
           addMessage(msg.content, msg.role);
@@ -1854,6 +1897,9 @@
 
         // Set active conversation
         conversationId = convId;
+
+        // Restart rolling disclosure timer
+        startAiDisclosureTimer();
 
         // Update active state in sidebar
         document.querySelectorAll('.conversation-item').forEach(item => {
@@ -2031,12 +2077,11 @@
       const message = messageText || searchInput.value.trim();
       if (!message) return;
 
-      // Reset AI disclosure timer on user activity (SB 1455)
-      startAiDisclosureTimer();
-
       // Transform to chat mode on first message
       if (!document.body.classList.contains('chat-started')) {
         document.body.classList.add('chat-started');
+        // SB 1455: Disclosure at initiation of each conversation
+        injectInitiationDisclosure();
       }
 
       // Clear and disable input
@@ -2159,31 +2204,44 @@
       }
     }
 
-    // ---- SB 1455 / GUARD Act: AI Disclosure Timer ----
+    // ---- SB 1455 / GUARD Act: AI Disclosure System ----
+    // Rolling 30-min clock from session start. NOT reset per message.
+    // Disclosure fires at: conversation initiation + every 30 min of active session.
 
     function startAiDisclosureTimer() {
-      if (aiDisclosureTimerId) clearTimeout(aiDisclosureTimerId);
-      aiDisclosureTimerId = setTimeout(() => {
-        showAiDisclosure();
+      if (aiDisclosureTimerId) clearInterval(aiDisclosureTimerId);
+      aiDisclosureTimerId = setInterval(() => {
+        injectDisclosureMessage();
       }, AI_DISCLOSURE_INTERVAL_MS);
     }
 
-    function showAiDisclosure() {
-      return new Promise((resolve) => {
-        const overlay = document.getElementById('aiDisclosureOverlay');
-        const okBtn = document.getElementById('aiDisclosureOk');
+    function injectDisclosureMessage() {
+      // Only inject if chat is active
+      if (!document.body.classList.contains('chat-started')) return;
 
-        overlay.classList.add('active');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message disclosure';
 
-        const handleOk = () => {
-          overlay.classList.remove('active');
-          okBtn.removeEventListener('click', handleOk);
-          startAiDisclosureTimer();
-          resolve(true);
-        };
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.textContent = "You've been studying with StudyFlow AI for a while! Just a reminder: I'm an artificial intelligence assistant, not a human or licensed professional. My responses are machine-generated and may contain errors -- always verify important information independently.";
 
-        okBtn.addEventListener('click', handleOk);
-      });
+      messageDiv.appendChild(contentDiv);
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function injectInitiationDisclosure() {
+      // Required at "initiation of each conversation" per SB 1455
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message disclosure';
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.textContent = "You are chatting with StudyFlow AI, an artificial intelligence assistant powered by Gemini 3 Flash Lite. I am not a human. My responses are machine-generated and may contain inaccuracies. Please verify important information independently.";
+
+      messageDiv.appendChild(contentDiv);
+      messagesContainer.appendChild(messageDiv);
     }
 
     // ---- SB 1324 Provenance Compliance ----
@@ -2352,6 +2410,9 @@
       // Clear and focus search input
       searchInput.value = '';
       searchInput.focus();
+
+      // Restart rolling disclosure timer (SB 1455)
+      startAiDisclosureTimer();
     }
 
     // Event Listeners
