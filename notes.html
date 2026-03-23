@@ -855,6 +855,7 @@
   <div class="context-menu" id="contextMenu">
     <div class="context-menu-item" id="contextRename">Rename</div>
     <div class="context-menu-item" id="contextDownload">Download</div>
+    <div class="context-menu-item" id="contextVisibility">Make Public</div>
     <div class="context-menu-item danger" id="contextDelete">Delete</div>
   </div>
 
@@ -1310,6 +1311,19 @@
       contextMenuItem = { id, type };
 
       const menu = document.getElementById('contextMenu');
+
+      // Update visibility toggle text based on current state (only for notes)
+      const visibilityItem = document.getElementById('contextVisibility');
+      if (type === 'note') {
+        const note = allNotes.find(n => n.id === id);
+        const isPublic = note ? (note.is_public !== false) : true; // Default to public
+        visibilityItem.textContent = isPublic ? 'Make Private' : 'Make Public';
+        visibilityItem.style.display = 'flex';
+      } else {
+        // Hide visibility toggle for folders
+        visibilityItem.style.display = 'none';
+      }
+
       menu.classList.add('active');
       menu.style.left = event.pageX + 'px';
       menu.style.top = event.pageY + 'px';
@@ -1410,6 +1424,39 @@
       const note = allNotes.find(n => n.id === contextMenuItem.id);
       if (note) {
         await downloadNote(note.id, note.filename);
+      }
+    }
+
+    async function toggleNoteVisibility() {
+      if (!contextMenuItem || contextMenuItem.type !== 'note') return;
+      closeContextMenu();
+
+      const note = allNotes.find(n => n.id === contextMenuItem.id);
+      if (!note) return;
+
+      const currentlyPublic = note.is_public !== false;
+      const newPublicState = !currentlyPublic;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${contextMenuItem.id}/visibility`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ is_public: newPublicState })
+        });
+
+        if (response.ok) {
+          // Update local note object
+          note.is_public = newPublicState;
+          console.log(`Note is now ${newPublicState ? 'public' : 'private'}`);
+        } else {
+          alert('Failed to update note visibility');
+        }
+      } catch (error) {
+        console.error('Error updating visibility:', error);
+        alert('Failed to update note visibility');
       }
     }
 
@@ -1822,6 +1869,11 @@
     document.getElementById('contextDownload').addEventListener('click', (e) => {
       e.stopPropagation();
       downloadItem();
+    });
+
+    document.getElementById('contextVisibility').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleNoteVisibility();
     });
 
     document.getElementById('contextDelete').addEventListener('click', (e) => {
