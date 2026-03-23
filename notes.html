@@ -1183,7 +1183,7 @@
         </div>
       </div>
       <div class="preview-actions">
-        <button class="preview-btn" onclick="downloadPreviewedNote()">Download</button>
+        <button class="preview-btn" id="previewDownloadBtn" onclick="downloadPreviewedNote()">Download</button>
         <button class="preview-btn" onclick="deletePreviewedNote()">Delete</button>
       </div>
     </div>
@@ -1312,30 +1312,34 @@
         // Update global Good Standing status
         isInGoodStanding = data.good_standing && !data.permanent_bad_standing;
 
+        console.log('[Good Standing] Status loaded:', {
+          good_standing: data.good_standing,
+          permanent_bad_standing: data.permanent_bad_standing,
+          isInGoodStanding: isInGoodStanding
+        });
+
         // Update download buttons based on Good Standing
         const contextDownloadBtn = document.getElementById('contextDownload');
-        const previewDownloadBtns = document.querySelectorAll('.preview-btn');
+        const previewDownloadBtn = document.getElementById('previewDownloadBtn');
 
         if (!isInGoodStanding) {
           // Disable download buttons when not in good standing
+          console.log('[Good Standing] Disabling download buttons');
           if (contextDownloadBtn) {
             contextDownloadBtn.classList.add('disabled');
           }
-          previewDownloadBtns.forEach(btn => {
-            if (btn.textContent.includes('Download')) {
-              btn.disabled = true;
-            }
-          });
+          if (previewDownloadBtn) {
+            previewDownloadBtn.disabled = true;
+          }
         } else {
           // Enable download buttons when in good standing
+          console.log('[Good Standing] Enabling download buttons');
           if (contextDownloadBtn) {
             contextDownloadBtn.classList.remove('disabled');
           }
-          previewDownloadBtns.forEach(btn => {
-            if (btn.textContent.includes('Download')) {
-              btn.disabled = false;
-            }
-          });
+          if (previewDownloadBtn) {
+            previewDownloadBtn.disabled = false;
+          }
         }
 
         // Update UI based on status
@@ -1713,6 +1717,16 @@
       } else {
         // Hide visibility toggle for folders
         visibilityItem.style.display = 'none';
+      }
+
+      // Update download button state based on Good Standing
+      const downloadBtn = document.getElementById('contextDownload');
+      if (downloadBtn) {
+        if (!isInGoodStanding) {
+          downloadBtn.classList.add('disabled');
+        } else {
+          downloadBtn.classList.remove('disabled');
+        }
       }
 
       menu.classList.add('active');
