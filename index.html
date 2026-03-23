@@ -454,81 +454,143 @@
 
     .loading.active { display: block; }
 
+    /* Mobile Optimization - Streamlined for all devices */
     @media (max-width: 968px) {
+      body::before, body::after {
+        opacity: 0.3; /* Reduce visual complexity */
+      }
+
       .container {
         flex-direction: column;
         height: auto;
+        overflow-y: auto;
       }
 
       .content-area {
-        padding: 40px 30px;
+        padding: 30px 20px;
+        overflow-y: visible;
       }
 
       .login-section {
         flex: 0 0 auto;
-        padding: 40px 30px;
+        padding: 30px 20px;
         border-left: none;
-        border-top: 3px solid transparent;
-        border-image: linear-gradient(to right, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+        border-top: 2px solid rgba(124, 152, 133, 0.2);
+        box-shadow: none;
       }
 
       .hero h1 {
-        font-size: 36px;
+        font-size: 32px;
       }
 
-      .collective-brain {
-        padding: 40px 30px;
-      }
-
-      .collective-brain h2 {
-        font-size: 28px;
-      }
-
-      .collective-brain > p {
+      .hero p {
         font-size: 16px;
       }
 
+      .collective-brain {
+        padding: 30px 20px;
+      }
+
+      .collective-brain h2 {
+        font-size: 24px;
+      }
+
+      .collective-brain > p {
+        font-size: 15px;
+      }
+
       .brain-animation-container {
-        padding: 40px 20px;
-        min-height: auto;
-        gap: 30px;
+        padding: 30px 15px;
+        gap: 25px;
       }
 
       .suite-title {
-        font-size: 48px;
+        font-size: 40px;
         letter-spacing: -1px;
       }
 
       .live-stats {
-        flex-direction: column;
+        gap: 40px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stat-number {
+        font-size: 36px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .network-flow {
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .flow-step {
+        max-width: 100%;
+      }
+
+      .flow-icon {
+        width: 45px;
+        height: 45px;
+      }
+
+      .flow-title {
+        font-size: 14px;
+      }
+
+      .flow-desc {
+        font-size: 12px;
+      }
+
+      .flow-arrow {
+        display: none; /* Hide arrows on mobile for cleaner look */
+      }
+
+      .info-text {
+        margin-top: 30px;
+        padding: 0 15px;
+      }
+
+      .info-text p {
+        font-size: 14px;
+      }
+    }
+
+    /* Extra small devices - ultra streamlined */
+    @media (max-width: 480px) {
+      .content-area, .login-section {
+        padding: 20px 16px;
+      }
+
+      .suite-title {
+        font-size: 32px;
+      }
+
+      .hero h1 {
+        font-size: 28px;
+      }
+
+      .collective-brain h2 {
+        font-size: 22px;
+      }
+
+      .stat-number {
+        font-size: 32px;
+      }
+
+      .live-stats {
         gap: 30px;
       }
 
       .network-flow {
-        flex-direction: column;
-        gap: 30px;
-        margin-top: 40px;
-      }
-
-      .flow-arrow {
-        transform: rotate(90deg);
-      }
-
-      .info-text {
-        margin-top: 40px;
-        padding: 0 20px;
+        gap: 15px;
       }
 
       .info-text p {
-        font-size: 15px;
-      }
-
-      .stat-number {
-        font-size: 44px;
-      }
-
-      .stat-label {
-        font-size: 12px;
+        font-size: 13px;
       }
     }
   </style>
