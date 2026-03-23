@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DMCA & Copyright - StudyFlow Suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .legal-hero {
+      position: relative;
+      z-index: 1;
+      padding: 100px 0 60px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .legal-hero-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .legal-hero-subtitle {
+      font-size: 1.125rem;
+      color: #5d5d5d;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    .legal-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .dmca-section {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid rgba(124, 152, 133, 0.2);
+    }
+
+    .section-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #4a4a4a;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(232, 155, 95, 0.1) 0%, rgba(232, 155, 95, 0.05) 100%);
+      border-left: 4px solid #e89b5f;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .warning-box strong {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .contact-box {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(124, 152, 133, 0.04) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 0.75rem;
+    }
+
+    .contact-item strong {
+      min-width: 140px;
+      color: #6b8575;
+      font-weight: 600;
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2.5rem;
+      border-radius: 12px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #2d2d2d;
+      font-size: 0.95rem;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      background: white;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #7c9885;
+      box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .form-checkbox {
+      margin-top: 4px;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 152, 133, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(124, 152, 133, 0.05) 100%);
+      border: 2px solid #7c9885;
+      padding: 1.5rem;
+      border-radius: 12px;
+      color: #2d2d2d;
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, rgba(232, 155, 95, 0.1) 0%, rgba(232, 155, 95, 0.05) 100%);
+      border: 2px solid #e89b5f;
+      padding: 1.5rem;
+      border-radius: 12px;
+      color: #d97706;
+      display: none;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .legal-hero-title {
+        font-size: 2.5rem;
+      }
+
+      .dmca-section,
+      .form-container {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="icon128.png" alt="StudyFlow" style="width: 32px; height: 32px; border-radius: 7px;">
+        <span class="logo-text">StudyFlow Suite</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="upload.html" class="btn btn-primary">Get Started</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="legal-hero">
+    <h1 class="legal-hero-title">DMCA & Copyright Policy</h1>
+    <p class="legal-hero-subtitle">We respect intellectual property rights and comply with the Digital Millennium Copyright Act</p>
+  </section>
+
+  <!-- Content -->
+  <section class="legal-content">
+    <!-- DMCA Safe Harbor -->
+    <div class="dmca-section">
+      <h2 class="section-title">DMCA Safe Harbor Compliance</h2>
+      <p class="section-text">
+        StudyFlow Suite operates as a Protected Service Provider under Section 512 of the Digital Millennium Copyright Act (DMCA). We provide tools for students to share educational notes with proper attribution and safeguards.
+      </p>
+      <p class="section-text">
+        We have registered a Designated Agent with the U.S. Copyright Office to receive notices of claimed infringement. If you believe content on StudyFlow infringes your copyright, please submit a takedown request below.
+      </p>
+
+      <div class="warning-box">
+        <strong>Federal Law Notice (DMCA § 1202):</strong> Removing or altering StudyFlow watermarks from downloaded notes is a violation of Federal Law and may result in civil and criminal penalties.
+      </div>
+    </div>
+
+    <!-- Designated Agent Contact -->
+    <div class="dmca-section">
+      <h2 class="section-title">Designated Copyright Agent</h2>
+      <p class="section-text">
+        For DMCA takedown requests and copyright concerns, please contact our designated agent:
+      </p>
+
+      <div class="contact-box">
+        <div class="contact-item">
+          <strong>Agent Name:</strong>
+          <span>StudyFlow DMCA Agent</span>
+        </div>
+        <div class="contact-item">
+          <strong>Email:</strong>
+          <span>dmca@studyflowsuite.com</span>
+        </div>
+        <div class="contact-item">
+          <strong>Physical Address:</strong>
+          <span>StudyFlow Suite<br>DMCA Compliance Department<br>[Your Address]<br>[City, State ZIP]</span>
+        </div>
+        <div class="contact-item">
+          <strong>Response Time:</strong>
+          <span>We respond to valid takedown notices within 24-48 hours</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Takedown Request Form -->
+    <div class="dmca-section">
+      <h2 class="section-title">Submit a Takedown Request</h2>
+      <p class="section-text">
+        If you believe that content uploaded to StudyFlow Suite infringes your copyright, please complete this form. We take copyright claims seriously and will investigate promptly.
+      </p>
+
+      <div class="form-container">
+        <form id="takedownForm">
+          <div class="form-group">
+            <label class="form-label" for="requestor-name">Your Full Name *</label>
+            <input type="text" id="requestor-name" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="requestor-email">Your Email Address *</label>
+            <input type="email" id="requestor-email" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="requestor-type">I am a... *</label>
+            <select id="requestor-type" class="form-select" required>
+              <option value="">Select one</option>
+              <option value="student">Student</option>
+              <option value="professor">Professor/Instructor</option>
+              <option value="university">University Administrator</option>
+              <option value="copyright_holder">Copyright Holder</option>
+              <option value="authorized_agent">Authorized Agent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="note-filename">Note Filename or URL *</label>
+            <input type="text" id="note-filename" class="form-input" placeholder="e.g., Biology_Chapter_3.pdf or https://studyflowsuite.com/note/..." required>
+            <small style="color: #9ca3af; font-size: 0.875rem; display: block; margin-top: 0.5rem;">
+              Provide as much detail as possible to help us locate the content
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="complaint-description">Description of Copyright Claim *</label>
+            <textarea id="complaint-description" class="form-textarea" required placeholder="Please describe:\n- What copyrighted work is being infringed\n- How you own or have rights to this work\n- Why the uploaded content infringes your copyright\n- Any other relevant details"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="evidence-urls">Evidence Links (optional)</label>
+            <input type="text" id="evidence-urls" class="form-input" placeholder="https://example.com/proof-of-ownership.pdf">
+            <small style="color: #9ca3af; font-size: 0.875rem; display: block; margin-top: 0.5rem;">
+              Links to proof of copyright ownership (e.g., textbook publisher page, syllabus, registration)
+            </small>
+          </div>
+
+          <div class="form-checkbox-group">
+            <input type="checkbox" id="good-faith" class="form-checkbox" required>
+            <label for="good-faith" style="font-size: 0.95rem; line-height: 1.6;">
+              I have a good faith belief that the use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.
+            </label>
+          </div>
+
+          <div class="form-checkbox-group">
+            <input type="checkbox" id="accuracy" class="form-checkbox" required>
+            <label for="accuracy" style="font-size: 0.95rem; line-height: 1.6;">
+              The information in this notification is accurate, and under penalty of perjury, I am the copyright owner or authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
+            </label>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Submit Takedown Request</button>
+
+          <div class="success-message" id="successMessage">
+            Thank you. Your DMCA takedown request has been submitted. You will receive a confirmation email and status updates at the address provided.
+          </div>
+
+          <div class="error-message" id="errorMessage">
+            There was an error submitting your request. Please try again or email dmca@studyflowsuite.com directly.
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- User Protections -->
+    <div class="dmca-section">
+      <h2 class="section-title">Student Upload Protections</h2>
+      <p class="section-text">
+        If you upload your own original study notes to StudyFlow, you retain full ownership of your content. By sharing notes with the Nexus, you grant StudyFlow a non-exclusive license to display and distribute your work for educational purposes.
+      </p>
+      <p class="section-text">
+        All note downloads include watermarks with your username and a unique transaction ID. This protects your work and provides attribution while discouraging unauthorized redistribution.
+      </p>
+
+      <div class="warning-box">
+        <strong>Download Limits:</strong> To prevent abuse and protect contributors, users are limited to 3 note downloads per day. Users must also contribute at least 5 notes before they can download others' work.
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+
+    const form = document.getElementById('takedownForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Hide previous messages
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      try {
+        const formData = {
+          requestor_name: document.getElementById('requestor-name').value,
+          requestor_email: document.getElementById('requestor-email').value,
+          requestor_type: document.getElementById('requestor-type').value,
+          note_filename: document.getElementById('note-filename').value,
+          complaint_description: document.getElementById('complaint-description').value,
+          evidence_urls: document.getElementById('evidence-urls').value.split('\n').filter(url => url.trim()),
+          good_faith: document.getElementById('good-faith').checked,
+          accuracy: document.getElementById('accuracy').checked
+        };
+
+        const response = await fetch(`${BACKEND_URL}/api/dmca/takedown`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          successMessage.style.display = 'block';
+          form.reset();
+
+          // Scroll to success message
+          successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          throw new Error('Submission failed');
+        }
+
+      } catch (error) {
+        console.error('Error submitting takedown request:', error);
+        errorMessage.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Takedown Request';
+      }
+    });
+  </script>
+</body>
+</html>
