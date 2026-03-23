@@ -260,9 +260,15 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     let currentNote = null;
+    let authToken = null;
 
     // Get note ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -271,17 +277,24 @@
     if (!noteId) {
       showError('No note ID provided');
     } else {
+      checkAuthAndLoad();
+    }
+
+    async function checkAuthAndLoad() {
+      // Check authentication
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
+        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        return;
+      }
+
+      authToken = session.access_token;
       loadNote(noteId);
     }
 
     async function loadNote(noteId) {
       try {
-        // Get auth token
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) {
-          window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
-          return;
-        }
 
         // Fetch note metadata
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/metadata`, {
@@ -331,7 +344,6 @@
 
     async function trackView(noteId) {
       try {
-        const authToken = localStorage.getItem('authToken');
         await fetch(`${BACKEND_URL}/api/notes/${noteId}/view`, {
           method: 'POST',
           headers: {
