@@ -1199,6 +1199,7 @@
     let folders = [];
     let currentFolder = null;
     let authToken = null;
+    let currentUserId = null; // Track current user ID
     let contextMenuItem = null;
     let renameTarget = null;
     let draggedItem = null;
@@ -1223,6 +1224,7 @@
       }
 
       authToken = session.access_token;
+      currentUserId = session.user.id; // Store current user ID
 
       const userAvatar = document.getElementById('userAvatar');
       if (session.user.email) {
@@ -1719,10 +1721,14 @@
         visibilityItem.style.display = 'none';
       }
 
-      // Update download button state based on Good Standing
+      // Update download button state based on Good Standing (only for notes)
       const downloadBtn = document.getElementById('contextDownload');
-      if (downloadBtn) {
-        if (!isInGoodStanding) {
+      if (downloadBtn && type === 'note') {
+        const note = allNotes.find(n => n.id === id);
+        const isOwnNote = note && note.user_id === currentUserId;
+
+        // Only disable download for OTHER people's notes when not in Good Standing
+        if (!isOwnNote && !isInGoodStanding) {
           downloadBtn.classList.add('disabled');
         } else {
           downloadBtn.classList.remove('disabled');
@@ -1825,19 +1831,21 @@
     async function downloadItem() {
       if (!contextMenuItem || contextMenuItem.type !== 'note') return;
 
-      // Check Good Standing status
-      if (!isInGoodStanding) {
-        alert('Good Standing required to download notes.\n\nUpload a verified note or subscribe to regain access.');
+      const note = allNotes.find(n => n.id === contextMenuItem.id);
+      if (!note) return;
+
+      // Check if this is the user's own note
+      const isOwnNote = note.user_id === currentUserId;
+
+      // Good Standing only required for downloading OTHER people's notes
+      if (!isOwnNote && !isInGoodStanding) {
+        alert('Good Standing required to download notes from the community.\n\nUpload a verified note or subscribe to regain access.\n\n(Your own notes are always downloadable)');
         closeContextMenu();
         return;
       }
 
       closeContextMenu();
-
-      const note = allNotes.find(n => n.id === contextMenuItem.id);
-      if (note) {
-        await downloadNote(note.id, note.filename);
-      }
+      await downloadNote(note.id, note.filename);
     }
 
     async function toggleNoteVisibility() {
@@ -2313,15 +2321,18 @@
     }
 
     async function downloadPreviewedNote() {
-      // Check Good Standing status
-      if (!isInGoodStanding) {
-        alert('Good Standing required to download notes.\n\nUpload a verified note or subscribe to regain access.');
+      if (!previewedNote) return;
+
+      // Check if this is the user's own note
+      const isOwnNote = previewedNote.user_id === currentUserId;
+
+      // Good Standing only required for downloading OTHER people's notes
+      if (!isOwnNote && !isInGoodStanding) {
+        alert('Good Standing required to download notes from the community.\n\nUpload a verified note or subscribe to regain access.\n\n(Your own notes are always downloadable)');
         return;
       }
 
-      if (previewedNote) {
-        await downloadNote(previewedNote.id, previewedNote.filename);
-      }
+      await downloadNote(previewedNote.id, previewedNote.filename);
     }
 
     async function deletePreviewedNote() {
