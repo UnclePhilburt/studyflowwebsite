@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Transparency Statement - StudyFlow Suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .legal-hero {
+      position: relative;
+      z-index: 1;
+      padding: 100px 0 60px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .legal-hero-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .legal-hero-subtitle {
+      font-size: 1.125rem;
+      color: #5d5d5d;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    .legal-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .dmca-section {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid rgba(124, 152, 133, 0.2);
+    }
+
+    .section-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #4a4a4a;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(232, 155, 95, 0.1) 0%, rgba(232, 155, 95, 0.05) 100%);
+      border-left: 4px solid #e89b5f;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .warning-box strong {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(124, 152, 133, 0.04) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    .info-box strong {
+      color: #6b8575;
+      font-weight: 600;
+    }
+
+    .provenance-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+    }
+
+    .provenance-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #4a4a4a;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .provenance-list li:last-child {
+      border-bottom: none;
+    }
+
+    .provenance-list .check {
+      color: #7c9885;
+      font-weight: 700;
+      min-width: 20px;
+    }
+
+    .statute-ref {
+      font-size: 0.875rem;
+      color: #7c9885;
+      font-weight: 500;
+      display: inline-block;
+      background: rgba(124, 152, 133, 0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+
+    .last-updated {
+      text-align: center;
+      color: #9a9a9a;
+      font-size: 0.875rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .legal-hero-title {
+        font-size: 2.5rem;
+      }
+
+      .dmca-section {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="icon128.png" alt="StudyFlow" style="width: 32px; height: 32px; border-radius: 7px;">
+        <span class="logo-text">StudyFlow Suite</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="upload.html" class="btn btn-primary">Get Started</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="legal-hero">
+    <h1 class="legal-hero-title">AI Transparency Statement</h1>
+    <p class="legal-hero-subtitle">How StudyFlow Suite uses artificial intelligence, and what we do to keep it honest</p>
+  </section>
+
+  <!-- Content -->
+  <section class="legal-content">
+    <!-- Missouri SB 1324 Disclosure -->
+    <div class="dmca-section">
+      <h2 class="section-title">AI Disclosure <span class="statute-ref">Missouri SB 1324</span></h2>
+      <p class="section-text">
+        StudyFlow Suite uses <strong>Google Gemini 3 Flash Lite</strong>, a large language model, to synthesize and explain content from student-uploaded notes. When you ask a question in our AI Chat, the model generates a response based on material in the Nexus (our shared knowledge base) and your personal uploads.
+      </p>
+      <p class="section-text">
+        All AI-generated content on StudyFlow is labeled and watermarked for provenance tracking. This means every response can be traced back to the model, timestamp, and source materials that produced it -- as required by Missouri's AI Transparency and Accountability Act (SB 1324), effective August 28, 2026.
+      </p>
+    </div>
+
+    <!-- What We Track -->
+    <div class="dmca-section">
+      <h2 class="section-title">Provenance Markers</h2>
+      <p class="section-text">
+        Every AI-generated response on StudyFlow carries multiple layers of provenance information so that AI content can always be identified and verified:
+      </p>
+
+      <ul class="provenance-list">
+        <li>
+          <span class="check">+</span>
+          <span><strong>Visible Label</strong> -- Every AI response displays an "AI-Generated by StudyFlow Suite" label with the exact UTC timestamp of generation.</span>
+        </li>
+        <li>
+          <span class="check">+</span>
+          <span><strong>Depiction Disclaimer</strong> -- A notice stating that AI-generated content does not reflect the actual statements or actions of any depicted individual.</span>
+        </li>
+        <li>
+          <span class="check">+</span>
+          <span><strong>Invisible Watermark</strong> -- A zero-width character steganography signature is embedded in every AI response, encoding the origin platform and generation timestamp. This watermark persists when text is copied or shared.</span>
+        </li>
+        <li>
+          <span class="check">+</span>
+          <span><strong>Clipboard Attribution</strong> -- When AI-generated text is copied from StudyFlow, provenance attribution is automatically appended to the clipboard content.</span>
+        </li>
+        <li>
+          <span class="check">+</span>
+          <span><strong>Source Attribution</strong> -- Each response cites the Nexus notes, Wikipedia articles, or other materials that informed the AI's answer, including contributor usernames where available.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 7-Year Logging -->
+    <div class="dmca-section">
+      <h2 class="section-title">Usage Logging & Retention <span class="statute-ref">SB 1324 Section 3(b)</span></h2>
+      <p class="section-text">
+        As required by Missouri law, StudyFlow maintains encrypted logs of every AI-generated response for a period of <strong>seven (7) years</strong>. These logs include:
+      </p>
+
+      <ul class="provenance-list">
+        <li><span class="check">+</span><span>Timestamp of when the response was generated</span></li>
+        <li><span class="check">+</span><span>User identity (who triggered the AI)</span></li>
+        <li><span class="check">+</span><span>The prompt or question that was asked</span></li>
+        <li><span class="check">+</span><span>Output description (response length, cryptographic hash, type)</span></li>
+        <li><span class="check">+</span><span>Sources used (which notes and materials informed the AI)</span></li>
+        <li><span class="check">+</span><span>Model identifier (which AI model generated the response)</span></li>
+        <li><span class="check">+</span><span>Provenance signature (the steganographic watermark embedded in the response)</span></li>
+      </ul>
+
+      <div class="info-box">
+        <strong>Your Privacy:</strong> While we retain provenance metadata for legal compliance, we do not store the full text of AI responses in these logs. Instead, we store a SHA-256 cryptographic hash that can verify the content without exposing it. For details on how your data is handled, see our <a href="privacy.html" style="color: #7c9885; font-weight: 500;">Privacy Policy</a>.
+      </div>
+    </div>
+
+    <!-- What AI Cannot Do -->
+    <div class="dmca-section">
+      <h2 class="section-title">Limitations of AI</h2>
+      <p class="section-text">
+        AI-generated content on StudyFlow is a study aid, not a substitute for academic work. The AI may produce responses that are incomplete, inaccurate, or misleading. Students should always verify AI-generated information against primary sources and exercise their own judgment.
+      </p>
+      <p class="section-text">
+        StudyFlow does not use AI to generate or complete academic assignments, write essays for submission, or produce content intended to be presented as a student's own original work. Our AI is designed to <strong>explain and synthesize</strong> material that students have already uploaded.
+      </p>
+
+      <div class="warning-box">
+        <strong>Important:</strong> StudyFlow Suite is not responsible for academic consequences arising from the use of AI-generated content. Students are responsible for ensuring their use of AI tools complies with their institution's academic integrity policies.
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="dmca-section">
+      <h2 class="section-title">Questions or Concerns</h2>
+      <p class="section-text">
+        If you have questions about how StudyFlow uses AI, or if you wish to request your AI interaction logs under Missouri law, please contact us:
+      </p>
+
+      <div class="info-box">
+        <strong>Email:</strong> legal@studyflowsuite.com<br><br>
+        <strong>Subject Line:</strong> "AI Transparency Inquiry" or "SB 1324 Data Request"
+      </div>
+    </div>
+
+    <p class="last-updated">Last updated: March 23, 2026</p>
+  </section>
+</body>
+</html>

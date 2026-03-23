@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Age & Safety Standards - StudyFlow Suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .legal-hero {
+      position: relative;
+      z-index: 1;
+      padding: 100px 0 60px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .legal-hero-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .legal-hero-subtitle {
+      font-size: 1.125rem;
+      color: #5d5d5d;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    .legal-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .dmca-section {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid rgba(124, 152, 133, 0.2);
+    }
+
+    .section-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #4a4a4a;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(232, 155, 95, 0.1) 0%, rgba(232, 155, 95, 0.05) 100%);
+      border-left: 4px solid #e89b5f;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .warning-box strong {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(124, 152, 133, 0.04) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    .info-box strong {
+      color: #6b8575;
+      font-weight: 600;
+    }
+
+    .statute-ref {
+      font-size: 0.875rem;
+      color: #7c9885;
+      font-weight: 500;
+      display: inline-block;
+      background: rgba(124, 152, 133, 0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+
+    .verification-steps {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+      counter-reset: step-counter;
+    }
+
+    .verification-steps li {
+      padding: 1.25rem 1.25rem 1.25rem 4rem;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #4a4a4a;
+      position: relative;
+      counter-increment: step-counter;
+    }
+
+    .verification-steps li:last-child {
+      border-bottom: none;
+    }
+
+    .verification-steps li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 1.25rem;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .last-updated {
+      text-align: center;
+      color: #9a9a9a;
+      font-size: 0.875rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .legal-hero-title {
+        font-size: 2.5rem;
+      }
+
+      .dmca-section {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="icon128.png" alt="StudyFlow" style="width: 32px; height: 32px; border-radius: 7px;">
+        <span class="logo-text">StudyFlow Suite</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="upload.html" class="btn btn-primary">Get Started</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="legal-hero">
+    <h1 class="legal-hero-title">Age & Safety Standards</h1>
+    <p class="legal-hero-subtitle">How StudyFlow Suite verifies user age and protects minors from AI interaction</p>
+  </section>
+
+  <!-- Content -->
+  <section class="legal-content">
+    <!-- Age Requirement -->
+    <div class="dmca-section">
+      <h2 class="section-title">Age Requirement <span class="statute-ref">Missouri SB 1455 / GUARD Act</span></h2>
+      <p class="section-text">
+        StudyFlow Suite is designed for college and university students. In compliance with Missouri's GUARD Act (SB 1455), <strong>all users must be 18 years of age or older</strong> to create an account and interact with our AI-powered features.
+      </p>
+      <p class="section-text">
+        Missouri's GUARD Act requires AI chatbot operators to implement robust age verification processes to prevent minors from interacting with AI companions and conversational AI systems. StudyFlow takes this obligation seriously and has implemented a multi-step verification process.
+      </p>
+
+      <div class="warning-box">
+        <strong>Legal Notice:</strong> Under Missouri SB 1455, operators who knowingly allow minors to interact with AI chatbot systems without proper age verification may face penalties of up to $100,000 per violation. StudyFlow enforces strict age verification to comply with this requirement and protect younger users.
+      </div>
+    </div>
+
+    <!-- How We Verify -->
+    <div class="dmca-section">
+      <h2 class="section-title">How We Verify Age</h2>
+      <p class="section-text">
+        StudyFlow uses a tiered verification approach during account registration to confirm that all users meet the minimum age requirement:
+      </p>
+
+      <ol class="verification-steps">
+        <li>
+          <strong>.edu Email Verification</strong> -- Users register with a valid .edu email address issued by an accredited college or university. Since .edu domains are only issued to post-secondary institutions, this serves as a strong initial indicator that the user is of college age (18+).
+        </li>
+        <li>
+          <strong>Email Confirmation</strong> -- A verification link is sent to the .edu email address. The user must click this link from within the institution's email system to confirm ownership, preventing the use of fabricated or borrowed email addresses.
+        </li>
+        <li>
+          <strong>Terms Acceptance</strong> -- During registration, users must affirmatively confirm that they are 18 years of age or older and agree to our Terms of Service, which include the age requirement.
+        </li>
+        <li>
+          <strong>Government ID Verification (if required)</strong> -- In cases where .edu email verification is insufficient or unavailable, StudyFlow may require government-issued photo ID verification to confirm the user's age before granting access to AI features.
+        </li>
+      </ol>
+    </div>
+
+    <!-- What Happens If Under 18 -->
+    <div class="dmca-section">
+      <h2 class="section-title">If You Are Under 18</h2>
+      <p class="section-text">
+        If you are under 18 years old, you are not eligible to use StudyFlow Suite. We do not knowingly collect personal information from or provide AI services to minors.
+      </p>
+      <p class="section-text">
+        If we discover that an account belongs to a user under 18, we will:
+      </p>
+      <ul style="margin: 0.75rem 0 0 1.25rem; color: #4a4a4a; line-height: 2;">
+        <li>Immediately suspend the account and revoke access to all AI features</li>
+        <li>Delete any personal data associated with the account</li>
+        <li>Delete any AI interaction logs associated with the account</li>
+        <li>Notify the user (and their parent or guardian, if contact information is available)</li>
+      </ul>
+    </div>
+
+    <!-- Parental Notice -->
+    <div class="dmca-section">
+      <h2 class="section-title">Notice to Parents & Guardians</h2>
+      <p class="section-text">
+        StudyFlow Suite includes an AI-powered chat feature that uses Google Gemini to generate responses based on student-uploaded notes. While this tool is educational in nature, Missouri law requires that only verified adults (18+) interact with AI chatbot systems.
+      </p>
+      <p class="section-text">
+        If you believe your child has created an account on StudyFlow without meeting the age requirement, please contact us immediately and we will remove the account and all associated data.
+      </p>
+
+      <div class="info-box">
+        <strong>Report Underage Account:</strong> safety@studyflowsuite.com<br><br>
+        <strong>General Safety Inquiries:</strong> legal@studyflowsuite.com
+      </div>
+    </div>
+
+    <!-- Data Protection -->
+    <div class="dmca-section">
+      <h2 class="section-title">Data Protection for Young Adults</h2>
+      <p class="section-text">
+        Even for verified users aged 18+, StudyFlow applies strong data protection practices:
+      </p>
+      <ul style="margin: 0.75rem 0 0 1.25rem; color: #4a4a4a; line-height: 2;">
+        <li>We do not sell personal data to third parties</li>
+        <li>AI interaction data is logged for legal compliance only (see our <a href="ai-transparency.html" style="color: #7c9885; font-weight: 500;">AI Transparency Statement</a>)</li>
+        <li>Users can request deletion of their data at any time (see our <a href="privacy.html" style="color: #7c9885; font-weight: 500;">Privacy Policy</a>)</li>
+        <li>All data is encrypted in transit and at rest</li>
+      </ul>
+    </div>
+
+    <p class="last-updated">Last updated: March 23, 2026</p>
+  </section>
+</body>
+</html>

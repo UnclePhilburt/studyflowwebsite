@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Integrity Commitment - StudyFlow Suite</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .legal-hero {
+      position: relative;
+      z-index: 1;
+      padding: 100px 0 60px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .legal-hero-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .legal-hero-subtitle {
+      font-size: 1.125rem;
+      color: #5d5d5d;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    .legal-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 24px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .dmca-section {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid rgba(124, 152, 133, 0.2);
+    }
+
+    .section-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #4a4a4a;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(232, 155, 95, 0.1) 0%, rgba(232, 155, 95, 0.05) 100%);
+      border-left: 4px solid #e89b5f;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    .warning-box strong {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.08) 0%, rgba(124, 152, 133, 0.04) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+    }
+
+    .info-box strong {
+      color: #6b8575;
+      font-weight: 600;
+    }
+
+    .safeguard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .safeguard-card {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      padding: 1.5rem;
+      border-radius: 12px;
+    }
+
+    .safeguard-card h4 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 0.5rem;
+    }
+
+    .safeguard-card p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #5a5a5a;
+    }
+
+    .statute-ref {
+      font-size: 0.875rem;
+      color: #7c9885;
+      font-weight: 500;
+      display: inline-block;
+      background: rgba(124, 152, 133, 0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+
+    .last-updated {
+      text-align: center;
+      color: #9a9a9a;
+      font-size: 0.875rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .legal-hero-title {
+        font-size: 2.5rem;
+      }
+
+      .dmca-section {
+        padding: 2rem 1.5rem;
+      }
+
+      .safeguard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <img src="icon128.png" alt="StudyFlow" style="width: 32px; height: 32px; border-radius: 7px;">
+        <span class="logo-text">StudyFlow Suite</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="terms.html">Terms</a></li>
+        <li><a href="privacy.html">Privacy</a></li>
+        <li><a href="upload.html" class="btn btn-primary">Get Started</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="legal-hero">
+    <h1 class="legal-hero-title">Academic Integrity Commitment</h1>
+    <p class="legal-hero-subtitle">StudyFlow Suite is a tutorial and research tool built to support honest learning</p>
+  </section>
+
+  <!-- Content -->
+  <section class="legal-content">
+    <!-- For Educators -->
+    <div class="dmca-section">
+      <h2 class="section-title">A Message to Professors & Administrators <span class="statute-ref">Missouri HB 2271</span></h2>
+      <p class="section-text">
+        We understand the concerns that educators and institutions have about AI-powered study tools. StudyFlow Suite was built by students, for students -- and we share your commitment to academic integrity.
+      </p>
+      <p class="section-text">
+        StudyFlow is <strong>not</strong> a commercial cheating service. It does not write essays, complete assignments, take exams, or produce work intended to be submitted as a student's own. Missouri's Commercial Cheating Services Act (HB 2271) targets services that facilitate plagiarism and academic dishonesty. StudyFlow was designed from the ground up to fall outside that scope.
+      </p>
+      <p class="section-text">
+        Our platform is a <strong>tutorial and research tool</strong> that helps students understand material they have already encountered in class. Students upload their own notes, and our AI helps them review, synthesize, and ask questions about that content -- the same way a study group or tutoring session would.
+      </p>
+    </div>
+
+    <!-- How We Prevent Misuse -->
+    <div class="dmca-section">
+      <h2 class="section-title">Built-In Safeguards</h2>
+      <p class="section-text">
+        StudyFlow has multiple technical safeguards in place to prevent academic dishonesty and ensure our platform is used responsibly:
+      </p>
+
+      <div class="safeguard-grid">
+        <div class="safeguard-card">
+          <h4>Flattened PDF Downloads</h4>
+          <p>All note downloads are flattened PDFs with embedded watermarks. Text cannot be selected, copied, or pasted from downloaded files, preventing direct plagiarism.</p>
+        </div>
+        <div class="safeguard-card">
+          <h4>Watermark Attribution</h4>
+          <p>Every downloaded file includes a visible watermark with the downloader's username and a unique transaction ID, creating a traceable chain of custody.</p>
+        </div>
+        <div class="safeguard-card">
+          <h4>AI Provenance Markers</h4>
+          <p>All AI-generated text carries visible labels, invisible steganographic watermarks, and clipboard attribution -- making it identifiable even when copied elsewhere.</p>
+        </div>
+        <div class="safeguard-card">
+          <h4>Download Limits</h4>
+          <p>Users are limited to 3 downloads per day and must contribute at least 5 notes before downloading, ensuring the platform rewards genuine participation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- What StudyFlow IS vs ISN'T -->
+    <div class="dmca-section">
+      <h2 class="section-title">What StudyFlow Is -- and Isn't</h2>
+
+      <div class="info-box">
+        <strong>StudyFlow IS:</strong>
+        <ul style="margin: 0.75rem 0 0 1.25rem; color: #4a4a4a; line-height: 1.8;">
+          <li>A note-sharing platform where students upload their own study materials</li>
+          <li>An AI tutor that explains and synthesizes content students have already encountered</li>
+          <li>A collaborative study tool (the Nexus) that connects learners across universities</li>
+          <li>A research aid that cites sources, including Wikipedia articles with proper CC BY-SA attribution</li>
+        </ul>
+      </div>
+
+      <div class="warning-box">
+        <strong>StudyFlow IS NOT:</strong>
+        <ul style="margin: 0.75rem 0 0 1.25rem; color: #4a4a4a; line-height: 1.8;">
+          <li>An essay-writing or assignment-completion service</li>
+          <li>A platform for sharing exam questions, answer keys, or proprietary course materials</li>
+          <li>A tool that produces work intended to be submitted as a student's own</li>
+          <li>A service that circumvents academic integrity detection systems</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Content Policy -->
+    <div class="dmca-section">
+      <h2 class="section-title">Prohibited Content</h2>
+      <p class="section-text">
+        The following materials are strictly prohibited on StudyFlow and will be removed immediately upon discovery:
+      </p>
+      <ul style="margin: 0.75rem 0 0 1.25rem; color: #4a4a4a; line-height: 2;">
+        <li>Scanned or photographed textbook pages (copyrighted material)</li>
+        <li>Exam questions, quizzes, or answer keys from any institution</li>
+        <li>Homework assignments or lab reports intended for submission</li>
+        <li>Proprietary course materials (syllabi marked "Do Not Distribute," instructor slides, etc.)</li>
+        <li>Any content uploaded for the purpose of facilitating academic dishonesty</li>
+      </ul>
+      <p class="section-text" style="margin-top: 1rem;">
+        Users who repeatedly upload prohibited content will have their accounts permanently suspended. See our <a href="guidelines.html" style="color: #7c9885; font-weight: 500;">Community Guidelines</a> for full details.
+      </p>
+    </div>
+
+    <!-- For Institutions -->
+    <div class="dmca-section">
+      <h2 class="section-title">For Institutions</h2>
+      <p class="section-text">
+        We welcome partnerships with colleges and universities. If you are a professor, department head, or administrator with questions about how StudyFlow operates, or if you would like to report content that violates your institution's academic integrity policies, we are here to help.
+      </p>
+
+      <div class="info-box">
+        <strong>Institutional Inquiries:</strong> academic-integrity@studyflowsuite.com<br><br>
+        <strong>Content Removal Requests:</strong> <a href="dmca.html" style="color: #7c9885; font-weight: 500;">Submit a DMCA Takedown Request</a><br><br>
+        <strong>Partnership Inquiries:</strong> partnerships@studyflowsuite.com
+      </div>
+    </div>
+
+    <p class="last-updated">Last updated: March 23, 2026</p>
+  </section>
+</body>
+</html>
