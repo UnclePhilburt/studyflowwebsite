@@ -1896,7 +1896,8 @@
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = filename;
+        const baseName = (filename || 'note').replace(/\.[^/.]+$/, '');
+        a.download = baseName + '_studyflow.pdf';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
