@@ -64,6 +64,51 @@
       color: #5d5d5d;
     }
 
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 12px;
+      color: #7c9885;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .nav-btn:hover {
+      background: rgba(124, 152, 133, 0.1);
+      border-color: #7c9885;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.15);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      border-color: transparent;
+    }
+
+    .nav-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+    }
+
     /* Verification Gate */
     .verification-gate {
       background: rgba(255, 255, 255, 0.7);
@@ -359,6 +404,47 @@
     <div class="browse-header">
       <h1 class="browse-title">Browse the Nexus</h1>
       <p class="browse-subtitle">Discover study notes shared by students across universities</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+      <a href="chat.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        Chat
+      </a>
+      <a href="upload.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        Upload
+      </a>
+      <a href="notes.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        My Notes
+      </a>
+      <a href="browse.html" class="nav-btn active">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        Browse
+      </a>
+      <a href="account.html" class="nav-btn">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Account
+      </a>
     </div>
 
     <!-- Verification Gate (shown only if .edu not verified) -->
