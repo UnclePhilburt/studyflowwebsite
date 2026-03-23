@@ -249,6 +249,23 @@
       <!-- PDF viewer (shown when note is loaded) -->
       <iframe id="pdf-viewer" style="display: none;"></iframe>
 
+      <!-- Image viewer (shown for image files) -->
+      <div id="image-viewer" style="display: none; text-align: center;">
+        <img id="image-content" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      </div>
+
+      <!-- Document viewer (for non-PDF documents) -->
+      <div id="document-viewer" style="display: none; text-align: center; padding: 60px 20px;">
+        <h3 style="color: #7c9885; margin-bottom: 16px;">Document Preview Not Available</h3>
+        <p style="color: #666; margin-bottom: 24px;">This file format cannot be previewed in the browser.</p>
+        <button class="btn btn-primary" onclick="downloadFile()">Download to View</button>
+      </div>
+
+      <!-- Text viewer (for text files) -->
+      <div id="text-viewer" style="display: none;">
+        <pre id="text-content" style="white-space: pre-wrap; font-family: monospace; padding: 20px; background: #f9f9f9; border-radius: 8px; max-height: 600px; overflow-y: auto;"></pre>
+      </div>
+
       <!-- Attribution -->
       <div class="attribution" id="attribution" style="display: none;">
         <strong>Source:</strong> Uploaded by <span id="attr-username">@username</span> from <span id="attr-university">University</span> (<span id="attr-course">Course Code</span>)
@@ -327,10 +344,49 @@
         document.getElementById('attr-transaction-id').textContent = '#' + noteId.substring(0, 5);
         document.getElementById('attribution').style.display = 'block';
 
-        // Load PDF
-        const pdfUrl = `${BACKEND_URL}/api/notes/${noteId}/view-pdf`;
-        document.getElementById('pdf-viewer').src = pdfUrl;
-        document.getElementById('pdf-viewer').style.display = 'block';
+        // Load file based on type
+        const fileUrl = `${BACKEND_URL}/api/notes/${noteId}/view-file`;
+
+        // Hide all viewers first
+        document.getElementById('pdf-viewer').style.display = 'none';
+        document.getElementById('image-viewer').style.display = 'none';
+        document.getElementById('document-viewer').style.display = 'none';
+        document.getElementById('text-viewer').style.display = 'none';
+
+        switch(currentNote.file_type) {
+          case 'pdf':
+            // Show PDF viewer
+            document.getElementById('pdf-viewer').src = fileUrl;
+            document.getElementById('pdf-viewer').style.display = 'block';
+            break;
+
+          case 'image':
+            // Show image viewer
+            document.getElementById('image-content').src = fileUrl;
+            document.getElementById('image-viewer').style.display = 'block';
+            break;
+
+          case 'text':
+            // Try to fetch and display text content
+            try {
+              const textResponse = await fetch(fileUrl);
+              const textContent = await textResponse.text();
+              document.getElementById('text-content').textContent = textContent;
+              document.getElementById('text-viewer').style.display = 'block';
+            } catch (error) {
+              // Fallback to download
+              document.getElementById('document-viewer').style.display = 'block';
+            }
+            break;
+
+          case 'document':
+          case 'other':
+          default:
+            // Show download option for unsupported formats
+            document.getElementById('document-viewer').style.display = 'block';
+            break;
+        }
+
         document.getElementById('loading').style.display = 'none';
 
         // Track view
@@ -365,6 +421,11 @@
       }
 
       alert('Download feature coming soon!\n\nThis premium feature will:\n- Generate a watermarked PDF\n- Track the download for DMCA compliance\n- Require .edu verification and 5+ uploaded notes');
+    }
+
+    function downloadFile() {
+      // Direct download for non-viewable formats
+      window.location.href = `${BACKEND_URL}/api/notes/${noteId}/download`;
     }
 
     function showError(message) {
