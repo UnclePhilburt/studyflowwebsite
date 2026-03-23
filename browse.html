@@ -245,6 +245,90 @@
       border-color: #7c9885;
     }
 
+    /* Searchable Filter */
+    .filter-search-wrapper {
+      position: relative;
+    }
+
+    .filter-search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .filter-search-input:focus {
+      outline: none;
+      border-color: #7c9885;
+      box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.1);
+    }
+
+    .filter-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-dropdown.active {
+      display: block;
+    }
+
+    .filter-dropdown-item {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      color: #2d2d2d;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .filter-dropdown-item:hover {
+      background: rgba(124, 152, 133, 0.1);
+      color: #6b8575;
+    }
+
+    .filter-dropdown-item.selected {
+      background: rgba(124, 152, 133, 0.15);
+      font-weight: 600;
+      color: #6b8575;
+    }
+
+    .filter-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      line-height: 1;
+      display: none;
+    }
+
+    .filter-clear.active {
+      display: block;
+    }
+
+    .filter-clear:hover {
+      color: #5d5d5d;
+    }
+
     /* Topic Tags */
     .topic-tags {
       display: flex;
@@ -441,16 +525,20 @@
         <div class="filters-row">
           <div class="filter-group">
             <label class="filter-label">University</label>
-            <select class="filter-select" id="universityFilter" onchange="filterNotes()">
-              <option value="">All Universities</option>
-            </select>
+            <div class="filter-search-wrapper">
+              <input type="text" class="filter-search-input" id="universityFilter" placeholder="All Universities" autocomplete="off">
+              <button class="filter-clear" id="universityClear" onclick="clearFilter('university')">&times;</button>
+              <div class="filter-dropdown" id="universityDropdown"></div>
+            </div>
           </div>
 
           <div class="filter-group">
             <label class="filter-label">Course</label>
-            <select class="filter-select" id="courseFilter" onchange="filterNotes()">
-              <option value="">All Courses</option>
-            </select>
+            <div class="filter-search-wrapper">
+              <input type="text" class="filter-search-input" id="courseFilter" placeholder="All Courses" autocomplete="off">
+              <button class="filter-clear" id="courseClear" onclick="clearFilter('course')">&times;</button>
+              <div class="filter-dropdown" id="courseDropdown"></div>
+            </div>
           </div>
 
           <div class="filter-group">
@@ -486,6 +574,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="university-data.js"></script>
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
     const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
@@ -611,18 +700,116 @@
       filterNotes();
     }
 
-    // Populate filter dropdowns
+    // Selected filter values
+    let selectedUniversity = '';
+    let selectedCourse = '';
+
+    // Populate filter dropdowns - merge data from notes + university-data.js
     function populateFilters() {
-      const universities = [...new Set(allNotes.map(n => n.university).filter(Boolean))];
-      const courses = [...new Set(allNotes.map(n => n.course_code).filter(Boolean))];
+      // Merge universities from actual notes with the master list
+      const noteUniversities = [...new Set(allNotes.map(n => n.university).filter(Boolean))];
+      const allUniversities = [...new Set([...noteUniversities, ...UNIVERSITIES])].sort();
 
-      const universityFilter = document.getElementById('universityFilter');
-      universityFilter.innerHTML = '<option value="">All Universities</option>' +
-        universities.map(u => `<option value="${u}">${u}</option>`).join('');
+      // Merge courses from actual notes with generated course codes
+      const noteCourses = [...new Set(allNotes.map(n => n.course_code).filter(Boolean))];
+      // Get department prefixes as summary items
+      const deptPrefixes = Object.entries(COURSE_DEPARTMENTS).map(([dept, codes]) => `${codes[0]} - ${dept}`);
+      // Combine: actual courses from notes first, then department prefixes
+      window._allUniversities = allUniversities;
+      window._noteCourses = noteCourses;
 
-      const courseFilter = document.getElementById('courseFilter');
-      courseFilter.innerHTML = '<option value="">All Courses</option>' +
-        courses.map(c => `<option value="${c}">${c}</option>`).join('');
+      setupFilterSearch('universityFilter', 'universityDropdown', 'universityClear', allUniversities, 'university');
+      setupFilterSearch('courseFilter', 'courseDropdown', 'courseClear', noteCourses, 'course');
+    }
+
+    function setupFilterSearch(inputId, dropdownId, clearId, allItems, type) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      const clearBtn = document.getElementById(clearId);
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+        let items;
+
+        if (type === 'university') {
+          items = query
+            ? window._allUniversities.filter(u => u.toLowerCase().includes(query))
+            : window._allUniversities;
+        } else {
+          // For courses, search both actual notes' courses and generated codes
+          if (query) {
+            const fromNotes = window._noteCourses.filter(c => c.toLowerCase().includes(query));
+            const generated = searchCourseCodes(query);
+            items = [...new Set([...fromNotes, ...generated])];
+          } else {
+            items = window._noteCourses;
+          }
+        }
+
+        items = items.slice(0, 25);
+
+        if (items.length === 0) {
+          dropdown.classList.remove('active');
+          return;
+        }
+
+        dropdown.innerHTML = `<div class="filter-dropdown-item" data-value="" style="color: #9ca3af; font-style: italic;">All ${type === 'university' ? 'Universities' : 'Courses'}</div>` +
+          items.map(item =>
+            `<div class="filter-dropdown-item${(type === 'university' ? selectedUniversity : selectedCourse) === item ? ' selected' : ''}" data-value="${item}">${item}</div>`
+          ).join('');
+        dropdown.classList.add('active');
+
+        dropdown.querySelectorAll('.filter-dropdown-item').forEach(el => {
+          el.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const val = el.dataset.value;
+            input.value = val;
+            if (type === 'university') selectedUniversity = val;
+            else selectedCourse = val;
+            dropdown.classList.remove('active');
+            clearBtn.classList.toggle('active', !!val);
+            filterNotes();
+          });
+        });
+      });
+
+      input.addEventListener('focus', () => {
+        input.dispatchEvent(new Event('input'));
+      });
+
+      input.addEventListener('blur', () => {
+        setTimeout(() => dropdown.classList.remove('active'), 150);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const highlighted = dropdown.querySelector('.filter-dropdown-item:hover') ||
+            dropdown.querySelector('.filter-dropdown-item:not([style])');
+          if (input.value.trim()) {
+            if (type === 'university') selectedUniversity = input.value.trim();
+            else selectedCourse = input.value.trim();
+            clearBtn.classList.add('active');
+          }
+          dropdown.classList.remove('active');
+          filterNotes();
+        } else if (e.key === 'Escape') {
+          dropdown.classList.remove('active');
+        }
+      });
+    }
+
+    function clearFilter(type) {
+      if (type === 'university') {
+        document.getElementById('universityFilter').value = '';
+        document.getElementById('universityClear').classList.remove('active');
+        selectedUniversity = '';
+      } else {
+        document.getElementById('courseFilter').value = '';
+        document.getElementById('courseClear').classList.remove('active');
+        selectedCourse = '';
+      }
+      filterNotes();
     }
 
     // Search notes
@@ -644,8 +831,8 @@
 
     // Filter notes
     function filterNotes() {
-      const university = document.getElementById('universityFilter').value;
-      const course = document.getElementById('courseFilter').value;
+      const university = selectedUniversity;
+      const course = selectedCourse;
       const sortBy = document.getElementById('sortFilter').value;
 
       let notes = [...filteredNotes];
