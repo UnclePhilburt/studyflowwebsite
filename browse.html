@@ -595,6 +595,12 @@
     let filteredNotes = [];
     let selectedTags = [];
 
+    // Infinite scroll pagination
+    let currentOffset = 0;
+    const NOTES_PER_PAGE = 12; // 4 rows x 3 columns
+    let isLoadingMore = false;
+    let hasMoreNotes = true;
+
     // Check authentication and .edu verification
     async function checkAuth() {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -632,6 +638,9 @@
           document.getElementById('browseInterface').style.display = 'block';
           await loadNotes();
           await loadTopicTags();
+
+          // Setup infinite scroll
+          setupInfiniteScroll();
         }
       } catch (error) {
         console.error('Error checking .edu verification:', error);
@@ -642,9 +651,12 @@
     }
 
     // Load notes from backend
-    async function loadNotes() {
+    async function loadNotes(append = false) {
+      if (isLoadingMore) return; // Prevent duplicate requests
+      isLoadingMore = true;
+
       try {
-        const response = await fetch(`${BACKEND_URL}/api/notes/browse`, {
+        const response = await fetch(`${BACKEND_URL}/api/notes/browse?limit=${NOTES_PER_PAGE}&offset=${currentOffset}`, {
           headers: {
             'Authorization': `Bearer ${authToken}`
           }
@@ -652,23 +664,58 @@
 
         if (response.ok) {
           const data = await response.json();
-          allNotes = data.notes || [];
-          filteredNotes = [...allNotes];
+          const newNotes = data.notes || [];
 
-          // Populate filters
-          populateFilters();
+          if (append) {
+            // Append new notes to existing
+            allNotes = [...allNotes, ...newNotes];
+            filteredNotes = [...allNotes];
+            displayNotes(newNotes, true); // Append mode
+          } else {
+            // Initial load - replace all
+            allNotes = newNotes;
+            filteredNotes = [...allNotes];
 
-          // Display notes
-          displayNotes();
+            // Populate filters only on initial load
+            populateFilters();
 
-          document.getElementById('loadingState').style.display = 'none';
+            // Display notes
+            displayNotes();
+
+            document.getElementById('loadingState').style.display = 'none';
+          }
+
+          // Update pagination state
+          currentOffset += newNotes.length;
+          hasMoreNotes = newNotes.length === NOTES_PER_PAGE;
+
+          console.log(`[Infinite Scroll] Loaded ${newNotes.length} notes, offset now ${currentOffset}, hasMore: ${hasMoreNotes}`);
         } else {
           throw new Error('Failed to load notes');
         }
       } catch (error) {
         console.error('Error loading notes:', error);
-        document.getElementById('loadingState').innerHTML = '<div>Error loading notes. Please try again.</div>';
+        if (!append) {
+          document.getElementById('loadingState').innerHTML = '<div>Error loading notes. Please try again.</div>';
+        }
+      } finally {
+        isLoadingMore = false;
       }
+    }
+
+    // Setup infinite scroll listener
+    function setupInfiniteScroll() {
+      window.addEventListener('scroll', () => {
+        // Check if user scrolled near bottom (within 500px of bottom)
+        const scrollPosition = window.scrollY + window.innerHeight;
+        const pageHeight = document.documentElement.scrollHeight;
+        const threshold = 500; // Load more when 500px from bottom
+
+        if (scrollPosition >= pageHeight - threshold && !isLoadingMore && hasMoreNotes) {
+          console.log('[Infinite Scroll] Loading more notes...');
+          loadNotes(true); // Append mode
+        }
+      });
     }
 
     // Load topic tags
@@ -875,11 +922,11 @@
     }
 
     // Display notes
-    function displayNotes(notes = filteredNotes) {
+    function displayNotes(notes = filteredNotes, append = false) {
       const grid = document.getElementById('notesGrid');
       const emptyState = document.getElementById('emptyState');
 
-      if (notes.length === 0) {
+      if (notes.length === 0 && !append) {
         grid.style.display = 'none';
         emptyState.style.display = 'block';
         return;
@@ -888,7 +935,7 @@
       grid.style.display = 'grid';
       emptyState.style.display = 'none';
 
-      grid.innerHTML = notes.map(note => `
+      const notesHTML = notes.map(note => `
         <div class="note-card" onclick="viewNote('${note.id}')">
           <div class="note-header">
             <div>
@@ -908,6 +955,14 @@
           </div>
         </div>
       `).join('');
+
+      if (append) {
+        // Append new notes to existing grid
+        grid.innerHTML += notesHTML;
+      } else {
+        // Replace entire grid
+        grid.innerHTML = notesHTML;
+      }
     }
 
     // View note
