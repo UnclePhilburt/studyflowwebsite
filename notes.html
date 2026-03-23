@@ -416,6 +416,38 @@
       box-shadow: 0 4px 14px rgba(124, 152, 133, 0.5);
     }
 
+    /* Private Badge */
+    .private-badge {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(93, 93, 93, 0.95);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid white;
+      z-index: 10;
+    }
+
+    .note-item:hover .private-badge {
+      transform: scale(1.1);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .private-note {
+      opacity: 0.8;
+    }
+
+    .private-note:hover {
+      opacity: 1;
+    }
+
     .item-name {
       font-size: 13px;
       font-weight: 500;
@@ -1166,8 +1198,12 @@
         const usageCount = note.usageCount || 0;
         const counterHtml = usageCount > 0 ? `<div class="usage-counter" title="Helped ${usageCount} student${usageCount === 1 ? '' : 's'}">${usageCount}</div>` : '';
 
+        // Private indicator (only show if note is private)
+        const isPrivate = note.is_public === false;
+        const privateHtml = isPrivate ? `<div class="private-badge" title="Private note">🔒</div>` : '';
+
         html += `
-          <div class="note-item"
+          <div class="note-item ${isPrivate ? 'private-note' : ''}"
                data-id="${note.id}"
                data-type="note"
                data-filename="${escapeQuotes(note.filename)}"
@@ -1178,6 +1214,7 @@
             <div class="note-icon">
               ${icon}
               ${counterHtml}
+              ${privateHtml}
             </div>
             <div class="item-name">${escapeHtml(note.filename)}</div>
             <div class="item-meta">${note.pages || '?'} pages</div>
@@ -1451,12 +1488,20 @@
           // Update local note object
           note.is_public = newPublicState;
           console.log(`Note is now ${newPublicState ? 'public' : 'private'}`);
+
+          // Re-render desktop to show changes
+          renderDesktop();
+
+          // Show brief confirmation
+          const message = newPublicState ? 'Note is now public' : 'Note is now private';
+          console.log(message);
         } else {
-          alert('Failed to update note visibility');
+          const error = await response.json();
+          alert('Failed to update note visibility: ' + (error.error || 'Unknown error'));
         }
       } catch (error) {
         console.error('Error updating visibility:', error);
-        alert('Failed to update note visibility');
+        alert('Failed to update note visibility: ' + error.message);
       }
     }
 
