@@ -420,12 +420,12 @@
       <div class="gate-icon">🎓</div>
       <h2 class="gate-title">.edu Email Required</h2>
       <p class="gate-text">
-        To browse and download notes from other students, you need a verified university email address (.edu). This creates a trusted educational sandbox and protects student contributors.
+        To browse and download notes from other students, you need to verify a university email address (.edu). This creates a trusted educational sandbox and protects student contributors.
       </p>
       <p class="gate-text" style="margin-top: 16px; font-size: 14px; color: #7c9885;">
-        Sign up with your university email to access the Nexus note library.
+        Verify your .edu email in Account Settings to access the Nexus note library.
       </p>
-      <button class="verify-btn" onclick="window.location.href='signup.html'">Sign Up with .edu Email</button>
+      <button class="verify-btn" onclick="window.location.href='account.html'">Go to Account Settings</button>
     </div>
 
     <!-- Main Browse Interface (hidden until verified) -->
@@ -515,19 +515,32 @@
       const firstLetter = userEmail.charAt(0).toUpperCase();
       document.getElementById('userAvatar').textContent = firstLetter;
 
-      // Check if user has .edu email
-      const isEduEmail = userEmail.toLowerCase().endsWith('.edu');
+      // Check if user has verified .edu email from user_profiles table
+      try {
+        const { data: profile, error } = await supabaseClient
+          .from('user_profiles')
+          .select('edu_email_verified')
+          .eq('id', currentUser.id)
+          .single();
 
-      if (!isEduEmail) {
-        // Show verification gate for non-.edu emails
+        const isEduVerified = profile?.edu_email_verified === true;
+
+        if (!isEduVerified) {
+          // Show verification gate for non-verified users
+          document.getElementById('verificationGate').style.display = 'block';
+          document.getElementById('browseInterface').style.display = 'none';
+        } else {
+          // Show browse interface for verified .edu users
+          document.getElementById('verificationGate').style.display = 'none';
+          document.getElementById('browseInterface').style.display = 'block';
+          await loadNotes();
+          await loadTopicTags();
+        }
+      } catch (error) {
+        console.error('Error checking .edu verification:', error);
+        // Default to showing verification gate on error
         document.getElementById('verificationGate').style.display = 'block';
         document.getElementById('browseInterface').style.display = 'none';
-      } else {
-        // Show browse interface for .edu emails
-        document.getElementById('verificationGate').style.display = 'none';
-        document.getElementById('browseInterface').style.display = 'block';
-        await loadNotes();
-        await loadTopicTags();
       }
     }
 

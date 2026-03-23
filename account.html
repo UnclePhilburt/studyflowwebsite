@@ -299,6 +299,153 @@
       transform: translateX(24px);
     }
 
+    /* University Email Verification */
+    .edu-email-status {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #7c9885;
+      font-weight: 500;
+    }
+
+    .edu-email-status.verified {
+      color: #7c9885;
+    }
+
+    .edu-email-status.unverified {
+      color: #9ca3af;
+    }
+
+    .verify-edu-btn {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      flex-shrink: 0;
+    }
+
+    .verify-edu-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .verify-edu-btn.verified {
+      background: rgba(124, 152, 133, 0.2);
+      color: #7c9885;
+      cursor: default;
+    }
+
+    .verify-edu-btn.verified:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(45, 45, 45, 0.5);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      font-family: 'Lora', Georgia, serif;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: #7c9885;
+      box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-btn.cancel {
+      background: #f1f1f1;
+      color: #5d5d5d;
+      border: none;
+    }
+
+    .modal-btn.cancel:hover {
+      background: #e0e0e0;
+    }
+
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      border: none;
+    }
+
+    .modal-btn.confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .error-message {
+      background: rgba(217, 83, 79, 0.1);
+      color: #d9534f;
+      border: 1px solid rgba(217, 83, 79, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
     /* Logout Button */
     .logout-btn {
       background: rgba(217, 83, 79, 0.1);
@@ -387,6 +534,20 @@
     <div class="settings-card">
       <h3 class="settings-title">Settings</h3>
 
+      <!-- University Email Verification -->
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">University Email (.edu)</div>
+          <div class="setting-description">
+            Verify your .edu email to access the Nexus note library. Your login email stays the same.
+          </div>
+          <div class="edu-email-status" id="eduEmailStatus">
+            <span id="eduEmailDisplay">Not verified</span>
+          </div>
+        </div>
+        <button class="verify-edu-btn" id="verifyEduBtn" onclick="showEduEmailModal()">Add .edu Email</button>
+      </div>
+
       <div class="setting-item">
         <div class="setting-info">
           <div class="setting-label">Nexus</div>
@@ -404,6 +565,22 @@
       </div>
 
       <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+
+    <!-- .edu Email Modal -->
+    <div class="modal-overlay" id="eduEmailModal">
+      <div class="modal">
+        <div class="modal-title">Verify University Email</div>
+        <p style="text-align: center; color: #5d5d5d; font-size: 14px; margin-bottom: 20px;">
+          Enter your university .edu email address
+        </p>
+        <input type="email" class="modal-input" id="eduEmailInput" placeholder="yourname@university.edu">
+        <div class="error-message" id="eduEmailError" style="display: none;"></div>
+        <div class="modal-actions">
+          <button class="modal-btn cancel" onclick="closeEduEmailModal()">Cancel</button>
+          <button class="modal-btn confirm" onclick="sendEduVerification()">Send Verification</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -463,15 +640,16 @@
         console.error('Error loading stats:', error);
       }
 
-      // Load Nexus setting from profile
+      // Load Nexus setting and .edu verification status from profile
       try {
         const { data: profile } = await supabaseClient
           .from('user_profiles')
-          .select('is_public')
+          .select('is_public, edu_email_verified, edu_email')
           .eq('id', currentUser.id)
           .single();
 
         if (profile) {
+          // Nexus toggle
           const isPublic = profile.is_public !== false; // Default to true
           const toggle = document.getElementById('nexusToggle');
           if (isPublic) {
@@ -479,9 +657,87 @@
           } else {
             toggle.classList.remove('active');
           }
+
+          // .edu email verification status
+          const eduVerified = profile.edu_email_verified === true;
+          const eduEmail = profile.edu_email || null;
+          updateEduEmailStatus(eduVerified, eduEmail);
         }
       } catch (error) {
         console.error('Error loading profile settings:', error);
+      }
+    }
+
+    // Update .edu email verification status display
+    function updateEduEmailStatus(verified, email) {
+      const statusDisplay = document.getElementById('eduEmailDisplay');
+      const verifyBtn = document.getElementById('verifyEduBtn');
+
+      if (verified && email) {
+        statusDisplay.textContent = email;
+        statusDisplay.style.color = '#7c9885';
+        verifyBtn.textContent = 'Change Email';
+      } else {
+        statusDisplay.textContent = 'Not verified';
+        statusDisplay.style.color = '#d9534f';
+        verifyBtn.textContent = 'Add .edu Email';
+      }
+    }
+
+    // Show .edu email modal
+    function showEduEmailModal() {
+      document.getElementById('eduEmailModal').classList.add('active');
+      document.getElementById('eduEmailInput').value = '';
+      document.getElementById('eduEmailError').style.display = 'none';
+    }
+
+    // Close .edu email modal
+    function closeEduEmailModal() {
+      document.getElementById('eduEmailModal').classList.remove('active');
+    }
+
+    // Send .edu verification email
+    async function sendEduVerification() {
+      const eduEmail = document.getElementById('eduEmailInput').value.trim();
+      const errorDiv = document.getElementById('eduEmailError');
+
+      // Validate .edu email
+      if (!eduEmail) {
+        errorDiv.textContent = 'Please enter an email address';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      if (!eduEmail.toLowerCase().endsWith('.edu')) {
+        errorDiv.textContent = 'Please enter a valid .edu email address';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      // Send verification email via backend
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/user/send-edu-verification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ edu_email: eduEmail })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          closeEduEmailModal();
+          alert('Verification email sent! Please check your inbox and click the verification link.');
+        } else {
+          errorDiv.textContent = data.error || 'Failed to send verification email';
+          errorDiv.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Error sending verification:', error);
+        errorDiv.textContent = 'Failed to send verification email: ' + error.message;
+        errorDiv.style.display = 'block';
       }
     }
 
