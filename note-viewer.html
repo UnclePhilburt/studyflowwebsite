@@ -640,7 +640,26 @@
 
       await showAiNotice();
 
-      alert('Download feature coming soon!\n\nYour consent has been recorded.');
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Download failed');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentNote.original_filename || currentNote.filename || 'note';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Download failed. Please try again.');
+      }
     }
 
     async function downloadFile() {
