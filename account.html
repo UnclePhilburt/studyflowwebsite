@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Account - StudyFlow NoteFlow</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>Account - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -15,633 +14,515 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f8f9fa;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
     }
 
-    /* Navigation */
-    .top-nav {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 16px 0;
-      position: sticky;
+    body::before {
+      content: '';
+      position: fixed;
       top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .nav-container {
-      max-width: 1200px;
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 60px 24px;
     }
 
-    .nav-logo {
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
       display: flex;
+      gap: 16px;
       align-items: center;
-      gap: 10px;
-      font-size: 20px;
-      font-weight: 700;
-      color: #1f2937;
+      z-index: 1000;
+    }
+
+    .nav-link {
+      color: #5d5d5d;
       text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 16px;
+      border-radius: 8px;
     }
 
-    .nav-logo span {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .nav-link:hover {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 42px;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .nav-links {
-      display: flex;
-      gap: 24px;
-      align-items: center;
-    }
-
-    .nav-link {
-      color: #6b7280;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-link:hover {
-      color: #667eea;
-    }
-
-    .nav-link.active {
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .btn-logout {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-logout:hover {
-      background: #dc2626;
-    }
-
-    /* Main Content */
-    .main-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 24px;
-    }
-
-    .page-header {
-      margin-bottom: 32px;
-    }
-
-    .page-title {
-      font-size: 32px;
-      font-weight: 800;
-      color: #1f2937;
-      margin-bottom: 8px;
-    }
-
-    .page-subtitle {
+    .header-subtitle {
       font-size: 16px;
-      color: #6b7280;
+      color: #5d5d5d;
+      font-weight: 400;
     }
 
-    /* Tabs */
-    .tabs {
-      display: flex;
-      gap: 0;
-      background: white;
-      border-radius: 12px 12px 0 0;
-      border-bottom: 2px solid #e5e7eb;
-      padding: 0 24px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .tab {
-      padding: 16px 24px;
-      background: transparent;
-      border: none;
-      color: #6b7280;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      font-family: inherit;
-    }
-
-    .tab:hover {
-      color: #667eea;
-      background: rgba(102, 126, 234, 0.05);
-    }
-
-    .tab.active {
-      color: #667eea;
-      border-bottom-color: #667eea;
-      background: rgba(102, 126, 234, 0.1);
-    }
-
-    /* Tab Content */
-    .tab-content {
-      display: none;
-      background: white;
-      border-radius: 0 0 12px 12px;
-      padding: 32px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    /* Profile Section */
-    .profile-section {
-      max-width: 600px;
-    }
-
+    /* Profile Card */
     .profile-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 12px;
-      padding: 32px;
-      color: white;
-      margin-bottom: 32px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      padding: 40px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
     }
 
-    .profile-avatar {
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 2px solid rgba(124, 152, 133, 0.1);
+    }
+
+    .profile-avatar-large {
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      font-weight: 800;
-      margin-bottom: 16px;
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.2);
     }
 
-    .profile-name {
+    .profile-info h2 {
+      font-family: 'Lora', Georgia, serif;
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 600;
+      color: #2d2d2d;
       margin-bottom: 4px;
     }
 
-    .profile-email {
+    .profile-info p {
       font-size: 14px;
-      opacity: 0.9;
+      color: #5d5d5d;
     }
 
-    .profile-tier {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 12px;
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
     }
 
-    .info-row {
+    .info-item {
       display: flex;
-      justify-content: space-between;
-      padding: 16px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .info-row:last-child {
-      border-bottom: none;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .info-label {
-      color: #6b7280;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #7c9885;
     }
 
     .info-value {
-      color: #1f2937;
-      font-size: 14px;
+      font-size: 20px;
       font-weight: 600;
+      color: #2d2d2d;
     }
 
-    /* Settings Section */
+    /* Settings Card */
+    .settings-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      padding: 40px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+    }
+
+    .settings-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 24px;
+    }
+
     .setting-item {
-      background: #f9fafb;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 16px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      transition: all 0.2s;
+      align-items: flex-start;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
     }
 
-    .setting-item:hover {
-      border-color: #667eea;
-      background: #f5f7ff;
+    .setting-item:last-child {
+      border-bottom: none;
     }
 
     .setting-info {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
       flex: 1;
+      padding-right: 24px;
     }
 
-    .setting-icon {
-      font-size: 32px;
-      flex-shrink: 0;
-    }
-
-    .setting-text {
-      flex: 1;
-    }
-
-    .setting-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 6px;
+    .setting-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
     }
 
     .setting-description {
       font-size: 14px;
-      color: #6b7280;
-      line-height: 1.5;
+      color: #5d5d5d;
+      line-height: 1.6;
     }
 
+    .sync-status {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #7c9885;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Toggle Switch */
     .toggle-switch {
       position: relative;
-      width: 56px;
-      height: 30px;
+      width: 52px;
+      height: 28px;
+      background: #cbd5e0;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
       flex-shrink: 0;
     }
 
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
+    .toggle-switch.active {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
     }
 
     .toggle-slider {
       position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #cbd5e1;
-      transition: 0.3s;
-      border-radius: 34px;
-    }
-
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 22px;
-      width: 22px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      transition: 0.3s;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: white;
       border-radius: 50%;
+      transition: transform 0.3s;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-    input:checked + .toggle-slider {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(24px);
     }
 
-    input:checked + .toggle-slider:before {
-      transform: translateX(26px);
-    }
-
-    .setting-help-text {
-      background: #eff6ff;
-      border-left: 4px solid #667eea;
-      padding: 16px;
-      margin-top: 24px;
-      border-radius: 8px;
-    }
-
-    .setting-help-text p {
-      color: #1f2937;
-      font-size: 14px;
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .sync-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #dcfce7;
-      color: #166534;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
+    /* Logout Button */
+    .logout-btn {
+      background: rgba(217, 83, 79, 0.1);
+      color: #d9534f;
+      border: 2px solid #d9534f;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-size: 15px;
       font-weight: 600;
-      margin-top: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      width: 100%;
+      margin-top: 24px;
     }
 
-    .sync-status.syncing {
-      background: #fef3c7;
-      color: #92400e;
+    .logout-btn:hover {
+      background: #d9534f;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-nav {
+        top: 16px;
+        right: 16px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="top-nav">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        📚 <span>StudyFlow</span>
-      </a>
-      <div class="nav-links">
-        <a href="upload.html" class="nav-link">Upload Notes</a>
-        <a href="notes.html" class="nav-link">My Notes</a>
-        <a href="account.html" class="nav-link active">Account</a>
-        <button class="btn-logout" onclick="logout()">Logout</button>
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="notes.html" class="nav-link">Notes</a>
+    <a href="browse.html" class="nav-link">Browse</a>
+    <div class="user-avatar" id="userAvatar"></div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="header-title">My Account</h1>
+      <p class="header-subtitle">Manage your profile and preferences</p>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar-large" id="profileAvatar">S</div>
+        <div class="profile-info">
+          <h2 id="profileName">Loading...</h2>
+          <p id="profileEmail">Loading...</p>
+        </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Main Content -->
-  <div class="main-container">
-    <div class="page-header">
-      <h1 class="page-title">My Account</h1>
-      <p class="page-subtitle">Manage your profile and preferences</p>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-tab="profile">Profile</button>
-      <button class="tab" data-tab="settings">Settings</button>
-    </div>
-
-    <!-- Profile Tab -->
-    <div class="tab-content active" id="profileTab">
-      <div class="profile-section">
-        <div class="profile-card">
-          <div class="profile-avatar" id="profile-avatar">S</div>
-          <div class="profile-name" id="profile-name">Loading...</div>
-          <div class="profile-email" id="profile-email">Loading...</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Member Since</div>
+          <div class="info-value" id="memberSince">-</div>
         </div>
-
-        <div class="info-row">
-          <span class="info-label">Member Since</span>
-          <span class="info-value" id="member-since">-</span>
+        <div class="info-item">
+          <div class="info-label">Total Notes</div>
+          <div class="info-value" id="totalNotes">-</div>
         </div>
-        <div class="info-row">
-          <span class="info-label">Total Notes Uploaded</span>
-          <span class="info-value" id="total-notes">-</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Total Pages</span>
-          <span class="info-value" id="total-pages">-</span>
+        <div class="info-item">
+          <div class="info-label">Total Pages</div>
+          <div class="info-value" id="totalPages">-</div>
         </div>
       </div>
     </div>
 
-    <!-- Settings Tab -->
-    <div class="tab-content" id="settingsTab">
+    <!-- Settings Card -->
+    <div class="settings-card">
+      <h3 class="settings-title">Settings</h3>
+
       <div class="setting-item">
         <div class="setting-info">
-          <div class="setting-icon">🧠</div>
-          <div class="setting-text">
-            <div class="setting-title">Nexus</div>
-            <div class="setting-description">
-              Share your notes to access everyone's notes. Turn off to keep notes private (you won't see others' notes).
-            </div>
-            <div class="sync-status" id="sync-status">
-              <span>✓</span>
-              <span>Synced with extension</span>
-            </div>
+          <div class="setting-label">Nexus</div>
+          <div class="setting-description">
+            Share your notes to access everyone's notes. Turn off to keep notes private (you won't see others' notes).
+          </div>
+          <div class="sync-status" id="syncStatus">
+            <span>✓</span>
+            <span>Synced with extension</span>
           </div>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="collective-brain-toggle" checked>
-          <span class="toggle-slider"></span>
-        </label>
+        <div class="toggle-switch active" id="nexusToggle">
+          <div class="toggle-slider"></div>
+        </div>
       </div>
 
-      <div class="setting-help-text">
-        <p><strong>🌟 How it works:</strong> When enabled, your notes help other students and their notes help you. It's a win-win! Changes sync automatically between the website and browser extension.</p>
-      </div>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
 
-    // Tab switching
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const tabName = tab.getAttribute('data-tab');
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let authToken = null;
+    let currentUser = null;
 
-        // Update tab buttons
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // Update tab content
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        document.getElementById(`${tabName}Tab`).classList.add('active');
-      });
-    });
-
-    // Load user profile
+    // Load profile data
     async function loadProfile() {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      if (!token) {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
         window.location.href = 'login.html';
         return;
       }
 
+      authToken = session.access_token;
+      currentUser = session.user;
+
+      // Set user info
+      const userEmail = currentUser.email || '';
+      const firstLetter = userEmail.charAt(0).toUpperCase();
+      const displayName = userEmail.split('@')[0];
+
+      document.getElementById('userAvatar').textContent = firstLetter;
+      document.getElementById('profileAvatar').textContent = firstLetter;
+      document.getElementById('profileName').textContent = displayName;
+      document.getElementById('profileEmail').textContent = userEmail;
+
+      // Get member since date
+      const createdAt = new Date(currentUser.created_at);
+      document.getElementById('memberSince').textContent = createdAt.toLocaleDateString('en-US', {
+        month: 'short',
+        year: 'numeric'
+      });
+
+      // Fetch notes statistics
       try {
-        // Get user info from localStorage first (faster)
-        const userFromStorage = localStorage.getItem('user');
-        if (userFromStorage) {
-          try {
-            const user = JSON.parse(userFromStorage);
-
-            // Update profile card
-            const userName = user.full_name || user.name || user.email.split('@')[0];
-            document.getElementById('profile-name').textContent = userName;
-            document.getElementById('profile-email').textContent = user.email;
-            document.getElementById('profile-avatar').textContent = userName.charAt(0).toUpperCase();
-          } catch (e) {
-            console.error('Error parsing user from localStorage:', e);
+        const response = await fetch(`${BACKEND_URL}/api/notes/stats`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
           }
-        }
-
-        // Fetch full user data from backend to get created_at
-        const userResponse = await fetch(`${BACKEND_URL}/api/current-user`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-
-          // Update member since if available
-          if (userData.created_at) {
-            const date = new Date(userData.created_at);
-            document.getElementById('member-since').textContent = date.toLocaleDateString('en-US', {
-              month: 'long',
-              year: 'numeric'
-            });
-          } else {
-            document.getElementById('member-since').textContent = 'Recently';
-          }
-        } else {
-          document.getElementById('member-since').textContent = 'Recently';
-        }
-
-        // Get notes stats
-        const notesResponse = await fetch(`${BACKEND_URL}/api/notes/list`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (notesResponse.ok) {
-          const notes = await notesResponse.json();
-          document.getElementById('total-notes').textContent = notes.length;
-
-          let totalPages = 0;
-          notes.forEach(note => {
-            totalPages += note.pages || 0;
-          });
-          document.getElementById('total-pages').textContent = totalPages;
-        } else {
-          // If API call fails, just show 0
-          document.getElementById('total-notes').textContent = '0';
-          document.getElementById('total-pages').textContent = '0';
-        }
-
-      } catch (error) {
-        console.error('Error loading profile:', error);
-        // Set defaults on error
-        document.getElementById('total-notes').textContent = '0';
-        document.getElementById('total-pages').textContent = '0';
-        document.getElementById('member-since').textContent = 'Recently';
-      }
-    }
-
-    // Load collective brain setting
-    async function loadCollectiveBrainSetting() {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      if (!token) return;
-
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/settings/collective-brain`, {
-          headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
-          const data = await response.json();
-          document.getElementById('collective-brain-toggle').checked = data.enabled !== false;
+          const stats = await response.json();
+          document.getElementById('totalNotes').textContent = stats.total_notes || 0;
+          document.getElementById('totalPages').textContent = stats.total_pages || 0;
         }
       } catch (error) {
-        console.error('Error loading collective brain setting:', error);
+        console.error('Error loading stats:', error);
+      }
+
+      // Load Nexus setting from profile
+      try {
+        const { data: profile } = await supabaseClient
+          .from('user_profiles')
+          .select('is_public')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (profile) {
+          const isPublic = profile.is_public !== false; // Default to true
+          const toggle = document.getElementById('nexusToggle');
+          if (isPublic) {
+            toggle.classList.add('active');
+          } else {
+            toggle.classList.remove('active');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading profile settings:', error);
       }
     }
 
-    // Update collective brain setting
-    document.getElementById('collective-brain-toggle').addEventListener('change', async (e) => {
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      if (!token) return;
-
-      const isEnabled = e.target.checked;
-      const syncStatus = document.getElementById('sync-status');
-
-      // Show syncing status
-      syncStatus.className = 'sync-status syncing';
-      syncStatus.innerHTML = '<span>⟳</span><span>Syncing...</span>';
+    // Nexus toggle
+    document.getElementById('nexusToggle').addEventListener('click', async function() {
+      this.classList.toggle('active');
+      const isPublic = this.classList.contains('active');
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/settings/collective-brain`, {
+        // Update in Supabase
+        await supabaseClient
+          .from('user_profiles')
+          .update({ is_public: isPublic })
+          .eq('id', currentUser.id);
+
+        // Also update via backend API to sync with extension
+        await fetch(`${BACKEND_URL}/api/user/settings`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
           },
-          body: JSON.stringify({ enabled: isEnabled })
+          body: JSON.stringify({ is_public: isPublic })
         });
 
-        if (response.ok) {
-          // Show synced status
-          syncStatus.className = 'sync-status';
-          syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
-        } else {
-          throw new Error('Failed to update setting');
-        }
+        // Show sync confirmation
+        const syncStatus = document.getElementById('syncStatus');
+        syncStatus.style.color = '#7c9885';
+        syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
       } catch (error) {
-        console.error('Error updating collective brain setting:', error);
-        // Revert toggle on error
-        e.target.checked = !isEnabled;
-        alert('Failed to update setting. Please try again.');
+        console.error('Error updating setting:', error);
       }
     });
 
-    // Logout function
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('jwtToken');
-      localStorage.removeItem('user');
-      window.location.href = 'login.html';
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
     }
 
     // Initialize
     loadProfile();
-    loadCollectiveBrainSetting();
-
-    // Poll for changes from extension every 5 seconds
-    setInterval(async () => {
-      const currentChecked = document.getElementById('collective-brain-toggle').checked;
-      const token = localStorage.getItem('token') || localStorage.getItem('jwtToken');
-      if (!token) return;
-
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/settings/collective-brain`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const serverEnabled = data.enabled !== false;
-
-          // If server value differs from current UI, update UI
-          if (serverEnabled !== currentChecked) {
-            document.getElementById('collective-brain-toggle').checked = serverEnabled;
-
-            // Show sync notification
-            const syncStatus = document.getElementById('sync-status');
-            syncStatus.className = 'sync-status';
-            syncStatus.innerHTML = '<span>✓</span><span>Updated from extension</span>';
-
-            setTimeout(() => {
-              syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
-            }, 2000);
-          }
-        }
-      } catch (error) {
-        // Silently fail - don't spam console
-      }
-    }, 5000);
   </script>
 </body>
 </html>
