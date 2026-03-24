@@ -1248,13 +1248,18 @@
     }
 
     // Assign bento box size based on position and popularity
-    function getBentoSize(index, note) {
-      // Pattern that creates visual interest:
-      // Popular notes (>100 views) get priority for large sizes
-      // Create balanced layout with mix of sizes
-
+    function getBentoSize(index, note, sortBy) {
+      // Top results in sorted lists get featured sizes
+      const isTopResult = index < 3;
       const isPopular = (note.view_count || 0) > 100;
-      const hasLongTitle = note.filename.length > 40;
+      const isHighUsage = (note.usage_count || 0) > 50;
+
+      // When sorting, feature top results with larger cards
+      if (sortBy === 'popular' || sortBy === 'views') {
+        if (index === 0) return 'size-2x2';  // First result always hero
+        if (index === 1) return 'size-2x1';  // Second result wide
+        if (index === 2) return 'size-1x2';  // Third result tall
+      }
 
       // Create a repeating pattern for visual balance
       const pattern = [
@@ -1268,13 +1273,15 @@
         'size-2x1',  // 7: Wide
         'size-1x1',  // 8: Small
         'size-1x1',  // 9: Small
+        'size-1x1',  // 10: Small
+        'size-2x1',  // 11: Wide
       ];
 
       let size = pattern[index % pattern.length];
 
-      // Popular notes get upgraded to larger sizes
-      if (isPopular && size === 'size-1x1') {
-        size = index % 2 === 0 ? 'size-2x1' : 'size-1x2';
+      // Upgrade popular notes that would be small
+      if ((isPopular || isHighUsage) && size === 'size-1x1' && index < 20) {
+        size = index % 3 === 0 ? 'size-2x1' : 'size-1x2';
       }
 
       return size;
@@ -1294,8 +1301,10 @@
       grid.style.display = 'grid';
       emptyState.style.display = 'none';
 
+      const sortBy = document.getElementById('sortFilter').value;
+
       const notesHTML = notes.map((note, index) => {
-        const bentoSize = getBentoSize(index, note);
+        const bentoSize = getBentoSize(index, note, sortBy);
         return `
         <div class="note-card ${bentoSize}" onclick="viewNote('${note.id}')">
           ${note.view_count > 100 ? '<div class="note-badge">Popular</div>' : ''}
