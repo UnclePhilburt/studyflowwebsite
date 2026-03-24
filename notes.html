@@ -1135,6 +1135,135 @@
       background: rgba(124, 152, 133, 0.15);
       border: 2px solid rgba(124, 152, 133, 0.4);
     }
+
+    /* --- Responsive: Tablet Landscape --- */
+    @media (max-width: 1024px) {
+      .preview-panel {
+        width: 100%;
+        right: -100%;
+      }
+
+      .preview-panel.active {
+        right: 0;
+      }
+
+      .container.preview-open {
+        margin-right: 0;
+      }
+    }
+
+    /* --- Responsive: Tablet Portrait --- */
+    @media (max-width: 768px) {
+      .container {
+        padding: 60px 16px 24px;
+      }
+
+      .top-nav {
+        top: 12px;
+        right: 12px;
+        gap: 8px;
+      }
+
+      .nav-link {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+
+      .toolbar-actions {
+        width: 100%;
+      }
+
+      .toolbar-btn {
+        min-height: 44px;
+        flex: 1;
+      }
+
+      .desktop {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 16px;
+        padding: 12px;
+        min-height: auto;
+      }
+
+      .folder-icon, .note-icon {
+        width: 64px;
+        height: 64px;
+      }
+
+      .folder-icon svg {
+        width: 32px;
+        height: 32px;
+      }
+
+      .item-name {
+        font-size: 12px;
+        max-width: 90px;
+      }
+
+      .impact-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .good-standing-widget {
+        flex-wrap: wrap;
+      }
+
+      .preview-header {
+        padding: 16px;
+      }
+
+      .preview-content {
+        padding: 16px;
+      }
+    }
+
+    /* --- Responsive: Phone --- */
+    @media (max-width: 480px) {
+      .container {
+        padding: 52px 12px 20px;
+      }
+
+      .nav-link {
+        padding: 6px 6px;
+        font-size: 12px;
+      }
+
+      .desktop {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        padding: 8px;
+      }
+
+      .folder-icon, .note-icon {
+        width: 56px;
+        height: 56px;
+      }
+
+      .item-name {
+        font-size: 11px;
+        max-width: 80px;
+      }
+
+      .impact-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .breadcrumb {
+        font-size: 13px;
+      }
+
+      .folder-item, .note-item {
+        padding: 10px;
+        gap: 8px;
+      }
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

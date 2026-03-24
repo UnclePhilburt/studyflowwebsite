@@ -790,6 +790,113 @@
       color: #9ca3af;
       font-size: 1rem;
     }
+
+    /* --- Responsive Layout: Tablet --- */
+    @media (max-width: 768px) {
+      .container {
+        padding: 60px 16px 24px;
+      }
+
+      .top-nav {
+        top: 12px;
+        right: 12px;
+        gap: 8px;
+      }
+
+      .nav-link {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .browse-header {
+        margin-bottom: 32px;
+      }
+
+      .browse-title {
+        font-size: 2rem;
+      }
+
+      .search-container {
+        padding: 1.25rem;
+        margin-bottom: 32px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-btn {
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .filter-group {
+        min-width: 0;
+        flex-basis: 100%;
+      }
+
+      .topic-tags {
+        gap: 8px;
+      }
+
+      .topic-tag {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
+
+      .verification-gate {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    /* --- Responsive Layout: Phone --- */
+    @media (max-width: 480px) {
+      .container {
+        padding: 52px 12px 16px;
+      }
+
+      .browse-title {
+        font-size: 1.5rem;
+      }
+
+      .browse-subtitle {
+        font-size: 0.9rem;
+      }
+
+      .browse-header {
+        margin-bottom: 20px;
+      }
+
+      .search-container {
+        padding: 1rem;
+        margin-bottom: 20px;
+        border-radius: 12px;
+      }
+
+      .search-input {
+        padding: 12px 16px;
+        font-size: 16px;
+      }
+
+      .filter-select, .filter-search-input {
+        padding: 10px 12px;
+        font-size: 16px;
+      }
+
+      .nav-link {
+        padding: 6px 6px;
+        font-size: 12px;
+      }
+
+      .gate-title {
+        font-size: 1.5rem;
+      }
+
+      .verify-btn {
+        width: 100%;
+        min-height: 44px;
+      }
+    }
   </style>
 </head>
 <body>

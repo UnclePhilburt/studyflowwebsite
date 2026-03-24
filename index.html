@@ -56,6 +56,7 @@
     .container {
       display: flex;
       height: 100vh;
+      height: 100dvh;
       position: relative;
       z-index: 1;
       overflow: hidden;
@@ -556,7 +557,7 @@
     .loading.active { display: block; }
 
     /* Mobile Optimization - Streamlined for all devices */
-    @media (max-width: 968px) {
+    @media (max-width: 1024px) {
       body::before, body::after {
         opacity: 0.3; /* Reduce visual complexity */
       }
@@ -706,6 +707,22 @@
 
       .info-text p {
         font-size: 13px;
+      }
+
+      .btn-primary {
+        min-height: 44px;
+      }
+
+      .footer-links a {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      input[type="email"],
+      input[type="password"],
+      input[type="text"] {
+        font-size: 16px;
       }
     }
   </style>
