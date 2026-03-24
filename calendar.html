@@ -703,9 +703,9 @@
           <div class="current-month" id="currentMonth">January 2026</div>
           <button onclick="nextMonth()">›</button>
         </div>
-        <button class="upload-syllabus-btn" onclick="openUploadModal()">
-          <span>📄</span>
-          Upload Syllabus
+        <button class="upload-syllabus-btn" onclick="openCanvasImportModal()">
+          <span>📅</span>
+          Import from Canvas
         </button>
       </div>
     </div>
@@ -725,48 +725,30 @@
     </div>
   </div>
 
-  <!-- Upload Syllabus Modal -->
+  <!-- Canvas Import Modal -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title">Upload Course Syllabus</h2>
-        <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+        <h2 class="modal-title">Import from Canvas</h2>
+        <button class="close-btn" onclick="closeCanvasImportModal()">&times;</button>
       </div>
       <form id="uploadForm" class="upload-form">
-        <div class="form-group">
-          <label>Course Name *</label>
-          <input type="text" id="courseName" placeholder="e.g., Introduction to Psychology" required>
-        </div>
-
-        <div class="form-group">
-          <label>Course Code</label>
-          <input type="text" id="courseCode" placeholder="e.g., PSY101">
-        </div>
-
-        <div class="form-group">
-          <label>Professor Name</label>
-          <input type="text" id="professorName" placeholder="e.g., Dr. Smith">
-        </div>
-
-        <div class="form-group">
-          <label>Semester</label>
-          <input type="text" id="semester" placeholder="e.g., Fall 2026">
-        </div>
-
         <div class="form-group full-width">
-          <label>Syllabus File (PDF or DOCX) *</label>
-          <div class="file-input-wrapper">
-            <input type="file" id="fileInput" accept=".pdf,.docx,.doc" required>
-            <label for="fileInput" class="file-input-label">
-              <span id="fileLabel">Choose File (PDF or DOCX)</span>
-            </label>
+          <label>Canvas Calendar Feed URL *</label>
+          <input type="url" id="canvasFeedUrl" placeholder="https://canvas.school.edu/feeds/calendars/user_xxx.ics" required style="font-family: monospace; font-size: 13px;">
+          <div style="margin-top: 8px; font-size: 13px; color: #5d5d5d; line-height: 1.6;">
+            <strong>How to get your Canvas calendar feed:</strong><br>
+            1. Log into Canvas → Click Account (left sidebar)<br>
+            2. Click Settings<br>
+            3. Scroll to "Other Services" section<br>
+            4. Click "Calendar Feed" and copy the URL
           </div>
         </div>
 
         <!-- Privacy Disclosure (SB 1324) -->
         <div class="form-group full-width" style="margin-top: 16px;">
           <div style="background: rgba(124, 152, 133, 0.08); padding: 12px; border-radius: 8px; font-size: 13px; color: #5d5d5d; line-height: 1.6;">
-            <strong>Privacy Notice:</strong> We extract only dates, times, and assignment names from your syllabus to generate your calendar. Your syllabus file is processed and immediately discarded - we do not store or share the original document. We do not use your syllabus to train AI models.
+            <strong>Privacy Notice:</strong> We import only assignment titles, due dates, and course names from your Canvas calendar. Your calendar feed URL is stored securely for auto-sync. We do not access your Canvas account directly or use your data to train AI models.
           </div>
         </div>
 
@@ -780,7 +762,17 @@
           </label>
         </div>
 
-        <button type="submit" class="submit-btn">Upload & Extract Calendar Events</button>
+        <!-- Auto-sync option -->
+        <div class="form-group full-width">
+          <label style="display: flex; align-items: start; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="autoSyncCheckbox" checked style="margin-top: 4px;">
+            <span style="font-size: 13px; color: #2d2d2d; line-height: 1.5;">
+              Auto-sync daily (keep my calendar updated with new Canvas assignments)
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" class="submit-btn">Import Canvas Calendar</button>
       </form>
     </div>
   </div>
@@ -886,14 +878,13 @@
     }
 
     // Modal functions
-    function openUploadModal() {
+    function openCanvasImportModal() {
       document.getElementById('uploadModal').style.display = 'block';
     }
 
-    function closeUploadModal() {
+    function closeCanvasImportModal() {
       document.getElementById('uploadModal').style.display = 'none';
       document.getElementById('uploadForm').reset();
-      document.getElementById('fileLabel').textContent = 'Choose File (PDF or DOCX)';
     }
 
     function closeEventDetails() {
@@ -908,52 +899,46 @@
       }
     }
 
-    // File input label update
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-      const fileName = e.target.files[0]?.name || 'Choose File (PDF or DOCX)';
-      document.getElementById('fileLabel').textContent = fileName;
-    });
-
-    // Upload syllabus form
+    // Canvas import form
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const formData = new FormData();
-      formData.append('file', document.getElementById('fileInput').files[0]);
-      formData.append('course_name', document.getElementById('courseName').value);
-      formData.append('course_code', document.getElementById('courseCode').value);
-      formData.append('professor_name', document.getElementById('professorName').value);
-      formData.append('semester', document.getElementById('semester').value);
+      const feedUrl = document.getElementById('canvasFeedUrl').value;
+      const autoSync = document.getElementById('autoSyncCheckbox').checked;
 
       const submitBtn = document.querySelector('.submit-btn');
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Uploading & Extracting...';
+      submitBtn.textContent = 'Importing from Canvas...';
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/syllabus/upload`, {
+        const response = await fetch(`${BACKEND_URL}/api/canvas/import`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${authToken}`
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
           },
-          body: formData
+          body: JSON.stringify({
+            feed_url: feedUrl,
+            auto_sync: autoSync
+          })
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          alert(`Success! Extracted ${data.events.length} calendar events`);
-          closeUploadModal();
+          alert(`Success! Imported ${data.events_count} assignments from Canvas`);
+          closeCanvasImportModal();
           await loadEvents();
           renderCalendar();
         } else {
-          alert('Upload failed: ' + (data.error || 'Unknown error'));
+          alert('Import failed: ' + (data.error || 'Unknown error'));
         }
       } catch (error) {
-        console.error('Upload error:', error);
-        alert('Upload failed: ' + error.message);
+        console.error('Import error:', error);
+        alert('Import failed: ' + error.message);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Upload & Extract Calendar Events';
+        submitBtn.textContent = 'Import Canvas Calendar';
       }
     });
 
