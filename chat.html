@@ -2666,10 +2666,17 @@
       sidebar.classList.toggle('active');
     });
 
-    // Auto-open sidebar when mouse approaches left edge
+    // Auto-open sidebar when mouse approaches left edge (desktop only)
     let sidebarAutoOpened = false;
+    let isTouchDevice = false;
+
+    document.addEventListener('touchstart', () => {
+      isTouchDevice = true;
+    }, { once: true });
 
     document.addEventListener('mousemove', (e) => {
+      if (isTouchDevice) return;
+
       const edgeThreshold = 80; // pixels from left edge
       const isNearEdge = e.clientX <= edgeThreshold;
 
