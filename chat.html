@@ -1404,26 +1404,21 @@
         transform: translateX(0);
       }
 
-      /* Before chat starts: show hamburger only */
-      .mobile-menu-toggle {
-        display: block;
-      }
-
-      /* After chat starts: show slim toolbar, hide individual buttons */
-      body.chat-started .mobile-toolbar {
+      /* Show slim toolbar on mobile, hide all floating buttons */
+      .mobile-toolbar {
         display: flex;
       }
 
-      body.chat-started .mobile-menu-toggle {
+      .mobile-menu-toggle {
         display: none;
       }
 
-      body.chat-started .menu-btn {
+      .menu-btn {
         display: none !important;
       }
 
-      body.chat-started .calendar-top-btn,
-      body.chat-started .settings-top-btn {
+      .calendar-top-btn,
+      .settings-top-btn {
         display: none !important;
       }
 
