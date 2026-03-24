@@ -67,7 +67,7 @@
       padding: 40px 60px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       overflow-y: hidden;
     }
 
@@ -116,6 +116,9 @@
       margin-bottom: 0;
       animation: slideUp 0.8s ease 0.2s both;
       position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     @keyframes slideUp {
@@ -142,6 +145,7 @@
     /* Stats Section */
     .brain-animation-container {
       position: relative;
+      flex: 1;
       min-height: 500px;
       display: flex;
       flex-direction: column;
