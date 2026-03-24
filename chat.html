@@ -3414,10 +3414,11 @@
 
       try {
         // Call backend to generate quiz
-        const response = await fetch('/api/generate-quiz', {
+        const response = await fetch(`${BACKEND_URL}/api/generate-quiz`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
           },
           body: JSON.stringify({ topic })
         });
