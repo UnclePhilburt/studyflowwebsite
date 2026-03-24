@@ -1055,9 +1055,8 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            price_id: 'price_convenience_tier', // Will be created in backend
-            success_url: `${window.location.origin}/account.html?success=true`,
-            cancel_url: `${window.location.origin}/account.html`
+            success_url: 'https://unclephilburt.github.io/studyflowsuitewebsite/account.html?success=true',
+            cancel_url: 'https://unclephilburt.github.io/studyflowsuitewebsite/account.html'
           })
         });
 
@@ -1087,7 +1086,7 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            return_url: `${window.location.origin}/account.html`
+            return_url: 'https://unclephilburt.github.io/studyflowsuitewebsite/account.html'
           })
         });
 
@@ -1111,7 +1110,7 @@
       // Show success message
       setTimeout(() => {
         alert('Subscription activated! Welcome to the Scholar\'s Club.');
-        window.history.replaceState({}, document.title, '/account.html');
+        window.history.replaceState({}, document.title, '/studyflowsuitewebsite/account.html');
       }, 500);
     }
 
