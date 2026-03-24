@@ -1157,7 +1157,7 @@
           </div>
           <div class="sync-status" id="syncStatus">
             <span>✓</span>
-            <span>Synced with extension</span>
+            <span>Synced with account</span>
           </div>
         </div>
         <div class="toggle-switch active" id="nexusToggle">
@@ -1402,7 +1402,7 @@
           .update({ is_public: isPublic })
           .eq('id', currentUser.id);
 
-        // Also update via backend API to sync with extension
+        // Also update via backend API to sync with account
         await fetch(`${BACKEND_URL}/api/user/settings`, {
           method: 'POST',
           headers: {
@@ -1415,7 +1415,7 @@
         // Show sync confirmation
         const syncStatus = document.getElementById('syncStatus');
         syncStatus.style.color = '#7c9885';
-        syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
+        syncStatus.innerHTML = '<span>✓</span><span>Synced with account</span>';
       } catch (error) {
         console.error('Error updating setting:', error);
       }

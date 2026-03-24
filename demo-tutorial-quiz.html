@@ -324,7 +324,7 @@
       </div>
       <h2 class="tutorial-title">Welcome to StudyFlowSuite! 👋</h2>
       <p class="tutorial-description">
-        This interactive tutorial will guide you through using the extension on a real quiz. Let's get started!
+        This interactive tutorial will guide you through using StudyFlowSuite on a real quiz. Let's get started!
       </p>
       <div class="tutorial-visual">
         <div class="tutorial-visual-icon">🎯</div>
@@ -349,7 +349,7 @@
 
   <!-- Help Banner -->
   <div class="help-banner" id="helpBanner">
-    Step 1 of 4: First, install the StudyFlowSuite extension if you haven't already
+    Step 1 of 4: First, sign into your StudyFlowSuite account
   </div>
 
   <!-- Quiz Container -->
@@ -450,33 +450,31 @@
     const steps = [
       {
         title: "Welcome to StudyFlowSuite! 👋",
-        description: "This interactive tutorial will guide you through using the extension on a real quiz. Let's get started!",
+        description: "This interactive tutorial will guide you through using StudyFlowSuite on a real quiz. Let's get started!",
         icon: "🎯",
         visualText: "Follow the step-by-step instructions to see how StudyFlowSuite automatically completes quizzes for you.",
-        banner: "Step 1 of 4: First, install the StudyFlowSuite extension if you haven't already"
+        banner: "Step 1 of 4: First, sign into your StudyFlowSuite account"
       },
       {
-        title: "Open the Extension 🔌",
-        description: "Click the StudyFlowSuite icon in your browser toolbar (top-right corner). It looks like a purple icon with a shield.",
+        title: "Open StudyFlow 🔌",
+        description: "Navigate to the StudyFlowSuite chat assistant from your dashboard.",
         icon: "🔌",
-        visualText: "Look for the extension icon near your address bar. Click it to open the popup.",
-        banner: "Step 2 of 4: Click the StudyFlowSuite extension icon in your browser toolbar",
-        pointer: true,
-        pointerText: "Extension icon is here →"
+        visualText: "Open the chat assistant to get started with your quiz.",
+        banner: "Step 2 of 4: Open the StudyFlowSuite chat assistant"
       },
       {
         title: "Configure Settings ⚙️",
-        description: "In the extension popup, you can set optional parameters like total questions (5) and target time. For this tutorial, you can leave them empty.",
+        description: "You can set optional parameters like total questions (5) and target time. For this tutorial, you can leave them empty.",
         icon: "⚙️",
         visualText: "Optional: Set total questions to 5 for this quiz. Leave target time empty for instant completion.",
-        banner: "Step 3 of 4: Optional - Configure quiz settings in the extension popup"
+        banner: "Step 3 of 4: Optional - Configure quiz settings"
       },
       {
         title: "Start the Quiz! 🚀",
-        description: "Click the 'Start Quiz' button in the extension popup. Watch as StudyFlowSuite automatically answers all the questions!",
+        description: "Click the 'Start Quiz' button. Watch as StudyFlowSuite automatically answers all the questions!",
         icon: "🚀",
-        visualText: "The extension will detect questions, analyze them, and fill in answers automatically. Just sit back and watch!",
-        banner: "Step 4 of 4: Click 'Start Quiz' in the extension and watch the magic happen!"
+        visualText: "StudyFlowSuite will detect questions, analyze them, and fill in answers automatically. Just sit back and watch!",
+        banner: "Step 4 of 4: Click 'Start Quiz' and watch the magic happen!"
       }
     ];
 
@@ -521,7 +519,7 @@
     function completeTutorial() {
       document.getElementById('tutorialOverlay').style.display = 'none';
       setTimeout(() => {
-        alert('🎉 Tutorial complete! Now try clicking the extension icon and pressing "Start Quiz" to see it in action!');
+        alert('🎉 Tutorial complete! Now try pressing "Start Quiz" to see it in action!');
       }, 500);
     }
 

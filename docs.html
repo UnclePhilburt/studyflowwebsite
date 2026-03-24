@@ -56,7 +56,6 @@
           <div class="nav-section">
             <h4 class="nav-section-title">Getting Started</h4>
             <ul class="nav-section-links">
-              <li><a href="#installation">Installation</a></li>
               <li><a href="#quick-start">Quick Start</a></li>
               <li><a href="#setup-wizard">Setup Wizard</a></li>
             </ul>
@@ -94,32 +93,6 @@
     <!-- Main Content -->
     <main class="docs-main">
       <div class="docs-content">
-        <!-- Installation -->
-        <section id="installation" class="doc-section">
-          <h1 class="doc-title">Installation</h1>
-          <p class="doc-intro">Get started with StudyFlowSuite in just a few minutes.</p>
-
-          <h2>Chrome Web Store (Recommended)</h2>
-          <ol class="doc-list">
-            <li>Visit the <a href="https://chrome.google.com/webstore" target="_blank">Chrome Web Store</a></li>
-            <li>Search for "StudyFlowSuite"</li>
-            <li>Click "Add to Chrome"</li>
-            <li>Confirm the installation when prompted</li>
-          </ol>
-
-          <h2>Manual Installation</h2>
-          <ol class="doc-list">
-            <li>Download the <code>StudyFlowSuite-v0.8.3.zip</code> file</li>
-            <li>Extract the ZIP file to a folder</li>
-            <li>Open Chrome and go to <code>chrome://extensions</code></li>
-            <li>Enable "Developer mode" in the top right</li>
-            <li>Click "Load unpacked" and select the extracted folder</li>
-          </ol>
-
-          <div class="callout callout-info">
-            <strong>Note:</strong> Manual installation requires keeping the folder in place. Don't delete it after installation!
-          </div>
-        </section>
 
         <!-- Quick Start -->
         <section id="quick-start" class="doc-section">
@@ -127,9 +100,9 @@
 
           <h2>First Time Setup</h2>
           <ol class="doc-list">
-            <li>Navigate to a quiz page on Canvas or your learning platform</li>
-            <li>Click the StudyFlowSuite icon in your browser toolbar</li>
-            <li>The extension will guide you through a 3-step setup wizard</li>
+            <li>Sign into your StudyFlowSuite account</li>
+            <li>Navigate to the chat assistant</li>
+            <li>StudyFlowSuite will guide you through a 3-step setup wizard</li>
             <li>Configure your quiz settings (optional)</li>
             <li>Click "Start Quiz"</li>
           </ol>
@@ -145,10 +118,10 @@
           <p class="doc-intro">The first time you use StudyFlowSuite on a new website, you'll be guided through a simple 3-step setup.</p>
 
           <h2>Step 1: Select Question Element</h2>
-          <p>Click on the question text on your quiz page. This helps the extension identify where questions are located.</p>
+          <p>Click on the question text on your quiz page. This helps StudyFlowSuite identify where questions are located.</p>
 
           <h2>Step 2: Select Answer Area</h2>
-          <p>Click on any answer option. This teaches the extension where answer choices appear.</p>
+          <p>Click on any answer option. This teaches StudyFlowSuite where answer choices appear.</p>
 
           <h2>Step 3: Select Submit Button</h2>
           <p>Click on the Submit or Next button. This allows automatic progression through the quiz.</p>
@@ -158,7 +131,7 @@
           </div>
 
           <h2>Skipping Setup</h2>
-          <p>If you enable <strong>One-page quiz mode</strong>, the setup wizard is automatically skipped since the extension uses different detection methods.</p>
+          <p>If you enable <strong>One-page quiz mode</strong>, the setup wizard is automatically skipped since StudyFlowSuite uses different detection methods.</p>
         </section>
 
         <!-- Question Types -->
@@ -166,7 +139,7 @@
           <h1 class="doc-title">Supported Question Types</h1>
 
           <h2>Multiple Choice</h2>
-          <p>The most common question type. The extension analyzes all answer options and selects the correct one.</p>
+          <p>The most common question type. StudyFlowSuite analyzes all answer options and selects the correct one.</p>
           <ul class="doc-list">
             <li>Single selection (radio buttons)</li>
             <li>Multiple selection (checkboxes)</li>
@@ -183,7 +156,7 @@
           <p>Questions requiring a brief text response (2-5 sentences).</p>
 
           <h2>Essay Questions</h2>
-          <p>Long-form questions requiring detailed, multi-paragraph responses. The extension generates well-structured, contextually appropriate essays.</p>
+          <p>Long-form questions requiring detailed, multi-paragraph responses. StudyFlowSuite generates well-structured, contextually appropriate essays.</p>
         </section>
 
         <!-- Quiz Modes -->
@@ -223,7 +196,7 @@
           <ol class="doc-list">
             <li>Set your target completion time (in minutes)</li>
             <li>Set total number of questions</li>
-            <li>The extension calculates optimal delays between questions</li>
+            <li>StudyFlowSuite calculates optimal delays between questions</li>
             <li>Adds random variation (±30%) to appear natural</li>
           </ol>
 
@@ -288,7 +261,7 @@ Result: ~30 seconds per question
           <ol class="doc-list">
             <li>Enable "One-page quiz mode" if your Canvas quiz shows all questions at once</li>
             <li>Set accurate Total Questions for proper pacing</li>
-            <li>Allow the extension to complete page navigation</li>
+            <li>Allow StudyFlowSuite to complete page navigation</li>
           </ol>
 
           <div class="callout callout-success">
@@ -300,7 +273,7 @@ Result: ~30 seconds per question
         <section id="common-issues" class="doc-section">
           <h1 class="doc-title">Common Issues</h1>
 
-          <h2>Extension Not Detecting Questions</h2>
+          <h2>Not Detecting Questions</h2>
           <p><strong>Solution:</strong></p>
           <ol class="doc-list">
             <li>Refresh the page</li>
@@ -320,8 +293,8 @@ Result: ~30 seconds per question
           <h2>Stuck After Completing Page</h2>
           <p><strong>Solution:</strong></p>
           <ul class="doc-list">
-            <li>This is expected behavior! Click the displayed Next/Submit button, then click "Resume" in the extension popup</li>
-            <li>The extension pauses to let you control page navigation</li>
+            <li>This is expected behavior! Click the displayed Next/Submit button, then click "Resume"</li>
+            <li>StudyFlowSuite pauses to let you control page navigation</li>
           </ul>
 
           <h2>Essay Answers Are Generic</h2>
@@ -349,7 +322,7 @@ Result: ~30 seconds per question
 
           <div class="faq-doc-item">
             <h3>What happens if a question is answered incorrectly?</h3>
-            <p>The extension tracks errors in the popup. Some questions may be ambiguous or require specific course knowledge not available in the question text.</p>
+            <p>StudyFlowSuite tracks errors automatically. Some questions may be ambiguous or require specific course knowledge not available in the question text.</p>
           </div>
 
           <div class="faq-doc-item">
