@@ -548,8 +548,8 @@
 
         switch(currentNote.file_type) {
           case 'pdf':
-            // Show PDF viewer
-            document.getElementById('pdf-viewer').src = fileUrl;
+            // Show PDF viewer without toolbar (disables browser's download/print buttons)
+            document.getElementById('pdf-viewer').src = fileUrl + '#toolbar=0&navpanes=0&scrollbar=0';
             document.getElementById('pdf-viewer').style.display = 'block';
             break;
 
