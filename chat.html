@@ -2694,8 +2694,9 @@
         const sidebarRect = sidebar.getBoundingClientRect();
         const isClickInSidebar = e.clientX <= sidebarRect.right;
         const isMenuBtn = e.target.closest('#menuBtn');
+        const isMobileToggle = e.target.closest('#mobileMenuToggle');
 
-        if (!isClickInSidebar && !isMenuBtn) {
+        if (!isClickInSidebar && !isMenuBtn && !isMobileToggle) {
           sidebar.classList.remove('active');
           sidebarAutoOpened = false;
         }
@@ -2728,7 +2729,8 @@
       window.location.href = 'index.html';
     });
 
-    mobileMenuToggle.addEventListener('click', () => {
+    mobileMenuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
       sidebar.classList.toggle('active');
     });
 
