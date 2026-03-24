@@ -1267,9 +1267,11 @@
       }, 500);
     }
 
-    // Initialize
-    loadProfile();
-    loadSubscriptionStatus();
+    // Initialize (load subscription after profile sets authToken)
+    (async () => {
+      await loadProfile();
+      await loadSubscriptionStatus();
+    })();
   </script>
 </body>
 </html>
