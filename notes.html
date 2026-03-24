@@ -93,14 +93,38 @@
     /* Good Standing Status Widget */
     .good-standing-widget {
       margin-bottom: 24px;
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.06) 100%);
-      border-radius: 12px;
-      border: 2px solid rgba(16, 185, 129, 0.2);
-      padding: 20px;
+      background: rgba(124, 152, 133, 0.06);
+      border-radius: 10px;
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 8px;
       transition: all 0.3s ease;
+      font-size: 13px;
+      color: #5d5d5d;
+    }
+
+    .good-standing-widget .standing-icon {
+      font-size: 16px;
+    }
+
+    .good-standing-widget .standing-info h3 {
+      font-size: 13px;
+      margin: 0;
+      color: #7c9885;
+    }
+
+    .good-standing-widget .standing-info p {
+      display: none;
+    }
+
+    .good-standing-widget .standing-right {
+      display: none;
+    }
+
+    .good-standing-widget .standing-left {
+      gap: 8px;
     }
 
     .good-standing-widget.bad-standing {
@@ -111,6 +135,52 @@
     .good-standing-widget.permanent-ban {
       background: linear-gradient(135deg, rgba(127, 29, 29, 0.12) 0%, rgba(87, 13, 13, 0.08) 100%);
       border-color: rgba(127, 29, 29, 0.3);
+    }
+
+    .good-standing-widget.scholars-club {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.12) 0%, rgba(232, 155, 95, 0.08) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      padding: 20px;
+      justify-content: space-between;
+    }
+
+    .scholars-club .standing-icon {
+      font-size: 36px;
+      filter: drop-shadow(0 2px 4px rgba(124, 152, 133, 0.3));
+    }
+
+    .scholars-club .standing-left {
+      gap: 16px;
+    }
+
+    .scholars-club .standing-info h3 {
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      font-size: 18px !important;
+      margin-bottom: 4px !important;
+    }
+
+    .scholars-club .standing-info p {
+      display: block !important;
+      font-size: 13px !important;
+      color: #6b7280;
+    }
+
+    .scholars-club .standing-right {
+      display: flex !important;
+    }
+
+    .scholars-club-badge {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      color: white;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.25);
     }
 
     .standing-left {
@@ -1283,6 +1353,42 @@
     // Load Good Standing status
     async function loadGoodStandingStatus() {
       try {
+        // Check subscription status first
+        const subResponse = await fetch(`${BACKEND_URL}/api/subscription/status`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const widget = document.getElementById('goodStandingWidget');
+        const icon = document.getElementById('standingIcon');
+        const title = document.getElementById('standingTitle');
+        const message = document.getElementById('standingMessage');
+        const badge = document.getElementById('standingBadge');
+        const badgeText = document.getElementById('badgeText');
+
+        // If user is Scholar's Club member, show special widget
+        if (subResponse.ok) {
+          const subData = await subResponse.json();
+          if (subData.subscription_tier === 'pro' && subData.subscription_status === 'active') {
+            widget.style.display = 'flex';
+            widget.className = 'good-standing-widget scholars-club';
+            icon.textContent = '⭐';
+            title.textContent = "Scholar's Club";
+            message.textContent = 'Unlimited access to all features';
+            badge.className = 'scholars-club-badge';
+            badgeText.textContent = 'Active Member';
+
+            // Scholar's Club members always have full access
+            isInGoodStanding = true;
+            const contextDownloadBtn = document.getElementById('contextDownload');
+            const previewDownloadBtn = document.getElementById('previewDownloadBtn');
+            if (contextDownloadBtn) contextDownloadBtn.classList.remove('disabled');
+            if (previewDownloadBtn) previewDownloadBtn.disabled = false;
+
+            return; // Skip good standing check
+          }
+        }
+
+        // For non-subscribers, check good standing
         const response = await fetch(`${BACKEND_URL}/api/good-standing/status`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -1293,12 +1399,6 @@
         }
 
         const data = await response.json();
-        const widget = document.getElementById('goodStandingWidget');
-        const icon = document.getElementById('standingIcon');
-        const title = document.getElementById('standingTitle');
-        const message = document.getElementById('standingMessage');
-        const badge = document.getElementById('standingBadge');
-        const badgeText = document.getElementById('badgeText');
         const strikeDisplay = document.getElementById('strikeDisplay');
         const strikeCount = document.getElementById('strikeCount');
 
