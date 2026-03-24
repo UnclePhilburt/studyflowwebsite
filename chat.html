@@ -1294,13 +1294,16 @@
       position: fixed;
       top: 16px;
       left: 16px;
-      z-index: 1000;
-      background: #171717;
-      border: 1px solid #2a2a2a;
+      z-index: 1001;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
+      border: 1px solid rgba(124, 152, 133, 0.3);
       border-radius: 8px;
-      padding: 8px;
+      padding: 8px 10px;
       cursor: pointer;
-      color: #2d2d2d;
+      color: #5d5d5d;
+      font-size: 20px;
+      min-width: 44px;
+      min-height: 44px;
     }
 
     /* Responsive */
@@ -2768,7 +2771,8 @@
     document.addEventListener('click', (e) => {
       if (sidebar.classList.contains('active') &&
           !sidebar.contains(e.target) &&
-          !menuBtn.contains(e.target)) {
+          !menuBtn.contains(e.target) &&
+          !mobileMenuToggle.contains(e.target)) {
         sidebar.classList.remove('active');
       }
     });
