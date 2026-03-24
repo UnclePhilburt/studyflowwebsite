@@ -703,9 +703,9 @@
           <button class="subscribe-btn" disabled id="freeBtn">Current Plan</button>
         </div>
 
-        <!-- Convenience Tier -->
-        <div class="plan-option" id="conveniencePlan">
-          <div class="plan-name">Convenience Tier</div>
+        <!-- Scholar's Club -->
+        <div class="plan-option" id="scholarsClubPlan">
+          <div class="plan-name">Scholar's Club</div>
           <div class="plan-price">$5<span>/month</span></div>
           <ul class="plan-features">
             <li>Everything in Student Tier</li>
@@ -995,7 +995,7 @@
 
     function updateSubscriptionUI(subscriptionData) {
       const freePlan = document.getElementById('freePlan');
-      const conveniencePlan = document.getElementById('conveniencePlan');
+      const scholarsClubPlan = document.getElementById('scholarsClubPlan');
       const freeBtn = document.getElementById('freeBtn');
       const subscribeBtn = document.getElementById('subscribeBtn');
       const manageBillingBtn = document.getElementById('manageBillingBtn');
@@ -1005,17 +1005,17 @@
                               subscriptionData.subscription_status === 'active';
 
       if (hasSubscription) {
-        // User is subscribed to Convenience Tier
+        // User is subscribed to Scholar's Club
         freePlan.classList.remove('active');
-        conveniencePlan.classList.add('active');
+        scholarsClubPlan.classList.add('active');
 
         // Add "Current Plan" badge
-        let badge = conveniencePlan.querySelector('.plan-badge');
+        let badge = scholarsClubPlan.querySelector('.plan-badge');
         if (!badge) {
           badge = document.createElement('div');
           badge.className = 'plan-badge';
           badge.textContent = 'Active';
-          conveniencePlan.appendChild(badge);
+          scholarsClubPlan.appendChild(badge);
         }
 
         subscribeBtn.style.display = 'none';
@@ -1025,7 +1025,7 @@
       } else {
         // User is on Free tier
         freePlan.classList.add('active');
-        conveniencePlan.classList.remove('active');
+        scholarsClubPlan.classList.remove('active');
 
         // Add "Current Plan" badge
         let badge = freePlan.querySelector('.plan-badge');
@@ -1110,7 +1110,7 @@
     if (urlParams.get('success') === 'true') {
       // Show success message
       setTimeout(() => {
-        alert('Subscription activated! Welcome to the Convenience Tier.');
+        alert('Subscription activated! Welcome to the Scholar\'s Club.');
         window.history.replaceState({}, document.title, '/account.html');
       }, 500);
     }
