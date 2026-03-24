@@ -208,6 +208,51 @@
       color: #2d2d2d;
     }
 
+    /* Scholar's Club Badge */
+    .scholars-club-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.15) 100%);
+      border-radius: 8px;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      font-size: 14px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .scholars-club-icon {
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .good-standing-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #7c9885;
+    }
+
+    .good-standing-icon {
+      width: 8px;
+      height: 8px;
+      background: #7c9885;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
     /* Settings Card */
     .settings-card {
       background: rgba(255, 255, 255, 0.9);
@@ -816,6 +861,15 @@
           <div class="info-label">Total Pages</div>
           <div class="info-value" id="totalPages">-</div>
         </div>
+        <div class="info-item">
+          <div class="info-label">Status</div>
+          <div class="info-value" id="accountStatus">
+            <span id="statusBadge" style="display: inline-flex; align-items: center; gap: 6px;">
+              <span id="statusIcon"></span>
+              <span id="statusText">Loading...</span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1140,6 +1194,29 @@
       // Check if user has active subscription
       const hasSubscription = subscriptionData.subscription_tier === 'pro' &&
                               subscriptionData.subscription_status === 'active';
+
+      // Update status badge in profile card
+      const statusIcon = document.getElementById('statusIcon');
+      const statusText = document.getElementById('statusText');
+
+      if (hasSubscription) {
+        // Scholar's Club member - show special badge
+        statusIcon.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" style="fill: url(#scholars-gradient);"><defs><linearGradient id="scholars-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7c9885"/><stop offset="100%" style="stop-color:#e89b5f"/></linearGradient></defs><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+        statusText.textContent = "Scholar's Club";
+        statusText.style.background = 'linear-gradient(135deg, #7c9885 0%, #e89b5f 100%)';
+        statusText.style.webkitBackgroundClip = 'text';
+        statusText.style.webkitTextFillColor = 'transparent';
+        statusText.style.backgroundClip = 'text';
+        statusText.style.fontWeight = '700';
+      } else {
+        // Free tier - show good standing
+        statusIcon.innerHTML = '<div style="width: 10px; height: 10px; background: #7c9885; border-radius: 50%;"></div>';
+        statusText.textContent = 'Good Standing';
+        statusText.style.color = '#7c9885';
+        statusText.style.background = 'none';
+        statusText.style.webkitTextFillColor = 'initial';
+        statusText.style.fontWeight = '600';
+      }
 
       if (hasSubscription) {
         // User is subscribed to Scholar's Club
