@@ -676,7 +676,7 @@
         height: auto;
         min-height: 100vh;
         min-height: 100dvh;
-        padding: 60px 16px 16px;
+        padding: 16px;
       }
 
       body {
@@ -698,15 +698,28 @@
       .header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: 12px;
+        margin-bottom: 16px;
       }
 
       .header-left h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
+        margin-bottom: 2px;
+      }
+
+      .header-left p {
+        font-size: 0.85rem;
       }
 
       .header-right {
         width: 100%;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .month-nav {
+        width: 100%;
+        justify-content: space-between;
       }
 
       .upload-syllabus-btn {
