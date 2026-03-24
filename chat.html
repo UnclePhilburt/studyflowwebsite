@@ -1391,9 +1391,11 @@
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(124, 152, 133, 0.12);
       align-items: center;
-      justify-content: space-between;
       padding: 0 8px;
       z-index: 998;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      gap: 4px;
     }
 
     .mobile-toolbar-btn {
@@ -1415,12 +1417,13 @@
 
     .mobile-toolbar-beta {
       width: auto !important;
-      padding: 0 12px !important;
+      height: 32px !important;
+      padding: 0 10px !important;
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.9) 0%, rgba(107, 133, 117, 0.9) 100%) !important;
       color: white !important;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      border-radius: 8px !important;
+      border-radius: 6px !important;
     }
 
     .mobile-toolbar-beta:active {
@@ -1432,6 +1435,7 @@
       font-weight: 500;
       color: #7c9885;
       letter-spacing: 0.03em;
+      justify-self: center;
     }
 
     /* Sidebar Nexus Toggle (mobile only) */
@@ -1510,7 +1514,7 @@
 
       /* Show slim toolbar on mobile, hide all floating buttons */
       .mobile-toolbar {
-        display: flex;
+        display: grid;
       }
 
       .mobile-menu-toggle {
