@@ -1288,6 +1288,72 @@
       background: rgba(232, 155, 95, 0.3);
     }
 
+    /* Mobile Toolbar */
+    .mobile-toolbar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: rgba(248, 247, 243, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.12);
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      z-index: 998;
+    }
+
+    .mobile-toolbar-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #7c9885;
+    }
+
+    .mobile-toolbar-btn:active {
+      background: rgba(124, 152, 133, 0.1);
+    }
+
+    .mobile-toolbar-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #7c9885;
+      letter-spacing: 0.03em;
+    }
+
+    /* Sidebar Nexus Toggle (mobile only) */
+    .sidebar-nexus-toggle {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid rgba(124, 152, 133, 0.1);
+    }
+
+    .sidebar-nexus-label {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #2d2d2d;
+    }
+
+    .sidebar-nexus-desc {
+      font-size: 11px;
+      font-weight: 400;
+      color: #8a8a8a;
+    }
+
     /* Mobile Menu Toggle */
     .mobile-menu-toggle {
       display: none;
@@ -1338,8 +1404,36 @@
         transform: translateX(0);
       }
 
+      /* Before chat starts: show hamburger only */
       .mobile-menu-toggle {
         display: block;
+      }
+
+      /* After chat starts: show slim toolbar, hide individual buttons */
+      body.chat-started .mobile-toolbar {
+        display: flex;
+      }
+
+      body.chat-started .mobile-menu-toggle {
+        display: none;
+      }
+
+      body.chat-started .menu-btn {
+        display: none !important;
+      }
+
+      body.chat-started .calendar-top-btn,
+      body.chat-started .settings-top-btn {
+        display: none !important;
+      }
+
+      body.chat-started .ai-banner {
+        display: none !important;
+      }
+
+      /* Show nexus toggle and calendar in sidebar on mobile */
+      .sidebar-nexus-toggle {
+        display: flex;
       }
 
       .chat-header {
@@ -1352,7 +1446,7 @@
       }
 
       body.chat-started .messages-container {
-        padding: 60px 16px 100px 16px;
+        padding: 56px 16px 100px 16px;
       }
 
       .input-container {
@@ -1607,8 +1701,26 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Mobile Menu Toggle -->
+    <!-- Mobile Menu Toggle (hidden when toolbar is active) -->
     <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+
+    <!-- Mobile Toolbar (replaces scattered buttons on mobile after chat starts) -->
+    <div class="mobile-toolbar" id="mobileToolbar">
+      <button class="mobile-toolbar-btn" id="mobileToolbarMenu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <span class="mobile-toolbar-title">AI Assistant</span>
+      <button class="mobile-toolbar-btn" id="mobileToolbarSettings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
 
     <!-- Left Sidebar - Hidden until chat starts -->
     <aside class="sidebar" id="sidebar">
@@ -1648,12 +1760,31 @@
             <path d="m21 21-4.35-4.35"></path>
           </svg>
         </button>
+        <button class="zen-stone" id="calendarBtn" title="Calendar">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </button>
         <button class="zen-stone" id="accountBtn" title="Account">
           <svg viewBox="0 0 24 24">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
         </button>
+      </div>
+
+      <!-- Nexus Toggle (visible on mobile) -->
+      <div class="sidebar-nexus-toggle">
+        <div class="sidebar-nexus-label">
+          <span>Nexus</span>
+          <span class="sidebar-nexus-desc">Search all notes</span>
+        </div>
+        <div class="toggle-switch active" id="sidebarNexusToggle">
+          <div class="toggle-slider"></div>
+        </div>
       </div>
 
       <div class="sidebar-footer">
@@ -2701,7 +2832,7 @@
         const sidebarRect = sidebar.getBoundingClientRect();
         const isClickInSidebar = e.clientX <= sidebarRect.right;
         const isMenuBtn = e.target.closest('#menuBtn');
-        const isMobileToggle = e.target.closest('#mobileMenuToggle');
+        const isMobileToggle = e.target.closest('#mobileMenuToggle') || e.target.closest('#mobileToolbarMenu');
 
         if (!isClickInSidebar && !isMenuBtn && !isMobileToggle) {
           sidebar.classList.remove('active');
@@ -2739,6 +2870,38 @@
     mobileMenuToggle.addEventListener('click', (e) => {
       e.stopPropagation();
       sidebar.classList.toggle('active');
+    });
+
+    // Mobile toolbar buttons
+    const mobileToolbarMenu = document.getElementById('mobileToolbarMenu');
+    const mobileToolbarSettings = document.getElementById('mobileToolbarSettings');
+
+    mobileToolbarMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('active');
+    });
+
+    mobileToolbarSettings.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsOverlay.classList.toggle('active');
+    });
+
+    // Sidebar Nexus toggle (synced with settings toggle)
+    const sidebarNexusToggle = document.getElementById('sidebarNexusToggle');
+    sidebarNexusToggle.addEventListener('click', () => {
+      collectiveBrainEnabled = !collectiveBrainEnabled;
+      sidebarNexusToggle.classList.toggle('active');
+      collectiveBrainToggle.classList.toggle('active');
+    });
+
+    // Keep sidebar toggle in sync when settings toggle is used
+    collectiveBrainToggle.addEventListener('click', () => {
+      sidebarNexusToggle.classList.toggle('active');
+    });
+
+    // Calendar button in sidebar
+    document.getElementById('calendarBtn').addEventListener('click', () => {
+      window.location.href = 'calendar.html';
     });
 
     // Settings popup toggle
@@ -2781,7 +2944,8 @@
       if (sidebar.classList.contains('active') &&
           !sidebar.contains(e.target) &&
           !menuBtn.contains(e.target) &&
-          !mobileMenuToggle.contains(e.target)) {
+          !mobileMenuToggle.contains(e.target) &&
+          !mobileToolbarMenu.contains(e.target)) {
         sidebar.classList.remove('active');
       }
     });
