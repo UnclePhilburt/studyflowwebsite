@@ -1393,9 +1393,6 @@
       align-items: center;
       padding: 0 8px;
       z-index: 998;
-      display: grid;
-      grid-template-columns: auto 1fr auto auto;
-      gap: 4px;
     }
 
     .mobile-toolbar-btn {
@@ -1515,6 +1512,8 @@
       /* Show slim toolbar on mobile, hide all floating buttons */
       .mobile-toolbar {
         display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        gap: 4px;
       }
 
       .mobile-menu-toggle {
