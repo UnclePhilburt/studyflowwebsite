@@ -963,6 +963,14 @@
             </span>
           </div>
         </div>
+        <div class="info-item" id="downloadCountItem">
+          <div class="info-label">Downloads Today</div>
+          <div class="info-value" id="downloadCount">
+            <span style="display: inline-flex; align-items: center; gap: 6px;">
+              <span id="downloadCountText">Loading...</span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1164,6 +1172,49 @@
         statusDisplay.textContent = 'Not verified';
         statusDisplay.style.color = '#d9534f';
         verifyBtn.textContent = 'Add .edu Email';
+      }
+    }
+
+    // Load daily download count
+    async function loadDailyDownloadStatus() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/downloads/daily-status`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const downloadCountText = document.getElementById('downloadCountText');
+          const downloadCountItem = document.getElementById('downloadCountItem');
+
+          if (data.is_scholar) {
+            // Scholar's Club member - show unlimited
+            downloadCountText.textContent = 'Unlimited';
+            downloadCountText.style.color = '#e89b5f'; // Orange zen color
+            downloadCountText.style.fontWeight = '600';
+          } else {
+            // Free user - show X/3
+            const used = data.downloads_used || 0;
+            const limit = data.downloads_limit || 3;
+            const remaining = data.downloads_remaining || 0;
+
+            downloadCountText.textContent = `${used}/${limit}`;
+
+            // Color based on remaining downloads
+            if (remaining === 0) {
+              downloadCountText.style.color = '#d9534f'; // Red - at limit
+            } else if (remaining === 1) {
+              downloadCountText.style.color = '#e89b5f'; // Orange - warning
+            } else {
+              downloadCountText.style.color = '#7c9885'; // Green - good
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading download status:', error);
+        document.getElementById('downloadCountText').textContent = '-';
       }
     }
 
@@ -1456,6 +1507,7 @@
     (async () => {
       await loadProfile();
       await loadSubscriptionStatus();
+      await loadDailyDownloadStatus();
     })();
   </script>
 </body>

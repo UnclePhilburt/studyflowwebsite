@@ -400,6 +400,49 @@
     </div>
   </div>
 
+  <!-- Download Limit Upsell Modal -->
+  <div class="modal-overlay" id="downloadLimitModal">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-title" style="background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        Daily Download Limit Reached
+      </div>
+      <div style="text-align: center; margin: 24px 0;">
+        <div style="font-size: 48px; color: #e89b5f; margin-bottom: 16px;">3/3</div>
+        <p style="font-size: 15px; color: #5d5d5d; line-height: 1.6; margin-bottom: 24px;">
+          You've used all 3 downloads today. Your downloads will reset tomorrow, or you can join the Scholar's Club for unlimited access.
+        </p>
+        <div style="background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%); border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 20px;">
+          <div style="font-weight: 600; color: #2d2d2d; margin-bottom: 12px;">Scholar's Club Benefits:</div>
+          <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #5d5d5d;">
+            <li style="padding: 6px 0; display: flex; align-items: center;">
+              <span style="color: #7c9885; margin-right: 8px;">✓</span>
+              Unlimited downloads per day
+            </li>
+            <li style="padding: 6px 0; display: flex; align-items: center;">
+              <span style="color: #7c9885; margin-right: 8px;">✓</span>
+              No upload requirement
+            </li>
+            <li style="padding: 6px 0; display: flex; align-items: center;">
+              <span style="color: #7c9885; margin-right: 8px;">✓</span>
+              Skip Good Standing checks
+            </li>
+            <li style="padding: 6px 0; display: flex; align-items: center;">
+              <span style="color: #7c9885; margin-right: 8px;">✓</span>
+              Support StudyFlow development
+            </li>
+          </ul>
+          <div style="text-align: center; margin-top: 16px; font-size: 18px; font-weight: 600; color: #e89b5f;">
+            Just $5/month
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" onclick="closeDownloadLimitModal()">Maybe Later</button>
+        <button class="modal-btn confirm" style="background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%); border: none;" onclick="goToSubscription()">Join Scholar's Club</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <a href="browse.html" class="back-link">← Back to Browse</a>
 
@@ -792,6 +835,10 @@
         if (!response.ok) {
           if (response.status === 403) {
             const errorData = await response.json();
+            if (errorData.limit_reached) {
+              showDownloadLimitModal();
+              return;
+            }
             if (errorData.good_standing_required) {
               alert('Good Standing Required\n\nYou must upload a verified note or subscribe to download from the community.');
               return;
@@ -828,7 +875,55 @@
 
       await showAiNotice();
 
-      window.location.href = `${BACKEND_URL}/api/notes/${noteId}/download`;
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+          if (response.status === 403) {
+            const errorData = await response.json();
+            if (errorData.limit_reached) {
+              showDownloadLimitModal();
+              return;
+            }
+            if (errorData.good_standing_required) {
+              alert('Good Standing Required\n\nYou must upload a verified note or subscribe to download from the community.');
+              return;
+            }
+          }
+          throw new Error('Download failed');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const baseName = (currentNote.original_filename || currentNote.filename || 'note').replace(/\.[^/.]+$/, '');
+        a.download = baseName + '_studyflow.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Download failed. Please try again.');
+      }
+    }
+
+    // Show download limit modal
+    function showDownloadLimitModal() {
+      document.getElementById('downloadLimitModal').classList.add('active');
+    }
+
+    // Close download limit modal
+    function closeDownloadLimitModal() {
+      document.getElementById('downloadLimitModal').classList.remove('active');
+    }
+
+    // Go to subscription page
+    function goToSubscription() {
+      window.location.href = 'account.html#subscription';
     }
 
     function showError(message) {
