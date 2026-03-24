@@ -163,23 +163,39 @@
     /* PDF viewer */
     #pdf-viewer {
       width: 100%;
-      height: 800px;
-      border: none;
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
     }
 
-    /* Overlay to block right-click on PDF */
-    .pdf-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1;
-      pointer-events: none;
+    #pdf-pages-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .pdf-page {
+      max-width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      user-drag: none;
+    }
+
+    .pdf-page-number {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
     }
 
     /* Loading state */
@@ -408,8 +424,10 @@
       <div id="loading" class="loading">Loading note...</div>
       <div id="error" class="error-message" style="display: none;"></div>
 
-      <!-- PDF viewer (shown when note is loaded) -->
-      <iframe id="pdf-viewer" style="display: none;" oncontextmenu="return false;"></iframe>
+      <!-- PDF viewer as images (prevents download/print) -->
+      <div id="pdf-viewer" style="display: none;">
+        <div id="pdf-pages-container"></div>
+      </div>
 
       <!-- Image viewer (shown for image files) -->
       <div id="image-viewer" style="display: none; text-align: center;">
@@ -577,16 +595,54 @@
 
         switch(currentNote.file_type) {
           case 'pdf':
-            // Show PDF viewer without toolbar (disables browser's download/print buttons)
-            const pdfViewer = document.getElementById('pdf-viewer');
-            pdfViewer.src = fileUrl + '#toolbar=0&navpanes=0&scrollbar=0';
-            pdfViewer.style.display = 'block';
+            // Convert PDF to images for secure viewing (prevents download/print)
+            try {
+              document.getElementById('loading').textContent = 'Converting PDF to images...';
+              const imageResponse = await fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`);
 
-            // Disable right-click on PDF viewer
-            pdfViewer.addEventListener('contextmenu', (e) => {
-              e.preventDefault();
-              return false;
-            });
+              if (!imageResponse.ok) {
+                throw new Error('Failed to convert PDF to images');
+              }
+
+              const imageData = await imageResponse.json();
+              const pdfViewer = document.getElementById('pdf-viewer');
+              const pagesContainer = document.getElementById('pdf-pages-container');
+
+              // Clear any existing content
+              pagesContainer.innerHTML = '';
+
+              // Add each page as an image
+              imageData.images.forEach((page) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.style.textAlign = 'center';
+                pageDiv.style.marginBottom = '20px';
+
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'pdf-page-number';
+                pageNumber.textContent = `Page ${page.page} of ${imageData.total_pages}`;
+
+                const img = document.createElement('img');
+                img.src = page.data;
+                img.className = 'pdf-page';
+                img.alt = `Page ${page.page}`;
+                img.draggable = false;
+
+                // Disable right-click on images
+                img.addEventListener('contextmenu', (e) => {
+                  e.preventDefault();
+                  return false;
+                });
+
+                pageDiv.appendChild(pageNumber);
+                pageDiv.appendChild(img);
+                pagesContainer.appendChild(pageDiv);
+              });
+
+              pdfViewer.style.display = 'block';
+            } catch (error) {
+              console.error('Error loading PDF as images:', error);
+              showError('Failed to load PDF. Please try again.');
+            }
             break;
 
           case 'image':
