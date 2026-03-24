@@ -629,15 +629,9 @@
 
         if (error) throw error;
 
-        showSuccess('Account created! Redirecting to verify your age...');
+        showSuccess('Account created! Redirecting to your dashboard...');
         setTimeout(() => {
-          window.location.href = 'verify-age.html?email=' + encodeURIComponent(email) +
-            '&name=' + encodeURIComponent(legalName) +
-            '&address=' + encodeURIComponent(address) +
-            '&city=' + encodeURIComponent(city) +
-            '&state=' + encodeURIComponent(state) +
-            '&zip=' + encodeURIComponent(zipCode) +
-            '&dob=' + encodeURIComponent(birthdate);
+          window.location.href = 'chat.html';
         }, 1500);
 
       } catch (error) {
