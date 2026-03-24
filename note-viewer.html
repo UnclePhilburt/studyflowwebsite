@@ -655,7 +655,7 @@
       const { data: { session } } = await supabaseClient.auth.getSession();
 
       if (!session) {
-        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        window.location.href = 'index.html?redirect=' + encodeURIComponent(window.location.href);
         return;
       }
 
