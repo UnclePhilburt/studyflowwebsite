@@ -67,6 +67,10 @@
       background: rgba(124, 152, 133, 0.08);
     }
 
+    .user-avatar-wrapper {
+      position: relative;
+    }
+
     .user-avatar {
       width: 36px;
       height: 36px;
@@ -85,6 +89,73 @@
     .user-avatar:hover {
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 12px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.15);
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10000;
+    }
+
+    .user-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .user-menu-header {
+      padding: 16px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .user-menu-email {
+      font-size: 13px;
+      color: #5d5d5d;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .user-menu-item {
+      padding: 12px 16px;
+      color: #2d2d2d;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .user-menu-item:hover {
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
+
+    .user-menu-item.logout {
+      color: #e89b5f;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .user-menu-item.logout:hover {
+      background: rgba(232, 155, 95, 0.08);
+      color: #d4783d;
     }
 
     /* Header */
@@ -827,7 +898,29 @@
     <a href="notes.html" class="nav-link">Notes</a>
     <a href="browse.html" class="nav-link">Browse</a>
     <a href="calendar.html" class="nav-link">Calendar</a>
-    <div class="user-avatar" id="userAvatar"></div>
+    <div class="user-avatar-wrapper">
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-menu" id="userMenu">
+        <div class="user-menu-header">
+          <div class="user-menu-email" id="menuUserEmail">Loading...</div>
+        </div>
+        <a href="account.html" class="user-menu-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Account
+        </a>
+        <button class="user-menu-item logout" onclick="logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Main Container -->
@@ -1004,6 +1097,7 @@
       document.getElementById('profileAvatar').textContent = firstLetter;
       document.getElementById('profileName').textContent = displayName;
       document.getElementById('profileEmail').textContent = userEmail;
+      document.getElementById('menuUserEmail').textContent = userEmail;
 
       // Get member since date
       const createdAt = new Date(currentUser.created_at);
@@ -1158,6 +1252,20 @@
         syncStatus.innerHTML = '<span>✓</span><span>Synced with extension</span>';
       } catch (error) {
         console.error('Error updating setting:', error);
+      }
+    });
+
+    function toggleUserMenu() {
+      const menu = document.getElementById('userMenu');
+      menu.classList.toggle('show');
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('userMenu');
+      const avatar = document.getElementById('userAvatar');
+      if (menu && !menu.contains(event.target) && !avatar.contains(event.target)) {
+        menu.classList.remove('show');
       }
     });
 
