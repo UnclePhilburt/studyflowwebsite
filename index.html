@@ -174,6 +174,28 @@
       z-index: 1;
     }
 
+    /* Header and Stats Group */
+    .header-stats-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .main-header {
+      font-family: 'Lora', serif;
+      font-size: 56px;
+      font-weight: 400;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      letter-spacing: -1px;
+      margin: 0;
+      animation: fadeIn 0.8s ease both;
+    }
+
     .brain-tagline {
       font-family: 'Lora', serif;
       font-size: 28px;
@@ -587,6 +609,11 @@
         letter-spacing: -1px;
       }
 
+      .main-header {
+        font-size: 40px;
+        letter-spacing: -1px;
+      }
+
       .live-stats {
         gap: 40px;
         flex-wrap: wrap;
@@ -652,6 +679,10 @@
         font-size: 32px;
       }
 
+      .main-header {
+        font-size: 32px;
+      }
+
       .hero h1 {
         font-size: 28px;
       }
@@ -691,15 +722,18 @@
           <!-- Animated Network Canvas -->
           <canvas id="networkCanvas"></canvas>
 
-          <!-- Live Stats -->
-          <div class="live-stats">
-            <div class="stat-item">
-              <div class="stat-number" id="studentCount">...</div>
-              <div class="stat-label">Students</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="noteCount">...</div>
-              <div class="stat-label">Notes</div>
+          <!-- Header and Stats Group -->
+          <div class="header-stats-group">
+            <h1 class="main-header">StudyFlow Suite</h1>
+            <div class="live-stats">
+              <div class="stat-item">
+                <div class="stat-number" id="studentCount">...</div>
+                <div class="stat-label">Students</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="noteCount">...</div>
+                <div class="stat-label">Notes</div>
+              </div>
             </div>
           </div>
 
