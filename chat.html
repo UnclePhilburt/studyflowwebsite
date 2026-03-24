@@ -1513,12 +1513,24 @@
         line-height: 1.7;
       }
 
+      .welcome-hint {
+        margin-bottom: 20px;
+      }
+
       .welcome-hint h1 {
-        font-size: 24px;
+        font-size: 22px;
+        margin-bottom: 6px;
       }
 
       .welcome-hint p {
-        font-size: 14px;
+        font-size: 13px;
+      }
+
+      .search-input {
+        font-size: 15px;
+        padding: 14px 52px 14px 20px;
+        min-height: 52px;
+        max-height: 52px;
       }
 
       .input-box {
@@ -1968,6 +1980,14 @@
     const myNotesBtn = document.getElementById('myNotesBtn');
     const browseBtn = document.getElementById('browseBtn');
     const accountBtn = document.getElementById('accountBtn');
+
+    // Shorter placeholder on small screens
+    const mobileQuery = window.matchMedia('(max-width: 480px)');
+    function updatePlaceholder(e) {
+      searchInput.placeholder = e.matches ? 'Ask anything...' : 'What would you like to explore today?';
+    }
+    updatePlaceholder(mobileQuery);
+    mobileQuery.addEventListener('change', updatePlaceholder);
 
     // Theme Management
     function loadTheme() {
