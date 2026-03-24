@@ -1833,6 +1833,213 @@
       box-shadow: 0 2px 8px rgba(124, 152, 133, 0.4);
     }
 
+    /* Quiz Maker Modal */
+    .quiz-maker-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(45, 45, 45, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .quiz-maker-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .quiz-maker-modal {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(45, 45, 45, 0.2),
+                  0 8px 32px rgba(124, 152, 133, 0.15);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      transform: scale(0.9);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .quiz-maker-overlay.active .quiz-maker-modal {
+      transform: scale(1);
+    }
+
+    .quiz-maker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .quiz-maker-title {
+      font-size: 22px;
+      font-weight: 500;
+      font-family: 'Lora', Georgia, serif;
+      color: #2d2d2d;
+    }
+
+    .quiz-maker-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #5d5d5d;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-maker-close:hover {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+    }
+
+    .quiz-maker-input-section {
+      margin-bottom: 24px;
+    }
+
+    .quiz-maker-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .quiz-maker-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 12px;
+      font-size: 15px;
+      color: #2d2d2d;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .quiz-maker-input:focus {
+      outline: none;
+      border-color: #7c9885;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(124, 152, 133, 0.1);
+    }
+
+    .quiz-maker-generate-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.2);
+    }
+
+    .quiz-maker-generate-btn:hover {
+      background: linear-gradient(135deg, #6b8575 0%, #5a7464 100%);
+      box-shadow: 0 6px 24px rgba(124, 152, 133, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .quiz-maker-generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .quiz-content {
+      margin-top: 24px;
+    }
+
+    .quiz-question {
+      margin-bottom: 32px;
+      padding: 20px;
+      background: rgba(124, 152, 133, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .quiz-question-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .quiz-answer-option {
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .quiz-answer-option:hover {
+      border-color: #7c9885;
+      background: rgba(124, 152, 133, 0.05);
+    }
+
+    .quiz-answer-option.selected {
+      border-color: #7c9885;
+      background: rgba(124, 152, 133, 0.1);
+    }
+
+    .quiz-answer-option.correct {
+      border-color: #4caf50;
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .quiz-answer-option.incorrect {
+      border-color: #f44336;
+      background: rgba(244, 67, 54, 0.1);
+    }
+
+    .quiz-loading {
+      text-align: center;
+      padding: 40px;
+      color: #7c9885;
+    }
+
+    .quiz-loading-spinner {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 16px;
+      border: 4px solid rgba(124, 152, 133, 0.2);
+      border-top-color: #7c9885;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
 
 
 
@@ -1977,6 +2184,32 @@
             <div class="toggle-slider"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Quiz Maker Modal -->
+    <div class="quiz-maker-overlay" id="quizMakerOverlay">
+      <div class="quiz-maker-modal">
+        <div class="quiz-maker-header">
+          <div class="quiz-maker-title">Quiz Maker</div>
+          <button class="quiz-maker-close" id="quizMakerClose">&times;</button>
+        </div>
+
+        <div class="quiz-maker-input-section">
+          <label class="quiz-maker-label">What topic would you like to quiz on?</label>
+          <input
+            type="text"
+            class="quiz-maker-input"
+            id="quizTopicInput"
+            placeholder="e.g., photosynthesis, world war 2, calculus..."
+          />
+        </div>
+
+        <button class="quiz-maker-generate-btn" id="generateQuizBtn">
+          Generate Quiz
+        </button>
+
+        <div class="quiz-content" id="quizContent"></div>
       </div>
     </div>
 
@@ -3099,13 +3332,137 @@
       }
     });
 
-    // Quiz Maker button
+    // Quiz Maker Modal Elements
+    const quizMakerOverlay = document.getElementById('quizMakerOverlay');
+    const quizMakerClose = document.getElementById('quizMakerClose');
+    const quizTopicInput = document.getElementById('quizTopicInput');
+    const generateQuizBtn = document.getElementById('generateQuizBtn');
+    const quizContent = document.getElementById('quizContent');
+
+    // Quiz Maker button - open modal
     quizMakerBtn.addEventListener('click', () => {
-      console.log('Quiz Maker clicked!');
       betaMenu.classList.remove('active');
-      // TODO: Implement Quiz Maker functionality
-      alert('Quiz Maker coming soon!');
+      quizMakerOverlay.classList.add('active');
+      quizTopicInput.value = '';
+      quizContent.innerHTML = '';
     });
+
+    // Close quiz maker modal
+    quizMakerClose.addEventListener('click', () => {
+      quizMakerOverlay.classList.remove('active');
+    });
+
+    // Close quiz maker when clicking overlay
+    quizMakerOverlay.addEventListener('click', (e) => {
+      if (e.target === quizMakerOverlay) {
+        quizMakerOverlay.classList.remove('active');
+      }
+    });
+
+    // Generate Quiz button
+    generateQuizBtn.addEventListener('click', async () => {
+      const topic = quizTopicInput.value.trim();
+
+      if (!topic) {
+        alert('Please enter a topic');
+        return;
+      }
+
+      // Disable button and show loading
+      generateQuizBtn.disabled = true;
+      generateQuizBtn.textContent = 'Generating...';
+      quizContent.innerHTML = `
+        <div class="quiz-loading">
+          <div class="quiz-loading-spinner"></div>
+          <div>Searching notes and generating quiz...</div>
+        </div>
+      `;
+
+      try {
+        // Call backend to generate quiz
+        const response = await fetch('/api/generate-quiz', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ topic })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate quiz');
+        }
+
+        const data = await response.json();
+        displayQuiz(data.questions);
+
+      } catch (error) {
+        console.error('Error generating quiz:', error);
+        quizContent.innerHTML = `
+          <div style="text-align: center; color: #f44336; padding: 20px;">
+            Failed to generate quiz. Please try again.
+          </div>
+        `;
+      } finally {
+        generateQuizBtn.disabled = false;
+        generateQuizBtn.textContent = 'Generate Quiz';
+      }
+    });
+
+    // Display quiz questions
+    function displayQuiz(questions) {
+      if (!questions || questions.length === 0) {
+        quizContent.innerHTML = `
+          <div style="text-align: center; color: #5d5d5d; padding: 20px;">
+            No quiz questions could be generated for this topic. Try a different topic or check if there are relevant notes in the Nexus.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      questions.forEach((q, qIndex) => {
+        html += `
+          <div class="quiz-question">
+            <div class="quiz-question-text">${qIndex + 1}. ${q.question}</div>
+            ${q.options.map((option, oIndex) => `
+              <div class="quiz-answer-option" data-question="${qIndex}" data-answer="${oIndex}">
+                ${String.fromCharCode(65 + oIndex)}. ${option}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      });
+
+      quizContent.innerHTML = html;
+
+      // Add click handlers to answer options
+      const answerOptions = quizContent.querySelectorAll('.quiz-answer-option');
+      answerOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          const questionIndex = parseInt(this.dataset.question);
+          const answerIndex = parseInt(this.dataset.answer);
+          const correctIndex = questions[questionIndex].correctIndex;
+
+          // Remove previous selections for this question
+          const siblings = quizContent.querySelectorAll(`[data-question="${questionIndex}"]`);
+          siblings.forEach(s => {
+            s.classList.remove('selected', 'correct', 'incorrect');
+          });
+
+          // Mark selected answer
+          this.classList.add('selected');
+
+          // Show correct/incorrect
+          if (answerIndex === correctIndex) {
+            this.classList.add('correct');
+          } else {
+            this.classList.add('incorrect');
+            // Also highlight the correct answer
+            siblings[correctIndex].classList.add('correct');
+          }
+        });
+      });
+    }
 
     // Settings popup toggle
     settingsBtn.addEventListener('click', (e) => {
