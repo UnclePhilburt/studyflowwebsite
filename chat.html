@@ -2209,6 +2209,9 @@
 
     // Load Specific Conversation
     async function loadConversation(convId, clickedElement) {
+      // Close sidebar on mobile when a conversation is selected
+      sidebar.classList.remove('active');
+
       try {
         const response = await fetch(`${BACKEND_URL}/api/conversations/${convId}/messages`, {
           headers: {
