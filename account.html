@@ -960,7 +960,7 @@
 
       // Fetch notes statistics
       try {
-        const response = await fetch(`${BACKEND_URL}/api/notes/stats`, {
+        const response = await fetch(`${BACKEND_URL}/api/notes/usage-stats`, {
           headers: {
             'Authorization': `Bearer ${authToken}`
           }
