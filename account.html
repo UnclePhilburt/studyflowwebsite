@@ -783,6 +783,18 @@
       color: #7c9885;
     }
 
+    /* Loading shimmer for placeholder text */
+    @keyframes shimmer {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    .loading-text {
+      animation: shimmer 1.5s ease-in-out infinite;
+      color: #b0b0b0 !important;
+    }
+
     @media (max-width: 768px) {
       .profile-header {
         flex-direction: column;
@@ -1034,8 +1046,8 @@
       <div class="profile-header">
         <div class="profile-avatar-large" id="profileAvatar">S</div>
         <div class="profile-info">
-          <h2 id="profileName">Loading...</h2>
-          <p id="profileEmail">Loading...</p>
+          <h2 id="profileName" class="loading-text">Loading...</h2>
+          <p id="profileEmail" class="loading-text">Loading...</p>
         </div>
       </div>
 
@@ -1201,8 +1213,12 @@
 
       document.getElementById('userAvatar').textContent = firstLetter;
       document.getElementById('profileAvatar').textContent = firstLetter;
-      document.getElementById('profileName').textContent = displayName;
-      document.getElementById('profileEmail').textContent = userEmail;
+      const nameEl = document.getElementById('profileName');
+      const emailEl = document.getElementById('profileEmail');
+      nameEl.textContent = displayName;
+      nameEl.classList.remove('loading-text');
+      emailEl.textContent = userEmail;
+      emailEl.classList.remove('loading-text');
       document.getElementById('menuUserEmail').textContent = userEmail;
 
       // Get member since date

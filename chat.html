@@ -517,6 +517,45 @@
       transform: translateY(-50%) scale(0.95);
     }
 
+    /* Skeleton loading */
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: 200px 0; }
+    }
+
+    .skeleton-list {
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .skeleton-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(124, 152, 133, 0.04);
+    }
+
+    .skeleton-line {
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, rgba(124, 152, 133, 0.08) 0%, rgba(124, 152, 133, 0.15) 50%, rgba(124, 152, 133, 0.08) 100%);
+      background-size: 400px 12px;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-message {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 20px 24px;
+      max-width: 70%;
+    }
+
+    .skeleton-message.right {
+      align-self: flex-end;
+    }
+
     .sidebar-footer {
       padding: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -1740,7 +1779,11 @@
       </button>
 
       <div class="conversation-list" id="conversationList">
-        <!-- Conversations will be loaded here -->
+        <div class="skeleton-list">
+          <div class="skeleton-item"><div class="skeleton-line" style="width:80%"></div></div>
+          <div class="skeleton-item"><div class="skeleton-line" style="width:60%"></div></div>
+          <div class="skeleton-item"><div class="skeleton-line" style="width:70%"></div></div>
+        </div>
       </div>
 
       <!-- Zen Action Stones -->
@@ -2227,6 +2270,14 @@
       // Close sidebar on mobile when a conversation is selected
       sidebar.classList.remove('active');
 
+      // Show loading skeleton while messages fetch
+      document.body.classList.add('chat-started');
+      messagesContainer.innerHTML = `
+        <div class="skeleton-message right"><div class="skeleton-line" style="width:60%"></div></div>
+        <div class="skeleton-message"><div class="skeleton-line" style="width:80%"></div><div class="skeleton-line" style="width:50%"></div></div>
+        <div class="skeleton-message right"><div class="skeleton-line" style="width:45%"></div></div>
+      `;
+
       try {
         const response = await fetch(`${BACKEND_URL}/api/conversations/${convId}/messages`, {
           headers: {
@@ -2240,7 +2291,7 @@
 
         const data = await response.json();
 
-        // Clear current messages
+        // Clear skeleton
         messagesContainer.innerHTML = '';
 
         // Transform to chat mode

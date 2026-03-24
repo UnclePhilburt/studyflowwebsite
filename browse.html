@@ -810,6 +810,23 @@
       margin: 0 auto 20px;
     }
 
+    .scroll-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+      color: #8a8a8a;
+      font-size: 14px;
+    }
+
+    .scroll-loading .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border-width: 3px;
+      margin: 0;
+    }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -1058,6 +1075,11 @@
           <h3 class="empty-title">No notes found</h3>
           <p class="empty-text">Try adjusting your search or filters</p>
         </div>
+
+        <div class="scroll-loading" id="scrollLoading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <span>Loading more notes...</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1137,6 +1159,10 @@
       if (isLoadingMore) return; // Prevent duplicate requests
       isLoadingMore = true;
 
+      if (append) {
+        document.getElementById('scrollLoading').style.display = 'flex';
+      }
+
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/browse?limit=${NOTES_PER_PAGE}&offset=${currentOffset}`, {
           headers: {
@@ -1182,6 +1208,7 @@
         }
       } finally {
         isLoadingMore = false;
+        document.getElementById('scrollLoading').style.display = 'none';
       }
     }
 
