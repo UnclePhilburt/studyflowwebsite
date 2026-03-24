@@ -2626,7 +2626,7 @@
     }
 
     // Event Listeners
-    searchBtn.addEventListener('click', sendMessage);
+    searchBtn.addEventListener('click', () => sendMessage());
 
     searchInput.addEventListener('input', () => {
       searchBtn.disabled = !searchInput.value.trim();
