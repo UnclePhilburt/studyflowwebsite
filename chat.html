@@ -1052,6 +1052,76 @@
     }
 
     /* SB 1324 Provenance Marker */
+    .source-citations {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(124, 152, 133, 0.12);
+    }
+
+    .source-citations-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9a9a9a;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .source-citation {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(124, 152, 133, 0.06);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .source-citation:hover {
+      background: rgba(124, 152, 133, 0.12);
+      border-color: rgba(124, 152, 133, 0.25);
+    }
+
+    .source-citation svg {
+      width: 14px;
+      height: 14px;
+      stroke: #7c9885;
+      flex-shrink: 0;
+    }
+
+    .source-citation-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .source-citation-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2d2d2d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-citation-meta {
+      font-size: 10px;
+      color: #9a9a9a;
+    }
+
+    .source-citation-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
     .provenance-marker {
       display: flex;
       align-items: center;
@@ -2656,8 +2726,8 @@
           conversationId = data.conversation_id;
         }
 
-        // Add AI response
-        addMessage(data.response || 'Sorry, I couldn\'t generate a response.', 'assistant');
+        // Add AI response with source citations
+        addMessage(data.response || 'Sorry, I couldn\'t generate a response.', 'assistant', data.sources);
 
         // Refresh conversation list (to show new chat or updated title)
         await loadConversations();
@@ -2718,8 +2788,8 @@
           conversationId = data.conversation_id;
         }
 
-        // Add AI response
-        addMessage(data.response || 'Sorry, I couldn\'t generate a response.', 'assistant');
+        // Add AI response with source citations
+        addMessage(data.response || 'Sorry, I couldn\'t generate a response.', 'assistant', data.sources);
 
         // Refresh conversation list (to show new chat or updated title)
         await loadConversations();
@@ -2835,7 +2905,7 @@
     });
 
     // Add Message to UI
-    function addMessage(content, role) {
+    function addMessage(content, role, sources) {
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${role}`;
 
@@ -2862,6 +2932,39 @@
         });
 
         contentDiv.innerHTML = marked.parse(steganographicContent);
+
+        // Append source citations if Nexus notes were used
+        if (sources && sources.length > 0) {
+          const citationsDiv = document.createElement('div');
+          citationsDiv.className = 'source-citations';
+          citationsDiv.innerHTML = '<div class="source-citations-label">Sources</div>';
+
+          sources.forEach(source => {
+            const link = document.createElement('a');
+            link.className = 'source-citation';
+            link.href = `note-viewer.html?id=${source.note_id}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+
+            const username = source.username ? `@${source.username}` : 'Anonymous';
+            const meta = source.course_code ? `${username} -- ${source.course_code}` : username;
+
+            link.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <div class="source-citation-text">
+                <div class="source-citation-title">${source.filename}</div>
+                <div class="source-citation-meta">${meta}</div>
+              </div>
+              <span class="source-citation-badge">View</span>
+            `;
+            citationsDiv.appendChild(link);
+          });
+
+          contentDiv.appendChild(citationsDiv);
+        }
 
         // Append visible provenance marker (SB 1324 "clear and conspicuous" label)
         const provenanceDiv = document.createElement('div');
