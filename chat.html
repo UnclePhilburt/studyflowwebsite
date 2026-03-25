@@ -1718,6 +1718,73 @@
       border-bottom: none;
     }
 
+    .settings-version {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(124, 152, 133, 0.1);
+    }
+
+    .settings-version-btn {
+      background: none;
+      border: none;
+      color: rgba(93, 93, 93, 0.5);
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 4px 8px;
+    }
+
+    .settings-version-btn:hover {
+      color: #7c9885;
+    }
+
+    .changelog-panel {
+      display: none;
+      margin-top: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .changelog-panel.active {
+      display: block;
+    }
+
+    .changelog-entry {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.08);
+    }
+
+    .changelog-entry:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .changelog-entry-version {
+      font-weight: 600;
+      font-size: 14px;
+      color: #7c9885;
+      margin-bottom: 2px;
+    }
+
+    .changelog-entry-date {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .changelog-entry ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+      color: #5d5d5d;
+      line-height: 1.7;
+    }
+
     .settings-option-label {
       color: #2d2d2d;
       font-weight: 600;
@@ -1915,6 +1982,23 @@
           </div>
           <div class="toggle-switch active" id="collectiveBrainToggle">
             <div class="toggle-slider"></div>
+          </div>
+        </div>
+
+        <div class="settings-version">
+          <button class="settings-version-btn" id="versionBtn">v1.0.0</button>
+          <div class="changelog-panel" id="changelogPanel">
+            <div class="changelog-entry">
+              <div class="changelog-entry-version">v1.0.0</div>
+              <div class="changelog-entry-date">March 25, 2026</div>
+              <ul>
+                <li>Initial public release</li>
+                <li>AI-powered chat with study assistance</li>
+                <li>Nexus shared notes system</li>
+                <li>Calendar with Canvas import</li>
+                <li>Note upload and management</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -3014,6 +3098,11 @@
     settingsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       settingsOverlay.classList.toggle('active');
+    });
+
+    // Version / Changelog toggle
+    document.getElementById('versionBtn').addEventListener('click', () => {
+      document.getElementById('changelogPanel').classList.toggle('active');
     });
 
     // Upload button - navigate to upload page
