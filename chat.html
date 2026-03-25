@@ -2493,7 +2493,7 @@
 
         // Display all messages
         data.messages.forEach(msg => {
-          addMessage(msg.content, msg.role);
+          addMessage(msg.content, msg.role, msg.sources);
         });
 
         // Set active conversation
