@@ -266,7 +266,7 @@ document.getElementById('emailMeBtn')?.addEventListener('click', function(e) {
   if (email && email.includes('@')) {
     // Create mailto link
     const subject = 'StudyFlow Download Link';
-    const body = `Hi!\n\nHere's the link to download StudyFlow on your computer:\n\nhttps://unclephilburt.github.io/studyflowwebsite/\n\nRemember:\n✅ Must use Chrome browser\n✅ Visit on desktop/laptop\n✅ Follow the installation guide\n\nQuestions? Visit our FAQ: https://unclephilburt.github.io/studyflowwebsite/docs.html\n\nHappy studying!\n- StudyFlow Team`;
+    const body = `Hi!\n\nHere's the link to download StudyFlow on your computer:\n\nhttps://studyflowsuite.com/\n\nRemember:\n✅ Must use Chrome browser\n✅ Visit on desktop/laptop\n✅ Follow the installation guide\n\nQuestions? Visit our FAQ: https://studyflowsuite.com/docs.html\n\nHappy studying!\n- StudyFlow Team`;
 
     window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 

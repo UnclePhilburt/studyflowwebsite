@@ -1560,8 +1560,8 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            success_url: 'https://unclephilburt.github.io/studyflowwebsite/account.html?success=true',
-            cancel_url: 'https://unclephilburt.github.io/studyflowwebsite/account.html'
+            success_url: 'https://studyflowsuite.com/account.html?success=true',
+            cancel_url: 'https://studyflowsuite.com/account.html'
           })
         });
 
@@ -1591,7 +1591,7 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            return_url: 'https://unclephilburt.github.io/studyflowwebsite/account.html'
+            return_url: 'https://studyflowsuite.com/account.html'
           })
         });
 
@@ -1631,7 +1631,7 @@
       // Show zen notification
       setTimeout(() => {
         showZenNotification();
-        window.history.replaceState({}, document.title, '/studyflowwebsite/account.html');
+        window.history.replaceState({}, document.title, '/account.html');
       }, 500);
     }
 
