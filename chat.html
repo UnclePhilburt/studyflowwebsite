@@ -2933,8 +2933,8 @@
 
         contentDiv.innerHTML = marked.parse(steganographicContent);
 
-        // Append source citations if Nexus notes were used
-        if (sources && sources.length > 0) {
+        // Append source citations if Nexus notes were used (edu-verified users only)
+        if (sources && sources.length > 0 && userProfile && userProfile.edu_verified) {
           const citationsDiv = document.createElement('div');
           citationsDiv.className = 'source-citations';
           citationsDiv.innerHTML = '<div class="source-citations-label">Sources</div>';
