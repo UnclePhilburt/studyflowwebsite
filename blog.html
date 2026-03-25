@@ -468,11 +468,38 @@
   <script src="script.js"></script>
   <script>
     // Newsletter form handling
-    document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+    document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+      const btn = this.querySelector('.newsletter-btn');
       const email = this.querySelector('input[type="email"]').value;
-      alert('Thanks for subscribing! We\'ll keep you updated at ' + email);
-      this.reset();
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing...';
+
+      try {
+        const response = await fetch('https://studyflowsuite.onrender.com/api/newsletter/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        if (response.ok) {
+          btn.textContent = 'Subscribed!';
+          btn.style.background = '#7c9885';
+          this.querySelector('input[type="email"]').value = '';
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (err) {
+        btn.textContent = 'Try Again';
+        btn.style.background = '#d97706';
+      }
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = 'Subscribe';
+        btn.style.background = '';
+      }, 3000);
     });
   </script>
 </body>
