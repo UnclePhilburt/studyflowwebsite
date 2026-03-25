@@ -464,6 +464,20 @@
       color: #9a9a9a;
     }
 
+    .forgot-password-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #7c9885;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-password-link:hover {
+      color: #6b8575;
+      text-decoration: underline;
+    }
+
     .btn-primary {
       width: 100%;
       padding: 16px;
@@ -557,6 +571,77 @@
     }
 
     .loading.active { display: block; }
+
+    /* Forgot Password Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(45, 45, 45, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: rgba(235, 230, 219, 0.98);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 440px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(124, 152, 133, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-family: 'Lora', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 32px;
+      color: #5a5a5a;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .modal-close:hover {
+      color: #7c9885;
+    }
+
+    .modal-description {
+      color: #5a5a5a;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
 
     /* Mobile Optimization - Streamlined for all devices */
     @media (max-width: 1024px) {
@@ -801,6 +886,7 @@
         <div class="form-group">
           <label for="password">Password</label>
           <input type="password" id="password" placeholder="Enter your password" required>
+          <a href="#" class="forgot-password-link" id="forgotPasswordLink">Forgot password?</a>
         </div>
 
         <button type="submit" class="btn-primary" id="loginBtn">
@@ -815,6 +901,30 @@
       <div class="auth-footer">
         Don't have an account? <a href="signup.html">Sign up free</a>
       </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal-overlay" id="forgotPasswordModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Reset Password</h3>
+        <button class="modal-close" id="closeForgotModal">&times;</button>
+      </div>
+      <p class="modal-description">Enter your email address and we'll send you a link to reset your password.</p>
+
+      <div class="error-message" id="forgotErrorMessage"></div>
+      <div class="success-message" id="forgotSuccessMessage"></div>
+
+      <form id="forgotPasswordForm">
+        <div class="form-group">
+          <label for="resetEmail">Email Address</label>
+          <input type="email" id="resetEmail" placeholder="your@email.com" required>
+        </div>
+        <button type="submit" class="btn-primary" id="resetBtn">
+          Send Reset Link
+        </button>
+      </form>
     </div>
   </div>
 
@@ -1050,6 +1160,93 @@
       emailInput.value = usernameParam;
       passwordInput.focus();
     }
+
+    // Forgot Password Modal
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+    const closeForgotModal = document.getElementById('closeForgotModal');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const resetEmailInput = document.getElementById('resetEmail');
+    const resetBtn = document.getElementById('resetBtn');
+    const forgotErrorMessage = document.getElementById('forgotErrorMessage');
+    const forgotSuccessMessage = document.getElementById('forgotSuccessMessage');
+
+    function showForgotError(message) {
+      forgotErrorMessage.textContent = message;
+      forgotErrorMessage.style.display = 'block';
+      forgotSuccessMessage.style.display = 'none';
+    }
+
+    function showForgotSuccess(message) {
+      forgotSuccessMessage.textContent = message;
+      forgotSuccessMessage.style.display = 'block';
+      forgotErrorMessage.style.display = 'none';
+    }
+
+    function hideForgotMessages() {
+      forgotErrorMessage.style.display = 'none';
+      forgotSuccessMessage.style.display = 'none';
+    }
+
+    // Open forgot password modal
+    forgotPasswordLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      forgotPasswordModal.classList.add('active');
+      hideForgotMessages();
+      resetEmailInput.value = '';
+    });
+
+    // Close modal
+    closeForgotModal.addEventListener('click', () => {
+      forgotPasswordModal.classList.remove('active');
+    });
+
+    // Close modal when clicking outside
+    forgotPasswordModal.addEventListener('click', (e) => {
+      if (e.target === forgotPasswordModal) {
+        forgotPasswordModal.classList.remove('active');
+      }
+    });
+
+    // Handle forgot password form submission
+    forgotPasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideForgotMessages();
+
+      const email = resetEmailInput.value.trim();
+
+      if (!email) {
+        showForgotError('Please enter your email address');
+        return;
+      }
+
+      resetBtn.disabled = true;
+      resetBtn.textContent = 'Sending...';
+
+      try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: 'https://studyflowsuite.com/reset-password.html'
+        });
+
+        if (error) throw error;
+
+        showForgotSuccess('Password reset link sent! Check your email.');
+        resetEmailInput.value = '';
+
+        // Close modal after 3 seconds
+        setTimeout(() => {
+          forgotPasswordModal.classList.remove('active');
+          hideForgotMessages();
+        }, 3000);
+
+      } catch (error) {
+        console.error('Password reset error:', error);
+        showForgotError(error.message || 'Failed to send reset link. Please try again.');
+      } finally {
+        resetBtn.disabled = false;
+        resetBtn.textContent = 'Send Reset Link';
+      }
+    });
   </script>
 </body>
 </html>
