@@ -208,6 +208,37 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Top Navigation (Desktop) */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .nav-link {
+      color: #5d5d5d;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .nav-link:hover {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .nav-link.active {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.1);
+    }
+
     /* Bottom Tab Bar */
     .bottom-tab-bar {
       display: none;
@@ -254,6 +285,7 @@
     .tab-item.active { color: #7c9885; }
 
     @media (max-width: 768px) {
+      .top-nav { display: none; }
       .bottom-tab-bar { display: flex; }
       body { padding-bottom: 56px; }
       .header { padding: 16px; }
@@ -263,6 +295,16 @@
   </style>
 </head>
 <body>
+
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="notes.html" class="nav-link">Notes</a>
+    <a href="office.html" class="nav-link active">Office</a>
+    <a href="browse.html" class="nav-link">Nexus</a>
+    <a href="calendar.html" class="nav-link">Calendar</a>
+  </div>
 
   <div class="header">
     <div class="header-left">
