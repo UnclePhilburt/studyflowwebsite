@@ -1888,7 +1888,7 @@
         const topList = document.getElementById('topNotesList');
         topList.innerHTML = stats.topNotes.slice(0, 5).map(note => `
           <div class="top-note-item">
-            <span class="top-note-name">${escapeHtml(note.filename)}</span>
+            <span class="top-note-name">${escapeHtml(note.original_filename)}</span>
             <span class="top-note-count">${note.count}x</span>
           </div>
         `).join('');
@@ -1965,7 +1965,7 @@
 
       // Render notes
       currentNotes.forEach(note => {
-        const icon = getFileIcon(note.filename);
+        const icon = getFileIcon(note.original_filename);
         const posKey = `note_${note.id}_position_${currentFolder || 'root'}`;
         const savedPos = localStorage.getItem(posKey);
         const position = savedPos ? JSON.parse(savedPos) : { x: (itemIndex % 6) * 160 + 20, y: Math.floor(itemIndex / 6) * 160 + 20 };
@@ -1984,7 +1984,7 @@
           <div class="note-item ${isPrivate ? 'private-note' : ''}"
                data-id="${note.id}"
                data-type="note"
-               data-filename="${escapeQuotes(note.filename)}"
+               data-filename="${escapeQuotes(note.original_filename)}"
                draggable="${isGridMode}"
                oncontextmenu="showContextMenu(event, '${note.id}', 'note')"
                ${isGridMode ? 'ondragstart="handleDragStart(event)"' : ''}
@@ -1994,7 +1994,7 @@
               ${counterHtml}
               ${privateHtml}
             </div>
-            <div class="item-name">${escapeHtml(note.filename)}</div>
+            <div class="item-name">${escapeHtml(note.original_filename)}</div>
             <div class="item-meta">${note.pages || '?'} pages</div>
           </div>
         `;
@@ -2172,7 +2172,7 @@
         input.value = folder ? folder.name : '';
       } else {
         const note = allNotes.find(n => n.id === renameTarget.id);
-        input.value = note ? note.filename : '';
+        input.value = note ? note.original_filename : '';
       }
 
       modal.classList.add('active');
@@ -2225,13 +2225,13 @@
               'Authorization': `Bearer ${authToken}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ filename: newName })
+            body: JSON.stringify({ original_filename: newName })
           });
 
           if (response.ok) {
             const note = allNotes.find(n => n.id === renameTarget.id);
             if (note) {
-              note.filename = newName;
+              note.original_filename = newName;
             }
             closeRenameModal();
             renderDesktop();
@@ -2263,7 +2263,7 @@
       }
 
       closeContextMenu();
-      await downloadNote(note.id, note.filename);
+      await downloadNote(note.id, note.original_filename);
     }
 
     async function toggleNoteVisibility() {
@@ -2666,10 +2666,10 @@
       previewedNote = note;
 
       // Update preview info
-      document.getElementById('previewTitle').textContent = note.filename;
+      document.getElementById('previewTitle').textContent = note.original_filename;
       document.getElementById('previewPages').textContent = note.pages || '?';
       document.getElementById('previewDate').textContent = new Date(note.uploaded_at).toLocaleDateString();
-      document.getElementById('previewType').textContent = note.filename.split('.').pop().toUpperCase();
+      document.getElementById('previewType').textContent = note.original_filename.split('.').pop().toUpperCase();
 
       // Show loading state
       const viewer = document.getElementById('previewViewer');
@@ -2701,7 +2701,7 @@
         if (!response.ok) throw new Error('Failed to load preview');
 
         const blobData = await response.blob();
-        const fileExt = note.filename.split('.').pop().toLowerCase();
+        const fileExt = note.original_filename.split('.').pop().toLowerCase();
 
         // Handle different file types
         let blob, url, viewerHTML;
