@@ -9,6 +9,12 @@
   <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/quill-table-better@1/dist/quill-table-better.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@enzedonline/quill-blot-formatter2/dist/css/quill-blot-formatter2.css" rel="stylesheet">
+  <!-- KaTeX for math formulas -->
+  <link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <!-- Highlight.js for syntax highlighting -->
+  <link href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github-dark.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/highlight.js@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill-table-better@1/dist/quill-table-better.js"></script>
@@ -311,6 +317,27 @@
       margin: 12px auto;
     }
 
+    /* Checklists */
+    .ql-editor ul[data-checked="true"] > li::before,
+    .ql-editor ul[data-checked="false"] > li::before {
+      color: #7c9885;
+    }
+
+    .ql-editor li[data-list="checked"] {
+      text-decoration: line-through;
+      color: #9a9a9a;
+    }
+
+    /* KaTeX formula styling */
+    .ql-editor .ql-formula {
+      padding: 2px 4px;
+    }
+
+    /* Color picker overrides */
+    .ql-snow .ql-color-picker .ql-picker-options {
+      width: 152px;
+    }
+
     .ql-snow .ql-tooltip {
       z-index: 200;
     }
@@ -489,7 +516,7 @@
     let currentTitle = '';
     let quill = null;
     let autoSaveTimer = null;
-    const AUTO_SAVE_DELAY = 3000; // 3 seconds
+    const AUTO_SAVE_DELAY = 3000;
 
     // DOM elements
     const saveBtn = document.getElementById('saveBtn');
@@ -502,7 +529,27 @@
     Quill.register({ 'modules/table-better': QuillTableBetter }, true);
     Quill.register('modules/blotFormatter2', QuillBlotFormatter2.default);
 
-    // Initialize Quill with table-better + blot-formatter modules
+    // Highlight.js color palette for app theme
+    const COLORS = [
+      '#2d2d2d', '#5a5a5a', '#9a9a9a', '#ffffff',
+      '#7c9885', '#6a8573', '#4a6b55', '#3d5a47',
+      '#e89b5f', '#d4854a', '#c06f35', '#a05a28',
+      '#d9534f', '#c9433f', '#b03333', '#4a90d9',
+      '#3b7dd8', '#2d6bc4', '#6b4fa0', '#9b59b6'
+    ];
+
+    const BG_COLORS = [
+      false,
+      '#fef9e7', '#fef3cd', '#fce4b8',
+      '#e8f5e9', '#c8e6c9', '#d4edda',
+      '#e3f2fd', '#bbdefb', '#d6eaf8',
+      '#fce4ec', '#f8d7da', '#f5c6cb',
+      '#f3e5f5', '#e8daef', '#d5c4e0',
+      '#fff9c4', '#fff176', '#fff59d',
+      '#e0e0e0', '#bdbdbd'
+    ];
+
+    // Initialize Quill with all modules
     quill = new Quill('#quillEditor', {
       theme: 'snow',
       placeholder: '',
@@ -514,16 +561,87 @@
           toolbarTable: true
         },
         blotFormatter2: {},
+        syntax: { hljs: hljs },
+        formula: true,
         keyboard: {
-          bindings: QuillTableBetter.keyboardBindings
+          bindings: {
+            ...QuillTableBetter.keyboardBindings,
+            // Markdown shortcuts
+            'header-1': {
+              key: ' ',
+              prefix: /^#$/,
+              handler: function(range) {
+                const line = quill.getLine(range.index);
+                quill.formatLine(range.index, 1, 'header', 1);
+                quill.deleteText(range.index - 1, 1);
+              }
+            },
+            'header-2': {
+              key: ' ',
+              prefix: /^##$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'header', 2);
+                quill.deleteText(range.index - 2, 2);
+              }
+            },
+            'header-3': {
+              key: ' ',
+              prefix: /^###$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'header', 3);
+                quill.deleteText(range.index - 3, 3);
+              }
+            },
+            'blockquote': {
+              key: ' ',
+              prefix: /^>$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'blockquote', true);
+                quill.deleteText(range.index - 1, 1);
+              }
+            },
+            'unordered-list': {
+              key: ' ',
+              prefix: /^-$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'list', 'bullet');
+                quill.deleteText(range.index - 1, 1);
+              }
+            },
+            'ordered-list': {
+              key: ' ',
+              prefix: /^1\.$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'list', 'ordered');
+                quill.deleteText(range.index - 2, 2);
+              }
+            },
+            'checklist': {
+              key: ' ',
+              prefix: /^\[\]$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'list', 'unchecked');
+                quill.deleteText(range.index - 2, 2);
+              }
+            },
+            'code-block': {
+              key: ' ',
+              prefix: /^```$/,
+              handler: function(range) {
+                quill.formatLine(range.index, 1, 'code-block', true);
+                quill.deleteText(range.index - 3, 3);
+              }
+            }
+          }
         },
         toolbar: {
           container: [
             [{ 'header': [1, 2, 3, false] }],
             ['bold', 'italic', 'underline', 'strike'],
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'color': COLORS }, { 'background': BG_COLORS }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
             ['blockquote', 'code-block'],
-            ['link', 'image'],
+            ['link', 'image', 'formula'],
             ['table-better'],
             ['clean']
           ],
