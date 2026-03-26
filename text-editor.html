@@ -6,7 +6,9 @@
   <title>Text Editor - StudyFlow Suite</title>
   <link rel="icon" type="image/png" href="icon128.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -70,6 +72,30 @@
       white-space: nowrap;
       flex: 1;
       min-width: 0;
+      cursor: pointer;
+      border: 1px solid transparent;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .header-title:hover {
+      border-color: rgba(124, 152, 133, 0.3);
+      background: rgba(124, 152, 133, 0.05);
+    }
+
+    .header-title-input {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2d2d2d;
+      font-family: 'Lora', serif;
+      flex: 1;
+      min-width: 0;
+      border: 1px solid #7c9885;
+      padding: 4px 8px;
+      border-radius: 6px;
+      outline: none;
+      background: white;
     }
 
     .save-status {
@@ -79,21 +105,10 @@
       transition: color 0.2s;
     }
 
-    .save-status.unsaved {
-      color: #e89b5f;
-    }
-
-    .save-status.saving {
-      color: #7c9885;
-    }
-
-    .save-status.saved {
-      color: #7c9885;
-    }
-
-    .save-status.error {
-      color: #d9534f;
-    }
+    .save-status.unsaved { color: #e89b5f; }
+    .save-status.saving { color: #7c9885; }
+    .save-status.saved { color: #7c9885; }
+    .save-status.error { color: #d9534f; }
 
     .save-btn {
       padding: 8px 20px;
@@ -129,27 +144,144 @@
       z-index: 1;
     }
 
-    .editor-textarea {
-      flex: 1;
-      width: 100%;
-      padding: 32px;
+    /* Quill overrides */
+    .ql-toolbar.ql-snow {
       border: none;
-      outline: none;
-      resize: none;
-      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'Courier New', monospace;
-      font-size: 14px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+      background: rgba(255, 255, 255, 0.85);
+      padding: 8px 16px;
+      position: sticky;
+      top: 56px;
+      z-index: 10;
+    }
+
+    .ql-toolbar.ql-snow .ql-stroke {
+      stroke: #5a5a5a;
+    }
+
+    .ql-toolbar.ql-snow .ql-fill {
+      fill: #5a5a5a;
+    }
+
+    .ql-toolbar.ql-snow .ql-picker {
+      color: #5a5a5a;
+    }
+
+    .ql-toolbar.ql-snow button:hover .ql-stroke,
+    .ql-toolbar.ql-snow .ql-picker-label:hover .ql-stroke {
+      stroke: #7c9885;
+    }
+
+    .ql-toolbar.ql-snow button:hover .ql-fill,
+    .ql-toolbar.ql-snow .ql-picker-label:hover .ql-fill {
+      fill: #7c9885;
+    }
+
+    .ql-toolbar.ql-snow button:hover,
+    .ql-toolbar.ql-snow .ql-picker-label:hover {
+      color: #7c9885;
+    }
+
+    .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+    .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-stroke {
+      stroke: #7c9885;
+    }
+
+    .ql-toolbar.ql-snow button.ql-active .ql-fill,
+    .ql-toolbar.ql-snow .ql-picker-label.ql-active .ql-fill {
+      fill: #7c9885;
+    }
+
+    .ql-toolbar.ql-snow button.ql-active,
+    .ql-toolbar.ql-snow .ql-picker-label.ql-active {
+      color: #7c9885;
+    }
+
+    .ql-container.ql-snow {
+      border: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+    }
+
+    .ql-editor {
+      flex: 1;
+      padding: 32px;
       line-height: 1.7;
       color: #2d2d2d;
       background: rgba(255, 255, 255, 0.6);
-      tab-size: 4;
+      min-height: calc(100vh - 56px - 50px);
     }
 
-    .editor-textarea::placeholder {
-      color: #b0b0b0;
-    }
-
-    .editor-textarea:focus {
+    .ql-editor:focus {
       background: rgba(255, 255, 255, 0.85);
+    }
+
+    .ql-editor.ql-blank::before {
+      color: #b0b0b0;
+      font-style: normal;
+    }
+
+    .ql-editor h1 {
+      font-family: 'Lora', serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .ql-editor h2 {
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: #3d3d3d;
+      margin-bottom: 6px;
+    }
+
+    .ql-editor h3 {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #4d4d4d;
+      margin-bottom: 4px;
+    }
+
+    .ql-editor blockquote {
+      border-left: 3px solid #7c9885;
+      padding-left: 16px;
+      color: #5a5a5a;
+      margin: 12px 0;
+    }
+
+    .ql-editor pre.ql-syntax {
+      background: #2d2d2d;
+      color: #e8e8e8;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 12px 0;
+      overflow-x: auto;
+    }
+
+    .ql-editor code {
+      background: rgba(124, 152, 133, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    .ql-editor a {
+      color: #7c9885;
+      text-decoration: underline;
+    }
+
+    .ql-snow .ql-tooltip {
+      z-index: 200;
     }
 
     /* Loading state */
@@ -221,9 +353,12 @@
         display: none;
       }
 
-      .editor-textarea {
+      .ql-editor {
         padding: 16px;
-        font-size: 13px;
+      }
+
+      .ql-toolbar.ql-snow {
+        padding: 6px 8px;
       }
     }
   </style>
@@ -232,18 +367,18 @@
 
   <!-- Header -->
   <div class="page-header">
-    <a class="back-link" href="pdf-annotate.html" id="backLink">
+    <a class="back-link" href="notes.html" id="backLink">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 12L6 8l4-4"/></svg>
       Back
     </a>
-    <span class="header-title" id="headerTitle">Loading...</span>
+    <span class="header-title" id="headerTitle" onclick="startRename()">Loading...</span>
     <span class="save-status" id="saveStatus"></span>
     <button class="save-btn" id="saveBtn" disabled>Save</button>
   </div>
 
   <!-- Editor -->
   <div class="editor-wrapper">
-    <textarea class="editor-textarea" id="editor" placeholder="Loading note content..." disabled></textarea>
+    <div id="quillEditor"></div>
   </div>
 
   <!-- Loading overlay -->
@@ -268,14 +403,34 @@
     let noteId = null;
     let originalContent = '';
     let hasUnsavedChanges = false;
+    let currentTitle = '';
+    let quill = null;
 
     // DOM elements
-    const editor = document.getElementById('editor');
     const saveBtn = document.getElementById('saveBtn');
     const saveStatus = document.getElementById('saveStatus');
     const headerTitle = document.getElementById('headerTitle');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const errorOverlay = document.getElementById('errorOverlay');
+
+    // Initialize Quill
+    quill = new Quill('#quillEditor', {
+      theme: 'snow',
+      placeholder: 'Start typing your notes...',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+          ['blockquote', 'code-block'],
+          ['link'],
+          ['clean']
+        ]
+      }
+    });
+
+    // Disable editor until content loads
+    quill.enable(false);
 
     // Get note ID from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -299,7 +454,6 @@
 
     async function loadNote() {
       try {
-        // Fetch metadata and content in parallel
         const [metaRes, contentRes] = await Promise.all([
           fetch(`${BACKEND_URL}/api/notes/${noteId}/metadata`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
@@ -319,19 +473,30 @@
 
         const metaData = await metaRes.json();
         const filename = metaData.note?.filename || 'Untitled';
-        headerTitle.textContent = filename;
-        document.title = `${filename} - StudyFlow Suite`;
+        currentTitle = filename.replace(/\.html$/, '').replace(/\.txt$/, '');
+        headerTitle.textContent = currentTitle;
+        document.title = `${currentTitle} - StudyFlow Suite`;
 
         if (!contentRes.ok) throw new Error('Failed to load note content');
 
         const textContent = await contentRes.text();
-        originalContent = textContent;
 
-        editor.value = textContent;
-        editor.disabled = false;
-        editor.placeholder = 'Start typing...';
+        // Auto-detect: if plain text (no HTML tags), wrap in <p> tags
+        let htmlContent = textContent;
+        if (textContent.trim() && !/<[a-z][\s\S]*>/i.test(textContent)) {
+          htmlContent = textContent.split('\n').map(line =>
+            `<p>${line || '<br>'}</p>`
+          ).join('');
+        }
+
+        // Load content into Quill
+        if (htmlContent.trim()) {
+          quill.root.innerHTML = htmlContent;
+        }
+
+        originalContent = quill.root.innerHTML;
+        quill.enable(true);
         saveBtn.disabled = false;
-
         loadingOverlay.style.display = 'none';
       } catch (error) {
         console.error('Load error:', error);
@@ -339,9 +504,9 @@
       }
     }
 
-    // Track changes
-    editor.addEventListener('input', () => {
-      const changed = editor.value !== originalContent;
+    // Track changes via Quill text-change event
+    quill.on('text-change', () => {
+      const changed = quill.root.innerHTML !== originalContent;
       if (changed !== hasUnsavedChanges) {
         hasUnsavedChanges = changed;
         updateSaveStatus();
@@ -358,7 +523,7 @@
       }
     }
 
-    // Save
+    // Save content
     async function saveContent() {
       if (!noteId || !authToken) return;
 
@@ -367,13 +532,14 @@
       saveStatus.className = 'save-status saving';
 
       try {
+        const htmlContent = quill.root.innerHTML;
         const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/content`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ content: editor.value })
+          body: JSON.stringify({ content: htmlContent })
         });
 
         if (!res.ok) {
@@ -381,7 +547,7 @@
           throw new Error(errData.error || 'Save failed');
         }
 
-        originalContent = editor.value;
+        originalContent = htmlContent;
         hasUnsavedChanges = false;
         saveStatus.textContent = 'Saved';
         saveStatus.className = 'save-status saved';
@@ -420,6 +586,48 @@
         e.returnValue = '';
       }
     });
+
+    // Editable title -- click to rename
+    function startRename() {
+      const titleEl = document.getElementById('headerTitle');
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'header-title-input';
+      input.value = currentTitle;
+      titleEl.replaceWith(input);
+      input.focus();
+      input.select();
+
+      async function commitRename() {
+        const newTitle = input.value.trim() || currentTitle;
+        input.replaceWith(titleEl);
+        if (newTitle === currentTitle) return;
+
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/rename`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filename: newTitle + '.html' })
+          });
+          if (res.ok) {
+            currentTitle = newTitle;
+            titleEl.textContent = currentTitle;
+            document.title = `${currentTitle} - StudyFlow Suite`;
+          }
+        } catch (err) {
+          console.error('Rename error:', err);
+        }
+      }
+
+      input.addEventListener('blur', commitRename);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') { input.value = currentTitle; input.blur(); }
+      });
+    }
 
     function showError(title, message) {
       loadingOverlay.style.display = 'none';

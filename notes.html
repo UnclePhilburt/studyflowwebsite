@@ -1426,6 +1426,7 @@
         <button class="toolbar-btn" id="favoritesToggle" onclick="toggleFavoritesFilter()">Favorites</button>
         <button class="toolbar-btn" id="gridToggle" onclick="toggleGridMode()">Grid: On</button>
         <button class="toolbar-btn" onclick="showNewFolderModal()">New Folder</button>
+        <button class="toolbar-btn" onclick="createNewNote()">New Note</button>
       </div>
     </div>
 
@@ -2059,6 +2060,30 @@
     }
 
     // Folder operations
+    async function createNewNote() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/create`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ title: 'Untitled' })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || 'Failed to create note');
+        }
+
+        const data = await response.json();
+        window.location.href = `text-editor.html?id=${data.note_id}`;
+      } catch (error) {
+        console.error('Create note error:', error);
+        alert('Failed to create note: ' + error.message);
+      }
+    }
+
     function showNewFolderModal() {
       document.getElementById('newFolderModal').classList.add('active');
       document.getElementById('folderNameInput').value = '';
