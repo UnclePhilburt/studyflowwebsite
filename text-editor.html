@@ -8,9 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/quill-table-better@1/dist/quill-table-better.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@enzedonline/quill-blot-formatter2/dist/css/quill-blot-formatter2.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill-table-better@1/dist/quill-table-better.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@enzedonline/quill-blot-formatter2@3.0/dist/index.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -291,6 +293,22 @@
       height: auto;
       border-radius: 8px;
       margin: 12px 0;
+      cursor: pointer;
+    }
+
+    .ql-editor img.ql-image-align-left {
+      float: left;
+      margin: 4px 16px 12px 0;
+    }
+
+    .ql-editor img.ql-image-align-right {
+      float: right;
+      margin: 4px 0 12px 16px;
+    }
+
+    .ql-editor img.ql-image-align-center {
+      display: block;
+      margin: 12px auto;
     }
 
     .ql-snow .ql-tooltip {
@@ -480,10 +498,11 @@
     const loadingOverlay = document.getElementById('loadingOverlay');
     const errorOverlay = document.getElementById('errorOverlay');
 
-    // Register quill-table-better module
+    // Register plugins
     Quill.register({ 'modules/table-better': QuillTableBetter }, true);
+    Quill.register('modules/blotFormatter2', QuillBlotFormatter2.default);
 
-    // Initialize Quill with table-better module
+    // Initialize Quill with table-better + blot-formatter modules
     quill = new Quill('#quillEditor', {
       theme: 'snow',
       placeholder: '',
@@ -494,6 +513,7 @@
           menus: ['column', 'row', 'merge', 'table', 'cell', 'delete'],
           toolbarTable: true
         },
+        blotFormatter2: {},
         keyboard: {
           bindings: QuillTableBetter.keyboardBindings
         },
