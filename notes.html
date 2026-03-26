@@ -2352,10 +2352,15 @@
           });
 
           if (response.ok) {
-            loadNotes();
+            // Remove note from local array and re-render immediately
+            allNotes = allNotes.filter(n => n.id !== itemToDelete.id);
+            renderDesktop();
+          } else {
+            alert('Failed to delete note');
           }
         } catch (error) {
           console.error('Delete error:', error);
+          alert('Failed to delete note');
         }
       }
     }
