@@ -272,6 +272,51 @@
       color: #2d2d2d;
     }
 
+    /* Search bar */
+    .search-wrapper {
+      max-width: 480px;
+      margin: 0 auto 28px;
+      position: relative;
+    }
+
+    .search-wrapper svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9a9a9a;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255, 255, 255, 0.8);
+      color: #2d2d2d;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input::placeholder { color: #b0b0b0; }
+
+    .search-input:focus {
+      border-color: #7c9885;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.12);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 48px 24px;
+      color: #9a9a9a;
+      font-size: 14px;
+      display: none;
+    }
+
     /* Responsive */
     @media (max-width: 640px) {
       .container {
@@ -302,6 +347,16 @@
   <!-- Content -->
   <div class="container">
     <p class="subtitle">Select a note to annotate</p>
+
+    <div class="search-wrapper" id="searchWrapper" style="display: none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search notes..." autocomplete="off">
+    </div>
+
+    <div class="no-results" id="noResults">No notes match your search.</div>
 
     <div class="loading" id="loading">
       <div class="spinner"></div>
@@ -402,7 +457,7 @@
       return div.innerHTML;
     }
 
-    function renderNotes() {
+    function renderNotes(filter = '') {
       document.getElementById('loading').style.display = 'none';
 
       if (allNotes.length === 0) {
@@ -410,10 +465,27 @@
         return;
       }
 
+      // Show search bar once notes are loaded
+      document.getElementById('searchWrapper').style.display = 'block';
+
+      const query = filter.toLowerCase().trim();
+      const filtered = query
+        ? allNotes.filter(n => (n.original_filename || '').toLowerCase().includes(query))
+        : allNotes;
+
       const grid = document.getElementById('notesGrid');
+      const noResults = document.getElementById('noResults');
+
+      if (filtered.length === 0) {
+        grid.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+      }
+
+      noResults.style.display = 'none';
       grid.style.display = 'grid';
 
-      grid.innerHTML = allNotes.map(note => {
+      grid.innerHTML = filtered.map(note => {
         const icon = getFileIcon(note.original_filename);
         const pages = note.pages || '?';
         return `
@@ -425,6 +497,11 @@
         `;
       }).join('');
     }
+
+    // Wire up search input
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      renderNotes(e.target.value);
+    });
 
     function handleNoteClick(noteId) {
       const note = allNotes.find(n => n.id === noteId);
