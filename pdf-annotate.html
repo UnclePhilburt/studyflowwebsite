@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Editor - StudyFlow Suite</title>
+  <link rel="icon" type="image/png" href="icon128.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    .page-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .back-link {
+      color: #7c9885;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: #6a8573; }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-left: 20px;
+      font-family: 'Lora', serif;
+    }
+
+    /* Content */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px 40px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #7a7a7a;
+      font-size: 15px;
+      margin-bottom: 32px;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 0;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(124, 152, 133, 0.2);
+      border-top-color: #7c9885;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading p {
+      margin-top: 16px;
+      color: #7a7a7a;
+      font-size: 14px;
+    }
+
+    /* Grid */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 24px;
+    }
+
+    .note-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      padding: 16px 8px;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .note-card:hover {
+      background: rgba(124, 152, 133, 0.06);
+      transform: translateY(-4px);
+    }
+
+    .note-card .icon-box {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 246, 243, 0.8) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #7c9885;
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 10px;
+    }
+
+    .note-card:hover .icon-box {
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.2);
+      transform: scale(1.05);
+    }
+
+    .note-card .filename {
+      font-size: 12px;
+      font-weight: 500;
+      color: #2d2d2d;
+      max-width: 130px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 4px;
+    }
+
+    .note-card .meta {
+      font-size: 11px;
+      color: #9a9a9a;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 80px 24px;
+      color: #9a9a9a;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #7a7a7a;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    .modal h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .modal p {
+      font-size: 14px;
+      color: #7a7a7a;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-btn.primary {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+    }
+
+    .modal-btn.primary:hover {
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .modal-btn.secondary {
+      background: linear-gradient(135deg, #e89b5f 0%, #d4783d 100%);
+      color: white;
+    }
+
+    .modal-btn.secondary:hover {
+      box-shadow: 0 4px 16px rgba(232, 155, 95, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .modal-btn.ghost {
+      background: transparent;
+      color: #7a7a7a;
+      border: 1px solid #e0ddd8;
+    }
+
+    .modal-btn.ghost:hover {
+      background: rgba(124, 152, 133, 0.06);
+      color: #2d2d2d;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .container {
+        padding: 72px 16px 32px;
+      }
+      .notes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 16px;
+      }
+      .note-card .icon-box {
+        width: 64px;
+        height: 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="page-header">
+    <a class="back-link" href="chat.html">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 12L6 8l4-4"/></svg>
+      Back
+    </a>
+    <span class="header-title">PDF Editor</span>
+  </div>
+
+  <!-- Content -->
+  <div class="container">
+    <p class="subtitle">Select a note to annotate</p>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading your notes...</p>
+    </div>
+
+    <div class="notes-grid" id="notesGrid" style="display: none;"></div>
+
+    <div class="empty-state" id="emptyState" style="display: none;">
+      <h3>No notes found</h3>
+      <p>Upload some notes in your library to start annotating them.</p>
+    </div>
+  </div>
+
+  <!-- Non-PDF Choice Modal -->
+  <div class="modal-overlay" id="choiceModal">
+    <div class="modal">
+      <h3>This is a <span id="modalFileType">text</span> file</h3>
+      <p id="modalFileName"></p>
+      <div class="modal-actions">
+        <button class="modal-btn primary" id="modalOpenPdf">Open in PDF Editor</button>
+        <button class="modal-btn secondary" id="modalEditText">Edit as text file</button>
+        <button class="modal-btn ghost" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let authToken = null;
+    let allNotes = [];
+
+    // Init
+    (async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+      authToken = session.access_token;
+      await loadNotes();
+    })();
+
+    async function loadNotes() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/list`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.status === 401) {
+          await supabaseClient.auth.signOut();
+          window.location.href = 'index.html';
+          return;
+        }
+
+        if (!response.ok) throw new Error('Failed to load notes');
+
+        allNotes = await response.json();
+
+        // Normalize filenames
+        allNotes.forEach(note => {
+          if (!note.original_filename && note.filename) {
+            note.original_filename = note.filename;
+          }
+        });
+
+        allNotes.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+        renderNotes();
+      } catch (error) {
+        console.error('Load error:', error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+      }
+    }
+
+    function getFileIcon(filename) {
+      if (!filename) return 'FILE';
+      const ext = filename.split('.').pop().toLowerCase();
+      if (ext === 'pdf') return 'PDF';
+      if (['jpg', 'jpeg', 'png'].includes(ext)) return 'IMG';
+      if (['doc', 'docx'].includes(ext)) return 'DOC';
+      if (ext === 'txt') return 'TXT';
+      return 'FILE';
+    }
+
+    function getFileExt(filename) {
+      if (!filename) return '';
+      return filename.split('.').pop().toLowerCase();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function renderNotes() {
+      document.getElementById('loading').style.display = 'none';
+
+      if (allNotes.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+      }
+
+      const grid = document.getElementById('notesGrid');
+      grid.style.display = 'grid';
+
+      grid.innerHTML = allNotes.map(note => {
+        const icon = getFileIcon(note.original_filename);
+        const pages = note.pages || '?';
+        return `
+          <div class="note-card" data-id="${note.id}" data-filename="${escapeHtml(note.original_filename || '')}" onclick="handleNoteClick('${note.id}')">
+            <div class="icon-box">${icon}</div>
+            <div class="filename" title="${escapeHtml(note.original_filename || 'Untitled')}">${escapeHtml(note.original_filename || 'Untitled')}</div>
+            <div class="meta">${pages} page${pages === 1 ? '' : 's'}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleNoteClick(noteId) {
+      const note = allNotes.find(n => n.id === noteId);
+      if (!note) return;
+
+      const ext = getFileExt(note.original_filename);
+      const isPdf = ext === 'pdf';
+
+      if (isPdf) {
+        // Go directly to PDF editor
+        window.location.href = `pdf-editor.html?id=${noteId}`;
+      } else {
+        // Show choice modal for non-PDF files
+        showChoiceModal(note);
+      }
+    }
+
+    function showChoiceModal(note) {
+      const ext = getFileExt(note.original_filename);
+      const typeLabel = ext.toUpperCase() || 'non-PDF';
+
+      document.getElementById('modalFileType').textContent = typeLabel;
+      document.getElementById('modalFileName').textContent =
+        `"${note.original_filename || 'Untitled'}" is not a PDF. How would you like to edit it?`;
+
+      document.getElementById('modalOpenPdf').onclick = () => {
+        window.location.href = `pdf-editor.html?id=${note.id}&source=text`;
+      };
+
+      document.getElementById('modalEditText').onclick = () => {
+        window.location.href = `note-viewer.html?id=${note.id}`;
+      };
+
+      document.getElementById('choiceModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('choiceModal').classList.remove('active');
+    }
+
+    // Close modal on overlay click
+    document.getElementById('choiceModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>

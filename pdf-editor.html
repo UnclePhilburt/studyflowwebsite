@@ -286,9 +286,97 @@
 
     .error-page h2 { color: #d9534f; margin-bottom: 12px; }
     .error-page p { color: #666; margin-bottom: 24px; }
+
+    /* ---- Save Modal ---- */
+    .save-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      backdrop-filter: blur(4px);
+    }
+    .save-modal-overlay.active { display: flex; }
+
+    .save-modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    .save-modal h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+    .save-modal p {
+      font-size: 14px;
+      color: #7a7a7a;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .save-modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .save-modal-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .save-modal-btn.primary {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      color: white;
+    }
+    .save-modal-btn.primary:hover {
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.4);
+      transform: translateY(-1px);
+    }
+    .save-modal-btn.secondary {
+      background: linear-gradient(135deg, #e89b5f 0%, #d4783d 100%);
+      color: white;
+    }
+    .save-modal-btn.secondary:hover {
+      box-shadow: 0 4px 16px rgba(232, 155, 95, 0.4);
+      transform: translateY(-1px);
+    }
+    .save-modal-btn.ghost {
+      background: transparent;
+      color: #7a7a7a;
+      border: 1px solid #e0ddd8;
+    }
+    .save-modal-btn.ghost:hover {
+      background: rgba(124, 152, 133, 0.06);
+      color: #2d2d2d;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Save Choice Modal -->
+  <div class="save-modal-overlay" id="saveModal">
+    <div class="save-modal">
+      <h3>Save annotations</h3>
+      <p id="saveModalMsg">How would you like to save your changes?</p>
+      <div class="save-modal-actions">
+        <button class="save-modal-btn primary" id="saveOverwriteBtn">Overwrite original note</button>
+        <button class="save-modal-btn secondary" id="saveNewBtn">Save as a new note</button>
+        <button class="save-modal-btn ghost" onclick="closeSaveModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Loading -->
   <div class="loading-overlay" id="loading">
@@ -397,6 +485,8 @@
     // ---- State ----
     let authToken = null;
     let noteId = null;
+    let isFromTextSource = false;
+    let noteFilename = '';
     let canvas = null;
     let pageImages = [];       // [{page, data, width, height}]
     let currentPage = 1;
@@ -415,6 +505,7 @@
     (async function init() {
       const urlParams = new URLSearchParams(window.location.search);
       noteId = urlParams.get('id');
+      isFromTextSource = urlParams.get('source') === 'text';
 
       if (!noteId) {
         showError('No note ID provided.');
@@ -444,8 +535,16 @@
         const imgData = await imgRes.json();
 
         // Set header title
-        document.getElementById('header-title').textContent = metaData.note.filename || 'Untitled';
-        document.getElementById('back-link').href = `note-viewer.html?id=${noteId}`;
+        noteFilename = metaData.note.filename || 'Untitled';
+        document.getElementById('header-title').textContent = noteFilename;
+
+        // If opened from pdf-annotate picker, go back there; otherwise note-viewer
+        const referrer = document.referrer;
+        if (referrer && referrer.includes('pdf-annotate.html')) {
+          document.getElementById('back-link').href = 'pdf-annotate.html';
+        } else {
+          document.getElementById('back-link').href = `note-viewer.html?id=${noteId}`;
+        }
 
         // Store page images
         pageImages = imgData.images || [];
@@ -778,12 +877,53 @@
       document.getElementById('save-status').textContent = 'Unsaved changes';
       document.getElementById('save-status').className = 'save-status unsaved';
 
-      // Auto-save after 30s of inactivity
+      // Auto-save after 30s of inactivity (silently overwrites, no modal)
       clearTimeout(autoSaveTimer);
-      autoSaveTimer = setTimeout(() => saveAnnotations(), 30000);
+      autoSaveTimer = setTimeout(() => doSave('overwrite'), 30000);
     }
 
     async function saveAnnotations() {
+      // Show save choice modal
+      showSaveModal();
+    }
+
+    function showSaveModal() {
+      const modal = document.getElementById('saveModal');
+      const msg = document.getElementById('saveModalMsg');
+
+      if (isFromTextSource) {
+        msg.textContent = `This was originally a text file. Overwriting will convert "${noteFilename}" to a PDF with your annotations.`;
+      } else {
+        msg.textContent = 'How would you like to save your changes?';
+      }
+
+      document.getElementById('saveOverwriteBtn').onclick = () => {
+        closeSaveModal();
+        doSave('overwrite');
+      };
+      document.getElementById('saveNewBtn').onclick = () => {
+        closeSaveModal();
+        doSave('new');
+      };
+
+      modal.classList.add('active');
+    }
+
+    function closeSaveModal() {
+      document.getElementById('saveModal').classList.remove('active');
+    }
+
+    // Close save modal on overlay click or Escape
+    document.getElementById('saveModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeSaveModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('saveModal').classList.contains('active')) {
+        closeSaveModal();
+      }
+    });
+
+    async function doSave(mode) {
       // Save current page to cache first
       saveCurrentPageToCache();
 
@@ -802,13 +942,24 @@
           });
         }
 
-        const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/annotations`, {
-          method: 'POST',
+        const targetId = noteId;
+        let endpoint = `${BACKEND_URL}/api/notes/${targetId}/annotations`;
+        let method = 'POST';
+        let body = { annotations };
+
+        if (mode === 'new') {
+          // Save as a new note with annotations
+          endpoint = `${BACKEND_URL}/api/notes/${targetId}/annotations`;
+          body = { annotations, save_as_new: true };
+        }
+
+        const res = await fetch(endpoint, {
+          method: method,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authToken}`
           },
-          body: JSON.stringify({ annotations })
+          body: JSON.stringify(body)
         });
 
         if (!res.ok) throw new Error('Save failed');
@@ -817,6 +968,19 @@
         statusEl.textContent = 'All changes saved';
         statusEl.className = 'save-status saved';
         clearTimeout(autoSaveTimer);
+
+        // If saved as new, update to the new note
+        if (mode === 'new') {
+          const resData = await res.clone().json().catch(() => null);
+          if (resData && resData.new_note_id) {
+            noteId = resData.new_note_id;
+            isFromTextSource = false;
+            window.history.replaceState(null, '', `pdf-editor.html?id=${noteId}`);
+            statusEl.textContent = 'Saved as new note';
+          } else {
+            statusEl.textContent = 'Saved as new note';
+          }
+        }
       } catch (err) {
         console.error('Save error:', err);
         statusEl.textContent = 'Save failed';
