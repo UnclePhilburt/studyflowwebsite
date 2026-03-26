@@ -518,6 +518,12 @@
       background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
     }
 
+    .toolbar-btn.active {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.2) 100%);
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.4) 100%) 1;
+      color: #5a6b5f;
+    }
+
     /* Desktop Grid */
     .desktop {
       display: grid;
@@ -1417,6 +1423,7 @@
         <span class="breadcrumb-item" onclick="navigateToRoot()">My Library</span>
       </div>
       <div class="toolbar-actions">
+        <button class="toolbar-btn" id="favoritesToggle" onclick="toggleFavoritesFilter()">Favorites</button>
         <button class="toolbar-btn" id="gridToggle" onclick="toggleGridMode()">Grid: On</button>
         <button class="toolbar-btn" onclick="showNewFolderModal()">New Folder</button>
       </div>
@@ -1433,6 +1440,7 @@
 
   <!-- Context Menu -->
   <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" id="contextFavorite">Favorite</div>
     <div class="context-menu-item" id="contextRename">Rename</div>
     <div class="context-menu-item" id="contextDownload">Download</div>
     <div class="context-menu-item" id="contextVisibility">Make Public</div>
@@ -1620,6 +1628,7 @@
       }
 
       await loadGoodStandingStatus();
+      await loadFavorites();
       await loadFolders();
       await loadNotes();
     }
@@ -1920,7 +1929,15 @@
       // Get items in current folder
       const currentFolders = folders.filter(f => f.parentId === currentFolder || f.parent_id === currentFolder);
       const currentNotes = allNotes.filter(note => {
+        // Favorites filter
+        if (showingFavoritesOnly && !userFavorites.has(note.id)) {
+          return false;
+        }
+
         const noteFolder = note.folder_id;  // Now from API response
+
+        // When showing favorites, show from all folders
+        if (showingFavoritesOnly) return true;
 
         // At root level, show notes without a folder or explicitly assigned to root
         if (currentFolder === null) {
@@ -1934,7 +1951,7 @@
       if (currentFolders.length === 0 && currentNotes.length === 0) {
         desktop.innerHTML = `
           <div class="empty-state">
-            <p class="empty-text">This folder is empty</p>
+            <p class="empty-text">${showingFavoritesOnly ? 'No favorited notes yet. Right-click a note to favorite it.' : 'This folder is empty'}</p>
           </div>
         `;
         return;
@@ -2134,6 +2151,16 @@
       contextMenuItem = { id, type };
 
       const menu = document.getElementById('contextMenu');
+
+      // Update favorite toggle text (only for notes)
+      const favoriteItem = document.getElementById('contextFavorite');
+      if (type === 'note') {
+        const isFav = userFavorites.has(id);
+        favoriteItem.textContent = isFav ? 'Unfavorite' : 'Favorite';
+        favoriteItem.style.display = 'flex';
+      } else {
+        favoriteItem.style.display = 'none';
+      }
 
       // Update visibility toggle text based on current state (only for notes)
       const visibilityItem = document.getElementById('contextVisibility');
@@ -2374,6 +2401,61 @@
 
       menu.classList.remove('active');
       contextMenuItem = null;
+    }
+
+    // ============ FAVORITES ============
+    let userFavorites = new Set();
+    let showingFavoritesOnly = false;
+
+    async function loadFavorites() {
+      if (!authToken) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/notes/favorites`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          userFavorites = new Set((json.favorites || []).map(f => f.note_id));
+        }
+      } catch (e) { console.error('Failed to load favorites:', e); }
+    }
+
+    async function toggleFavorite() {
+      if (!contextMenuItem || contextMenuItem.type !== 'note') return;
+      const noteId = contextMenuItem.id;
+      const isFav = userFavorites.has(noteId);
+      closeContextMenu();
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/notes/favorite`, {
+          method: isFav ? 'DELETE' : 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ note_id: noteId })
+        });
+        if (res.ok) {
+          if (isFav) {
+            userFavorites.delete(noteId);
+          } else {
+            userFavorites.add(noteId);
+          }
+          // Re-render if showing favorites only
+          if (showingFavoritesOnly) renderDesktop();
+        }
+      } catch (e) { console.error('Favorite toggle failed:', e); }
+    }
+
+    function toggleFavoritesFilter() {
+      showingFavoritesOnly = !showingFavoritesOnly;
+      const btn = document.getElementById('favoritesToggle');
+      if (showingFavoritesOnly) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+      renderDesktop();
     }
 
     // Grid mode toggle
@@ -2855,6 +2937,11 @@
     }
 
     // Context menu item event listeners
+    document.getElementById('contextFavorite').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite();
+    });
+
     document.getElementById('contextRename').addEventListener('click', (e) => {
       e.stopPropagation();
       renameItem();
