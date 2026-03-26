@@ -15,66 +15,9 @@
       overflow: hidden;
     }
 
-    .editor-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 56px;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      z-index: 100;
-      gap: 16px;
-    }
-
-    .back-link {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #7c9885;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-
-    .back-link svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .doc-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #2d2d2d;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
-    }
-
-    .save-status {
-      font-size: 13px;
-      color: #9ca3af;
-      white-space: nowrap;
-    }
-
-    .save-status.editing { color: #e89b5f; }
-    .save-status.saved { color: #7c9885; }
-
     #editorContainer {
       position: absolute;
-      top: 56px;
+      top: 0;
       left: 0;
       right: 0;
       bottom: 0;
@@ -144,15 +87,6 @@
   </style>
 </head>
 <body>
-
-  <div class="editor-header">
-    <a href="office.html" class="back-link">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      Office
-    </a>
-    <div id="docTitle" class="doc-title">Loading...</div>
-    <div id="saveStatus" class="save-status">Loading</div>
-  </div>
 
   <div id="editorContainer"></div>
 
@@ -224,31 +158,13 @@
       return;
     }
 
-    // Update header title
-    const rawTitle = config.document.title || 'Untitled';
-    document.getElementById('docTitle').textContent = rawTitle.replace(/\.\w+$/, '');
-
     // Add event handlers to config
     config.events = {
       onDocumentReady: function () {
         document.getElementById('loadingOverlay').style.display = 'none';
-        document.getElementById('saveStatus').textContent = 'Ready';
-        document.getElementById('saveStatus').className = 'save-status saved';
-      },
-      onDocumentStateChange: function (event) {
-        const statusEl = document.getElementById('saveStatus');
-        if (event.data) {
-          statusEl.textContent = 'Editing...';
-          statusEl.className = 'save-status editing';
-        } else {
-          statusEl.textContent = 'Saved';
-          statusEl.className = 'save-status saved';
-        }
       },
       onError: function (event) {
         console.error('ONLYOFFICE error:', event);
-        document.getElementById('saveStatus').textContent = 'Error';
-        document.getElementById('saveStatus').className = 'save-status';
       }
     };
 
