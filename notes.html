@@ -1822,6 +1822,14 @@
         if (!response.ok) throw new Error('Failed to load notes');
 
         allNotes = await response.json();
+
+        // Normalize field names - ensure original_filename exists
+        allNotes.forEach(note => {
+          if (!note.original_filename && note.filename) {
+            note.original_filename = note.filename;
+          }
+        });
+
         allNotes.sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
 
         loadUsageStats();
@@ -2800,6 +2808,7 @@
 
     // Utilities
     function getFileIcon(filename) {
+      if (!filename) return 'FILE';
       const ext = filename.split('.').pop().toLowerCase();
       if (ext === 'pdf') return 'PDF';
       if (['jpg', 'jpeg', 'png'].includes(ext)) return 'IMG';
