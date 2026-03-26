@@ -458,7 +458,7 @@
           fetch(`${BACKEND_URL}/api/notes/${noteId}/metadata`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
           }),
-          fetch(`${BACKEND_URL}/api/notes/${noteId}/view-file`, {
+          fetch(`${BACKEND_URL}/api/notes/${noteId}/raw-content`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
           })
         ]);
