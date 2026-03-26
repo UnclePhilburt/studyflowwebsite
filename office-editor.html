@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor - StudyFlow Office</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f4f0;
+      overflow: hidden;
+    }
+
+    .editor-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 100;
+      gap: 16px;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #7c9885;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .back-link svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .doc-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .save-status {
+      font-size: 13px;
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .save-status.editing { color: #e89b5f; }
+    .save-status.saved { color: #7c9885; }
+
+    #editorContainer {
+      position: absolute;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(245, 244, 240, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .loading-overlay .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(124, 152, 133, 0.2);
+      border-top-color: #7c9885;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    .loading-overlay p {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error Overlay */
+    .error-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(245, 244, 240, 0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      text-align: center;
+      padding: 32px;
+    }
+
+    .error-overlay h3 {
+      color: #dc2626;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+
+    .error-overlay p {
+      color: #9ca3af;
+      font-size: 14px;
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    .error-overlay a {
+      color: #7c9885;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="editor-header">
+    <a href="office.html" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Office
+    </a>
+    <div id="docTitle" class="doc-title">Loading...</div>
+    <div id="saveStatus" class="save-status">Loading</div>
+  </div>
+
+  <div id="editorContainer"></div>
+
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading editor...</p>
+  </div>
+
+  <div id="errorOverlay" class="error-overlay">
+    <h3>Failed to load editor</h3>
+    <p id="errorMessage">Something went wrong.</p>
+    <a href="office.html">Back to Office</a>
+  </div>
+
+<script>
+  const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+  const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function showError(msg) {
+    document.getElementById('loadingOverlay').style.display = 'none';
+    document.getElementById('errorMessage').textContent = msg;
+    document.getElementById('errorOverlay').style.display = 'flex';
+  }
+
+  async function init() {
+    // Auth check
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    const authToken = session.access_token;
+
+    // Get doc ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get('id');
+    if (!docId) {
+      showError('No document ID provided.');
+      return;
+    }
+
+    // Fetch editor config
+    let config, docServerUrl;
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/office/${docId}/editor-config`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        showError(err.error || `Server error (${resp.status})`);
+        return;
+      }
+
+      const data = await resp.json();
+      config = data.config;
+      docServerUrl = data.docServerUrl;
+    } catch (err) {
+      showError('Failed to fetch editor configuration.');
+      return;
+    }
+
+    if (!docServerUrl) {
+      showError('Document server URL is not configured.');
+      return;
+    }
+
+    // Update header title
+    const rawTitle = config.document.title || 'Untitled';
+    document.getElementById('docTitle').textContent = rawTitle.replace(/\.\w+$/, '');
+
+    // Add event handlers to config
+    config.events = {
+      onDocumentReady: function () {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.getElementById('saveStatus').textContent = 'Ready';
+        document.getElementById('saveStatus').className = 'save-status saved';
+      },
+      onDocumentStateChange: function (event) {
+        const statusEl = document.getElementById('saveStatus');
+        if (event.data) {
+          statusEl.textContent = 'Editing...';
+          statusEl.className = 'save-status editing';
+        } else {
+          statusEl.textContent = 'Saved';
+          statusEl.className = 'save-status saved';
+        }
+      },
+      onError: function (event) {
+        console.error('ONLYOFFICE error:', event);
+        document.getElementById('saveStatus').textContent = 'Error';
+        document.getElementById('saveStatus').className = 'save-status';
+      }
+    };
+
+    // Dynamically load ONLYOFFICE API script and init editor
+    const script = document.createElement('script');
+    script.src = `${docServerUrl}/web-apps/apps/api/documents/api.js`;
+    script.onload = function () {
+      try {
+        new DocsAPI.DocEditor('editorContainer', config);
+      } catch (err) {
+        console.error('Editor init error:', err);
+        showError('Failed to initialize the document editor.');
+      }
+    };
+    script.onerror = function () {
+      showError('Could not connect to the document server. Please check that it is running.');
+    };
+    document.head.appendChild(script);
+  }
+
+  init();
+</script>
+</body>
+</html>
