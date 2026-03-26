@@ -521,17 +521,40 @@
       authToken = session.access_token;
 
       try {
-        // Load metadata + images in parallel
-        const [metaRes, imgRes] = await Promise.all([
-          fetch(`${BACKEND_URL}/api/notes/${noteId}/metadata`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-          }),
-          fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`)
-        ]);
+        // Load metadata first to check file type
+        const metaRes = await fetch(`${BACKEND_URL}/api/notes/${noteId}/metadata`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
 
-        if (!metaRes.ok || !imgRes.ok) throw new Error('Failed to load note data');
+        if (!metaRes.ok) throw new Error('Failed to load note data');
 
         const metaData = await metaRes.json();
+
+        // Check if this is an office document - redirect to office editor
+        const fileType = metaData.note.file_type;
+        if (fileType === 'docx' || fileType === 'xlsx' || fileType === 'pptx') {
+          document.getElementById('loading-text').textContent = 'Redirecting to Office editor...';
+          setTimeout(() => {
+            window.location.href = `office-editor.html?id=${noteId}`;
+          }, 500);
+          return;
+        }
+
+        // Load images for PDF
+        const imgRes = await fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!imgRes.ok) {
+          const errorData = await imgRes.json().catch(() => ({}));
+          // Check if backend suggests redirect
+          if (errorData.redirect) {
+            window.location.href = errorData.redirect;
+            return;
+          }
+          throw new Error('Failed to load note data');
+        }
+
         const imgData = await imgRes.json();
 
         // Set header title

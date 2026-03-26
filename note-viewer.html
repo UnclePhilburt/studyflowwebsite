@@ -755,13 +755,33 @@
         document.getElementById('text-viewer').style.display = 'none';
 
         switch(currentNote.file_type) {
+          case 'docx':
+          case 'xlsx':
+          case 'pptx':
+            // Redirect office documents to Office editor
+            document.getElementById('loading').textContent = 'Opening in Office editor...';
+            setTimeout(() => {
+              window.location.href = `office-editor.html?id=${noteId}`;
+            }, 500);
+            return;
+
           case 'pdf':
             // Convert PDF to images for secure viewing (prevents download/print)
             try {
               document.getElementById('loading').textContent = 'Converting PDF to images...';
-              const imageResponse = await fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`);
+              const imageResponse = await fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`, {
+                headers: authToken ? {
+                  'Authorization': `Bearer ${authToken}`
+                } : {}
+              });
 
               if (!imageResponse.ok) {
+                const errorData = await imageResponse.json().catch(() => ({}));
+                // Check if backend suggests redirect
+                if (errorData.redirect) {
+                  window.location.href = errorData.redirect;
+                  return;
+                }
                 throw new Error('Failed to convert PDF to images');
               }
 
