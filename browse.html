@@ -453,43 +453,15 @@
       box-shadow: 0 2px 8px rgba(124, 152, 133, 0.2);
     }
 
-    /* Bento Box Grid */
+    /* Zen Scroll - Vertical centered list */
     .notes-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: 200px;
-      gap: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
       margin-top: 48px;
-      max-width: 1400px;
+      max-width: 800px;
       margin-left: auto;
       margin-right: auto;
-    }
-
-    /* Bento box size variations */
-    .note-card.size-1x1 {
-      grid-column: span 1;
-      grid-row: span 1;
-    }
-
-    .note-card.size-2x1 {
-      grid-column: span 2;
-      grid-row: span 1;
-    }
-
-    .note-card.size-1x2 {
-      grid-column: span 1;
-      grid-row: span 2;
-    }
-
-    .note-card.size-2x2 {
-      grid-column: span 2;
-      grid-row: span 2;
-    }
-
-    @media (max-width: 1200px) {
-      .notes-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
     }
 
     /* Mobile Bottom Tab Bar */
@@ -541,172 +513,88 @@
 
     @media (max-width: 768px) {
       .notes-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 180px;
-        gap: 12px;
-      }
-
-      .note-card.size-2x2,
-      .note-card.size-2x1 {
-        grid-column: span 2;
+        max-width: calc(100% - 32px);
+        margin-left: 16px;
+        margin-right: 16px;
       }
     }
 
     @media (max-width: 480px) {
       .notes-grid {
-        grid-template-columns: 1fr;
-        grid-auto-rows: 160px;
-      }
-
-      .note-card.size-2x2,
-      .note-card.size-2x1,
-      .note-card.size-1x2 {
-        grid-column: span 1;
-        grid-row: span 1;
+        max-width: calc(100% - 16px);
+        margin-left: 8px;
+        margin-right: 8px;
       }
     }
 
     .note-card {
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      border: 1px solid rgba(124, 152, 133, 0.15);
-      padding: 0;
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      padding: 48px 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
-      overflow: hidden;
       position: relative;
-      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.08);
+      box-shadow: none;
       display: flex;
       flex-direction: column;
+      text-align: center;
     }
 
-    .note-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #7c9885 0%, #e89b5f 100%);
-      opacity: 0;
-      transition: opacity 0.35s ease;
+    .note-card:last-child {
+      border-bottom: none;
     }
 
     .note-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.15);
-      border-color: rgba(124, 152, 133, 0.3);
-      z-index: 10;
-    }
-
-    .note-card:hover::before {
       opacity: 0.7;
     }
 
     .note-card-content {
-      padding: 20px;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      height: 100%;
-      gap: 8px;
-    }
-
-    /* Larger cards get more padding and bigger text */
-    .note-card.size-2x2 .note-card-content {
-      padding: 32px;
       gap: 12px;
-    }
-
-    .note-card.size-2x1 .note-card-content,
-    .note-card.size-1x2 .note-card-content {
-      padding: 24px;
-      gap: 10px;
     }
 
     .note-header {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+      justify-content: center;
+      align-items: center;
       margin-bottom: 0;
       gap: 12px;
     }
 
     .note-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: 1.0rem;
-      font-weight: 500;
-      color: #2d2d2d;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #5a6b5f;
       margin-bottom: 0;
       line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      flex: 1;
-    }
-
-    /* Larger cards get bigger titles */
-    .note-card.size-2x2 .note-title {
-      font-size: 1.5rem;
-      -webkit-line-clamp: 3;
-      line-height: 1.3;
-    }
-
-    .note-card.size-2x1 .note-title,
-    .note-card.size-1x2 .note-title {
-      font-size: 1.15rem;
-      -webkit-line-clamp: 2;
     }
 
     .note-university {
-      display: inline-block;
-      padding: 6px 12px;
-      background: rgba(124, 152, 133, 0.1);
-      border-radius: 12px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: #6b8575;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-
-    .note-card.size-2x2 .note-university {
-      font-size: 0.8rem;
-      padding: 8px 16px;
+      display: block;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: #8a8a8a;
+      text-transform: none;
+      letter-spacing: 0.01em;
     }
 
     .note-course {
-      font-size: 0.85rem;
-      color: #5a5a5a;
-      font-weight: 500;
-      margin-bottom: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .note-card.size-2x2 .note-course {
-      font-size: 1.0rem;
-      margin-bottom: 4px;
+      display: none;
     }
 
     .note-meta {
       font-size: 0.75rem;
-      color: #8a8a8a;
+      color: #9a9a9a;
       margin-bottom: 0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: auto;
-    }
-
-    .note-card.size-2x2 .note-meta {
-      font-size: 0.875rem;
+      display: block;
+      margin-top: 8px;
     }
 
     .note-contributor {
@@ -715,84 +603,23 @@
     }
 
     .note-tags {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    /* Hide tags on small cards */
-    .note-card.size-1x1 .note-tags {
       display: none;
     }
 
     .note-tag {
-      padding: 4px 10px;
-      background: rgba(232, 155, 95, 0.12);
-      border-radius: 12px;
-      font-size: 0.7rem;
-      color: #d4783d;
-      font-weight: 500;
-    }
-
-    .note-card.size-2x2 .note-tag {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-    }
-
-    .note-stats {
-      display: flex;
-      gap: 16px;
-      margin-top: auto;
-      padding-top: 12px;
-      border-top: 1px solid rgba(124, 152, 133, 0.12);
-      font-size: 0.75rem;
-      color: #8a8a8a;
-    }
-
-    /* Hide stats on smallest cards */
-    .note-card.size-1x1 .note-stats {
       display: none;
     }
 
-    .note-card.size-2x2 .note-stats {
-      font-size: 0.875rem;
-      gap: 20px;
-      padding-top: 16px;
+    .note-stats {
+      display: none;
     }
 
     .note-stat {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-weight: 500;
-    }
-
-    .note-stat svg {
-      width: 14px;
-      height: 14px;
-      opacity: 0.6;
-      flex-shrink: 0;
-    }
-
-    .note-card.size-2x2 .note-stat svg {
-      width: 16px;
-      height: 16px;
+      display: none;
     }
 
     .note-badge {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      padding: 5px 12px;
-      background: rgba(232, 155, 95, 0.12);
-      border: 1px solid rgba(232, 155, 95, 0.2);
-      border-radius: 14px;
-      font-size: 0.6875rem;
-      color: #d4783d;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      display: none;
     }
 
     /* Loading State */
