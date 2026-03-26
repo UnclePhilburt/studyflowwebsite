@@ -2320,18 +2320,21 @@
 
     async function deleteItem() {
       if (!contextMenuItem) return;
+
+      // Save item info before closing menu (which clears contextMenuItem)
+      const itemToDelete = { ...contextMenuItem };
       closeContextMenu();
 
-      if (contextMenuItem.type === 'folder') {
+      if (itemToDelete.type === 'folder') {
         // Delete folder via API
         try {
-          const response = await fetch(`${BACKEND_URL}/api/folders/${contextMenuItem.id}`, {
+          const response = await fetch(`${BACKEND_URL}/api/folders/${itemToDelete.id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authToken}` }
           });
 
           if (response.ok) {
-            folders = folders.filter(f => f.id !== contextMenuItem.id);
+            folders = folders.filter(f => f.id !== itemToDelete.id);
             renderDesktop();
           } else {
             alert('Failed to delete folder');
@@ -2343,7 +2346,7 @@
       } else {
         // Delete note
         try {
-          const response = await fetch(`${BACKEND_URL}/api/notes/${contextMenuItem.id}`, {
+          const response = await fetch(`${BACKEND_URL}/api/notes/${itemToDelete.id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${authToken}` }
           });
