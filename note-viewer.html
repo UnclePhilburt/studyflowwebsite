@@ -575,6 +575,7 @@
       </div>
       <div class="actions">
         <button class="btn btn-secondary" onclick="window.open('dmca.html', '_blank')">Report</button>
+        <button class="btn btn-primary" id="annotate-btn" style="display:none;" onclick="openAnnotationEditor()">Annotate</button>
         <button class="btn btn-primary" onclick="downloadNote()">Download</button>
       </div>
     </div>
@@ -799,6 +800,8 @@
               });
 
               pdfViewer.style.display = 'block';
+              // Show Annotate button for PDFs
+              document.getElementById('annotate-btn').style.display = '';
             } catch (error) {
               console.error('Error loading PDF as images:', error);
               showError('Failed to load PDF. Please try again.');
@@ -1047,6 +1050,11 @@
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error').textContent = message;
       document.getElementById('error').style.display = 'block';
+    }
+
+    function openAnnotationEditor() {
+      if (!noteId) return;
+      window.location.href = `pdf-editor.html?id=${noteId}`;
     }
 
     // Disable right-click and keyboard shortcuts for copying
