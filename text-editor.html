@@ -212,7 +212,8 @@
       line-height: 1.7;
       color: #2d2d2d;
       background: rgba(255, 255, 255, 0.6);
-      min-height: calc(100vh - 56px - 50px);
+      min-height: calc(100vh - 56px - 50px - 28px);
+      padding-bottom: 44px;
     }
 
     .ql-editor:focus {
@@ -338,6 +339,29 @@
       font-size: 14px;
     }
 
+    /* Word count bar */
+    .status-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(124, 152, 133, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 20px;
+      gap: 16px;
+      font-size: 12px;
+      color: #9a9a9a;
+      z-index: 100;
+    }
+
+    .status-bar span {
+      white-space: nowrap;
+    }
+
     /* Responsive */
     @media (max-width: 640px) {
       .page-header {
@@ -381,6 +405,12 @@
     <div id="quillEditor"></div>
   </div>
 
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span id="wordCount">0 words</span>
+    <span id="charCount">0 characters</span>
+  </div>
+
   <!-- Loading overlay -->
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
@@ -405,6 +435,8 @@
     let hasUnsavedChanges = false;
     let currentTitle = '';
     let quill = null;
+    let autoSaveTimer = null;
+    const AUTO_SAVE_DELAY = 3000; // 3 seconds
 
     // DOM elements
     const saveBtn = document.getElementById('saveBtn');
@@ -498,6 +530,7 @@
         quill.enable(true);
         saveBtn.disabled = false;
         loadingOverlay.style.display = 'none';
+        updateWordCount();
       } catch (error) {
         console.error('Load error:', error);
         showError('Failed to load note', error.message);
@@ -510,6 +543,16 @@
       if (changed !== hasUnsavedChanges) {
         hasUnsavedChanges = changed;
         updateSaveStatus();
+      }
+
+      updateWordCount();
+
+      // Auto-save: reset timer on every change
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      if (hasUnsavedChanges) {
+        autoSaveTimer = setTimeout(() => {
+          saveContent();
+        }, AUTO_SAVE_DELAY);
       }
     });
 
@@ -627,6 +670,14 @@
         if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
         if (e.key === 'Escape') { input.value = currentTitle; input.blur(); }
       });
+    }
+
+    function updateWordCount() {
+      const text = quill.getText().trim();
+      const chars = text.length;
+      const words = text ? text.split(/\s+/).length : 0;
+      document.getElementById('wordCount').textContent = words === 1 ? '1 word' : `${words} words`;
+      document.getElementById('charCount').textContent = chars === 1 ? '1 character' : `${chars} characters`;
     }
 
     function showError(title, message) {
