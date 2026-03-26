@@ -906,24 +906,15 @@
       background: linear-gradient(180deg, rgba(124, 152, 133, 0.5) 0%, rgba(232, 155, 95, 0.5) 100%);
     }
 
-    /* Paper Card Messages - Like notes on a desk */
+    /* Zen Messages - Centered, floating text */
     .message {
-      max-width: 600px;
-      margin: 32px auto 56px auto;
+      max-width: 800px;
+      margin: 0 auto 55px auto;
       position: relative;
       animation: messageBreathe 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       opacity: 0;
       animation-fill-mode: forwards;
-    }
-
-    .message.user {
-      margin-left: calc(50% - 270px);
-      margin-right: calc(50% - 330px);
-    }
-
-    .message.assistant {
-      margin-left: calc(50% - 330px);
-      margin-right: calc(50% - 270px);
+      text-align: center;
     }
 
     .message:first-child {
@@ -933,85 +924,58 @@
     @keyframes messageBreathe {
       from {
         opacity: 0;
-        transform: translateY(40px) scale(0.98);
+        transform: translateY(8px);
       }
       to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
       }
     }
 
-    /* Role label - Subtle ink stamp */
+    /* Role label - Subtle but clear */
     .message::before {
       content: attr(data-role);
       display: block;
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-bottom: 12px;
-      opacity: 0.35;
+      letter-spacing: 0.12em;
+      margin-bottom: 16px;
+      opacity: 0.45;
       font-family: 'Inter', sans-serif;
     }
 
     .message.user::before {
       content: "You";
-      color: #d88850;
+      color: #8a6b5a;
     }
 
     .message.assistant::before {
       content: "StudyFlow";
-      color: #7c9885;
-      opacity: 0.5;
+      color: #5a6b5f;
     }
 
-    /* Paper card with ribbon bookmark */
+    /* Message content - Pure text, no card */
     .message-content {
       position: relative;
-      padding: 24px 28px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
+      padding: 0;
+      background: transparent;
+      border: none;
       font-size: 16px;
       line-height: 1.9;
-      color: #2d2d2d;
       font-family: 'Lora', Georgia, serif;
       font-weight: 400;
       letter-spacing: 0.01em;
-      box-shadow: 0 2px 16px rgba(45, 45, 45, 0.06),
-                  0 8px 32px rgba(45, 45, 45, 0.04);
-      border-left: 4px solid transparent;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: none;
+      transition: none;
     }
 
     .message.user .message-content {
-      border-left-color: #e89b5f;
-      box-shadow: 0 2px 16px rgba(232, 155, 95, 0.15),
-                  0 8px 32px rgba(232, 155, 95, 0.08);
+      color: #8a6b5a;
     }
 
     .message.assistant .message-content {
-      border-left-color: #7c9885;
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.02) 0%, rgba(255, 255, 255, 0.9) 100%);
-    }
-
-    .message-content:hover {
-      box-shadow: 0 4px 24px rgba(45, 45, 45, 0.1),
-                  0 12px 48px rgba(45, 45, 45, 0.06);
-      transform: translateY(-2px);
-    }
-
-    .message.user .message-content {
-      background: linear-gradient(to right, rgba(232, 155, 95, 0.04) 0%, rgba(255, 255, 255, 0.9) 100%);
-    }
-
-    .message.user .message-content:hover {
-      box-shadow: 0 4px 24px rgba(232, 155, 95, 0.2),
-                  0 12px 48px rgba(232, 155, 95, 0.12);
-    }
-
-    .message.assistant .message-content:hover {
-      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.2),
-                  0 12px 48px rgba(124, 152, 133, 0.12);
+      color: #5a6b5f;
     }
 
     /* Link styling for Wikipedia citations and other links */
@@ -1019,7 +983,7 @@
       color: #7c9885;
       text-decoration: none;
       font-weight: 500;
-      border-bottom: 1px solid rgba(124, 152, 133, 0.3);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.4);
       transition: all 0.3s ease;
     }
 
@@ -1031,15 +995,16 @@
     /* Italic text for attribution */
     .message-content em {
       font-style: italic;
-      color: #5d5d5d;
+      opacity: 0.8;
       font-size: 0.95em;
     }
 
     /* Horizontal rules for separating attribution */
     .message-content hr {
       border: none;
-      border-top: 1px solid rgba(124, 152, 133, 0.2);
-      margin: 20px 0;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+      margin: 20px auto;
+      width: 60%;
     }
 
     /* Paragraph spacing in messages */
@@ -1214,9 +1179,10 @@
     }
 
     .message.disclosure .message-content {
-      background: rgba(124, 152, 133, 0.06);
-      border: 1px solid rgba(124, 152, 133, 0.15);
+      background: transparent;
+      border: none;
       color: #6b8575;
+      opacity: 0.7;
       font-size: 13px;
       text-align: center;
       max-width: 480px;
@@ -1521,11 +1487,11 @@
       .message.assistant {
         margin-left: 16px;
         margin-right: 16px;
-        max-width: 100%;
+        max-width: calc(100% - 32px);
       }
 
       .message-content {
-        padding: 16px 20px;
+        padding: 0;
       }
 
       .welcome-hint h1 {
@@ -1649,9 +1615,9 @@
       }
 
       .message-content {
-        padding: 14px 16px;
-        font-size: 14px;
-        line-height: 1.7;
+        padding: 0;
+        font-size: 15px;
+        line-height: 1.8;
       }
 
       .welcome-hint {
