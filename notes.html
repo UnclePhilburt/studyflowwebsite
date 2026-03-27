@@ -1579,6 +1579,7 @@
         </div>
       </div>
       <div class="preview-actions">
+        <button class="preview-btn" id="previewAnnotateBtn" onclick="annotatePreviewedNote()" style="display: none;">Annotate</button>
         <button class="preview-btn" id="previewDownloadBtn" onclick="downloadPreviewedNote()">Download</button>
         <button class="preview-btn" onclick="deletePreviewedNote()">Delete</button>
       </div>
@@ -2858,6 +2859,17 @@
 
         viewer.innerHTML = viewerHTML;
 
+        // Show/hide Annotate button - only for PDFs that the user owns
+        const annotateBtn = document.getElementById('previewAnnotateBtn');
+        const isOwner = note.user_id === currentUserId;
+        const isPdf = fileExt === 'pdf';
+
+        if (isPdf && isOwner) {
+          annotateBtn.style.display = 'inline-block';
+        } else {
+          annotateBtn.style.display = 'none';
+        }
+
         // Clean up object URL when preview is closed
         if (url) {
           viewer.dataset.blobUrl = url;
@@ -2869,6 +2881,8 @@
             Failed to load preview
           </div>
         `;
+        // Hide Annotate button on error
+        document.getElementById('previewAnnotateBtn').style.display = 'none';
       }
     }
 
@@ -2886,6 +2900,13 @@
         item.classList.remove('selected');
       });
       previewedNote = null;
+    }
+
+    function annotatePreviewedNote() {
+      if (!previewedNote) return;
+
+      // Open PDF annotation editor
+      window.location.href = `pdf-editor.html?id=${previewedNote.id}`;
     }
 
     async function downloadPreviewedNote() {
