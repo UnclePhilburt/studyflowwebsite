@@ -12,7 +12,7 @@
     {
       "description": "AI writing assistant powered by your study notes",
       "url": "index.html",
-      "icons": [],
+      "icons": ["icon.svg"],
       "isViewer": false,
       "EditorsSupport": ["word"],
       "isVisual": true,
