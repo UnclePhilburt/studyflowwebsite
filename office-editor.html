@@ -182,14 +182,6 @@
       return;
     }
 
-    // Inject StudyFlow Assistant plugin for word documents
-    if (config.documentType === 'word') {
-      config.plugins = {
-        autostart: ['asc.{7C9885A0-0001-0001-0001-000000000001}'],
-        pluginsData: [window.location.origin + '/plugins/study-assistant/config.json']
-      };
-    }
-
     // Add event handlers to config
     config.events = {
       onDocumentReady: function () {
