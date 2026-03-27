@@ -3272,37 +3272,67 @@
 
         contentDiv.innerHTML = marked.parse(steganographicContent);
 
-        // Append source citations if Nexus notes were used (edu-verified users only)
-        if (sources && sources.length > 0 && userProfile && userProfile.edu_verified) {
-          const citationsDiv = document.createElement('div');
-          citationsDiv.className = 'source-citations';
-          citationsDiv.innerHTML = '<div class="source-citations-label">Sources</div>';
+        // Append source citations
+        if (sources && sources.length > 0) {
+          // Wikipedia sources are shown to all users; Nexus note sources require edu verification
+          const wikiSources = sources.filter(s => s.from_wikipedia && s.wikipedia_url);
+          const noteSources = (userProfile && userProfile.edu_verified) ? sources.filter(s => !s.from_wikipedia) : [];
 
-          sources.forEach(source => {
-            const link = document.createElement('a');
-            link.className = 'source-citation';
-            link.href = `note-viewer.html?id=${source.note_id}`;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
+          if (wikiSources.length > 0 || noteSources.length > 0) {
+            const citationsDiv = document.createElement('div');
+            citationsDiv.className = 'source-citations';
+            citationsDiv.innerHTML = '<div class="source-citations-label">Sources</div>';
 
-            const username = source.username ? `@${source.username}` : 'Anonymous';
-            const meta = source.course_code ? `${username} -- ${source.course_code}` : username;
+            wikiSources.forEach(source => {
+              const link = document.createElement('a');
+              link.className = 'source-citation';
+              link.href = source.wikipedia_url;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
 
-            link.innerHTML = `
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <div class="source-citation-text">
-                <div class="source-citation-title">${source.filename}</div>
-                <div class="source-citation-meta">${meta}</div>
-              </div>
-              <span class="source-citation-badge">View</span>
-            `;
-            citationsDiv.appendChild(link);
-          });
+              const title = source.filename.replace('.txt', '').replace(/ \(Wikipedia.*\)/, '');
 
-          contentDiv.appendChild(citationsDiv);
+              link.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                <div class="source-citation-text">
+                  <div class="source-citation-title">${title}</div>
+                  <div class="source-citation-meta">Wikipedia</div>
+                </div>
+                <span class="source-citation-badge">View</span>
+              `;
+              citationsDiv.appendChild(link);
+            });
+
+            noteSources.forEach(source => {
+              const link = document.createElement('a');
+              link.className = 'source-citation';
+              link.href = `note-viewer.html?id=${source.note_id}`;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+
+              const username = source.username ? `@${source.username}` : 'Anonymous';
+              const meta = source.course_code ? `${username} -- ${source.course_code}` : username;
+
+              link.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <div class="source-citation-text">
+                  <div class="source-citation-title">${source.filename}</div>
+                  <div class="source-citation-meta">${meta}</div>
+                </div>
+                <span class="source-citation-badge">View</span>
+              `;
+              citationsDiv.appendChild(link);
+            });
+
+            contentDiv.appendChild(citationsDiv);
+          }
         }
 
         // Append visible provenance marker (SB 1324 "clear and conspicuous" label)
