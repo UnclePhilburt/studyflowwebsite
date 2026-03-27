@@ -11,16 +11,33 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f5f4f0 0%, #ede9e4 100%);
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       color: #2d2d2d;
       min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .header {
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 24px 32px;
+      padding: 32px 40px 24px;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -28,20 +45,24 @@
     .header-left h1 {
       font-family: 'Lora', Georgia, serif;
       font-size: 2rem;
-      font-weight: 700;
+      font-weight: 600;
       color: #2d2d2d;
+      letter-spacing: -0.02em;
     }
 
     .header-left p {
       color: #9ca3af;
       font-size: 14px;
-      margin-top: 4px;
+      margin-top: 6px;
+      font-weight: 400;
     }
 
     .toolbar {
+      position: relative;
+      z-index: 1;
       display: flex;
-      gap: 10px;
-      padding: 0 32px 16px;
+      gap: 12px;
+      padding: 0 40px 24px;
       max-width: 1200px;
       margin: 0 auto;
       flex-wrap: wrap;
@@ -51,19 +72,27 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 18px;
-      background: #7c9885;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
+      padding: 11px 20px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      color: #7c9885;
+      border: 1.5px solid rgba(124, 152, 133, 0.25);
+      border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.08);
     }
 
-    .toolbar-btn:hover { background: #6a8a73; }
-    .toolbar-btn:active { transform: scale(0.97); }
+    .toolbar-btn:hover {
+      background: rgba(124, 152, 133, 0.12);
+      border-color: rgba(124, 152, 133, 0.4);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.15);
+    }
+
+    .toolbar-btn:active { transform: translateY(0); }
 
     .toolbar-btn svg {
       width: 18px;
@@ -76,81 +105,99 @@
     }
 
     .doc-grid {
+      position: relative;
+      z-index: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      padding: 16px 32px 100px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+      padding: 16px 40px 100px;
       max-width: 1200px;
       margin: 0 auto;
     }
 
     .doc-card {
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(124, 152, 133, 0.15);
-      border-radius: 14px;
-      padding: 20px;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(124, 152, 133, 0.15);
+      border-radius: 16px;
+      padding: 24px;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.06);
     }
 
     .doc-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(124, 152, 133, 0.12);
+      border-color: rgba(124, 152, 133, 0.3);
+      background: rgba(255, 255, 255, 0.85);
     }
 
     .doc-card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 13px;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .doc-card-icon.docx { background: #4285f4; }
-    .doc-card-icon.xlsx { background: #34a853; }
-    .doc-card-icon.pptx { background: #ea4335; }
+    .doc-card-icon.docx { background: linear-gradient(135deg, #4285f4 0%, #3b78e7 100%); }
+    .doc-card-icon.xlsx { background: linear-gradient(135deg, #34a853 0%, #2d9248 100%); }
+    .doc-card-icon.pptx { background: linear-gradient(135deg, #ea4335 0%, #d63c2f 100%); }
 
     .doc-card-title {
       font-weight: 600;
       font-size: 15px;
       color: #2d2d2d;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      line-height: 1.4;
     }
 
     .doc-card-meta {
       font-size: 12px;
       color: #9ca3af;
+      font-weight: 500;
     }
 
     .doc-card-delete {
       position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
       border: none;
-      background: rgba(220, 38, 38, 0.08);
+      background: rgba(255, 255, 255, 0.9);
       color: #dc2626;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.15s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
     }
 
-    .doc-card:hover .doc-card-delete { opacity: 1; }
+    .doc-card:hover .doc-card-delete {
+      opacity: 1;
+    }
+
+    .doc-card-delete:hover {
+      background: #dc2626;
+      color: white;
+      transform: scale(1.05);
+    }
 
     .doc-card-delete svg {
       width: 14px;
@@ -164,36 +211,43 @@
 
     /* Loading & Empty States */
     .state-container {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 80px 32px;
+      padding: 100px 32px;
       text-align: center;
     }
 
     .state-container svg {
-      width: 64px;
-      height: 64px;
+      width: 72px;
+      height: 72px;
       stroke: #b0b0b0;
       fill: none;
       stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
-      margin-bottom: 16px;
+      margin-bottom: 24px;
+      opacity: 0.6;
     }
 
     .state-container h3 {
       font-family: 'Lora', Georgia, serif;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
+      font-weight: 600;
       color: #2d2d2d;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
     }
 
     .state-container p {
       color: #9ca3af;
       font-size: 14px;
-      max-width: 340px;
+      max-width: 380px;
+      line-height: 1.6;
+      font-weight: 400;
     }
 
     .spinner {
