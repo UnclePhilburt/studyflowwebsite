@@ -1992,7 +1992,7 @@
 
       // Render notes
       currentNotes.forEach(note => {
-        const icon = getFileIcon(note.original_filename);
+        const icon = getFileIcon(note);
         const posKey = `note_${note.id}_position_${currentFolder || 'root'}`;
         const savedPos = localStorage.getItem(posKey);
         const position = savedPos ? JSON.parse(savedPos) : { x: (itemIndex % 6) * 160 + 20, y: Math.floor(itemIndex / 6) * 160 + 20 };
@@ -2825,7 +2825,8 @@
         if (!response.ok) throw new Error('Failed to load preview');
 
         const blobData = await response.blob();
-        const fileExt = note.original_filename.split('.').pop().toLowerCase();
+        // Use file_type from database instead of parsing filename extension
+        const fileExt = note.file_type ? note.file_type.toLowerCase() : note.original_filename.split('.').pop().toLowerCase();
 
         // Handle different file types
         let blob, url, viewerHTML;
@@ -2923,13 +2924,20 @@
     }
 
     // Utilities
-    function getFileIcon(filename) {
-      if (!filename) return 'FILE';
-      const ext = filename.split('.').pop().toLowerCase();
+    function getFileIcon(note) {
+      // Accept note object or just filename string for backward compatibility
+      const fileType = typeof note === 'object' ? note.file_type : null;
+      const filename = typeof note === 'object' ? note.original_filename : note;
+
+      if (!filename && !fileType) return 'FILE';
+
+      // Use file_type from database if available, otherwise parse filename extension
+      const ext = fileType ? fileType.toLowerCase() : filename.split('.').pop().toLowerCase();
+
       if (ext === 'pdf') return 'PDF';
-      if (['jpg', 'jpeg', 'png'].includes(ext)) return 'IMG';
+      if (['jpg', 'jpeg', 'png', 'image'].includes(ext)) return 'IMG';
       if (['doc', 'docx'].includes(ext)) return 'DOC';
-      if (ext === 'txt') return 'TXT';
+      if (ext === 'txt' || ext === 'text') return 'TXT';
       return 'FILE';
     }
 
