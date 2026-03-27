@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlow Assistant</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f7f4;
+      color: #2d2d2d;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* Scrollbar */
+    body::-webkit-scrollbar { width: 4px; }
+    body::-webkit-scrollbar-track { background: transparent; }
+    body::-webkit-scrollbar-thumb { background: rgba(124, 152, 133, 0.25); border-radius: 4px; }
+
+    /* State containers */
+    .state { display: none; padding: 24px 20px; }
+    .state.active { display: block; }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(248, 247, 244, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+    }
+
+    .header-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-icon {
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(135deg, #7c9885 0%, #6a8573 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-icon svg {
+      width: 12px;
+      height: 12px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .header-subtitle {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* Status indicator */
+    .status-bar {
+      padding: 8px 20px;
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(248, 247, 244, 0.6);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.06);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #d1d5db;
+      flex-shrink: 0;
+    }
+
+    .status-dot.active {
+      background: #7c9885;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .status-dot.loading {
+      background: #e89b5f;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Initializing state */
+    .state-initializing {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid rgba(124, 152, 133, 0.15);
+      border-top-color: #7c9885;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .state-initializing p {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    /* Empty state */
+    .state-empty {
+      text-align: center;
+      padding-top: 60px;
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      background: rgba(124, 152, 133, 0.08);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: #7c9885;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .state-empty h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .state-empty p {
+      font-size: 12px;
+      color: #9ca3af;
+      max-width: 260px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Suggestions state */
+    .suggestion-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      animation: fadeInUp 0.4s ease-out both;
+      transition: border-color 0.3s;
+    }
+
+    .suggestion-card:hover {
+      border-color: rgba(124, 152, 133, 0.25);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .suggestion-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7c9885;
+      margin-bottom: 8px;
+    }
+
+    .suggestion-text {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.65;
+      word-wrap: break-word;
+    }
+
+    .suggestion-text p {
+      margin-bottom: 8px;
+    }
+
+    .suggestion-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Sources section */
+    .sources-section {
+      margin-top: 16px;
+    }
+
+    .sources-header {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .source-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .source-card:hover {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(124, 152, 133, 0.2);
+      transform: translateX(2px);
+    }
+
+    .source-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .source-icon.note {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.12), rgba(124, 152, 133, 0.06));
+    }
+
+    .source-icon.wiki {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.06));
+    }
+
+    .source-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .source-icon.note svg { stroke: #7c9885; }
+    .source-icon.wiki svg { stroke: #6366f1; }
+
+    .source-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .source-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #2d2d2d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .source-meta {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 1px;
+    }
+
+    .source-badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: #7c9885;
+      padding: 3px 8px;
+      background: rgba(124, 152, 133, 0.08);
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    /* No notes state */
+    .state-no-notes {
+      text-align: center;
+      padding-top: 60px;
+    }
+
+    .state-no-notes h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .state-no-notes p {
+      font-size: 12px;
+      color: #9ca3af;
+      max-width: 260px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+
+    .upload-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .upload-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    /* Error state */
+    .state-error {
+      text-align: center;
+      padding-top: 60px;
+    }
+
+    .error-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      background: rgba(220, 38, 38, 0.06);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .error-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: #dc2626;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .state-error h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+
+    .state-error p {
+      font-size: 12px;
+      color: #9ca3af;
+      max-width: 260px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      margin-bottom: 12px;
+    }
+
+    .skeleton-line {
+      height: 12px;
+      background: linear-gradient(90deg, rgba(124, 152, 133, 0.06) 25%, rgba(124, 152, 133, 0.12) 50%, rgba(124, 152, 133, 0.06) 75%);
+      background-size: 400% 100%;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-line:nth-child(1) { width: 90%; }
+    .skeleton-line:nth-child(2) { width: 100%; }
+    .skeleton-line:nth-child(3) { width: 75%; }
+    .skeleton-line:nth-child(4) { width: 85%; animation-delay: 0.1s; }
+    .skeleton-line:nth-child(5) { width: 60%; animation-delay: 0.2s; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .loading-label {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      StudyFlow Assistant
+    </div>
+    <div class="header-subtitle">AI suggestions from your notes</div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Connecting...</span>
+  </div>
+
+  <!-- State: Initializing -->
+  <div class="state state-initializing active" id="stateInitializing">
+    <div class="spinner"></div>
+    <p>Connecting to StudyFlow...</p>
+  </div>
+
+  <!-- State: Empty document -->
+  <div class="state" id="stateEmpty">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+    </div>
+    <h3>Start writing</h3>
+    <p>Begin typing your document and I'll surface relevant information from your study notes as you write.</p>
+  </div>
+
+  <!-- State: Loading / Analyzing -->
+  <div class="state" id="stateLoading">
+    <div class="suggestion-label">Analyzing your writing...</div>
+    <div class="skeleton">
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+    </div>
+    <div class="loading-label" id="loadingLabel">Searching your notes...</div>
+  </div>
+
+  <!-- State: Suggestions -->
+  <div class="state" id="stateSuggestions">
+    <div id="suggestionsContent"></div>
+  </div>
+
+  <!-- State: No notes -->
+  <div class="state state-no-notes" id="stateNoNotes">
+    <div class="empty-icon">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <h3>No notes yet</h3>
+    <p>Upload your study notes to get personalized suggestions while you write.</p>
+    <a href="https://studyflowsuite.com/upload.html" target="_blank" class="upload-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload Notes
+    </a>
+  </div>
+
+  <!-- State: Error -->
+  <div class="state state-error" id="stateError">
+    <div class="error-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <h3>Something went wrong</h3>
+    <p id="errorMessage">Could not connect to StudyFlow. Will retry on next edit.</p>
+  </div>
+
+<script>
+  // ─── Configuration ───────────────────────────────────────────
+  var DEBOUNCE_DELAY = 3000;
+  var MIN_QUERY_INTERVAL = 10000;
+  var MIN_TEXT_LENGTH = 30;
+  var CHANGE_THRESHOLD = 0.20;
+  var AUTH_TIMEOUT = 8000;
+  var API_TIMEOUT = 30000;
+  var MAX_QUERIES_PER_CONVERSATION = 10;
+
+  // ─── State ───────────────────────────────────────────────────
+  var authToken = null;
+  var backendUrl = null;
+  var conversationId = null;
+  var queryCount = 0;
+  var lastAnalyzedText = '';
+  var lastQueryTime = 0;
+  var debounceTimer = null;
+  var isQuerying = false;
+  var hasShownFirstResult = false;
+
+  // ─── UI State Management ─────────────────────────────────────
+  function setState(stateId) {
+    var states = document.querySelectorAll('.state');
+    for (var i = 0; i < states.length; i++) {
+      states[i].classList.remove('active');
+    }
+    var el = document.getElementById(stateId);
+    if (el) el.classList.add('active');
+  }
+
+  function setStatus(text, dotClass) {
+    document.getElementById('statusText').textContent = text;
+    var dot = document.getElementById('statusDot');
+    dot.className = 'status-dot';
+    if (dotClass) dot.classList.add(dotClass);
+  }
+
+  function setErrorMessage(msg) {
+    document.getElementById('errorMessage').textContent = msg;
+  }
+
+  // ─── Text Utilities ──────────────────────────────────────────
+  function escapeHtml(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function formatResponseText(text) {
+    if (!text) return '';
+    // Split into paragraphs and wrap
+    var paragraphs = text.split(/\n\n+/);
+    var html = '';
+    for (var i = 0; i < paragraphs.length; i++) {
+      var p = paragraphs[i].trim();
+      if (!p) continue;
+      // Handle bullet points
+      if (p.match(/^[-*]\s/)) {
+        var lines = p.split(/\n/);
+        html += '<ul style="margin: 6px 0; padding-left: 18px;">';
+        for (var j = 0; j < lines.length; j++) {
+          var line = lines[j].replace(/^[-*]\s*/, '').trim();
+          if (line) html += '<li style="margin-bottom: 3px;">' + escapeHtml(line) + '</li>';
+        }
+        html += '</ul>';
+      } else {
+        // Handle bold markers **text**
+        var escaped = escapeHtml(p);
+        escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html += '<p>' + escaped + '</p>';
+      }
+    }
+    return html;
+  }
+
+  function computeTextSimilarity(textA, textB) {
+    if (!textA || !textB) return 0;
+    var wordsA = textA.toLowerCase().split(/\s+/).filter(function(w) { return w.length > 3; });
+    var wordsB = textB.toLowerCase().split(/\s+/).filter(function(w) { return w.length > 3; });
+    if (wordsA.length === 0 && wordsB.length === 0) return 1;
+
+    var setA = {};
+    for (var i = 0; i < wordsA.length; i++) setA[wordsA[i]] = true;
+
+    var setB = {};
+    for (var j = 0; j < wordsB.length; j++) setB[wordsB[j]] = true;
+
+    var intersection = 0;
+    for (var w in setB) {
+      if (setA[w]) intersection++;
+    }
+
+    var unionObj = {};
+    for (var a in setA) unionObj[a] = true;
+    for (var b in setB) unionObj[b] = true;
+    var unionSize = Object.keys(unionObj).length;
+
+    return unionSize === 0 ? 1 : intersection / unionSize;
+  }
+
+  // ─── Auth Token Relay ────────────────────────────────────────
+  function requestAuthToken() {
+    window.addEventListener('message', function handler(event) {
+      if (event.data && event.data.type === 'SF_TOKEN') {
+        authToken = event.data.token;
+        backendUrl = event.data.backendUrl;
+        window.removeEventListener('message', handler);
+        onAuthReady();
+      }
+    });
+
+    // Try parent frames at multiple depths
+    try { window.parent.postMessage({ type: 'REQUEST_SF_TOKEN' }, '*'); } catch(e) {}
+    try { window.parent.parent.postMessage({ type: 'REQUEST_SF_TOKEN' }, '*'); } catch(e) {}
+    try { window.parent.parent.parent.postMessage({ type: 'REQUEST_SF_TOKEN' }, '*'); } catch(e) {}
+
+    // Timeout if no token received
+    setTimeout(function() {
+      if (!authToken) {
+        setState('stateError');
+        setErrorMessage('Could not connect to StudyFlow. Please reload the page.');
+        setStatus('Disconnected', '');
+      }
+    }, AUTH_TIMEOUT);
+  }
+
+  function onAuthReady() {
+    setStatus('Watching for changes', 'active');
+    setState('stateEmpty');
+    // Do an initial text extraction in case there's already content
+    setTimeout(analyzeDocument, 1000);
+  }
+
+  // ─── Document Text Extraction ────────────────────────────────
+  function analyzeDocument() {
+    if (isQuerying || !authToken) return;
+
+    try {
+      window.Asc.plugin.callCommand(function() {
+        var oDocument = Api.GetDocument();
+        var paragraphs = oDocument.GetAllParagraphs();
+        var text = '';
+        for (var i = 0; i < paragraphs.length; i++) {
+          text += paragraphs[i].GetText() + '\n';
+        }
+        return text;
+      }, false, false, function(extractedText) {
+        if (!extractedText || extractedText.trim().length < MIN_TEXT_LENGTH) {
+          if (!hasShownFirstResult) {
+            setState('stateEmpty');
+          }
+          return;
+        }
+        processExtractedText(extractedText.trim());
+      });
+    } catch (err) {
+      console.error('[StudyFlow Assistant] callCommand error:', err);
+    }
+  }
+
+  // ─── Change Detection & Rate Limiting ────────────────────────
+  function processExtractedText(fullText) {
+    var similarity = computeTextSimilarity(lastAnalyzedText, fullText);
+
+    // Skip if text hasn't changed enough
+    if (similarity > (1 - CHANGE_THRESHOLD) && hasShownFirstResult) {
+      return;
+    }
+
+    // Rate limit
+    var now = Date.now();
+    if (now - lastQueryTime < MIN_QUERY_INTERVAL && hasShownFirstResult) {
+      setTimeout(function() {
+        processExtractedText(fullText);
+      }, MIN_QUERY_INTERVAL - (now - lastQueryTime) + 200);
+      return;
+    }
+
+    queryAI(fullText);
+  }
+
+  // ─── AI Query ────────────────────────────────────────────────
+  async function queryAI(fullText) {
+    isQuerying = true;
+    setState('stateLoading');
+    setStatus('Analyzing...', 'loading');
+
+    // Reset conversation if too many queries
+    if (queryCount >= MAX_QUERIES_PER_CONVERSATION) {
+      conversationId = null;
+      queryCount = 0;
+    }
+
+    // Extract context: topic (first ~200 chars) + recent writing (last ~500 chars)
+    var topicContext = fullText.slice(0, 200);
+    var recentWriting = fullText.length > 500 ? fullText.slice(-500) : fullText;
+
+    var message = 'I am writing a document and need help from my study notes. ' +
+      'Here is the beginning/topic of my document: "' + topicContext + '"';
+
+    if (fullText.length > 200) {
+      message += ' And here is what I am currently writing: "' + recentWriting + '"';
+    }
+
+    message += ' Based on my uploaded notes, what relevant information, key points, ' +
+      'definitions, or facts should I consider including? Be concise and specific. ' +
+      'Mention which notes the information comes from.';
+
+    var requestBody = { message: message };
+    if (conversationId) {
+      requestBody.conversation_id = conversationId;
+    }
+
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() {
+      controller.abort();
+    }, API_TIMEOUT);
+
+    // Show extended loading message after 10s
+    var slowTimer = setTimeout(function() {
+      document.getElementById('loadingLabel').textContent = 'Taking a bit longer than usual...';
+    }, 10000);
+
+    try {
+      var response = await fetch(backendUrl + '/api/notes/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + authToken
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+      clearTimeout(slowTimer);
+      document.getElementById('loadingLabel').textContent = 'Searching your notes...';
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired — request fresh one
+          authToken = null;
+          isQuerying = false;
+          requestAuthToken();
+          return;
+        }
+        throw new Error('HTTP ' + response.status);
+      }
+
+      var data = await response.json();
+
+      if (data.conversation_id) {
+        conversationId = data.conversation_id;
+      }
+      queryCount++;
+
+      lastAnalyzedText = fullText;
+      lastQueryTime = Date.now();
+      hasShownFirstResult = true;
+
+      // Check if response indicates no notes
+      var sources = data.sources || [];
+      var hasNotes = sources.length > 0 ||
+        (data.response && !data.response.toLowerCase().includes("don't have any notes") &&
+         !data.response.toLowerCase().includes("no notes found") &&
+         !data.response.toLowerCase().includes("haven't uploaded"));
+
+      if (!hasNotes && sources.length === 0) {
+        setState('stateNoNotes');
+        setStatus('No notes found', 'active');
+      } else {
+        renderSuggestions(data.response, sources);
+        setState('stateSuggestions');
+        setStatus('Updated just now', 'active');
+      }
+
+    } catch (err) {
+      clearTimeout(timeoutId);
+      clearTimeout(slowTimer);
+      document.getElementById('loadingLabel').textContent = 'Searching your notes...';
+      console.error('[StudyFlow Assistant] Query error:', err);
+
+      if (err.name === 'AbortError') {
+        setErrorMessage('Request timed out. Will retry on next edit.');
+      } else {
+        setErrorMessage('Could not reach StudyFlow AI. Will retry on next edit.');
+      }
+
+      // Only show error if we haven't shown results yet
+      if (!hasShownFirstResult) {
+        setState('stateError');
+      }
+      setStatus('Retry on next edit', '');
+    } finally {
+      isQuerying = false;
+    }
+  }
+
+  // ─── Render Suggestions ──────────────────────────────────────
+  function renderSuggestions(responseText, sources) {
+    var container = document.getElementById('suggestionsContent');
+    container.innerHTML = '';
+
+    // Main AI response card
+    var card = document.createElement('div');
+    card.className = 'suggestion-card';
+    card.innerHTML =
+      '<div class="suggestion-label">From your notes</div>' +
+      '<div class="suggestion-text">' + formatResponseText(responseText) + '</div>';
+    container.appendChild(card);
+
+    // Source cards
+    if (sources && sources.length > 0) {
+      var section = document.createElement('div');
+      section.className = 'sources-section';
+      section.innerHTML = '<div class="sources-header">Sources</div>';
+
+      for (var i = 0; i < sources.length; i++) {
+        var source = sources[i];
+        var isWiki = source.from_wikipedia && source.wikipedia_url;
+
+        var link = document.createElement('a');
+        link.className = 'source-card';
+        link.target = '_blank';
+        link.rel = 'noopener';
+
+        if (isWiki) {
+          link.href = source.wikipedia_url;
+        } else if (source.note_id) {
+          link.href = 'https://studyflowsuite.com/note-viewer.html?id=' + source.note_id;
+        } else {
+          link.href = '#';
+        }
+
+        var iconType = isWiki ? 'wiki' : 'note';
+        var iconSvg = isWiki
+          ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>'
+          : '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+
+        var filename = source.filename || 'Note';
+        // Clean up Wikipedia suffix
+        if (isWiki) {
+          filename = filename.replace(/\s*-\s*Wikipedia.*$/i, '');
+        }
+
+        var metaText = '';
+        if (isWiki) {
+          metaText = 'Wikipedia';
+        } else if (source.username) {
+          metaText = '@' + source.username;
+          if (source.course_code) metaText += ' \u00B7 ' + source.course_code;
+        } else if (source.course_code) {
+          metaText = source.course_code;
+        }
+
+        link.innerHTML =
+          '<div class="source-icon ' + iconType + '">' + iconSvg + '</div>' +
+          '<div class="source-info">' +
+            '<div class="source-name">' + escapeHtml(filename) + '</div>' +
+            (metaText ? '<div class="source-meta">' + escapeHtml(metaText) + '</div>' : '') +
+          '</div>' +
+          '<div class="source-badge">View</div>';
+
+        section.appendChild(link);
+      }
+
+      container.appendChild(section);
+    }
+  }
+
+  // ─── Plugin Lifecycle ────────────────────────────────────────
+  window.Asc.plugin.init = function() {
+    requestAuthToken();
+  };
+
+  window.Asc.plugin.button = function() {};
+
+  window.Asc.plugin.onExternalMouseUp = function() {};
+
+  window.Asc.plugin.onMethodReturn = function() {};
+
+  // Fires when cursor position changes (typing, clicking, navigation)
+  window.Asc.plugin.event_onTargetPositionChanged = function() {
+    if (!authToken) return;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(analyzeDocument, DEBOUNCE_DELAY);
+  };
+</script>
+</body>
+</html>
