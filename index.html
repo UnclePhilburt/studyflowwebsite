@@ -370,6 +370,13 @@
       border-color: rgba(124, 152, 133, 0.35);
       color: #7c9885;
       transform: translateY(-1px);
+      cursor: pointer;
+    }
+
+    .feature-pill.active {
+      background: rgba(124, 152, 133, 0.12);
+      border-color: rgba(124, 152, 133, 0.4);
+      color: #7c9885;
     }
 
     .feature-pill svg {
@@ -381,6 +388,33 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       flex-shrink: 0;
+    }
+
+    .feature-detail {
+      max-width: 480px;
+      text-align: center;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.4s ease;
+      margin-top: 0;
+    }
+
+    .feature-detail.visible {
+      max-height: 120px;
+      opacity: 1;
+      margin-top: 8px;
+    }
+
+    .feature-detail-text {
+      font-size: 13px;
+      color: #5a5a5a;
+      line-height: 1.6;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
     }
 
     /* Info Text */
@@ -901,30 +935,33 @@
 
           <!-- Feature Pills -->
           <div class="feature-pills">
-            <div class="feature-pill">
+            <div class="feature-pill" onclick="toggleFeature('chat')">
               <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               AI Chat
             </div>
-            <div class="feature-pill">
+            <div class="feature-pill" onclick="toggleFeature('nexus')">
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
               Nexus Library
             </div>
-            <div class="feature-pill">
+            <div class="feature-pill" onclick="toggleFeature('office')">
               <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
               Private Office
             </div>
-            <div class="feature-pill">
+            <div class="feature-pill" onclick="toggleFeature('assistant')">
               <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
               AI Writing Assistant
             </div>
-            <div class="feature-pill">
+            <div class="feature-pill" onclick="toggleFeature('pdf')">
               <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               PDF Editor
             </div>
-            <div class="feature-pill">
+            <div class="feature-pill" onclick="toggleFeature('upload')">
               <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               Note Upload
             </div>
+          </div>
+          <div class="feature-detail" id="featureDetail">
+            <div class="feature-detail-text" id="featureDetailText"></div>
           </div>
         </div>
 
@@ -1009,6 +1046,39 @@
   </div>
 
   <script>
+    // Feature pill descriptions
+    var featureDescriptions = {
+      chat: 'Chat with an AI that actually reads your notes. Ask questions, get explanations, and study with answers grounded in your own coursework -- not generic responses.',
+      nexus: 'Browse and download notes shared by students across universities. Filter by school and course, and contribute to a growing knowledge network.',
+      office: 'Create and edit Word documents, spreadsheets, and presentations right in your browser. Everything saves securely to your personal cloud storage.',
+      assistant: 'An AI sidebar built into the document editor that automatically surfaces relevant information from your notes as you write essays and reports.',
+      pdf: 'View, annotate, and edit PDFs directly in the browser. Highlight text, add notes, insert pages, and manage your study materials.',
+      upload: 'Upload PDFs, images, Word docs, or text files. StudyFlow processes and indexes everything so the AI can reference your actual material.'
+    };
+    var activeFeature = null;
+
+    function toggleFeature(key) {
+      var detail = document.getElementById('featureDetail');
+      var text = document.getElementById('featureDetailText');
+      var pills = document.querySelectorAll('.feature-pill');
+
+      if (activeFeature === key) {
+        detail.classList.remove('visible');
+        pills.forEach(function(p) { p.classList.remove('active'); });
+        activeFeature = null;
+        return;
+      }
+
+      text.textContent = featureDescriptions[key];
+      detail.classList.add('visible');
+      activeFeature = key;
+
+      var keys = Object.keys(featureDescriptions);
+      pills.forEach(function(p, i) {
+        p.classList.toggle('active', keys[i] === key);
+      });
+    }
+
     const supabaseClient = window.supabase.createClient(
       'https://mxddgbpxjoltaimftpmn.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
