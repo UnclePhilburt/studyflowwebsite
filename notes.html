@@ -2864,9 +2864,18 @@
         const isOwner = note.user_id === currentUserId;
         const isPdf = fileExt === 'pdf';
 
+        console.log('[ANNOTATE DEBUG] fileExt:', fileExt);
+        console.log('[ANNOTATE DEBUG] isPdf:', isPdf);
+        console.log('[ANNOTATE DEBUG] note.user_id:', note.user_id);
+        console.log('[ANNOTATE DEBUG] currentUserId:', currentUserId);
+        console.log('[ANNOTATE DEBUG] isOwner:', isOwner);
+        console.log('[ANNOTATE DEBUG] annotateBtn element:', annotateBtn);
+
         if (isPdf && isOwner) {
+          console.log('[ANNOTATE DEBUG] SHOWING button');
           annotateBtn.style.display = 'inline-block';
         } else {
+          console.log('[ANNOTATE DEBUG] HIDING button - isPdf:', isPdf, 'isOwner:', isOwner);
           annotateBtn.style.display = 'none';
         }
 
