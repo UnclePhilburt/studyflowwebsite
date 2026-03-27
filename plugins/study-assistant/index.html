@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyFlow Assistant</title>
   <script type="text/javascript" src="https://onlyoffice.github.io/sdkjs-plugins/v1/plugins.js"></script>
+  <script type="text/javascript">
+    // Fallback: if plugins.js was blocked by CSP, create minimal Asc structure
+    if (typeof window.Asc === 'undefined') {
+      window.Asc = window.Asc || {};
+      window.Asc.plugin = window.Asc.plugin || {};
+    }
+  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -884,22 +891,37 @@
   }
 
   // ─── Plugin Lifecycle ────────────────────────────────────────
-  window.Asc.plugin.init = function() {
-    requestAuthToken();
-  };
+  function registerPluginHandlers() {
+    window.Asc.plugin.init = function() {
+      requestAuthToken();
+    };
 
-  window.Asc.plugin.button = function() {};
+    window.Asc.plugin.button = function() {};
 
-  window.Asc.plugin.onExternalMouseUp = function() {};
+    window.Asc.plugin.onExternalMouseUp = function() {};
 
-  window.Asc.plugin.onMethodReturn = function() {};
+    window.Asc.plugin.onMethodReturn = function() {};
 
-  // Fires when cursor position changes (typing, clicking, navigation)
-  window.Asc.plugin.event_onTargetPositionChanged = function() {
-    if (!authToken) return;
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(analyzeDocument, DEBOUNCE_DELAY);
-  };
+    // Fires when cursor position changes (typing, clicking, navigation)
+    window.Asc.plugin.event_onTargetPositionChanged = function() {
+      if (!authToken) return;
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(analyzeDocument, DEBOUNCE_DELAY);
+    };
+  }
+
+  // Wait for OnlyOffice plugin API, then register handlers
+  (function waitForPluginApi() {
+    if (window.Asc && window.Asc.plugin && window.Asc.plugin.callCommand) {
+      registerPluginHandlers();
+    } else if (window.Asc && window.Asc.plugin) {
+      // API object exists but not fully initialized — register handlers
+      // and trust that OnlyOffice will call init() when ready
+      registerPluginHandlers();
+    } else {
+      setTimeout(waitForPluginApi, 100);
+    }
+  })();
 </script>
 </body>
 </html>
