@@ -801,7 +801,7 @@
       'definitions, or facts should I consider including? Be concise and specific. ' +
       'Mention which notes the information comes from.';
 
-    var requestBody = { message: message, search_scope: searchScope };
+    var requestBody = { message: message, search_scope: searchScope, source: 'plugin' };
     if (conversationId) {
       requestBody.conversation_id = conversationId;
     }
