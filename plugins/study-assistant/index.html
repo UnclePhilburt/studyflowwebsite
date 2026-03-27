@@ -92,6 +92,42 @@
       font-weight: 400;
     }
 
+    /* Scope toggle */
+    .scope-toggle {
+      display: flex;
+      padding: 10px 20px 8px;
+      gap: 4px;
+      background: rgba(248, 247, 244, 0.8);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.08);
+    }
+
+    .scope-btn {
+      flex: 1;
+      padding: 6px 12px;
+      border: 1.5px solid rgba(124, 152, 133, 0.15);
+      border-radius: 8px;
+      background: transparent;
+      color: #9ca3af;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+    }
+
+    .scope-btn:hover {
+      border-color: rgba(124, 152, 133, 0.3);
+      color: #6b7280;
+    }
+
+    .scope-btn.active {
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      border-color: #7c9885;
+      color: white;
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.25);
+    }
+
     /* Status indicator */
     .status-bar {
       padding: 8px 20px;
@@ -466,6 +502,12 @@
     <div class="header-subtitle">AI suggestions from your notes</div>
   </div>
 
+  <!-- Scope toggle -->
+  <div class="scope-toggle">
+    <button class="scope-btn active" id="scopePersonal" onclick="setScope('personal')">My Notes</button>
+    <button class="scope-btn" id="scopeNexus" onclick="setScope('all')">Nexus</button>
+  </div>
+
   <!-- Status bar -->
   <div class="status-bar" id="statusBar">
     <div class="status-dot" id="statusDot"></div>
@@ -551,6 +593,7 @@
   var debounceTimer = null;
   var isQuerying = false;
   var hasShownFirstResult = false;
+  var searchScope = 'personal'; // 'personal' or 'all'
 
   // ─── UI State Management ─────────────────────────────────────
   function setState(stateId) {
@@ -571,6 +614,23 @@
 
   function setErrorMessage(msg) {
     document.getElementById('errorMessage').textContent = msg;
+  }
+
+  // ─── Scope Toggle ────────────────────────────────────────────
+  function setScope(scope) {
+    searchScope = scope;
+    document.getElementById('scopePersonal').classList.toggle('active', scope === 'personal');
+    document.getElementById('scopeNexus').classList.toggle('active', scope === 'all');
+
+    // Reset conversation and re-query with new scope
+    conversationId = null;
+    queryCount = 0;
+    lastAnalyzedText = '';
+    hasShownFirstResult = false;
+
+    if (authToken) {
+      analyzeDocument();
+    }
   }
 
   // ─── Text Utilities ──────────────────────────────────────────
@@ -741,7 +801,7 @@
       'definitions, or facts should I consider including? Be concise and specific. ' +
       'Mention which notes the information comes from.';
 
-    var requestBody = { message: message };
+    var requestBody = { message: message, search_scope: searchScope };
     if (conversationId) {
       requestBody.conversation_id = conversationId;
     }
