@@ -340,6 +340,49 @@
       flex-shrink: 0;
     }
 
+    /* Feature Pills */
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 560px;
+      animation: fadeIn 1.2s ease 0.8s both;
+    }
+
+    .feature-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(124, 152, 133, 0.18);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #5a5a5a;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s;
+    }
+
+    .feature-pill:hover {
+      background: rgba(255, 255, 255, 0.75);
+      border-color: rgba(124, 152, 133, 0.35);
+      color: #7c9885;
+      transform: translateY(-1px);
+    }
+
+    .feature-pill svg {
+      width: 14px;
+      height: 14px;
+      stroke: #7c9885;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
     /* Info Text */
     .info-text {
       margin-top: 30px;
@@ -743,6 +786,15 @@
         display: none; /* Hide arrows on mobile for cleaner look */
       }
 
+      .feature-pills {
+        gap: 8px;
+      }
+
+      .feature-pill {
+        font-size: 11px;
+        padding: 5px 11px;
+      }
+
       .info-text {
         margin-top: 30px;
         padding: 0 15px;
@@ -845,6 +897,34 @@
           <!-- Center Tagline -->
           <div class="brain-tagline">
             Your notes connect with others, forming a growing network that helps everyone learn
+          </div>
+
+          <!-- Feature Pills -->
+          <div class="feature-pills">
+            <div class="feature-pill">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              AI Chat
+            </div>
+            <div class="feature-pill">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              Nexus Library
+            </div>
+            <div class="feature-pill">
+              <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+              Private Office
+            </div>
+            <div class="feature-pill">
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              AI Writing Assistant
+            </div>
+            <div class="feature-pill">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              PDF Editor
+            </div>
+            <div class="feature-pill">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Note Upload
+            </div>
           </div>
         </div>
 
