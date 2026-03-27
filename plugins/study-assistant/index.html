@@ -20,16 +20,25 @@
       background: #f8f7f4;
       color: #2d2d2d;
       height: 100vh;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden;
       font-size: 13px;
       line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Scrollable content area */
+    .content-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* Scrollbar */
-    body::-webkit-scrollbar { width: 4px; }
-    body::-webkit-scrollbar-track { background: transparent; }
-    body::-webkit-scrollbar-thumb { background: rgba(124, 152, 133, 0.25); border-radius: 4px; }
+    .content-scroll::-webkit-scrollbar { width: 4px; }
+    .content-scroll::-webkit-scrollbar-track { background: transparent; }
+    .content-scroll::-webkit-scrollbar-thumb { background: rgba(124, 152, 133, 0.25); border-radius: 4px; }
 
     /* State containers */
     .state { display: none; padding: 24px 20px; }
@@ -463,6 +472,8 @@
     <span id="statusText">Connecting...</span>
   </div>
 
+  <div class="content-scroll">
+
   <!-- State: Initializing -->
   <div class="state state-initializing active" id="stateInitializing">
     <div class="spinner"></div>
@@ -517,6 +528,8 @@
     <h3>Something went wrong</h3>
     <p id="errorMessage">Could not connect to StudyFlow. Will retry on next edit.</p>
   </div>
+
+  </div><!-- end content-scroll -->
 
 <script>
   // ─── Configuration ───────────────────────────────────────────
