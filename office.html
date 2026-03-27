@@ -66,151 +66,128 @@
     .container {
       position: relative;
       z-index: 1;
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 60px 48px 120px;
+      padding: 80px 48px 120px;
+      min-height: 100vh;
     }
 
-    /* Hero Section */
-    .hero {
-      text-align: center;
-      padding: 40px 0 60px;
-      animation: fadeInUp 0.8s ease-out;
-    }
-
-    .hero h1 {
-      font-family: 'Lora', Georgia, serif;
-      font-size: 3.5rem;
-      font-weight: 600;
-      color: #2d2d2d;
-      letter-spacing: -0.03em;
-      margin-bottom: 16px;
-      line-height: 1.1;
-    }
-
-    .hero p {
-      font-size: 17px;
-      color: #6b7280;
-      font-weight: 400;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
-
-    /* Create New Section */
-    .create-section {
-      margin: 60px 0;
-      animation: fadeInUp 0.8s ease-out 0.2s both;
-    }
-
-    .create-label {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #9ca3af;
-      margin-bottom: 24px;
-      text-align: center;
-    }
-
-    .create-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      max-width: 920px;
-      margin: 0 auto;
-    }
-
-    .create-card {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(20px);
-      border: 2px solid rgba(124, 152, 133, 0.12);
-      border-radius: 20px;
-      padding: 32px 28px;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .create-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: left 0.5s;
-    }
-
-    .create-card:hover::before {
-      left: 100%;
-    }
-
-    .create-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 20px 40px rgba(124, 152, 133, 0.15);
-      border-color: rgba(124, 152, 133, 0.3);
-      background: rgba(255, 255, 255, 0.95);
-    }
-
-    .create-card-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 16px;
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6a8573 100%);
+      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 12px 48px rgba(124, 152, 133, 0.4);
+    }
+
+    .fab.active {
+      transform: rotate(45deg);
+    }
+
+    .fab svg {
+      width: 32px;
+      height: 32px;
+      stroke: white;
+      transition: transform 0.4s;
+    }
+
+    /* Radial Menu */
+    .radial-menu {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      z-index: 99;
+      pointer-events: none;
+    }
+
+    .radial-item {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: scale(0);
+      pointer-events: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .radial-menu.active .radial-item {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: all;
+    }
+
+    .radial-item:hover {
+      transform: scale(1.15);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+    }
+
+    .radial-item.docx {
+      background: linear-gradient(135deg, #4285f4 0%, #3b78e7 100%);
+      bottom: 140px;
+      right: 5px;
+      transition-delay: 0.1s;
+    }
+
+    .radial-item.xlsx {
+      background: linear-gradient(135deg, #34a853 0%, #2d9248 100%);
+      bottom: 100px;
+      right: 100px;
+      transition-delay: 0.15s;
+    }
+
+    .radial-item.pptx {
+      background: linear-gradient(135deg, #ea4335 0%, #d63c2f 100%);
+      bottom: 30px;
+      right: 140px;
+      transition-delay: 0.2s;
+    }
+
+    .radial-item-label {
+      font-size: 11px;
       font-weight: 700;
-      color: #fff;
+      color: white;
       text-transform: uppercase;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.05em;
     }
 
-    .create-card:hover .create-card-icon {
-      transform: scale(1.1) rotateY(10deg);
-    }
-
-    .create-card-icon.docx { background: linear-gradient(135deg, #4285f4 0%, #3b78e7 100%); }
-    .create-card-icon.xlsx { background: linear-gradient(135deg, #34a853 0%, #2d9248 100%); }
-    .create-card-icon.pptx { background: linear-gradient(135deg, #ea4335 0%, #d63c2f 100%); }
-
-    .create-card-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .create-card-desc {
-      font-size: 13px;
-      color: #9ca3af;
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    /* Document Gallery */
+    /* Document Gallery - Polaroid Style */
     .gallery-section {
-      margin-top: 80px;
+      margin-top: 0;
       animation: fadeInUp 0.8s ease-out 0.4s both;
     }
 
     .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 32px;
+      text-align: center;
+      margin-bottom: 60px;
     }
 
     .section-title {
       font-family: 'Lora', Georgia, serif;
-      font-size: 1.75rem;
-      font-weight: 600;
+      font-size: 2.2rem;
+      font-weight: 400;
       color: #2d2d2d;
       letter-spacing: -0.02em;
     }
@@ -222,23 +199,33 @@
     }
 
     .doc-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: center;
+      padding: 40px 0;
     }
 
     .doc-card {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(15px);
-      border: 1.5px solid rgba(124, 152, 133, 0.12);
-      border-radius: 18px;
-      padding: 28px;
+      background: white;
+      border-radius: 4px;
+      padding: 16px 16px 60px 16px;
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.06);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
       animation: fadeInUp 0.6s ease-out both;
+      width: 280px;
+      transform-origin: center center;
     }
+
+    /* Polaroid scatter effect - slight rotations */
+    .doc-card:nth-child(6n+1) { transform: rotate(-3deg); }
+    .doc-card:nth-child(6n+2) { transform: rotate(2deg); }
+    .doc-card:nth-child(6n+3) { transform: rotate(-1deg); }
+    .doc-card:nth-child(6n+4) { transform: rotate(1deg); }
+    .doc-card:nth-child(6n+5) { transform: rotate(-2deg); }
+    .doc-card:nth-child(6n+6) { transform: rotate(2deg); }
 
     .doc-card:nth-child(1) { animation-delay: 0.1s; }
     .doc-card:nth-child(2) { animation-delay: 0.15s; }
@@ -248,10 +235,9 @@
     .doc-card:nth-child(6) { animation-delay: 0.35s; }
 
     .doc-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 16px 40px rgba(124, 152, 133, 0.14);
-      border-color: rgba(124, 152, 133, 0.25);
-      background: rgba(255, 255, 255, 0.9);
+      transform: rotate(0deg) translateY(-12px) scale(1.05);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.12);
+      z-index: 10;
     }
 
     .doc-card-icon {
@@ -360,47 +346,52 @@
       stroke-linejoin: round;
     }
 
-    /* Empty State */
+    /* Empty State - Haiku Style */
     .empty-state {
       text-align: center;
-      padding: 120px 32px;
+      padding: 160px 32px;
       animation: fadeInUp 0.8s ease-out;
+      max-width: 500px;
+      margin: 0 auto;
     }
 
     .empty-state-icon {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 32px;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 48px;
       position: relative;
+      opacity: 0.3;
     }
 
     .empty-state-icon svg {
       width: 100%;
       height: 100%;
-      stroke: #d1d5db;
+      stroke: #7c9885;
       fill: none;
       stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
-      opacity: 0.6;
       animation: float 6s ease-in-out infinite;
     }
 
     .empty-state h3 {
       font-family: 'Lora', Georgia, serif;
-      font-size: 2rem;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 16px;
-      letter-spacing: -0.02em;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: #7c9885;
+      margin-bottom: 32px;
+      letter-spacing: 0.02em;
+      line-height: 2;
+      font-style: italic;
     }
 
     .empty-state p {
-      color: #9ca3af;
-      font-size: 16px;
+      color: #b0b0b0;
+      font-size: 13px;
       max-width: 480px;
       margin: 0 auto 40px;
       line-height: 1.7;
+      opacity: 0.7;
     }
 
     .empty-state-cta {
@@ -626,13 +617,19 @@
       .top-nav { display: none; }
       .bottom-tab-bar { display: flex; }
       body { padding-bottom: 64px; }
-      .container { padding: 32px 20px 80px; }
-      .hero h1 { font-size: 2.5rem; }
-      .hero { padding: 20px 0 40px; }
-      .create-grid { grid-template-columns: 1fr; }
-      .doc-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-      .gallery-section { margin-top: 60px; }
-      .section-title { font-size: 1.5rem; }
+      .container { padding: 60px 20px 100px; }
+      .doc-grid { gap: 24px; }
+      .doc-card { width: 240px; }
+      .gallery-section { margin-top: 0; }
+      .section-title { font-size: 1.8rem; }
+      .fab { bottom: 88px; right: 24px; width: 60px; height: 60px; }
+      .fab svg { width: 28px; height: 28px; }
+      .radial-menu { bottom: 88px; right: 24px; }
+      .radial-item { width: 52px; height: 52px; }
+      .radial-item.docx { bottom: 120px; right: 4px; }
+      .radial-item.xlsx { bottom: 85px; right: 85px; }
+      .radial-item.pptx { bottom: 25px; right: 120px; }
+      .empty-state { padding: 100px 24px; }
     }
   </style>
 </head>
@@ -671,34 +668,28 @@
     </div>
   </div>
 
-  <div class="container">
-    <!-- Hero Section -->
-    <div class="hero">
-      <h1>Your Private Office</h1>
-      <p>Create and edit documents, spreadsheets, and presentations with elegant simplicity.</p>
-    </div>
+  <!-- Floating Action Button -->
+  <button class="fab" id="fabBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
 
-    <!-- Create New Section -->
-    <div class="create-section">
-      <div class="create-label">Create New</div>
-      <div class="create-grid">
-        <div class="create-card" onclick="createDocument('docx')">
-          <div class="create-card-icon docx">DOCX</div>
-          <div class="create-card-title">Document</div>
-          <div class="create-card-desc">Rich text documents for essays, notes, and reports</div>
-        </div>
-        <div class="create-card" onclick="createDocument('xlsx')">
-          <div class="create-card-icon xlsx">XLSX</div>
-          <div class="create-card-title">Spreadsheet</div>
-          <div class="create-card-desc">Organize data, create tables, and perform calculations</div>
-        </div>
-        <div class="create-card" onclick="createDocument('pptx')">
-          <div class="create-card-icon pptx">PPTX</div>
-          <div class="create-card-title">Presentation</div>
-          <div class="create-card-desc">Beautiful slides for presentations and pitches</div>
-        </div>
-      </div>
+  <!-- Radial Menu -->
+  <div class="radial-menu" id="radialMenu">
+    <div class="radial-item docx" onclick="createDocument('docx')">
+      <span class="radial-item-label">Doc</span>
     </div>
+    <div class="radial-item xlsx" onclick="createDocument('xlsx')">
+      <span class="radial-item-label">Sheet</span>
+    </div>
+    <div class="radial-item pptx" onclick="createDocument('pptx')">
+      <span class="radial-item-label">Slides</span>
+    </div>
+  </div>
+
+  <div class="container">
 
     <!-- Loading State -->
     <div id="loadingState" class="loading-state">
@@ -710,15 +701,11 @@
     <div id="emptyState" class="empty-state" style="display: none;">
       <div class="empty-state-icon">
         <svg viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-          <line x1="12" y1="9" x2="12" y2="9"/>
+          <circle cx="12" cy="12" r="10"/>
         </svg>
       </div>
-      <h3>Your canvas awaits</h3>
-      <p>Begin your creative journey by choosing a document type above. Every great idea starts with a blank page.</p>
+      <h3>Blank page awaits<br/>Ideas flow like gentle streams<br/>Create and begin</h3>
+      <p>Touch the circle below to start your journey</p>
     </div>
 
     <!-- Document Gallery -->
@@ -808,6 +795,24 @@
     await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
   }
+
+  // FAB and Radial Menu
+  const fabBtn = document.getElementById('fabBtn');
+  const radialMenu = document.getElementById('radialMenu');
+
+  fabBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fabBtn.classList.toggle('active');
+    radialMenu.classList.toggle('active');
+  });
+
+  // Close radial menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!fabBtn.contains(e.target) && !radialMenu.contains(e.target)) {
+      fabBtn.classList.remove('active');
+      radialMenu.classList.remove('active');
+    }
+  });
 
   async function loadDocuments() {
     const loadingEl = document.getElementById('loadingState');
