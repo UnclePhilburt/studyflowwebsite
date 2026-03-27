@@ -530,6 +530,15 @@
 
         const metaData = await metaRes.json();
 
+        // Check if user owns this note - annotation only allowed for own notes
+        if (!metaData.note.is_owner) {
+          document.getElementById('loading-text').textContent = 'Access denied - You can only annotate your own notes';
+          setTimeout(() => {
+            window.location.href = `note-viewer.html?id=${noteId}`;
+          }, 2000);
+          return;
+        }
+
         // Check if this is an office document - redirect to office editor
         const fileType = metaData.note.file_type;
         if (fileType === 'docx' || fileType === 'xlsx' || fileType === 'pptx') {
