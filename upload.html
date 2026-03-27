@@ -326,55 +326,26 @@
       display: none;
     }
 
-    /* Course Info Toggle */
-    .course-info-toggle {
-      text-align: center;
-      margin-top: 24px;
-    }
-
-    .toggle-link {
-      color: #7c9885;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-    }
-
-    .toggle-link:hover {
-      color: #6b8575;
-      border-bottom-color: #7c9885;
-    }
-
     /* Course Info Form */
     .course-info {
-      max-height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      margin-top: 0;
-    }
-
-    .course-info.active {
-      max-height: 400px;
-      opacity: 1;
-      margin-top: 32px;
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
     }
 
     .course-form {
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0%, rgba(248, 246, 243, 0.5) 100%);
-      border-radius: 16px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(248, 246, 243, 0.9) 100%);
+      border-radius: 20px;
       padding: 32px;
-      border: 2px solid rgba(124, 152, 133, 0.1);
+      border: 2px solid rgba(124, 152, 133, 0.25);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.08);
     }
 
     .course-form-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       color: #2d2d2d;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       text-align: center;
+      letter-spacing: -0.02em;
     }
 
     .form-grid {
@@ -1128,6 +1099,38 @@
     <!-- Upload Progress -->
     <div class="upload-progress" id="upload-progress"></div>
 
+    <!-- Course Info (Now mandatory and shown first) -->
+    <div class="course-info active" id="course-info" style="margin-bottom: 40px;">
+      <div class="course-form">
+        <div class="course-form-title">Course Details (Required)</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">University <span style="color: #e89b5f;">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input type="text" class="form-input" id="university-input" placeholder="Start typing your university..." autocomplete="off" required>
+              <div class="autocomplete-dropdown" id="university-dropdown"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Course Code <span style="color: #e89b5f;">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input type="text" class="form-input" id="course-code-input" placeholder="e.g. CS 101, BIO 201..." autocomplete="off" required>
+              <div class="autocomplete-dropdown" id="course-dropdown"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Professor</label>
+            <input type="text" class="form-input" id="professor-input" placeholder="Dr. Smith">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester</label>
+            <input type="text" class="form-input" id="semester-input" placeholder="Fall 2024">
+          </div>
+        </div>
+        <p class="form-note">Required fields help categorize your notes and match them with students in the same class</p>
+      </div>
+    </div>
+
     <!-- Upload Zone -->
     <div class="upload-zone" id="upload-zone">
       <div class="upload-icon">
@@ -1160,42 +1163,6 @@
         <div class="batch-summary-text">
           Uploading <span class="batch-summary-count" id="batch-count">0</span> files
         </div>
-      </div>
-
-      <div class="course-info-toggle">
-        <a class="toggle-link" id="toggle-course-info">Add course information (optional)</a>
-      </div>
-    </div>
-
-    <!-- Course Info (Hidden by default) -->
-    <div class="course-info" id="course-info">
-      <div class="course-form">
-        <div class="course-form-title">Course Details</div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">University</label>
-            <div class="autocomplete-wrapper">
-              <input type="text" class="form-input" id="university-input" placeholder="Start typing your university..." autocomplete="off">
-              <div class="autocomplete-dropdown" id="university-dropdown"></div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Course Code</label>
-            <div class="autocomplete-wrapper">
-              <input type="text" class="form-input" id="course-code-input" placeholder="e.g. CS 101, BIO 201..." autocomplete="off">
-              <div class="autocomplete-dropdown" id="course-dropdown"></div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Professor</label>
-            <input type="text" class="form-input" id="professor-input" placeholder="Dr. Smith">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Semester</label>
-            <input type="text" class="form-input" id="semester-input" placeholder="Fall 2024">
-          </div>
-        </div>
-        <p class="form-note">Adding course info helps match you with notes from the same class in the Nexus</p>
       </div>
     </div>
 
@@ -1395,19 +1362,8 @@
       }
     }
 
-    // Course info toggle
-    const toggleCourseInfo = document.getElementById('toggle-course-info');
+    // Stop propagation on course info form so clicking inside doesn't trigger file upload
     const courseInfo = document.getElementById('course-info');
-    let courseInfoVisible = false;
-
-    toggleCourseInfo.addEventListener('click', (e) => {
-      e.stopPropagation();  // Don't trigger file upload
-      courseInfoVisible = !courseInfoVisible;
-      courseInfo.classList.toggle('active');
-      toggleCourseInfo.textContent = courseInfoVisible ? 'Hide course information' : 'Add course information (optional)';
-    });
-
-    // Stop propagation on course info form itself
     courseInfo.addEventListener('click', (e) => {
       e.stopPropagation();  // Don't trigger file upload when clicking inside form
     });
@@ -1450,6 +1406,28 @@
 
     async function handleFiles(files) {
       if (files.length === 0) return;
+
+      // Validate required fields
+      const university = document.getElementById('university-input').value.trim();
+      const courseCode = document.getElementById('course-code-input').value.trim();
+
+      if (!university || !courseCode) {
+        alert('Please fill in both University and Course Code before uploading files.');
+        // Highlight the empty fields
+        if (!university) {
+          document.getElementById('university-input').style.borderColor = '#e89b5f';
+          setTimeout(() => {
+            document.getElementById('university-input').style.borderColor = '';
+          }, 2000);
+        }
+        if (!courseCode) {
+          document.getElementById('course-code-input').style.borderColor = '#e89b5f';
+          setTimeout(() => {
+            document.getElementById('course-code-input').style.borderColor = '';
+          }, 2000);
+        }
+        return;
+      }
 
       // Show modal if first time uploading
       if (!hasSeenModal) {
