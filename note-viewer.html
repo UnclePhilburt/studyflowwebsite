@@ -728,6 +728,9 @@
         const data = await response.json();
         currentNote = data.note;
 
+        console.log('[DEBUG] Note metadata:', currentNote);
+        console.log('[DEBUG] is_owner:', currentNote.is_owner);
+
         // Update header
         document.getElementById('note-title').textContent = currentNote.filename;
         document.getElementById('note-university').textContent = currentNote.university || 'Unknown University';
@@ -821,8 +824,12 @@
 
               pdfViewer.style.display = 'block';
               // Show Annotate button ONLY if user owns this note
+              console.log('[DEBUG] Checking annotate button visibility. is_owner:', currentNote.is_owner);
               if (currentNote.is_owner) {
-                document.getElementById('annotate-btn').style.display = '';
+                console.log('[DEBUG] Showing annotate button');
+                document.getElementById('annotate-btn').style.display = 'inline-block';
+              } else {
+                console.log('[DEBUG] Hiding annotate button - not owner');
               }
             } catch (error) {
               console.error('Error loading PDF as images:', error);
