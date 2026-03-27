@@ -429,38 +429,7 @@
             </div>
           </div>
 
-          <div class="age-notice">
-            <strong>Why we ask for this information:</strong> Missouri law requires age verification for platforms with AI and user-generated content.
-          </div>
-
-          <div class="form-group">
-            <label for="address">Street Address</label>
-            <input type="text" id="address" placeholder="123 Main St" required>
-            <div class="form-hint">For age verification -- no ID upload required</div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="city">City</label>
-              <input type="text" id="city" placeholder="Springfield" required>
-            </div>
-            <div class="form-group">
-              <label for="state">State</label>
-              <input type="text" id="state" placeholder="MO" required maxlength="2" pattern="[A-Za-z]{2}" style="text-transform: uppercase;">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="zipCode">Zip Code</label>
-              <input type="text" id="zipCode" placeholder="65802" required pattern="[0-9]{5}(-[0-9]{4})?" maxlength="10">
-            </div>
-            <div class="form-group">
-              <label for="birthdate">Date of Birth</label>
-              <input type="date" id="birthdate" required>
-              <div class="form-hint">Must be 18 or older</div>
-            </div>
-          </div>
+          <!-- Address, city, state, zip, and DOB fields temporarily removed -->
         </div>
 
         <!-- Right: Legal Certifications -->
@@ -545,20 +514,11 @@
       }
     });
 
-    // Set max date for birthdate (today)
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('birthdate').setAttribute('max', today);
-
     const signupForm = document.getElementById('signupForm');
     const legalNameInput = document.getElementById('legalName');
     const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
-    const addressInput = document.getElementById('address');
-    const cityInput = document.getElementById('city');
-    const stateInput = document.getElementById('state');
-    const zipCodeInput = document.getElementById('zipCode');
     const passwordInput = document.getElementById('password');
-    const birthdateInput = document.getElementById('birthdate');
     const termsInput = document.getElementById('terms');
     const submitBtn = document.getElementById('submitBtn');
     const errorMessage = document.getElementById('errorMessage');
@@ -582,17 +542,6 @@
       successMessage.style.display = 'none';
     }
 
-    function calculateAge(birthdate) {
-      const today = new Date();
-      const birth = new Date(birthdate);
-      let age = today.getFullYear() - birth.getFullYear();
-      const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-      }
-      return age;
-    }
-
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       hideMessages();
@@ -600,19 +549,14 @@
       const legalName = legalNameInput.value.trim();
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
-      const address = addressInput.value.trim();
-      const city = cityInput.value.trim();
-      const state = stateInput.value.trim().toUpperCase();
-      const zipCode = zipCodeInput.value.trim();
       const password = passwordInput.value;
-      const birthdate = birthdateInput.value;
       const ageGate = document.getElementById('ageGate').checked;
       const aiTransparency = document.getElementById('aiTransparency').checked;
       const noteLicense = document.getElementById('noteLicense').checked;
       const academicIntegrity = document.getElementById('academicIntegrity').checked;
       const terms = termsInput.checked;
 
-      if (!legalName || !username || !email || !address || !city || !state || !zipCode || !password || !birthdate) {
+      if (!legalName || !username || !email || !password) {
         showError('Please fill in all fields');
         return;
       }
@@ -620,13 +564,6 @@
       // Validate username format
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
         showError('Username must be 3-20 characters (letters, numbers, underscores only)');
-        return;
-      }
-
-      // Validate age from birthdate (Missouri SB 1455)
-      const age = calculateAge(birthdate);
-      if (age < 18) {
-        showError('You must be 18 years of age or older to use StudyFlow Suite, as required by Missouri law (SB 1455).');
         return;
       }
 
@@ -667,12 +604,7 @@
             data: {
               full_name: legalName,
               username: username,
-              birthdate: birthdate,
-              legal_name: legalName,
-              address: address,
-              city: city,
-              state: state,
-              zip_code: zipCode
+              legal_name: legalName
             }
           }
         });
