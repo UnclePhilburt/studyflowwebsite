@@ -44,7 +44,126 @@
       background: linear-gradient(180deg, #f8f7f3 0%, #f1ede8 100%);
     }
 
+    /* Navigation Menu Button */
+    .nav-menu-btn {
+      position: fixed;
+      top: 28px;
+      left: 28px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid transparent;
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 99;
+      color: #7c9885;
+      font-size: 18px;
+      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
+      animation: gentleFadeIn 0.8s ease 0.2s forwards;
+      opacity: 0;
+    }
 
+    .nav-menu-btn:hover {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
+      box-shadow: 0 6px 30px rgba(124, 152, 133, 0.2), 0 4px 20px rgba(232, 155, 95, 0.15);
+      transform: translateY(-2px);
+      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
+      color: #d88850;
+    }
+
+    /* Navigation Drawer */
+    .nav-drawer {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 320px;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-right: 2px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 4px 0 24px rgba(124, 152, 133, 0.15);
+      z-index: 1000;
+      transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .nav-drawer.open {
+      left: 0;
+    }
+
+    .nav-drawer-header {
+      padding: 32px 24px 24px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .nav-drawer-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+    }
+
+    .nav-drawer-subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .nav-drawer-links {
+      padding: 16px 0;
+    }
+
+    .nav-drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      color: #5d5d5d;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .nav-drawer-link:hover {
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
+
+    .nav-drawer-link.active {
+      background: rgba(124, 152, 133, 0.12);
+      color: #7c9885;
+      font-weight: 600;
+    }
+
+    .nav-drawer-link svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .nav-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .nav-drawer-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
 
 
 
@@ -1667,6 +1786,15 @@
         display: none !important;
       }
 
+      .nav-menu-btn {
+        display: none !important;
+      }
+
+      .nav-drawer {
+        width: 280px;
+        left: -280px;
+      }
+
 
       .beta-btn {
         display: none !important;
@@ -2206,6 +2334,81 @@
         <polyline points="6 17 11 12 6 7"></polyline>
       </svg>
     </button>
+
+    <!-- Navigation Menu Button -->
+    <button class="nav-menu-btn" id="navMenuBtn" title="Navigation Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Navigation Drawer Overlay -->
+    <div class="nav-drawer-overlay" id="navDrawerOverlay"></div>
+
+    <!-- Navigation Drawer -->
+    <div class="nav-drawer" id="navDrawer">
+      <div class="nav-drawer-header">
+        <div class="nav-drawer-title">StudyFlow Suite</div>
+        <div class="nav-drawer-subtitle">Navigate</div>
+      </div>
+      <div class="nav-drawer-links">
+        <a href="chat.html" class="nav-drawer-link active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          Chat
+        </a>
+        <a href="upload.html" class="nav-drawer-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload
+        </a>
+        <a href="notes.html" class="nav-drawer-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Notes
+        </a>
+        <a href="office.html" class="nav-drawer-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="8" y1="13" x2="16" y2="13"/>
+            <line x1="8" y1="17" x2="12" y2="17"/>
+          </svg>
+          Office
+        </a>
+        <a href="browse.html" class="nav-drawer-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          Nexus
+        </a>
+        <a href="calendar.html" class="nav-drawer-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Calendar
+        </a>
+        <a href="account.html" class="nav-drawer-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Account
+        </a>
+      </div>
+    </div>
 
     <!-- Notification Bell Button -->
     <button class="notif-bell-btn" id="notifBellBtn" title="Notifications">
@@ -3499,6 +3702,30 @@
     notifMarkAll.addEventListener('click', (e) => {
       e.stopPropagation();
       markAllNotifsRead();
+    });
+
+    // Navigation drawer toggle
+    const navMenuBtn = document.getElementById('navMenuBtn');
+    const navDrawer = document.getElementById('navDrawer');
+    const navDrawerOverlay = document.getElementById('navDrawerOverlay');
+
+    navMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navDrawer.classList.add('open');
+      navDrawerOverlay.classList.add('show');
+    });
+
+    navDrawerOverlay.addEventListener('click', () => {
+      navDrawer.classList.remove('open');
+      navDrawerOverlay.classList.remove('show');
+    });
+
+    // Close drawer on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navDrawer.classList.contains('open')) {
+        navDrawer.classList.remove('open');
+        navDrawerOverlay.classList.remove('show');
+      }
     });
 
     notifList.addEventListener('click', (e) => {
