@@ -2216,8 +2216,22 @@
       }
 
       menu.classList.add('active');
-      menu.style.left = event.pageX + 'px';
-      menu.style.top = event.pageY + 'px';
+
+      // Position menu, clamping to viewport so it doesn't go off-screen
+      var menuWidth = menu.offsetWidth || 180;
+      var menuHeight = menu.offsetHeight || 200;
+      var x = event.clientX;
+      var y = event.clientY;
+
+      if (x + menuWidth > window.innerWidth) {
+        x = window.innerWidth - menuWidth - 8;
+      }
+      if (y + menuHeight > window.innerHeight) {
+        y = window.innerHeight - menuHeight - 8;
+      }
+
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
     }
 
     function renameItem() {
