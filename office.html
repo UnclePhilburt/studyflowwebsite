@@ -613,6 +613,59 @@
       transform: translateY(-2px);
     }
 
+    /* Verification Gate */
+    .verification-gate {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 20px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 2px 16px rgba(124, 152, 133, 0.08);
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .gate-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+    }
+
+    .gate-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 1.25rem;
+    }
+
+    .gate-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #5a5a5a;
+      margin-bottom: 2rem;
+    }
+
+    .verify-btn {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(232, 155, 95, 0.95) 100%);
+      color: white;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.2);
+    }
+
+    .verify-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.25);
+    }
+
     @media (max-width: 768px) {
       .top-nav { display: none; }
       .bottom-tab-bar { display: flex; }
@@ -630,6 +683,16 @@
       .radial-item.xlsx { bottom: 85px; right: 85px; }
       .radial-item.pptx { bottom: 25px; right: 120px; }
       .empty-state { padding: 100px 24px; }
+      .verification-gate {
+        padding: 2rem 1.5rem;
+      }
+      .gate-title {
+        font-size: 1.5rem;
+      }
+      .verify-btn {
+        width: 100%;
+        min-height: 44px;
+      }
     }
   </style>
 </head>
@@ -668,28 +731,44 @@
     </div>
   </div>
 
-  <!-- Floating Action Button -->
-  <button class="fab" id="fabBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-  </button>
-
-  <!-- Radial Menu -->
-  <div class="radial-menu" id="radialMenu">
-    <div class="radial-item docx" onclick="createDocument('docx')">
-      <span class="radial-item-label">Doc</span>
-    </div>
-    <div class="radial-item xlsx" onclick="createDocument('xlsx')">
-      <span class="radial-item-label">Sheet</span>
-    </div>
-    <div class="radial-item pptx" onclick="createDocument('pptx')">
-      <span class="radial-item-label">Slides</span>
-    </div>
-  </div>
-
   <div class="container">
+
+    <!-- Verification Gate (shown only if .edu not verified) -->
+    <div class="verification-gate" id="verificationGate" style="display: none;">
+      <div class="gate-icon">🎓</div>
+      <h2 class="gate-title">.edu Email Required</h2>
+      <p class="gate-text">
+        To access the Office suite and create documents, you need to verify a university email address (.edu). This ensures you're part of the educational community using StudyFlow Suite.
+      </p>
+      <p class="gate-text" style="margin-top: 16px; font-size: 14px; color: #7c9885;">
+        Verify your .edu email in Account Settings to unlock Office features.
+      </p>
+      <button class="verify-btn" onclick="window.location.href='account.html'">Go to Account Settings</button>
+    </div>
+
+    <!-- Office Interface (hidden until verified) -->
+    <div id="officeInterface" style="display: none;">
+
+      <!-- Floating Action Button -->
+      <button class="fab" id="fabBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+
+      <!-- Radial Menu -->
+      <div class="radial-menu" id="radialMenu">
+        <div class="radial-item docx" onclick="createDocument('docx')">
+          <span class="radial-item-label">Doc</span>
+        </div>
+        <div class="radial-item xlsx" onclick="createDocument('xlsx')">
+          <span class="radial-item-label">Sheet</span>
+        </div>
+        <div class="radial-item pptx" onclick="createDocument('pptx')">
+          <span class="radial-item-label">Slides</span>
+        </div>
+      </div>
 
     <!-- Loading State -->
     <div id="loadingState" class="loading-state">
@@ -708,15 +787,17 @@
       <p>Touch the circle below to start your journey</p>
     </div>
 
-    <!-- Document Gallery -->
-    <div id="gallerySection" class="gallery-section" style="display: none;">
-      <div class="section-header">
-        <h2 class="section-title">Recent Documents</h2>
-        <span class="doc-count" id="docCount">0 documents</span>
+      <!-- Document Gallery -->
+      <div id="gallerySection" class="gallery-section" style="display: none;">
+        <div class="section-header">
+          <h2 class="section-title">Recent Documents</h2>
+          <span class="doc-count" id="docCount">0 documents</span>
+        </div>
+        <div id="docGrid" class="doc-grid"></div>
       </div>
-      <div id="docGrid" class="doc-grid"></div>
-    </div>
-  </div>
+
+    </div><!-- End officeInterface -->
+  </div><!-- End container -->
 
   <!-- Bottom Tab Bar (Mobile) -->
   <nav class="bottom-tab-bar">
@@ -772,7 +853,32 @@
     document.getElementById('userAvatar').textContent = initial;
     document.getElementById('menuUserEmail').textContent = userEmail;
 
-    await loadDocuments();
+    // Check if user has verified .edu email from user_profiles table
+    try {
+      const { data: profile, error } = await supabaseClient
+        .from('user_profiles')
+        .select('edu_email_verified')
+        .eq('id', session.user.id)
+        .single();
+
+      const isEduVerified = profile?.edu_email_verified === true;
+
+      if (!isEduVerified) {
+        // Show verification gate for non-verified users
+        document.getElementById('verificationGate').style.display = 'block';
+        document.getElementById('officeInterface').style.display = 'none';
+      } else {
+        // Show office interface for verified .edu users
+        document.getElementById('verificationGate').style.display = 'none';
+        document.getElementById('officeInterface').style.display = 'block';
+        await loadDocuments();
+      }
+    } catch (error) {
+      console.error('Error checking .edu verification:', error);
+      // Default to showing verification gate on error
+      document.getElementById('verificationGate').style.display = 'block';
+      document.getElementById('officeInterface').style.display = 'none';
+    }
   }
 
   // Toggle user menu
