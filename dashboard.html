@@ -283,10 +283,15 @@
       padding: 20px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
       transition: all 0.3s ease;
-      cursor: move;
+      cursor: grab;
       min-height: 200px;
       display: flex;
       flex-direction: column;
+      user-select: none;
+    }
+
+    .widget:active {
+      cursor: grabbing;
     }
 
     @media (max-width: 768px) {
@@ -302,7 +307,9 @@
 
     .widget.dragging {
       opacity: 0.5;
-      cursor: grabbing;
+      cursor: grabbing !important;
+      transform: scale(0.95);
+      box-shadow: 0 8px 32px rgba(139, 157, 131, 0.3);
     }
 
     .widget-header {
@@ -1424,6 +1431,13 @@
 
       const isMobile = window.innerWidth <= 768;
 
+      // Add canvas dragover handler for desktop
+      if (!isMobile) {
+        canvas.addEventListener('dragover', (e) => {
+          e.preventDefault();
+        });
+      }
+
       activeWidgets.forEach((widgetId, index) => {
         const widgetDef = WIDGET_TYPES[widgetId];
         if (!widgetDef) return;
@@ -1433,11 +1447,6 @@
         widget.draggable = !isMobile; // Disable dragging on mobile
         widget.dataset.widgetId = widgetId;
         widget.dataset.index = index;
-
-        // Update cursor style for mobile
-        if (isMobile) {
-          widget.style.cursor = 'default';
-        }
 
         widget.innerHTML = `
           <div class="widget-header">
@@ -1454,32 +1463,42 @@
           widget.addEventListener('dragstart', (e) => {
             widget.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', index);
+            e.dataTransfer.setData('text/plain', widgetId);
           });
 
-          widget.addEventListener('dragend', () => {
+          widget.addEventListener('dragend', async () => {
             widget.classList.remove('dragging');
+            // Save new order after drag ends
+            const widgets = Array.from(canvas.querySelectorAll('.widget'));
+            activeWidgets = widgets.map(w => w.dataset.widgetId);
+            await saveWidgets();
           });
 
           widget.addEventListener('dragover', (e) => {
             e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+          });
+
+          widget.addEventListener('dragenter', (e) => {
+            e.preventDefault();
             const dragging = document.querySelector('.dragging');
             if (dragging && dragging !== widget) {
-              const rect = widget.getBoundingClientRect();
-              const midpoint = rect.left + rect.width / 2;
-              if (e.clientX < midpoint) {
-                canvas.insertBefore(dragging, widget);
+              // Get all widgets
+              const allWidgets = Array.from(canvas.querySelectorAll('.widget'));
+              const dragIndex = allWidgets.indexOf(dragging);
+              const targetIndex = allWidgets.indexOf(widget);
+
+              // Insert before or after based on direction
+              if (dragIndex < targetIndex) {
+                widget.parentNode.insertBefore(dragging, widget.nextSibling);
               } else {
-                canvas.insertBefore(dragging, widget.nextSibling);
+                widget.parentNode.insertBefore(dragging, widget);
               }
             }
           });
 
-          widget.addEventListener('drop', async (e) => {
+          widget.addEventListener('drop', (e) => {
             e.preventDefault();
-            const widgets = Array.from(canvas.querySelectorAll('.widget'));
-            activeWidgets = widgets.map(w => w.dataset.widgetId);
-            await saveWidgets();
           });
         }
 
