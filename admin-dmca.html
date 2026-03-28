@@ -508,7 +508,7 @@
 
     // Check for stored key on load
     (function init() {
-      const storedKey = localStorage.getItem(STORAGE_KEY);
+      const storedKey = sessionStorage.getItem(STORAGE_KEY);
       if (storedKey) {
         adminKey = storedKey;
         showDashboard();
@@ -534,7 +534,7 @@
           throw new Error('Auth failed');
         }
         const data = await res.json();
-        localStorage.setItem(STORAGE_KEY, key);
+        sessionStorage.setItem(STORAGE_KEY, key);
         allReports = data.reports || [];
         showDashboard();
         renderReports();
@@ -549,7 +549,7 @@
 
     // Logout
     logoutBtn.addEventListener('click', function() {
-      localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(STORAGE_KEY);
       adminKey = '';
       allReports = [];
       dashboard.style.display = 'none';
@@ -582,7 +582,7 @@
         const res = await fetch(API_BASE + '/api/dmca/reports?key=' + encodeURIComponent(adminKey));
         if (!res.ok) {
           if (res.status === 401 || res.status === 403) {
-            localStorage.removeItem(STORAGE_KEY);
+            sessionStorage.removeItem(STORAGE_KEY);
             adminKey = '';
             dashboard.style.display = 'none';
             authGate.style.display = 'block';

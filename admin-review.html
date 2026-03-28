@@ -351,7 +351,7 @@
 
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
-    let adminKey = localStorage.getItem('studyflow_admin_key') || '';
+    let adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
     let queue = [];
     let currentIndex = 0;
     let isProcessing = false;
@@ -367,7 +367,7 @@
         const res = await fetch(BACKEND_URL + '/admin/review-queue?key=' + encodeURIComponent(adminKey));
         if (!res.ok) {
           if (res.status === 403) {
-            localStorage.removeItem('studyflow_admin_key');
+            sessionStorage.removeItem('studyflow_admin_key');
             window.location.href = 'admin.html';
             return;
           }

@@ -248,8 +248,10 @@
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
 
+    let sessionKey = '';
+
     function getKey() {
-      return localStorage.getItem('studyflow_admin_key') || '';
+      return sessionKey;
     }
 
     async function authenticate() {
@@ -259,7 +261,8 @@
       try {
         const res = await fetch(BACKEND_URL + '/admin/university-stats?key=' + encodeURIComponent(key));
         if (res.ok) {
-          localStorage.setItem('studyflow_admin_key', key);
+          sessionKey = key;
+          sessionStorage.setItem('studyflow_admin_key', key);
           showHub();
         } else {
           document.getElementById('authError').style.display = 'block';
@@ -282,24 +285,14 @@
     }
 
     function logout() {
+      sessionKey = '';
+      sessionStorage.removeItem('studyflow_admin_key');
       localStorage.removeItem('studyflow_admin_key');
       location.reload();
     }
 
-    // Auto-login if key stored
-    (async () => {
-      const key = getKey();
-      if (key) {
-        try {
-          const res = await fetch(BACKEND_URL + '/admin/university-stats?key=' + encodeURIComponent(key));
-          if (res.ok) {
-            showHub();
-            return;
-          }
-        } catch (e) {}
-        localStorage.removeItem('studyflow_admin_key');
-      }
-    })();
+    // No auto-login -- always require key on page load
+    localStorage.removeItem('studyflow_admin_key');
 
     document.getElementById('adminKeyInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') authenticate();
