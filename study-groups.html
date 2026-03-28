@@ -1532,16 +1532,18 @@
       <div class="tab-panel" data-panel="notes">
         <div class="notes-panel-content" id="notesPanelContent">
           <div class="notes-panel-actions">
-            <button class="add-note-btn" id="addNoteBtn">
+            <label class="add-note-btn" for="groupNoteUpload" style="cursor:pointer;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
-              Add Notes
-            </button>
+              Upload Note
+            </label>
+            <input type="file" id="groupNoteUpload" style="display:none;" accept=".pdf,.doc,.docx,.txt,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg">
           </div>
           <div id="notesListContainer">
-            <div class="notes-empty" id="notesEmpty">No shared notes yet. Add your notes to the group.</div>
+            <div class="notes-empty" id="notesEmpty">No shared notes yet. Upload a file to share with the group.</div>
           </div>
         </div>
       </div>
@@ -1565,6 +1567,9 @@
             </div>
           </div>
           <div id="membersListContainer"></div>
+          <div id="leaveGroupSection" style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(124,152,133,0.1); display:none;">
+            <button onclick="leaveGroup()" style="width:100%; padding:10px; background:none; border:1.5px solid rgba(220,38,38,0.3); color:#dc2626; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.2s;">Leave Group</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1620,20 +1625,6 @@
     </div>
   </div>
 
-  <!-- Add notes modal -->
-  <div class="modal-overlay" id="addNotesModal">
-    <div class="modal-card">
-      <div class="modal-title">Add Notes to Group</div>
-      <div class="add-notes-list" id="addNotesList">
-        <div class="loading-center"><div class="spinner"></div></div>
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" id="addNotesCancel">Cancel</button>
-        <button class="modal-btn confirm" id="addNotesConfirm">Add Selected</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Confirm dialog -->
   <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-card">
@@ -1685,8 +1676,7 @@
     const createGroupModal = document.getElementById('createGroupModal');
     const createGroupNameInput = document.getElementById('createGroupNameInput');
     const createGroupConfirm = document.getElementById('createGroupConfirm');
-    const addNotesModal = document.getElementById('addNotesModal');
-    const addNotesList = document.getElementById('addNotesList');
+    // addNotesModal removed - using direct upload now
     const confirmOverlay = document.getElementById('confirmOverlay');
     const confirmTitle = document.getElementById('confirmTitle');
     const confirmMessage = document.getElementById('confirmMessage');
@@ -1924,6 +1914,9 @@
       membersListContainer.querySelectorAll('.member-remove-btn').forEach(btn => {
         btn.addEventListener('click', () => removeMember(btn.dataset.userId));
       });
+
+      // Show leave button for non-owners
+      document.getElementById('leaveGroupSection').style.display = isOwner ? 'none' : 'block';
     }
 
     async function removeMember(userId) {
@@ -1941,22 +1934,21 @@
     // ---- Notes ----
     function renderNotes(notes) {
       if (!notes.length) {
-        notesListContainer.innerHTML = '<div class="notes-empty">No shared notes yet. Add your notes to the group.</div>';
+        notesListContainer.innerHTML = '<div class="notes-empty">No shared notes yet. Upload a file to share with the group.</div>';
         return;
       }
       const isOwner = (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id && m.role === 'owner');
-      const isMember = (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id);
       let html = '';
       notes.forEach(n => {
+        const sizeKB = n.file_size ? Math.round(n.file_size / 1024) : 0;
         html += '<div class="note-item">';
-        html += '<div class="note-item-info">';
-        html += '<div class="note-item-name">' + escapeHtml(n.filename || n.title || 'Untitled') + '</div>';
+        html += '<div class="note-item-info" style="cursor:pointer;" onclick="downloadGroupNote(\'' + n.id + '\')">';
+        html += '<div class="note-item-name">' + escapeHtml(n.filename || 'Untitled') + '</div>';
         html += '<div class="note-item-meta">';
-        if (n.course_code) html += '<span class="course-code">' + escapeHtml(n.course_code) + '</span>';
-        if (n.added_by_username || n.username) html += '<span>Added by ' + escapeHtml(n.added_by_username || n.username) + '</span>';
+        html += '<span>' + sizeKB + ' KB</span>';
+        if (n.added_by) html += '<span>Added by @' + escapeHtml(n.added_by) + '</span>';
         html += '</div>';
         html += '</div>';
-        // Owner or the person who added can remove
         if (isOwner || n.added_by === currentUser.id) {
           html += '<button class="note-remove-btn" data-note-id="' + n.id + '" title="Remove note">';
           html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -1979,56 +1971,68 @@
       });
     }
 
-    // ---- Add notes modal ----
-    async function openAddNotesModal() {
-      addNotesModal.classList.add('show');
-      addNotesList.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+    // ---- Upload note to group ----
+    document.getElementById('groupNoteUpload').addEventListener('change', async function() {
+      const file = this.files[0];
+      if (!file || !currentGroup) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      showToast('Uploading ' + file.name + '...');
+
       try {
-        const data = await apiFetch('/api/groups/' + currentGroup + '/my-notes');
-        const notes = data.notes || data || [];
-        if (!notes.length) {
-          addNotesList.innerHTML = '<div class="notes-empty">You have no notes to add. Upload some notes first.</div>';
-          return;
-        }
-        let html = '';
-        notes.forEach(n => {
-          const disabled = n.already_added ? ' disabled' : '';
-          const checked = n.already_added ? ' checked' : '';
-          html += '<label class="add-note-check-item">';
-          html += '<input type="checkbox" value="' + n.id + '"' + checked + disabled + '>';
-          html += '<div class="add-note-check-label">';
-          html += '<div class="add-note-check-name">' + escapeHtml(n.filename || n.title || 'Untitled') + '</div>';
-          if (n.course_code) html += '<div class="add-note-check-meta">' + escapeHtml(n.course_code) + '</div>';
-          html += '</div>';
-          if (n.already_added) html += '<span class="add-note-already">Added</span>';
-          html += '</label>';
+        const resp = await fetch(BACKEND_URL + '/api/groups/' + currentGroup + '/notes/upload', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + accessToken },
+          body: formData
         });
-        addNotesList.innerHTML = html;
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Upload failed');
+        showToast('Uploaded ' + file.name);
+        await openGroup(currentGroup);
       } catch (e) {
-        addNotesList.innerHTML = '<div class="notes-empty">Could not load notes: ' + escapeHtml(e.message) + '</div>';
+        showToast('Error: ' + e.message);
+      }
+
+      this.value = '';
+    });
+
+    // ---- Download group note ----
+    async function downloadGroupNote(noteId) {
+      try {
+        const data = await apiFetch('/api/groups/' + currentGroup + '/notes/' + noteId + '/download');
+        if (data.url) {
+          const a = document.createElement('a');
+          a.href = data.url;
+          a.download = data.filename || 'download';
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+      } catch (e) {
+        showToast('Error: ' + e.message);
       }
     }
 
-    async function addSelectedNotes() {
-      const checkboxes = addNotesList.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)');
-      if (!checkboxes.length) {
-        addNotesModal.classList.remove('show');
-        return;
-      }
-      let added = 0;
-      for (const cb of checkboxes) {
+    // ---- Leave group ----
+    async function leaveGroup() {
+      showConfirm('Leave Group', 'You will lose access to this group\'s chat and notes. You can be re-invited later.', 'Leave', async () => {
         try {
-          await apiFetch('/api/groups/' + currentGroup + '/notes', {
-            method: 'POST',
-            body: JSON.stringify({ note_id: cb.value })
-          });
-          added++;
+          await apiFetch('/api/groups/' + currentGroup + '/members/' + currentUser.id, { method: 'DELETE' });
+          showToast('Left the group');
+          closeGroup();
         } catch (e) {
-          // skip
+          showToast('Error: ' + e.message);
         }
-      }
-      addNotesModal.classList.remove('show');
-      if (added > 0) {
+      });
+    }
+
+    // placeholder for removed addSelectedNotes
+    async function addSelectedNotes() {
+      // no-op, replaced by direct upload
+      if (false) {
         showToast(added + ' note' + (added === 1 ? '' : 's') + ' added');
         await openGroup(currentGroup);
       }
@@ -2336,10 +2340,6 @@
       if (e.target === createGroupModal) createGroupModal.classList.remove('show');
     });
 
-    addNotesModal.addEventListener('click', (e) => {
-      if (e.target === addNotesModal) addNotesModal.classList.remove('show');
-    });
-
     confirmOverlay.addEventListener('click', (e) => {
       if (e.target === confirmOverlay) hideConfirm();
     });
@@ -2364,13 +2364,6 @@
     });
 
     chatSendBtn.addEventListener('click', sendChatMessage);
-
-    // Add notes
-    document.getElementById('addNoteBtn').addEventListener('click', openAddNotesModal);
-    document.getElementById('addNotesCancel').addEventListener('click', () => {
-      addNotesModal.classList.remove('show');
-    });
-    document.getElementById('addNotesConfirm').addEventListener('click', addSelectedNotes);
 
     // Invite
     document.getElementById('inviteSendBtn').addEventListener('click', inviteByUsername);
@@ -2412,7 +2405,6 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         createGroupModal.classList.remove('show');
-        addNotesModal.classList.remove('show');
         hideConfirm();
       }
     });
