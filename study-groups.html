@@ -1556,24 +1556,45 @@
       <!-- Schedule panel -->
       <div class="tab-panel" data-panel="schedule">
         <div style="padding:16px;overflow-y:auto;flex:1;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#2d2d2d;">Upcoming</div>
-            <button id="addEventBtn" style="padding:6px 14px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Add Event</button>
+          <!-- Calendar header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <button id="calPrev" style="width:32px;height:32px;border:none;background:rgba(124,152,133,0.08);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#7c9885;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div id="calMonthLabel" style="font-size:15px;font-weight:600;color:#2d2d2d;"></div>
+            <button id="calNext" style="width:32px;height:32px;border:none;background:rgba(124,152,133,0.08);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#7c9885;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
-          <div id="addEventForm" style="display:none;background:rgba(255,255,255,0.8);border:1px solid rgba(124,152,133,0.15);border-radius:12px;padding:14px;margin-bottom:16px;">
-            <input type="text" id="eventTitle" placeholder="Event title (e.g. Chapter 5 Review)" style="width:100%;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;color:#2d2d2d;">
-            <div style="display:flex;gap:8px;margin-bottom:8px;">
-              <input type="date" id="eventDate" style="flex:1;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
-              <input type="time" id="eventTime" style="flex:1;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
-            </div>
-            <input type="text" id="eventDesc" placeholder="Description (optional)" style="width:100%;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:10px;outline:none;color:#2d2d2d;">
-            <div style="display:flex;gap:8px;justify-content:flex-end;">
-              <button onclick="document.getElementById('addEventForm').style.display='none'" style="padding:7px 14px;background:none;border:1px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
-              <button id="saveEventBtn" style="padding:7px 14px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Save</button>
-            </div>
+          <!-- Day headers -->
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px;">
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Sun</div>
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Mon</div>
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Tue</div>
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Wed</div>
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Thu</div>
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Fri</div>
+            <div style="font-size:11px;font-weight:600;color:#9ca3af;padding:4px;">Sat</div>
           </div>
-          <div id="eventsListContainer">
-            <div style="text-align:center;padding:40px 20px;color:#9ca3af;font-size:13px;">No events scheduled yet.</div>
+          <!-- Calendar grid -->
+          <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:16px;"></div>
+          <!-- Selected day events -->
+          <div id="dayEventsSection" style="display:none;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div id="dayEventsLabel" style="font-size:13px;font-weight:600;color:#2d2d2d;"></div>
+              <button id="addEventBtn" style="padding:5px 12px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Add Event</button>
+            </div>
+            <!-- Add event form -->
+            <div id="addEventForm" style="display:none;background:rgba(255,255,255,0.8);border:1px solid rgba(124,152,133,0.15);border-radius:10px;padding:12px;margin-bottom:12px;">
+              <input type="text" id="eventTitle" placeholder="Event title" style="width:100%;padding:8px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;color:#2d2d2d;">
+              <input type="time" id="eventTime" style="width:100%;padding:8px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;color:#2d2d2d;">
+              <input type="text" id="eventDesc" placeholder="Description (optional)" style="width:100%;padding:8px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:10px;outline:none;color:#2d2d2d;">
+              <div style="display:flex;gap:8px;justify-content:flex-end;">
+                <button onclick="document.getElementById('addEventForm').style.display='none'" style="padding:6px 12px;background:none;border:1px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+                <button id="saveEventBtn" style="padding:6px 12px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Save</button>
+              </div>
+            </div>
+            <div id="dayEventsList"></div>
           </div>
         </div>
       </div>
@@ -2496,60 +2517,144 @@
       }
     }
 
-    // ---- Study Schedule ----
+    // ---- Study Schedule (Calendar) ----
+    let calYear, calMonth, calEvents = [], calSelectedDate = null;
+
+    function initCalendar() {
+      const now = new Date();
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+      document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); });
+      document.getElementById('calNext').addEventListener('click', () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); });
+      document.getElementById('addEventBtn').addEventListener('click', () => { document.getElementById('addEventForm').style.display = 'block'; });
+      document.getElementById('saveEventBtn').addEventListener('click', saveEvent);
+    }
+
     async function loadEvents() {
       if (!currentGroup) return;
       try {
         const data = await apiFetch('/api/groups/' + currentGroup + '/events');
-        const events = data.events || [];
-        const container = document.getElementById('eventsListContainer');
-        if (!events.length) {
-          container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#9ca3af;font-size:13px;">No events scheduled yet.</div>';
-          return;
-        }
-        const isOwner = (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id && m.role === 'owner');
-        const today = new Date().toISOString().split('T')[0];
-        let html = '';
-        events.forEach(ev => {
-          const isPast = ev.event_date < today;
-          const dateStr = new Date(ev.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-          const timeStr = ev.event_time ? new Date('2000-01-01T' + ev.event_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
-          const canDelete = isOwner || ev.created_by_id === currentUser.id;
-
-          html += '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(124,152,133,0.08);' + (isPast ? 'opacity:0.5;' : '') + '">';
-          html += '<div style="min-width:48px;height:48px;background:' + (isPast ? 'rgba(156,163,175,0.08)' : 'rgba(124,152,133,0.08)') + ';border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;">';
-          html += '<div style="font-size:10px;font-weight:600;color:' + (isPast ? '#9ca3af' : '#7c9885') + ';text-transform:uppercase;">' + dateStr.split(',')[0] + '</div>';
-          html += '<div style="font-size:15px;font-weight:700;color:#2d2d2d;">' + new Date(ev.event_date + 'T00:00:00').getDate() + '</div>';
-          html += '</div>';
-          html += '<div style="flex:1;min-width:0;">';
-          html += '<div style="font-size:13px;font-weight:600;color:#2d2d2d;">' + escapeHtml(ev.title) + '</div>';
-          html += '<div style="font-size:11px;color:#9ca3af;margin-top:2px;">';
-          if (timeStr) html += timeStr + ' -- ';
-          html += dateStr;
-          if (ev.created_by) html += ' -- Added by @' + escapeHtml(ev.created_by);
-          html += '</div>';
-          if (ev.description) html += '<div style="font-size:12px;color:#6b7280;margin-top:4px;">' + escapeHtml(ev.description) + '</div>';
-          html += '</div>';
-          if (canDelete) {
-            html += '<button onclick="deleteEvent(\'' + ev.id + '\')" style="background:none;border:none;color:#dc2626;cursor:pointer;padding:4px;" title="Delete event">';
-            html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-            html += '</button>';
-          }
-          html += '</div>';
-        });
-        container.innerHTML = html;
+        calEvents = data.events || [];
+        renderCalendar();
+        if (calSelectedDate) showDayEvents(calSelectedDate);
       } catch (e) {
         console.error('Load events error:', e);
       }
     }
 
+    function renderCalendar() {
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
+
+      const grid = document.getElementById('calGrid');
+      grid.innerHTML = '';
+
+      const firstDay = new Date(calYear, calMonth, 1).getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+      // Build set of dates with events
+      const eventDates = {};
+      calEvents.forEach(ev => {
+        if (!eventDates[ev.event_date]) eventDates[ev.event_date] = 0;
+        eventDates[ev.event_date]++;
+      });
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += '<div style="padding:6px;"></div>';
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        const isToday = dateStr === todayStr;
+        const isSelected = dateStr === calSelectedDate;
+        const hasEvents = eventDates[dateStr];
+
+        let bg = 'transparent';
+        let color = '#2d2d2d';
+        let border = 'none';
+        let fontWeight = '400';
+
+        if (isSelected) {
+          bg = '#7c9885'; color = 'white'; fontWeight = '600';
+        } else if (isToday) {
+          border = '2px solid #7c9885'; fontWeight = '600';
+        }
+
+        let dot = '';
+        if (hasEvents && !isSelected) {
+          dot = '<div style="width:5px;height:5px;border-radius:50%;background:#7c9885;margin:2px auto 0;"></div>';
+        } else if (hasEvents && isSelected) {
+          dot = '<div style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.7);margin:2px auto 0;"></div>';
+        }
+
+        const cell = document.createElement('div');
+        cell.style.cssText = 'padding:6px 2px;text-align:center;cursor:pointer;border-radius:8px;background:' + bg + ';color:' + color + ';font-size:13px;font-weight:' + fontWeight + ';border:' + border + ';transition:background 0.15s;';
+        cell.innerHTML = d + dot;
+        cell.addEventListener('click', () => selectDate(dateStr));
+        cell.addEventListener('mouseenter', () => { if (!isSelected) cell.style.background = 'rgba(124,152,133,0.08)'; });
+        cell.addEventListener('mouseleave', () => { if (!isSelected) cell.style.background = 'transparent'; });
+        grid.appendChild(cell);
+      }
+    }
+
+    function selectDate(dateStr) {
+      calSelectedDate = dateStr;
+      renderCalendar();
+      showDayEvents(dateStr);
+    }
+
+    function showDayEvents(dateStr) {
+      const section = document.getElementById('dayEventsSection');
+      const label = document.getElementById('dayEventsLabel');
+      const list = document.getElementById('dayEventsList');
+      section.style.display = 'block';
+
+      const d = new Date(dateStr + 'T00:00:00');
+      label.textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+      const dayEvents = calEvents.filter(ev => ev.event_date === dateStr);
+      const isOwner = currentGroupDetail && (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id && m.role === 'owner');
+
+      if (!dayEvents.length) {
+        list.innerHTML = '<div style="padding:16px 0;color:#9ca3af;font-size:12px;text-align:center;">No events on this day.</div>';
+        return;
+      }
+
+      let html = '';
+      dayEvents.forEach(ev => {
+        const timeStr = ev.event_time ? new Date('2000-01-01T' + ev.event_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+        const canDelete = isOwner || ev.created_by_id === currentUser.id;
+
+        html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(124,152,133,0.08);">';
+        html += '<div style="width:4px;border-radius:2px;background:#7c9885;align-self:stretch;flex-shrink:0;"></div>';
+        html += '<div style="flex:1;min-width:0;">';
+        html += '<div style="font-size:13px;font-weight:600;color:#2d2d2d;">' + escapeHtml(ev.title) + '</div>';
+        html += '<div style="font-size:11px;color:#9ca3af;margin-top:2px;">';
+        if (timeStr) html += timeStr;
+        if (ev.created_by) html += (timeStr ? ' -- ' : '') + 'by @' + escapeHtml(ev.created_by);
+        html += '</div>';
+        if (ev.description) html += '<div style="font-size:12px;color:#6b7280;margin-top:3px;">' + escapeHtml(ev.description) + '</div>';
+        html += '</div>';
+        if (canDelete) {
+          html += '<button onclick="deleteEvent(\'' + ev.id + '\')" style="background:none;border:none;color:#dc2626;cursor:pointer;padding:4px;flex-shrink:0;" title="Delete">';
+          html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+          html += '</button>';
+        }
+        html += '</div>';
+      });
+      list.innerHTML = html;
+    }
+
     async function saveEvent() {
       const title = document.getElementById('eventTitle').value.trim();
-      const eventDate = document.getElementById('eventDate').value;
       const eventTime = document.getElementById('eventTime').value;
       const desc = document.getElementById('eventDesc').value.trim();
+      const eventDate = calSelectedDate;
       if (!title || !eventDate) {
-        showToast('Title and date are required');
+        showToast('Select a date and enter a title');
         return;
       }
       try {
@@ -2562,7 +2667,6 @@
         });
         document.getElementById('addEventForm').style.display = 'none';
         document.getElementById('eventTitle').value = '';
-        document.getElementById('eventDate').value = '';
         document.getElementById('eventTime').value = '';
         document.getElementById('eventDesc').value = '';
         showToast('Event added');
@@ -2582,10 +2686,7 @@
       }
     }
 
-    document.getElementById('addEventBtn').addEventListener('click', () => {
-      document.getElementById('addEventForm').style.display = 'block';
-    });
-    document.getElementById('saveEventBtn').addEventListener('click', saveEvent);
+    initCalendar();
 
     // ---- Init ----
     (async function init() {
