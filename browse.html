@@ -1052,6 +1052,37 @@
       </svg>
       <span>View Note</span>
     </div>
+    <div class="browse-context-menu-item" id="browseCtxReport" style="color:#dc2626;">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+      </svg>
+      <span>Report / DMCA</span>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="reportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:rgba(255,255,255,0.97);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.15);max-width:440px;width:100%;padding:28px;position:relative;">
+      <button onclick="closeReportModal()" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.04);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div style="font-size:16px;font-weight:600;color:#2d2d2d;margin-bottom:4px;">Report Content</div>
+      <div style="font-size:12px;color:#9ca3af;margin-bottom:16px;" id="reportNoteInfo"></div>
+      <input type="hidden" id="reportNoteId">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:13px;font-weight:500;color:#2d2d2d;margin-bottom:4px;">Your Email</label>
+        <input type="email" id="reportEmail" placeholder="your@email.com" style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:13px;font-weight:500;color:#2d2d2d;margin-bottom:4px;">Your Name (optional)</label>
+        <input type="text" id="reportName" placeholder="Dr. Jane Doe" style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:13px;font-weight:500;color:#2d2d2d;margin-bottom:4px;">Reason for Report</label>
+        <textarea id="reportReason" rows="3" placeholder="This contains my copyrighted lecture slides..." style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;resize:vertical;"></textarea>
+      </div>
+      <button id="reportSubmitBtn" onclick="submitReport()" style="width:100%;padding:10px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Submit Report</button>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1622,6 +1653,70 @@
         viewNote(browseCtxNoteId);
       }
       closeBrowseContextMenu();
+    });
+
+    document.getElementById('browseCtxReport').addEventListener('click', () => {
+      if (browseCtxNoteId) {
+        openReportModal(browseCtxNoteId);
+      }
+      closeBrowseContextMenu();
+    });
+
+    function openReportModal(noteId) {
+      document.getElementById('reportNoteId').value = noteId;
+      document.getElementById('reportNoteInfo').textContent = 'Note ID: ' + noteId;
+      document.getElementById('reportEmail').value = currentUser ? currentUser.email : '';
+      document.getElementById('reportReason').value = '';
+      document.getElementById('reportName').value = '';
+      document.getElementById('reportModal').style.display = 'flex';
+    }
+
+    function closeReportModal() {
+      document.getElementById('reportModal').style.display = 'none';
+    }
+
+    async function submitReport() {
+      const noteId = document.getElementById('reportNoteId').value;
+      const email = document.getElementById('reportEmail').value.trim();
+      const name = document.getElementById('reportName').value.trim();
+      const reason = document.getElementById('reportReason').value.trim();
+
+      if (!email || !reason) {
+        alert('Email and reason are required.');
+        return;
+      }
+
+      const btn = document.getElementById('reportSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(BACKEND_URL + '/api/dmca/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            note_id: noteId,
+            reporter_email: email,
+            reporter_name: name || undefined,
+            reason: reason
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Report submitted. The note will be reviewed within 24 hours.');
+          closeReportModal();
+        } else {
+          alert(data.error || 'Failed to submit report.');
+        }
+      } catch (e) {
+        alert('Failed to submit report.');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Submit Report';
+    }
+
+    document.getElementById('reportModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('reportModal')) closeReportModal();
     });
 
     // Close context menu on click outside

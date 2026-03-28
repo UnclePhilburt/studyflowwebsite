@@ -73,104 +73,134 @@
     }
 
     /* Floating Action Button */
-    .fab {
+    .fab-container {
       position: fixed;
       bottom: 40px;
       right: 40px;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #7c9885 0%, #6a8573 100%);
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 100;
       animation: fadeInUp 0.8s ease-out 0.6s both;
     }
 
-    .fab:hover {
-      transform: scale(1.1) rotate(90deg);
-      box-shadow: 0 12px 48px rgba(124, 152, 133, 0.4);
-    }
-
-    .fab.active {
-      transform: rotate(45deg);
-    }
-
-    .fab svg {
-      width: 32px;
-      height: 32px;
-      stroke: white;
-      transition: transform 0.4s;
-    }
-
-    /* Radial Menu */
-    .radial-menu {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      z-index: 99;
-      pointer-events: none;
-    }
-
-    .radial-item {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
+    .fab {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #7c9885 0%, #6a8573 100%);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      opacity: 0;
-      transform: scale(0);
-      pointer-events: none;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transition: all 0.25s ease;
     }
 
-    .radial-menu.active .radial-item {
+    .fab:hover {
+      box-shadow: 0 6px 24px rgba(124, 152, 133, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .fab.active {
+      border-radius: 14px 14px 14px 4px;
+    }
+
+    .fab svg {
+      width: 22px;
+      height: 22px;
+      stroke: white;
+      transition: transform 0.25s ease;
+    }
+
+    .fab.active svg {
+      transform: rotate(45deg);
+    }
+
+    /* Dropdown Menu */
+    .fab-dropdown {
+      position: absolute;
+      bottom: 62px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.04);
+      padding: 6px;
+      opacity: 0;
+      transform: translateY(8px) scale(0.95);
+      pointer-events: none;
+      transition: all 0.2s ease;
+      min-width: 180px;
+    }
+
+    .fab-dropdown.active {
       opacity: 1;
-      transform: scale(1);
+      transform: translateY(0) scale(1);
       pointer-events: all;
     }
 
-    .radial-item:hover {
-      transform: scale(1.15);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
+    .fab-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      font-family: inherit;
     }
 
-    .radial-item.docx {
-      background: linear-gradient(135deg, #4285f4 0%, #3b78e7 100%);
-      bottom: 140px;
-      right: 5px;
-      transition-delay: 0.1s;
+    .fab-dropdown-item:hover {
+      background: rgba(124, 152, 133, 0.08);
     }
 
-    .radial-item.xlsx {
-      background: linear-gradient(135deg, #34a853 0%, #2d9248 100%);
-      bottom: 100px;
-      right: 100px;
-      transition-delay: 0.15s;
+    .fab-dropdown-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .radial-item.pptx {
-      background: linear-gradient(135deg, #ea4335 0%, #d63c2f 100%);
-      bottom: 30px;
-      right: 140px;
-      transition-delay: 0.2s;
+    .fab-dropdown-icon.docx { background: rgba(66, 133, 244, 0.1); }
+    .fab-dropdown-icon.xlsx { background: rgba(52, 168, 83, 0.1); }
+    .fab-dropdown-icon.pptx { background: rgba(234, 67, 53, 0.1); }
+
+    .fab-dropdown-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
     }
 
-    .radial-item-label {
+    .fab-dropdown-icon.docx svg { stroke: #4285f4; }
+    .fab-dropdown-icon.xlsx svg { stroke: #34a853; }
+    .fab-dropdown-icon.pptx svg { stroke: #ea4335; }
+
+    .fab-dropdown-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .fab-dropdown-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2d2d2d;
+      line-height: 1.2;
+    }
+
+    .fab-dropdown-subtitle {
       font-size: 11px;
-      font-weight: 700;
-      color: white;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: #9ca3af;
+      font-weight: 400;
     }
 
     /* Document Gallery - Polaroid Style */
@@ -326,6 +356,16 @@
       transform: scale(1.1);
     }
 
+    .doc-action-btn.share {
+      color: #7c9885;
+    }
+
+    .doc-action-btn.share:hover {
+      background: #7c9885;
+      color: white;
+      box-shadow: 0 6px 16px rgba(124, 152, 133, 0.3);
+    }
+
     .doc-action-btn.delete {
       color: #dc2626;
     }
@@ -334,6 +374,267 @@
       background: #dc2626;
       color: white;
       box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3);
+    }
+
+    /* Share Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .share-modal {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      max-width: 440px;
+      width: 100%;
+      padding: 28px;
+      position: relative;
+    }
+
+    .share-modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+    }
+
+    .share-modal-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+
+    .share-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      transition: all 0.15s;
+    }
+
+    .share-modal-close:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: #2d2d2d;
+    }
+
+    .share-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .share-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .share-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: inherit;
+      background: white;
+      color: #2d2d2d;
+      transition: border-color 0.2s;
+    }
+
+    .share-input:focus {
+      outline: none;
+      border-color: #7c9885;
+    }
+
+    .share-perm-select {
+      padding: 10px 12px;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 13px;
+      font-family: inherit;
+      background: white;
+      color: #2d2d2d;
+      cursor: pointer;
+    }
+
+    .share-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .share-btn:hover {
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .share-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* User search results dropdown */
+    .user-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      margin-top: 4px;
+      z-index: 10;
+      display: none;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .user-results.active {
+      display: block;
+    }
+
+    .user-result-item {
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #2d2d2d;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .user-result-item:hover {
+      background: rgba(124, 152, 133, 0.06);
+    }
+
+    .user-result-item:first-child {
+      border-radius: 10px 10px 0 0;
+    }
+
+    .user-result-item:last-child {
+      border-radius: 0 0 10px 10px;
+    }
+
+    /* Current shares list */
+    .shares-list {
+      margin-top: 16px;
+      border-top: 1px solid rgba(124, 152, 133, 0.1);
+      padding-top: 16px;
+    }
+
+    .shares-list-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+
+    .share-user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .share-user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .share-user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .share-user-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #2d2d2d;
+    }
+
+    .share-user-perm {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .share-revoke-btn {
+      border: none;
+      background: none;
+      color: #dc2626;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    .share-revoke-btn:hover {
+      background: rgba(220, 38, 38, 0.06);
+    }
+
+    /* Shared with me badge */
+    .shared-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-top: 6px;
+    }
+
+    .shared-badge.edit {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+    }
+
+    .shared-badge.view {
+      background: rgba(156, 163, 175, 0.1);
+      color: #9ca3af;
+    }
+
+    .shared-owner {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
     }
 
     .doc-action-btn svg {
@@ -675,10 +976,10 @@
       .doc-card { width: 240px; }
       .gallery-section { margin-top: 0; }
       .section-title { font-size: 1.8rem; }
-      .fab { bottom: 88px; right: 24px; width: 60px; height: 60px; }
-      .fab svg { width: 28px; height: 28px; }
-      .radial-menu { bottom: 88px; right: 24px; }
-      .radial-item { width: 52px; height: 52px; }
+      .fab-container { bottom: 88px; right: 24px; }
+      .fab { width: 48px; height: 48px; }
+      .fab svg { width: 20px; height: 20px; }
+      .fab-dropdown { min-width: 170px; }
       .radial-item.docx { bottom: 120px; right: 4px; }
       .radial-item.xlsx { bottom: 85px; right: 85px; }
       .radial-item.pptx { bottom: 25px; right: 120px; }
@@ -750,23 +1051,41 @@
     <div id="officeInterface" style="display: none;">
 
       <!-- Floating Action Button -->
-      <button class="fab" id="fabBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </button>
-
-      <!-- Radial Menu -->
-      <div class="radial-menu" id="radialMenu">
-        <div class="radial-item docx" onclick="createDocument('docx')">
-          <span class="radial-item-label">Doc</span>
-        </div>
-        <div class="radial-item xlsx" onclick="createDocument('xlsx')">
-          <span class="radial-item-label">Sheet</span>
-        </div>
-        <div class="radial-item pptx" onclick="createDocument('pptx')">
-          <span class="radial-item-label">Slides</span>
+      <div class="fab-container">
+        <button class="fab" id="fabBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <div class="fab-dropdown" id="radialMenu">
+          <button class="fab-dropdown-item" onclick="createDocument('docx')">
+            <div class="fab-dropdown-icon docx">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="fab-dropdown-text">
+              <span class="fab-dropdown-title">Document</span>
+              <span class="fab-dropdown-subtitle">Word document</span>
+            </div>
+          </button>
+          <button class="fab-dropdown-item" onclick="createDocument('xlsx')">
+            <div class="fab-dropdown-icon xlsx">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+            </div>
+            <div class="fab-dropdown-text">
+              <span class="fab-dropdown-title">Spreadsheet</span>
+              <span class="fab-dropdown-subtitle">Excel spreadsheet</span>
+            </div>
+          </button>
+          <button class="fab-dropdown-item" onclick="createDocument('pptx')">
+            <div class="fab-dropdown-icon pptx">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="fab-dropdown-text">
+              <span class="fab-dropdown-title">Presentation</span>
+              <span class="fab-dropdown-subtitle">PowerPoint slides</span>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -796,7 +1115,43 @@
         <div id="docGrid" class="doc-grid"></div>
       </div>
 
+      <!-- Shared With Me Section -->
+      <div id="sharedSection" class="gallery-section" style="display: none;">
+        <div class="section-header">
+          <h2 class="section-title">Shared with Me</h2>
+          <span class="doc-count" id="sharedDocCount">0 documents</span>
+        </div>
+        <div id="sharedDocGrid" class="doc-grid"></div>
+      </div>
+
     </div><!-- End officeInterface -->
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+      <div class="share-modal">
+        <button class="share-modal-close" onclick="closeShareModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="share-modal-title">Share Document</div>
+        <div class="share-modal-subtitle" id="shareModalSubtitle"></div>
+        <div class="share-input-row">
+          <div class="share-input-wrap">
+            <input type="text" class="share-input" id="shareUsernameInput" placeholder="Search by username..." autocomplete="off">
+            <div class="user-results" id="userResults"></div>
+          </div>
+          <select class="share-perm-select" id="sharePermSelect">
+            <option value="edit">Can edit</option>
+            <option value="view">Can view</option>
+          </select>
+          <button class="share-btn" id="shareConfirmBtn" onclick="confirmShare()" disabled>Share</button>
+        </div>
+        <div class="shares-list" id="sharesList" style="display: none;">
+          <div class="shares-list-title">People with access</div>
+          <div id="sharesListContent"></div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- End container -->
 
   <!-- Bottom Tab Bar (Mobile) -->
@@ -872,6 +1227,7 @@
         document.getElementById('verificationGate').style.display = 'none';
         document.getElementById('officeInterface').style.display = 'block';
         await loadDocuments();
+        await loadSharedDocuments();
       }
     } catch (error) {
       console.error('Error checking .edu verification:', error);
@@ -971,6 +1327,9 @@
             <span>${date}</span>
           </div>
           <div class="doc-card-actions">
+            <button class="doc-action-btn share" onclick="openShareModal('${doc.id}', '${doc.title.replace(/'/g, "\\'")}', event)" title="Share">
+              <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
             <button class="doc-action-btn delete" onclick="deleteDocument('${doc.id}', event)" title="Delete">
               <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
             </button>
@@ -1030,6 +1389,216 @@
     } catch (err) {
       console.error('Delete error:', err);
       alert('Failed to delete document.');
+    }
+  }
+
+  // ─── Share Modal ──────────────────────────────────────────
+  let shareDocId = null;
+  let searchTimer = null;
+
+  function openShareModal(docId, docTitle, event) {
+    event.stopPropagation();
+    shareDocId = docId;
+    document.getElementById('shareModalSubtitle').textContent = docTitle;
+    document.getElementById('shareUsernameInput').value = '';
+    document.getElementById('userResults').classList.remove('active');
+    document.getElementById('shareConfirmBtn').disabled = true;
+    document.getElementById('shareModal').classList.add('active');
+    loadShares(docId);
+    document.getElementById('shareUsernameInput').focus();
+  }
+
+  function closeShareModal() {
+    document.getElementById('shareModal').classList.remove('active');
+    shareDocId = null;
+  }
+
+  // Close modal on overlay click
+  document.getElementById('shareModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('shareModal')) closeShareModal();
+  });
+
+  // User search with debounce
+  document.getElementById('shareUsernameInput').addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
+    const q = e.target.value.trim();
+    if (q.length < 2) {
+      document.getElementById('userResults').classList.remove('active');
+      document.getElementById('shareConfirmBtn').disabled = true;
+      return;
+    }
+    searchTimer = setTimeout(() => searchUsers(q), 300);
+  });
+
+  async function searchUsers(query) {
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/office/search-users?q=${encodeURIComponent(query)}`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const data = await resp.json();
+      const container = document.getElementById('userResults');
+      container.innerHTML = '';
+
+      if (data.users && data.users.length > 0) {
+        data.users.forEach(u => {
+          const item = document.createElement('div');
+          item.className = 'user-result-item';
+          item.textContent = '@' + u.username;
+          item.addEventListener('click', () => {
+            document.getElementById('shareUsernameInput').value = u.username;
+            container.classList.remove('active');
+            document.getElementById('shareConfirmBtn').disabled = false;
+          });
+          container.appendChild(item);
+        });
+        container.classList.add('active');
+      } else {
+        container.classList.remove('active');
+      }
+    } catch (err) {
+      console.error('User search error:', err);
+    }
+  }
+
+  async function confirmShare() {
+    const username = document.getElementById('shareUsernameInput').value.trim();
+    const permission = document.getElementById('sharePermSelect').value;
+    if (!username || !shareDocId) return;
+
+    const btn = document.getElementById('shareConfirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sharing...';
+
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/office/${shareDocId}/share`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, permission })
+      });
+      const data = await resp.json();
+
+      if (data.success) {
+        document.getElementById('shareUsernameInput').value = '';
+        loadShares(shareDocId);
+      } else {
+        alert(data.error || 'Failed to share');
+      }
+    } catch (err) {
+      console.error('Share error:', err);
+      alert('Failed to share document.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Share';
+    }
+  }
+
+  async function loadShares(docId) {
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/office/${docId}/shares`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const data = await resp.json();
+      const container = document.getElementById('sharesListContent');
+      const section = document.getElementById('sharesList');
+
+      if (data.shares && data.shares.length > 0) {
+        container.innerHTML = '';
+        data.shares.forEach(s => {
+          const initial = s.username.charAt(0).toUpperCase();
+          const permLabel = s.permission === 'edit' ? 'Can edit' : 'Can view';
+          const row = document.createElement('div');
+          row.className = 'share-user-row';
+          row.innerHTML = `
+            <div class="share-user-info">
+              <div class="share-user-avatar">${initial}</div>
+              <div>
+                <div class="share-user-name">@${s.username}</div>
+                <div class="share-user-perm">${permLabel}</div>
+              </div>
+            </div>
+            <button class="share-revoke-btn" onclick="revokeShare('${docId}', '${s.user_id}')">Remove</button>
+          `;
+          container.appendChild(row);
+        });
+        section.style.display = 'block';
+      } else {
+        section.style.display = 'none';
+      }
+    } catch (err) {
+      console.error('Load shares error:', err);
+    }
+  }
+
+  async function revokeShare(docId, userId) {
+    if (!confirm('Remove this person\'s access?')) return;
+    try {
+      await fetch(`${BACKEND_URL}/api/office/${docId}/share/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      loadShares(docId);
+    } catch (err) {
+      console.error('Revoke error:', err);
+    }
+  }
+
+  // ─── Shared With Me ────────────────────────────────────────
+  async function loadSharedDocuments() {
+    try {
+      const resp = await fetch(`${BACKEND_URL}/api/office/shared-with-me`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const data = await resp.json();
+
+      if (!data.documents || data.documents.length === 0) {
+        document.getElementById('sharedSection').style.display = 'none';
+        return;
+      }
+
+      const section = document.getElementById('sharedSection');
+      const grid = document.getElementById('sharedDocGrid');
+      const countEl = document.getElementById('sharedDocCount');
+
+      section.style.display = 'block';
+      countEl.textContent = data.documents.length + ' document' + (data.documents.length !== 1 ? 's' : '');
+      grid.innerHTML = '';
+
+      data.documents.forEach(doc => {
+        const typeLabels = { docx: 'DOC', xlsx: 'XLS', pptx: 'PPT' };
+        const typeLabel = typeLabels[doc.file_type] || 'DOC';
+        const sizeKB = doc.file_size ? Math.round(doc.file_size / 1024) : 0;
+        const date = doc.created_at ? new Date(doc.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+        const permLabel = doc.permission === 'edit' ? 'Can edit' : 'View only';
+        const permClass = doc.permission === 'edit' ? 'edit' : 'view';
+
+        const card = document.createElement('div');
+        card.className = 'doc-card';
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.doc-action-btn')) return;
+          window.location.href = 'office-editor.html?id=' + doc.id;
+        });
+
+        card.innerHTML = `
+          <div class="doc-card-icon ${doc.file_type}">${typeLabel}</div>
+          <div class="doc-card-title" title="${doc.title}">${doc.title}</div>
+          <div class="doc-card-meta">
+            <span>${typeLabel}</span>
+            <span class="doc-card-meta-dot"></span>
+            <span>${sizeKB} KB</span>
+            <span class="doc-card-meta-dot"></span>
+            <span>${date}</span>
+          </div>
+          <div class="shared-owner">Shared by @${doc.owner_username}</div>
+          <span class="shared-badge ${permClass}">${permLabel}</span>
+        `;
+
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.error('Failed to load shared documents:', err);
     }
   }
 

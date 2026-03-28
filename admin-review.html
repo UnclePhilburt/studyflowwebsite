@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Note Review - StudyFlow Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f4f0;
+      color: #2d2d2d;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .review-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(248, 247, 244, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    .review-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .review-header-left a {
+      color: #7c9885;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .review-header h1 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .review-counter {
+      font-size: 13px;
+      color: #9ca3af;
+      font-weight: 500;
+    }
+
+    /* Card stack area */
+    .review-area {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .note-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      max-width: 500px;
+      width: 100%;
+      padding: 32px;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s;
+    }
+
+    .note-card.swipe-left {
+      transform: translateX(-150%) rotate(-15deg);
+      opacity: 0;
+    }
+
+    .note-card.swipe-right {
+      transform: translateX(150%) rotate(15deg);
+      opacity: 0;
+    }
+
+    .note-filename {
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 16px;
+      word-break: break-word;
+    }
+
+    .note-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .note-meta-item {
+      padding: 12px;
+      background: rgba(248, 247, 244, 0.8);
+      border-radius: 10px;
+    }
+
+    .note-meta-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+
+    .note-meta-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #2d2d2d;
+    }
+
+    .note-preview-link {
+      display: block;
+      text-align: center;
+      padding: 10px;
+      background: rgba(124, 152, 133, 0.06);
+      border-radius: 10px;
+      color: #7c9885;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: background 0.2s;
+    }
+
+    .note-preview-link:hover {
+      background: rgba(124, 152, 133, 0.12);
+    }
+
+    /* Action buttons */
+    .action-bar {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .action-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .action-btn.reject {
+      background: white;
+      border: 2px solid #dc2626;
+      color: #dc2626;
+    }
+
+    .action-btn.reject:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    .action-btn.approve {
+      background: white;
+      border: 2px solid #7c9885;
+      color: #7c9885;
+    }
+
+    .action-btn.approve:hover {
+      background: #7c9885;
+      color: white;
+    }
+
+    .action-btn svg {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Key hints */
+    .key-hints {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 16px;
+    }
+
+    .key-hint {
+      font-size: 11px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .key-hint kbd {
+      padding: 2px 8px;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 4px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    /* Empty / Done state */
+    .empty-state {
+      text-align: center;
+      display: none;
+    }
+
+    .empty-state h2 {
+      font-family: 'Lora', serif;
+      font-size: 24px;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+
+    .empty-state a {
+      color: #7c9885;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Result flash */
+    .flash {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      font-weight: 700;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 200;
+    }
+
+    .flash.approve { color: #7c9885; }
+    .flash.reject { color: #dc2626; }
+    .flash.show { opacity: 0.6; }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .note-card { padding: 20px; flex-direction: column !important; }
+      .note-filename { font-size: 18px; }
+      #previewPane { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="review-header">
+    <div class="review-header-left">
+      <a href="admin.html">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
+      <h1>Note Review</h1>
+    </div>
+    <div class="review-counter" id="counter">Loading...</div>
+  </div>
+
+  <div class="review-area" id="reviewArea">
+    <div class="loading" id="loadingState">Loading review queue...</div>
+
+    <div id="cardContainer" style="display:none;width:100%;max-width:900px;">
+      <div class="note-card" id="noteCard" style="display:flex;gap:24px;max-width:900px;">
+        <!-- Preview pane -->
+        <div id="previewPane" style="flex:1;min-width:0;min-height:400px;max-height:70vh;background:rgba(0,0,0,0.02);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <div id="previewLoading" style="color:#9ca3af;font-size:13px;">Loading preview...</div>
+          <iframe id="previewFrame" style="width:100%;height:100%;border:none;display:none;"></iframe>
+          <img id="previewImage" style="max-width:100%;max-height:100%;object-fit:contain;display:none;">
+          <div id="previewText" style="width:100%;height:100%;overflow:auto;padding:16px;font-size:13px;color:#2d2d2d;white-space:pre-wrap;display:none;font-family:'Inter',sans-serif;"></div>
+          <div id="previewUnsupported" style="color:#9ca3af;font-size:13px;display:none;">Preview not available for this file type. <a id="previewDownloadLink" href="#" target="_blank" style="color:#7c9885;font-weight:600;">Download file</a></div>
+        </div>
+        <!-- Info pane -->
+        <div style="width:240px;flex-shrink:0;display:flex;flex-direction:column;">
+          <div class="note-filename" id="noteFilename"></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+            <div class="note-meta-item">
+              <div class="note-meta-label">University</div>
+              <div class="note-meta-value" id="noteUni">--</div>
+            </div>
+            <div class="note-meta-item">
+              <div class="note-meta-label">Course</div>
+              <div class="note-meta-value" id="noteCourse">--</div>
+            </div>
+            <div class="note-meta-item">
+              <div class="note-meta-label">Uploaded by</div>
+              <div class="note-meta-value" id="noteUploader">--</div>
+            </div>
+            <div class="note-meta-item">
+              <div class="note-meta-label">File size</div>
+              <div class="note-meta-value" id="noteSize">--</div>
+            </div>
+          </div>
+          <div style="flex:1;"></div>
+          <div class="action-bar" style="flex-direction:column;gap:12px;">
+          <button class="action-btn reject" id="rejectBtn" title="Reject (Left Arrow)" style="width:100%;border-radius:12px;height:48px;">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button class="action-btn approve" id="approveBtn" title="Approve (Right Arrow)" style="width:100%;border-radius:12px;height:48px;">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          </div>
+          <div class="key-hints" style="margin-top:12px;">
+            <div class="key-hint"><kbd>Left</kbd> Reject</div>
+            <div class="key-hint"><kbd>Right</kbd> Approve</div>
+          </div>
+        </div><!-- end info pane -->
+      </div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <h2>All caught up</h2>
+      <p>No notes left to review.</p>
+      <a href="admin.html">Back to Admin Dashboard</a>
+    </div>
+  </div>
+
+  <!-- Rejection reason picker -->
+  <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:rgba(255,255,255,0.97);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.15);max-width:380px;width:100%;padding:24px;">
+      <div style="font-size:16px;font-weight:600;color:#2d2d2d;margin-bottom:4px;">Remove Note</div>
+      <div style="font-size:12px;color:#9ca3af;margin-bottom:16px;">Select a reason to notify the uploader:</div>
+      <div id="reasonButtons" style="display:flex;flex-direction:column;gap:8px;">
+        <button class="reason-btn" onclick="confirmReject('Does not meet quality standards')">Does not meet quality standards</button>
+        <button class="reason-btn" onclick="confirmReject('Contains copyrighted material')">Contains copyrighted material</button>
+        <button class="reason-btn" onclick="confirmReject('Contains personally identifiable information')">Contains personally identifiable information</button>
+        <button class="reason-btn" onclick="confirmReject('Not original student work')">Not original student work</button>
+        <button class="reason-btn" onclick="confirmReject('Duplicate or spam content')">Duplicate or spam content</button>
+        <button class="reason-btn" onclick="confirmReject('Inappropriate or offensive content')">Inappropriate or offensive content</button>
+        <button class="reason-btn" onclick="confirmReject('Incorrect university or course categorization')">Incorrect university or course categorization</button>
+      </div>
+      <button onclick="closeRejectModal()" style="width:100%;margin-top:12px;padding:10px;background:none;border:1px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+  </div>
+
+  <style>
+    .reason-btn {
+      padding: 10px 14px;
+      background: rgba(220, 38, 38, 0.04);
+      border: 1px solid rgba(220, 38, 38, 0.15);
+      border-radius: 10px;
+      color: #dc2626;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .reason-btn:hover {
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+  </style>
+
+  <div class="flash approve" id="flashApprove">APPROVED</div>
+  <div class="flash reject" id="flashReject">REMOVED</div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    let adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
+    let queue = [];
+    let currentIndex = 0;
+    let isProcessing = false;
+    let reviewedCount = 0;
+
+    // Auth check
+    if (!adminKey) {
+      window.location.href = 'admin.html';
+    }
+
+    async function loadQueue() {
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/review-queue?key=' + encodeURIComponent(adminKey));
+        if (!res.ok) {
+          if (res.status === 403) {
+            sessionStorage.removeItem('studyflow_admin_key');
+            window.location.href = 'admin.html';
+            return;
+          }
+          throw new Error('Failed to load');
+        }
+        const data = await res.json();
+        queue = data.notes || [];
+        currentIndex = 0;
+
+        document.getElementById('loadingState').style.display = 'none';
+
+        if (queue.length === 0) {
+          showEmpty();
+        } else {
+          showCard();
+        }
+        updateCounter();
+      } catch (e) {
+        document.getElementById('loadingState').textContent = 'Failed to load queue: ' + e.message;
+      }
+    }
+
+    function updateCounter() {
+      const remaining = queue.length - currentIndex;
+      document.getElementById('counter').textContent = remaining + ' remaining | ' + reviewedCount + ' reviewed';
+    }
+
+    function showCard() {
+      if (currentIndex >= queue.length) {
+        showEmpty();
+        return;
+      }
+
+      const note = queue[currentIndex];
+      const card = document.getElementById('noteCard');
+      card.className = 'note-card';
+
+      document.getElementById('noteFilename').textContent = note.filename || 'Untitled';
+      document.getElementById('noteUni').textContent = note.university || 'Not set';
+      document.getElementById('noteCourse').textContent = note.course_code || 'Not set';
+      document.getElementById('noteUploader').textContent = '@' + (note.uploader || 'Unknown');
+      document.getElementById('noteSize').textContent = note.file_size ? Math.round(note.file_size / 1024) + ' KB' : '--';
+
+      // Reset preview
+      document.getElementById('previewFrame').style.display = 'none';
+      document.getElementById('previewImage').style.display = 'none';
+      document.getElementById('previewText').style.display = 'none';
+      document.getElementById('previewUnsupported').style.display = 'none';
+      document.getElementById('previewLoading').style.display = 'block';
+
+      document.getElementById('cardContainer').style.display = 'flex';
+      document.getElementById('emptyState').style.display = 'none';
+      updateCounter();
+
+      // Load preview via note-viewer signed URL
+      loadPreview(note);
+    }
+
+    async function loadPreview(note) {
+      const ext = (note.filename || '').split('.').pop().toLowerCase();
+      const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext);
+      const isPdf = ext === 'pdf';
+      const isText = ['txt', 'md', 'csv'].includes(ext);
+
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/note-preview/' + note.id + '?key=' + encodeURIComponent(adminKey));
+        let fileUrl = '';
+        if (res.ok) {
+          const data = await res.json();
+          fileUrl = data.url || '';
+        }
+
+        document.getElementById('previewLoading').style.display = 'none';
+
+        if (isPdf && fileUrl) {
+          const frame = document.getElementById('previewFrame');
+          frame.src = fileUrl;
+          frame.style.display = 'block';
+        } else if (isImage && fileUrl) {
+          const img = document.getElementById('previewImage');
+          img.src = fileUrl;
+          img.style.display = 'block';
+        } else if (isText && fileUrl) {
+          try {
+            const textRes = await fetch(fileUrl);
+            const text = await textRes.text();
+            const textEl = document.getElementById('previewText');
+            textEl.textContent = text.substring(0, 5000);
+            textEl.style.display = 'block';
+          } catch (e) {
+            showUnsupported(fileUrl);
+          }
+        } else {
+          // Use note-viewer as iframe fallback
+          const frame = document.getElementById('previewFrame');
+          frame.src = 'note-viewer.html?id=' + note.id;
+          frame.style.display = 'block';
+        }
+      } catch (e) {
+        document.getElementById('previewLoading').style.display = 'none';
+        const frame = document.getElementById('previewFrame');
+        frame.src = 'note-viewer.html?id=' + note.id;
+        frame.style.display = 'block';
+      }
+    }
+
+    function showUnsupported(url) {
+      document.getElementById('previewUnsupported').style.display = 'block';
+      document.getElementById('previewDownloadLink').href = url || '#';
+    }
+
+    function showEmpty() {
+      document.getElementById('cardContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+      updateCounter();
+    }
+
+    function flashResult(type) {
+      const el = document.getElementById(type === 'approve' ? 'flashApprove' : 'flashReject');
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 500);
+    }
+
+    async function reviewNote(action, reason) {
+      if (isProcessing || currentIndex >= queue.length) return;
+      isProcessing = true;
+
+      const note = queue[currentIndex];
+      const card = document.getElementById('noteCard');
+
+      // Animate card
+      card.classList.add(action === 'approve' ? 'swipe-right' : 'swipe-left');
+      flashResult(action);
+
+      const body = { key: adminKey, action: action };
+      if (reason) body.reason = reason;
+
+      try {
+        await fetch(BACKEND_URL + '/admin/review/' + note.id, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      } catch (e) {
+        console.error('Review error:', e);
+      }
+
+      reviewedCount++;
+
+      // Wait for animation, then show next
+      setTimeout(() => {
+        currentIndex++;
+        showCard();
+        isProcessing = false;
+      }, 400);
+    }
+
+    // Reject flow: show reason picker
+    function openRejectModal() {
+      if (isProcessing || currentIndex >= queue.length) return;
+      document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    function closeRejectModal() {
+      document.getElementById('rejectModal').style.display = 'none';
+    }
+
+    function confirmReject(reason) {
+      closeRejectModal();
+      reviewNote('reject', reason);
+    }
+
+    // Button clicks
+    document.getElementById('approveBtn').addEventListener('click', () => reviewNote('approve'));
+    document.getElementById('rejectBtn').addEventListener('click', openRejectModal);
+
+    // Arrow keys
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        reviewNote('approve');
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        openRejectModal();
+      } else if (e.key === 'Escape') {
+        closeRejectModal();
+      }
+    });
+
+    // Init
+    loadQueue();
+  </script>
+</body>
+</html>

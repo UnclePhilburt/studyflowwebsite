@@ -1282,6 +1282,11 @@
         userProfile = data;
         hasSeenModal = data.has_seen_upload_modal || false;
 
+        // Auto-fill university from profile
+        if (data.university) {
+          document.getElementById('university-input').value = data.university;
+        }
+
         console.log('User profile loaded:', userProfile);
       } catch (error) {
         console.error('Error loading user profile:', error);
