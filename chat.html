@@ -2775,6 +2775,16 @@
       // Load conversation history
       await loadConversations();
 
+      // Check if a conversation ID is in the URL (e.g., from dashboard widget)
+      const urlParams = new URLSearchParams(window.location.search);
+      const conversationIdFromUrl = urlParams.get('id');
+      if (conversationIdFromUrl) {
+        // Load the specific conversation
+        await loadConversation(conversationIdFromUrl);
+        // Clean up URL without reloading
+        window.history.replaceState({}, '', 'chat.html');
+      }
+
       // Enable search input
       searchInput.disabled = false;
     }
