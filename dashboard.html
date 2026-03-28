@@ -1324,6 +1324,29 @@
       box-shadow: 0 4px 16px rgba(139, 157, 131, 0.15);
     }
 
+    /* Zoom indicator (mobile only) */
+    .zoom-indicator {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1001;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .zoom-indicator.visible {
+      opacity: 1;
+    }
+
     /* Mac-style dock */
     .dock {
       position: fixed;
@@ -1426,19 +1449,21 @@
 
       .nav-bell,
       .user-avatar {
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
       }
 
       .add-widget-btn {
         top: 16px;
         left: 16px;
-        width: 40px;
-        height: 40px;
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
       }
 
       .canvas-container {
         cursor: default;
+        touch-action: pan-x pan-y;
       }
 
       .widget {
@@ -1446,15 +1471,57 @@
         padding: 16px;
         width: 300px;
         cursor: default;
+        touch-action: none;
       }
 
       .canvas-reset {
         display: none;
       }
 
+      .zoom-indicator {
+        display: block;
+      }
+
       .widget-header {
         margin-bottom: 12px;
         padding-bottom: 10px;
+        min-height: 44px;
+      }
+
+      /* Make modals more mobile-friendly */
+      .widget-picker-content, .clock-modal-content, .quote-modal-content {
+        max-width: 95%;
+        max-height: 85vh;
+        padding: 20px;
+      }
+
+      /* Larger touch targets for mobile */
+      button, .widget-remove, input[type="button"] {
+        min-height: 44px;
+        min-width: 44px;
+        font-size: 14px;
+      }
+
+      .widget-remove {
+        width: 44px;
+        height: 44px;
+        font-size: 24px;
+      }
+
+      /* Better tap feedback */
+      button:active, .widget-remove:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+
+      /* Make scrollable areas more obvious */
+      .group-chat-messages, .calendar-day, .widget-content {
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Prevent double-tap zoom on buttons */
+      button, a, .widget-remove {
+        touch-action: manipulation;
       }
 
       .widget-title {
@@ -1795,6 +1862,9 @@
 
   <!-- Reset canvas view button -->
   <button class="canvas-reset" id="canvasReset" title="Reset view">Reset View</button>
+
+  <!-- Zoom indicator (mobile only) -->
+  <div class="zoom-indicator" id="zoomIndicator">100%</div>
 
   <!-- Infinite canvas container -->
   <div class="canvas-container" id="canvasContainer">
@@ -2226,10 +2296,12 @@
     let activeWidgets = []; // Array of {id, x, y}
     let isDragging = false;
     let canvasPan = { x: 0, y: 0 }; // Canvas pan offset
+    let canvasZoom = 1; // Canvas zoom level
     let isPanningCanvas = false;
     let panStart = { x: 0, y: 0 };
     let draggedWidget = null;
     let widgetDragStart = { x: 0, y: 0 };
+    let lastTouchDistance = 0; // For pinch-to-zoom
 
     // Generate unique widget ID
     function generateWidgetId(type) {
@@ -2360,13 +2432,34 @@
     // Apply canvas transform
     function updateCanvasTransform() {
       const canvas = document.getElementById('canvas');
-      canvas.style.transform = `translate(${canvasPan.x}px, ${canvasPan.y}px)`;
+      canvas.style.transform = `translate(${canvasPan.x}px, ${canvasPan.y}px) scale(${canvasZoom})`;
+
+      // Update zoom indicator on mobile
+      const zoomIndicator = document.getElementById('zoomIndicator');
+      if (zoomIndicator && window.innerWidth <= 768) {
+        zoomIndicator.textContent = `${Math.round(canvasZoom * 100)}%`;
+        zoomIndicator.classList.add('visible');
+
+        // Hide after 1 second
+        clearTimeout(window.zoomIndicatorTimeout);
+        window.zoomIndicatorTimeout = setTimeout(() => {
+          zoomIndicator.classList.remove('visible');
+        }, 1000);
+      }
     }
 
     // Reset canvas view to center
     function resetCanvasView() {
       canvasPan = { x: 0, y: 0 };
+      canvasZoom = 1;
       updateCanvasTransform();
+    }
+
+    // Calculate distance between two touch points
+    function getTouchDistance(touch1, touch2) {
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
     }
 
     function renderWidgets() {
@@ -2411,28 +2504,48 @@
           `;
         }
 
-        // Widget drag events (only on desktop)
-        if (!isMobile) {
-          widget.addEventListener('mousedown', (e) => {
-            // Don't start drag if clicking on remove button or widget content
-            if (e.target.closest('.widget-remove') || e.target.closest('.widget-content')) {
-              return;
-            }
+        // Widget drag events - mouse for desktop
+        widget.addEventListener('mousedown', (e) => {
+          // Don't start drag if clicking on remove button or widget content
+          if (e.target.closest('.widget-remove') || e.target.closest('.widget-content')) {
+            return;
+          }
 
-            e.preventDefault();
-            e.stopPropagation();
-            isDragging = true;
-            draggedWidget = widgetData;
-            widget.classList.add('dragging');
-            widget.style.zIndex = '100';
+          e.preventDefault();
+          e.stopPropagation();
+          isDragging = true;
+          draggedWidget = widgetData;
+          widget.classList.add('dragging');
+          widget.style.zIndex = '100';
 
-            // Calculate drag offset accounting for canvas pan
-            widgetDragStart = {
-              x: e.clientX - widgetData.x - canvasPan.x,
-              y: e.clientY - widgetData.y - canvasPan.y
-            };
-          });
-        }
+          // Calculate drag offset accounting for canvas pan
+          widgetDragStart = {
+            x: e.clientX - widgetData.x - canvasPan.x,
+            y: e.clientY - widgetData.y - canvasPan.y
+          };
+        });
+
+        // Widget drag events - touch for mobile
+        widget.addEventListener('touchstart', (e) => {
+          // Don't start drag if touching remove button or widget content
+          if (e.target.closest('.widget-remove') || e.target.closest('.widget-content')) {
+            return;
+          }
+
+          const touch = e.touches[0];
+          e.preventDefault();
+          e.stopPropagation();
+          isDragging = true;
+          draggedWidget = widgetData;
+          widget.classList.add('dragging');
+          widget.style.zIndex = '100';
+
+          // Calculate drag offset accounting for canvas pan
+          widgetDragStart = {
+            x: touch.clientX - widgetData.x - canvasPan.x,
+            y: touch.clientY - widgetData.y - canvasPan.y
+          };
+        }, { passive: false });
 
         canvas.appendChild(widget);
 
@@ -2524,13 +2637,30 @@
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
-      if (isPanningCanvas) {
+      // Pinch to zoom (two fingers)
+      if (e.touches.length === 2 && (isPanningCanvas || !isDragging)) {
+        const distance = getTouchDistance(e.touches[0], e.touches[1]);
+
+        if (lastTouchDistance > 0) {
+          const scale = distance / lastTouchDistance;
+          const newZoom = Math.max(0.5, Math.min(2, canvasZoom * scale)); // Limit zoom between 0.5x and 2x
+
+          if (newZoom !== canvasZoom) {
+            canvasZoom = newZoom;
+            updateCanvasTransform();
+          }
+        }
+
+        lastTouchDistance = distance;
+        isPanningCanvas = false; // Stop panning during pinch
+        e.preventDefault();
+      } else if (isPanningCanvas && e.touches.length === 1) {
         const touch = e.touches[0];
         canvasPan.x = touch.clientX - panStart.x;
         canvasPan.y = touch.clientY - panStart.y;
         updateCanvasTransform();
         e.preventDefault();
-      } else if (isDragging && draggedWidget) {
+      } else if (isDragging && draggedWidget && e.touches.length === 1) {
         const touch = e.touches[0];
         draggedWidget.x = touch.clientX - widgetDragStart.x - canvasPan.x;
         draggedWidget.y = touch.clientY - widgetDragStart.y - canvasPan.y;
@@ -2545,6 +2675,9 @@
     }, { passive: false });
 
     document.addEventListener('touchend', async () => {
+      // Reset pinch zoom tracking
+      lastTouchDistance = 0;
+
       if (isPanningCanvas) {
         isPanningCanvas = false;
         canvasContainer.classList.remove('panning');
