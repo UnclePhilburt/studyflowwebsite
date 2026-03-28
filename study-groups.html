@@ -1847,7 +1847,8 @@
       }
 
       try {
-        const data = await apiFetch('/api/groups/' + groupId);
+        const resp = await apiFetch('/api/groups/' + groupId);
+        const data = resp.group || resp;
         currentGroupDetail = data;
         groupDetailTitle.textContent = data.name || 'Group';
 
