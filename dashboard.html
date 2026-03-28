@@ -2508,6 +2508,61 @@
       }
     });
 
+    // Touch events for mobile support
+    canvasContainer.addEventListener('touchstart', (e) => {
+      // Only start panning if not touching a widget
+      if (e.target === canvasContainer || e.target === canvas) {
+        const touch = e.touches[0];
+        isPanningCanvas = true;
+        canvasContainer.classList.add('panning');
+        panStart = {
+          x: touch.clientX - canvasPan.x,
+          y: touch.clientY - canvasPan.y
+        };
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+      if (isPanningCanvas) {
+        const touch = e.touches[0];
+        canvasPan.x = touch.clientX - panStart.x;
+        canvasPan.y = touch.clientY - panStart.y;
+        updateCanvasTransform();
+        e.preventDefault();
+      } else if (isDragging && draggedWidget) {
+        const touch = e.touches[0];
+        draggedWidget.x = touch.clientX - widgetDragStart.x - canvasPan.x;
+        draggedWidget.y = touch.clientY - widgetDragStart.y - canvasPan.y;
+
+        const widgetElement = canvas.querySelector(`[data-widget-id="${draggedWidget.id}"]`);
+        if (widgetElement) {
+          widgetElement.style.left = draggedWidget.x + 'px';
+          widgetElement.style.top = draggedWidget.y + 'px';
+        }
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', async () => {
+      if (isPanningCanvas) {
+        isPanningCanvas = false;
+        canvasContainer.classList.remove('panning');
+        await saveWidgets();
+      }
+
+      if (isDragging && draggedWidget) {
+        isDragging = false;
+        const widgetElement = canvas.querySelector(`[data-widget-id="${draggedWidget.id}"]`);
+        if (widgetElement) {
+          widgetElement.classList.remove('dragging');
+          widgetElement.style.zIndex = '10';
+        }
+        draggedWidget = null;
+        await saveWidgets();
+      }
+    });
+
     // Reset canvas view button
     document.getElementById('canvasReset').addEventListener('click', () => {
       resetCanvasView();
