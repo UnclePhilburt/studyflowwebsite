@@ -854,48 +854,165 @@
     }
 
     /* Bottom nav */
-    .bottom-nav {
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .nav-link {
+      color: #5d5d5d;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .nav-link:hover {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .user-avatar-wrapper {
+      position: relative;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.2);
+    }
+
+    .user-avatar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 48px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      min-width: 200px;
+      padding: 8px;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 1001;
+    }
+
+    .user-menu.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .user-menu-header {
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      margin-bottom: 6px;
+    }
+
+    .user-menu-email {
+      font-size: 12px;
+      color: #9ca3af;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #2d2d2d;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .user-menu-item:hover {
+      background: rgba(124, 152, 133, 0.06);
+    }
+
+    .user-menu-item.logout {
+      color: #dc2626;
+    }
+
+    .user-menu-item svg {
+      stroke: currentColor;
+      fill: none;
+    }
+
+    /* Mobile bottom tab bar */
+    .bottom-tab-bar {
+      display: none;
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 72px;
-      background: rgba(248, 247, 244, 0.92);
+      height: 56px;
+      background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(124, 152, 133, 0.12);
-      display: flex;
-      align-items: center;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
       justify-content: space-around;
-      z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom, 0);
+      align-items: center;
+      z-index: 9999;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
-    .bottom-nav-item {
+    .tab-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       text-decoration: none;
       color: #9ca3af;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
+      padding: 6px 8px;
       transition: color 0.2s;
-      padding: 8px 12px;
-      border-radius: 10px;
     }
 
-    .bottom-nav-item:hover {
-      color: #7c9885;
-    }
+    .tab-item:hover, .tab-item.active { color: #7c9885; }
 
-    .bottom-nav-item.active {
-      color: #7c9885;
-    }
-
-    .bottom-nav-item svg {
-      width: 22px;
-      height: 22px;
+    .tab-item svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
     }
 
     /* Modal */
@@ -1259,9 +1376,16 @@
         flex-direction: column;
       }
 
-      .bottom-nav-item {
-        font-size: 10px;
-        padding: 6px 8px;
+      .top-nav {
+        display: none;
+      }
+
+      .bottom-tab-bar {
+        display: flex;
+      }
+
+      body {
+        padding-bottom: 56px;
       }
     }
   </style>
@@ -1386,44 +1510,41 @@
   </div>
 
   <!-- Bottom nav -->
-  <nav class="bottom-nav">
-    <a href="chat.html" class="bottom-nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-      Chat
-    </a>
-    <a href="upload.html" class="bottom-nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="17 8 12 3 7 8"/>
-        <line x1="12" y1="3" x2="12" y2="15"/>
-      </svg>
-      Upload
-    </a>
-    <a href="notes.html" class="bottom-nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-      </svg>
-      Notes
-    </a>
-    <a href="office.html" class="bottom-nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="8" y1="13" x2="16" y2="13"/>
-        <line x1="8" y1="17" x2="12" y2="17"/>
-      </svg>
-      Office
-    </a>
-    <a href="browse.html" class="bottom-nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.35-4.35"/>
-      </svg>
-      Nexus
-    </a>
+  <!-- Top Navigation -->
+  <div class="top-nav" id="topNav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="notes.html" class="nav-link">Notes</a>
+    <a href="office.html" class="nav-link">Office</a>
+    <a href="browse.html" class="nav-link">Nexus</a>
+    <a href="calendar.html" class="nav-link">Calendar</a>
+    <div class="user-avatar-wrapper">
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-menu" id="userMenu">
+        <div class="user-menu-header">
+          <div class="user-menu-email" id="menuUserEmail">Loading...</div>
+        </div>
+        <a href="account.html" class="user-menu-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Account
+        </a>
+        <button class="user-menu-item logout" onclick="logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="bottom-tab-bar">
+    <a href="chat.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></a>
+    <a href="upload.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span></a>
+    <a href="notes.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notes</span></a>
+    <a href="office.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg><span>Office</span></a>
+    <a href="browse.html" class="tab-item"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Nexus</span></a>
+    <a href="calendar.html" class="tab-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
+    <a href="account.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></a>
   </nav>
 
   <!-- Create group modal -->
@@ -1563,7 +1684,31 @@
       }
       currentUser = session.user;
       accessToken = session.access_token;
+
+      // Set up user avatar
+      const email = currentUser.email || '';
+      const initial = email.charAt(0).toUpperCase();
+      document.getElementById('userAvatar').textContent = initial;
+      document.getElementById('menuUserEmail').textContent = email;
+
       return true;
+    }
+
+    function toggleUserMenu() {
+      document.getElementById('userMenu').classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('userMenu');
+      const avatar = document.getElementById('userAvatar');
+      if (menu && !menu.contains(e.target) && !avatar.contains(e.target)) {
+        menu.classList.remove('show');
+      }
+    });
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
     }
 
     // ---- Join flow ----
