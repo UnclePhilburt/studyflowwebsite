@@ -2313,6 +2313,11 @@
     let draggedWidget = null;
     let widgetDragStart = { x: 0, y: 0 };
 
+    // Momentum variables
+    let lastPanPosition = { x: 0, y: 0, time: 0 };
+    let panVelocity = { x: 0, y: 0 };
+    let momentumAnimation = null;
+
     // Generate unique widget ID
     function generateWidgetId(type) {
       return `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -2449,6 +2454,48 @@
     function resetCanvasView() {
       canvasPan = { x: 0, y: 0 };
       updateCanvasTransform();
+      stopMomentum();
+    }
+
+    // Stop momentum animation
+    function stopMomentum() {
+      if (momentumAnimation) {
+        cancelAnimationFrame(momentumAnimation);
+        momentumAnimation = null;
+      }
+    }
+
+    // Apply momentum after pan ends
+    function applyMomentum() {
+      const friction = 0.95; // Friction coefficient (0.95 = 5% loss per frame)
+      const minVelocity = 0.5; // Stop when velocity is below this
+
+      function animate() {
+        // Apply friction
+        panVelocity.x *= friction;
+        panVelocity.y *= friction;
+
+        // Check if we should stop
+        if (Math.abs(panVelocity.x) < minVelocity && Math.abs(panVelocity.y) < minVelocity) {
+          stopMomentum();
+          saveWidgets(); // Save final position
+          return;
+        }
+
+        // Update position
+        canvasPan.x += panVelocity.x;
+        canvasPan.y += panVelocity.y;
+        updateCanvasTransform();
+
+        // Continue animation
+        momentumAnimation = requestAnimationFrame(animate);
+      }
+
+      // Start momentum if velocity is significant
+      if (Math.abs(panVelocity.x) > minVelocity || Math.abs(panVelocity.y) > minVelocity) {
+        stopMomentum(); // Stop any existing momentum
+        momentumAnimation = requestAnimationFrame(animate);
+      }
     }
 
     function renderWidgets() {
@@ -2559,6 +2606,7 @@
     canvasContainer.addEventListener('mousedown', (e) => {
       // Only start panning if not clicking on a widget
       if (e.target === canvasContainer || e.target === canvas) {
+        stopMomentum(); // Stop any existing momentum
         isPanningCanvas = true;
         canvasContainer.classList.add('panning');
         panStart = {
@@ -2614,6 +2662,7 @@
     canvasContainer.addEventListener('touchstart', (e) => {
       // Only start panning if not touching a widget (single touch only)
       if (e.touches.length === 1 && (e.target === canvasContainer || e.target === canvas)) {
+        stopMomentum(); // Stop any existing momentum
         isPanningCanvas = true;
         canvasContainer.classList.add('panning');
         const touch = e.touches[0];
@@ -2621,6 +2670,9 @@
           x: touch.clientX - canvasPan.x,
           y: touch.clientY - canvasPan.y
         };
+        // Initialize velocity tracking
+        lastPanPosition = { x: canvasPan.x, y: canvasPan.y, time: Date.now() };
+        panVelocity = { x: 0, y: 0 };
         e.preventDefault();
       }
     }, { passive: false });
@@ -2629,9 +2681,24 @@
       // Pan canvas (one finger)
       if (isPanningCanvas && e.touches.length === 1) {
         const touch = e.touches[0];
-        canvasPan.x = touch.clientX - panStart.x;
-        canvasPan.y = touch.clientY - panStart.y;
+        const newX = touch.clientX - panStart.x;
+        const newY = touch.clientY - panStart.y;
+
+        // Calculate velocity for momentum
+        const now = Date.now();
+        const timeDelta = now - lastPanPosition.time;
+
+        if (timeDelta > 0) {
+          panVelocity.x = (newX - lastPanPosition.x) / timeDelta * 16; // Normalize to ~60fps
+          panVelocity.y = (newY - lastPanPosition.y) / timeDelta * 16;
+        }
+
+        canvasPan.x = newX;
+        canvasPan.y = newY;
         updateCanvasTransform();
+
+        // Update last position
+        lastPanPosition = { x: newX, y: newY, time: now };
         e.preventDefault();
       }
       // Drag widget (one finger)
@@ -2655,7 +2722,8 @@
         if (isPanningCanvas) {
           isPanningCanvas = false;
           canvasContainer.classList.remove('panning');
-          await saveWidgets();
+          // Apply momentum based on final velocity
+          applyMomentum();
         }
 
         if (isDragging && draggedWidget) {
