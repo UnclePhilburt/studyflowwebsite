@@ -1504,11 +1504,16 @@
       <div class="tab-bar">
         <div class="tab-item active" data-tab="chat">Chat</div>
         <div class="tab-item" data-tab="notes">Notes</div>
+        <div class="tab-item" data-tab="schedule">Schedule</div>
         <div class="tab-item" data-tab="members">Members</div>
       </div>
 
       <!-- Chat panel -->
       <div class="tab-panel active" data-panel="chat">
+        <div id="pinnedBanner" style="display:none;padding:8px 14px;background:rgba(124,152,133,0.06);border-bottom:1px solid rgba(124,152,133,0.1);cursor:pointer;font-size:12px;color:#7c9885;font-weight:500;" onclick="togglePinnedExpand()">
+          <span id="pinnedBannerText">0 pinned messages</span>
+        </div>
+        <div id="pinnedExpand" style="display:none;max-height:200px;overflow-y:auto;border-bottom:1px solid rgba(124,152,133,0.1);background:rgba(124,152,133,0.03);"></div>
         <div class="chat-messages" id="chatMessages">
           <div class="chat-empty" id="chatEmpty">
             <div>
@@ -1544,6 +1549,31 @@
           </div>
           <div id="notesListContainer">
             <div class="notes-empty" id="notesEmpty">No shared notes yet. Upload a file to share with the group.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule panel -->
+      <div class="tab-panel" data-panel="schedule">
+        <div style="padding:16px;overflow-y:auto;flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:14px;font-weight:600;color:#2d2d2d;">Upcoming</div>
+            <button id="addEventBtn" style="padding:6px 14px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Add Event</button>
+          </div>
+          <div id="addEventForm" style="display:none;background:rgba(255,255,255,0.8);border:1px solid rgba(124,152,133,0.15);border-radius:12px;padding:14px;margin-bottom:16px;">
+            <input type="text" id="eventTitle" placeholder="Event title (e.g. Chapter 5 Review)" style="width:100%;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;color:#2d2d2d;">
+            <div style="display:flex;gap:8px;margin-bottom:8px;">
+              <input type="date" id="eventDate" style="flex:1;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
+              <input type="time" id="eventTime" style="flex:1;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
+            </div>
+            <input type="text" id="eventDesc" placeholder="Description (optional)" style="width:100%;padding:9px 12px;border:1px solid rgba(124,152,133,0.2);border-radius:8px;font-size:13px;font-family:inherit;margin-bottom:10px;outline:none;color:#2d2d2d;">
+            <div style="display:flex;gap:8px;justify-content:flex-end;">
+              <button onclick="document.getElementById('addEventForm').style.display='none'" style="padding:7px 14px;background:none;border:1px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+              <button id="saveEventBtn" style="padding:7px 14px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Save</button>
+            </div>
+          </div>
+          <div id="eventsListContainer">
+            <div style="text-align:center;padding:40px 20px;color:#9ca3af;font-size:13px;">No events scheduled yet.</div>
           </div>
         </div>
       </div>
@@ -1861,6 +1891,8 @@
         renderMembers(data.members || []);
         renderNotes(data.notes || []);
         await loadChatHistory();
+        await loadPinnedMessages();
+        await loadEvents();
         subscribeRealtime(groupId);
         updateInviteLink(data.invite_code);
       } catch (e) {
@@ -2100,10 +2132,19 @@
         html += msg.sources.map(s => escapeHtml(s.filename || s.title || s)).join(', ');
         html += '</div>';
       }
-      html += '</div>';
+      if (msg.pinned) {
+        html += '<div style="font-size:10px;color:#7c9885;font-weight:600;margin-top:6px;">Pinned</div>';
+      }
+      html += '</div>'; // close bubble
 
-      // Timestamp
+      html += '<div class="chat-msg-footer" style="display:flex;align-items:center;gap:6px;">';
       html += '<div class="chat-msg-time">' + formatTime(msg.created_at || msg.timestamp) + '</div>';
+      if (msg.id && (isSelf || (currentGroupDetail && currentGroupDetail.role === 'owner'))) {
+        html += '<button onclick="togglePin(\'' + msg.id + '\')" style="background:none;border:none;cursor:pointer;color:' + (msg.pinned ? '#7c9885' : '#d1d5db') + ';padding:2px;" title="' + (msg.pinned ? 'Unpin' : 'Pin') + '">';
+        html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="' + (msg.pinned ? '#7c9885' : 'none') + '" stroke="currentColor" stroke-width="2"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>';
+        html += '</button>';
+      }
+      html += '</div>';
 
       wrapper.innerHTML = html;
       chatMessages.appendChild(wrapper);
@@ -2411,6 +2452,140 @@
         hideConfirm();
       }
     });
+
+    // ---- Pinned messages ----
+    async function loadPinnedMessages() {
+      if (!currentGroup) return;
+      try {
+        const data = await apiFetch('/api/groups/' + currentGroup + '/pinned');
+        const pinned = data.pinned || [];
+        const banner = document.getElementById('pinnedBanner');
+        const expand = document.getElementById('pinnedExpand');
+        if (pinned.length > 0) {
+          banner.style.display = 'block';
+          document.getElementById('pinnedBannerText').textContent = pinned.length + ' pinned message' + (pinned.length > 1 ? 's' : '');
+          let html = '';
+          pinned.forEach(p => {
+            html += '<div style="padding:8px 14px;border-bottom:1px solid rgba(124,152,133,0.06);font-size:12px;">';
+            html += '<div style="font-weight:600;color:#7c9885;margin-bottom:2px;">@' + escapeHtml(p.username) + '</div>';
+            html += '<div style="color:#2d2d2d;">' + escapeHtml(p.content) + '</div>';
+            html += '</div>';
+          });
+          expand.innerHTML = html;
+        } else {
+          banner.style.display = 'none';
+          expand.style.display = 'none';
+        }
+      } catch (e) {
+        console.error('Load pinned error:', e);
+      }
+    }
+
+    function togglePinnedExpand() {
+      const expand = document.getElementById('pinnedExpand');
+      expand.style.display = expand.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function togglePin(messageId) {
+      try {
+        await apiFetch('/api/groups/' + currentGroup + '/messages/' + messageId + '/pin', { method: 'POST' });
+        await loadPinnedMessages();
+        await openGroup(currentGroup, true);
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    // ---- Study Schedule ----
+    async function loadEvents() {
+      if (!currentGroup) return;
+      try {
+        const data = await apiFetch('/api/groups/' + currentGroup + '/events');
+        const events = data.events || [];
+        const container = document.getElementById('eventsListContainer');
+        if (!events.length) {
+          container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#9ca3af;font-size:13px;">No events scheduled yet.</div>';
+          return;
+        }
+        const isOwner = (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id && m.role === 'owner');
+        const today = new Date().toISOString().split('T')[0];
+        let html = '';
+        events.forEach(ev => {
+          const isPast = ev.event_date < today;
+          const dateStr = new Date(ev.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+          const timeStr = ev.event_time ? new Date('2000-01-01T' + ev.event_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '';
+          const canDelete = isOwner || ev.created_by_id === currentUser.id;
+
+          html += '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(124,152,133,0.08);' + (isPast ? 'opacity:0.5;' : '') + '">';
+          html += '<div style="min-width:48px;height:48px;background:' + (isPast ? 'rgba(156,163,175,0.08)' : 'rgba(124,152,133,0.08)') + ';border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;">';
+          html += '<div style="font-size:10px;font-weight:600;color:' + (isPast ? '#9ca3af' : '#7c9885') + ';text-transform:uppercase;">' + dateStr.split(',')[0] + '</div>';
+          html += '<div style="font-size:15px;font-weight:700;color:#2d2d2d;">' + new Date(ev.event_date + 'T00:00:00').getDate() + '</div>';
+          html += '</div>';
+          html += '<div style="flex:1;min-width:0;">';
+          html += '<div style="font-size:13px;font-weight:600;color:#2d2d2d;">' + escapeHtml(ev.title) + '</div>';
+          html += '<div style="font-size:11px;color:#9ca3af;margin-top:2px;">';
+          if (timeStr) html += timeStr + ' -- ';
+          html += dateStr;
+          if (ev.created_by) html += ' -- Added by @' + escapeHtml(ev.created_by);
+          html += '</div>';
+          if (ev.description) html += '<div style="font-size:12px;color:#6b7280;margin-top:4px;">' + escapeHtml(ev.description) + '</div>';
+          html += '</div>';
+          if (canDelete) {
+            html += '<button onclick="deleteEvent(\'' + ev.id + '\')" style="background:none;border:none;color:#dc2626;cursor:pointer;padding:4px;" title="Delete event">';
+            html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+            html += '</button>';
+          }
+          html += '</div>';
+        });
+        container.innerHTML = html;
+      } catch (e) {
+        console.error('Load events error:', e);
+      }
+    }
+
+    async function saveEvent() {
+      const title = document.getElementById('eventTitle').value.trim();
+      const eventDate = document.getElementById('eventDate').value;
+      const eventTime = document.getElementById('eventTime').value;
+      const desc = document.getElementById('eventDesc').value.trim();
+      if (!title || !eventDate) {
+        showToast('Title and date are required');
+        return;
+      }
+      try {
+        const body = { title, event_date: eventDate };
+        if (eventTime) body.event_time = eventTime;
+        if (desc) body.description = desc;
+        await apiFetch('/api/groups/' + currentGroup + '/events', {
+          method: 'POST',
+          body: JSON.stringify(body)
+        });
+        document.getElementById('addEventForm').style.display = 'none';
+        document.getElementById('eventTitle').value = '';
+        document.getElementById('eventDate').value = '';
+        document.getElementById('eventTime').value = '';
+        document.getElementById('eventDesc').value = '';
+        showToast('Event added');
+        await loadEvents();
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    async function deleteEvent(eventId) {
+      try {
+        await apiFetch('/api/groups/' + currentGroup + '/events/' + eventId, { method: 'DELETE' });
+        showToast('Event deleted');
+        await loadEvents();
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    document.getElementById('addEventBtn').addEventListener('click', () => {
+      document.getElementById('addEventForm').style.display = 'block';
+    });
+    document.getElementById('saveEventBtn').addEventListener('click', saveEvent);
 
     // ---- Init ----
     (async function init() {
