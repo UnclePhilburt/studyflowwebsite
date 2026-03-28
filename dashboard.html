@@ -1474,6 +1474,11 @@
           const data = await res.json();
           let layout = data.layout || DEFAULT_WIDGETS;
 
+          // Load canvas pan position if saved
+          if (data.canvasPan) {
+            canvasPan = data.canvasPan;
+          }
+
           // Migration: Convert old array format ['id1', 'id2'] to new format [{id, x, y}]
           if (layout.length > 0 && typeof layout[0] === 'string') {
             layout = layout.map((id, index) => ({
@@ -1532,7 +1537,10 @@
             'Authorization': 'Bearer ' + authToken,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ layout: toSave })
+          body: JSON.stringify({
+            layout: toSave,
+            canvasPan: canvasPan
+          })
         });
       } catch (e) {
         console.error('Save widgets error:', e);
@@ -1662,6 +1670,8 @@
       if (isPanningCanvas) {
         isPanningCanvas = false;
         canvasContainer.classList.remove('panning');
+        // Save canvas pan position
+        await saveWidgets();
       }
 
       if (isDragging && draggedWidget) {
