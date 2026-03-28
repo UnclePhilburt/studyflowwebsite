@@ -273,6 +273,10 @@
       overflow: hidden;
       cursor: grab;
       z-index: 1;
+      background-color: #E8DFD3;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 99px, rgba(139, 126, 115, 0.15) 99px, rgba(139, 126, 115, 0.15) 100px),
+        repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(139, 126, 115, 0.15) 99px, rgba(139, 126, 115, 0.15) 100px);
     }
 
     .canvas-container.panning {
@@ -284,10 +288,8 @@
       position: absolute;
       width: 10000px;
       height: 10000px;
-      background-color: #E8DFD3;
-      background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 99px, rgba(139, 126, 115, 0.15) 99px, rgba(139, 126, 115, 0.15) 100px),
-        repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(139, 126, 115, 0.15) 99px, rgba(139, 126, 115, 0.15) 100px);
+      left: 0;
+      top: 0;
       z-index: 1;
       transform-origin: 0 0;
     }
