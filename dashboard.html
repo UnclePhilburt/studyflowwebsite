@@ -1582,15 +1582,16 @@
 
       .dock {
         bottom: 12px;
-        left: 12px;
-        right: 12px;
-        transform: none;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        max-width: calc(100% - 24px);
         padding: 10px 16px;
         gap: 6px;
         border-radius: 20px;
         overflow-x: auto;
         overflow-y: hidden;
-        justify-content: flex-start;
+        justify-content: center;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
       }
@@ -1757,8 +1758,10 @@
       }
 
       .dock {
-        left: 8px;
-        right: 8px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        max-width: calc(100% - 16px);
         bottom: 8px;
         padding: 8px 12px;
         gap: 4px;
@@ -1782,8 +1785,10 @@
     /* Very narrow screens (Fold outer screen) */
     @media (max-width: 380px) {
       .dock {
-        left: 6px;
-        right: 6px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        max-width: calc(100% - 12px);
         bottom: 6px;
         padding: 6px 10px;
         gap: 3px;
