@@ -1813,18 +1813,23 @@
         { id: 'studyGroups_1', type: 'studyGroups', x: 20200, y: 20500, data: {} }
       ];
 
+      console.log('Loading widgets from backend...');
       try {
         const res = await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
           headers: { 'Authorization': 'Bearer ' + authToken }
         });
 
+        console.log('Load response status:', res.status);
+
         if (res.ok) {
           const data = await res.json();
+          console.log('Loaded data:', data);
           let layout = data.layout || DEFAULT_WIDGETS;
 
           // Load canvas pan position if saved
           if (data.canvasPan) {
             canvasPan = data.canvasPan;
+            console.log('Loaded canvasPan:', canvasPan);
           }
 
           // Migration: Convert old array format ['id1', 'id2'] to new format [{id, type, x, y, data}]
@@ -1862,12 +1867,15 @@
           }
 
           // Filter out coming soon widgets
-          activeWidgets = layout.filter(w => !WIDGET_TYPES[w.id]?.comingSoon);
+          activeWidgets = layout.filter(w => !WIDGET_TYPES[w.type]?.comingSoon);
+          console.log('Loaded', activeWidgets.length, 'widgets');
         } else {
+          console.log('Load failed, using defaults');
           activeWidgets = DEFAULT_WIDGETS;
         }
       } catch (e) {
         console.error('Load widgets error:', e);
+        console.error('Error details:', e.message, e.stack);
         // Try localStorage fallback for migration
         const saved = localStorage.getItem('dashboardWidgets');
         if (saved) {
@@ -1893,8 +1901,9 @@
 
     async function saveWidgets(widgetsToSave) {
       const toSave = widgetsToSave || activeWidgets;
+      console.log('Saving widgets:', toSave.length, 'widgets, canvasPan:', canvasPan);
       try {
-        await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
+        const response = await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + authToken,
@@ -1905,6 +1914,13 @@
             canvasPan: canvasPan
           })
         });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Save failed:', response.status, errorText);
+        } else {
+          console.log('Save successful');
+        }
       } catch (e) {
         console.error('Save widgets error:', e);
       }
