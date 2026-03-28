@@ -605,6 +605,54 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
 
+    /* Clock widget styles */
+    .clock-container {
+      width: 100%;
+      height: 100%;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .widget[data-widget-type="clock"] {
+      min-width: 220px;
+      width: 220px;
+    }
+
+    /* Quote Display widget styles */
+    .widget[data-widget-type="quoteDisplay"] {
+      min-width: 320px;
+      width: 320px;
+      min-height: 200px;
+    }
+
+    /* Countdown widget styles */
+    .widget[data-widget-type="countdown"] {
+      min-width: 240px;
+      width: 240px;
+      min-height: 200px;
+    }
+
+    /* Sticker Pack widget styles */
+    .widget[data-widget-type="stickerPack"] {
+      min-width: 200px;
+      width: 200px;
+      min-height: 200px;
+      background: transparent;
+    }
+
+    /* Divider Line widget styles */
+    .widget[data-widget-type="dividerLine"] {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .widget[data-widget-type="dividerLine"]:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
     /* Recent Conversations widget */
     .conv-item {
       padding: 12px;
@@ -1706,6 +1754,41 @@
         render: renderShape,
         comingSoon: false,
         category: 'accessory'
+      },
+      clock: {
+        name: 'Clock',
+        desc: 'Digital or analog time display',
+        render: renderClock,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      quoteDisplay: {
+        name: 'Quote Display',
+        desc: 'Random inspirational quotes',
+        render: renderQuoteDisplay,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      countdown: {
+        name: 'Countdown',
+        desc: 'Days until your deadline',
+        render: renderCountdown,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      stickerPack: {
+        name: 'Sticker Pack',
+        desc: 'Decorative icons and emoji',
+        render: renderStickerPack,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      dividerLine: {
+        name: 'Divider Line',
+        desc: 'Organize your canvas',
+        render: renderDividerLine,
+        comingSoon: false,
+        category: 'accessory'
       }
     };
 
@@ -2457,6 +2540,267 @@
 
     function changeShapeColor(widgetId, color) {
       updateWidgetData(widgetId, { color });
+    }
+
+    // Clock widget
+    function renderClock(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const mode = widgetData.data.mode || 'digital'; // 'digital' or 'analog'
+
+      container.innerHTML = `
+        <div class="clock-container" id="clock-display-${widgetData.id}"></div>
+        <div style="position:absolute;bottom:8px;right:8px;display:flex;gap:4px;">
+          <button onclick="toggleClockMode('${widgetData.id}', 'digital')" style="padding:4px 8px;background:${mode === 'digital' ? '#8B9D83' : 'rgba(255,255,255,0.7)'};color:${mode === 'digital' ? 'white' : '#8B9D83'};border:1px solid #E8DFD3;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;">Digital</button>
+          <button onclick="toggleClockMode('${widgetData.id}', 'analog')" style="padding:4px 8px;background:${mode === 'analog' ? '#8B9D83' : 'rgba(255,255,255,0.7)'};color:${mode === 'analog' ? 'white' : '#8B9D83'};border:1px solid #E8DFD3;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;">Analog</button>
+        </div>
+      `;
+
+      updateClock(widgetData.id, mode);
+
+      // Update every second
+      if (!window.clockIntervals) window.clockIntervals = {};
+      if (window.clockIntervals[widgetData.id]) {
+        clearInterval(window.clockIntervals[widgetData.id]);
+      }
+      window.clockIntervals[widgetData.id] = setInterval(() => {
+        updateClock(widgetData.id, mode);
+      }, 1000);
+    }
+
+    function updateClock(widgetId, mode) {
+      const display = document.getElementById(`clock-display-${widgetId}`);
+      if (!display) return;
+
+      const now = new Date();
+
+      if (mode === 'digital') {
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        display.innerHTML = `<div style="font-size:42px;font-weight:300;color:#2C2C2C;text-align:center;line-height:1;margin-top:60px;">${hours}:${minutes}:${seconds}</div>`;
+      } else {
+        // Analog clock
+        const hours = now.getHours() % 12;
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        const hourAngle = (hours * 30) + (minutes * 0.5);
+        const minuteAngle = minutes * 6;
+        const secondAngle = seconds * 6;
+
+        display.innerHTML = `
+          <svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="4"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 75 * Math.cos(angle);
+              const y1 = 100 + 75 * Math.sin(angle);
+              const x2 = 100 + 85 * Math.cos(angle);
+              const y2 = 100 + 85 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8B9D83" stroke-width="3"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="4" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 70 * Math.cos((secondAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((secondAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="#2C2C2C"/>
+          </svg>
+        `;
+      }
+    }
+
+    function toggleClockMode(widgetId, mode) {
+      updateWidgetData(widgetId, { mode });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderClock(widgetData);
+    }
+
+    // Quote Display widget
+    const INSPIRATIONAL_QUOTES = [
+      "The only way to do great work is to love what you do. - Steve Jobs",
+      "Believe you can and you're halfway there. - Theodore Roosevelt",
+      "Success is not final, failure is not fatal. - Winston Churchill",
+      "Education is the most powerful weapon. - Nelson Mandela",
+      "The future belongs to those who believe in their dreams. - Eleanor Roosevelt",
+      "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+      "The expert in anything was once a beginner. - Helen Hayes",
+      "You are never too old to set another goal. - C.S. Lewis",
+      "It always seems impossible until it's done. - Nelson Mandela",
+      "The only impossible journey is the one you never begin. - Tony Robbins",
+      "Study while others are sleeping; work while others are loafing. - William A. Ward",
+      "The beautiful thing about learning is that no one can take it away from you. - B.B. King",
+      "Learning is a treasure that will follow its owner everywhere. - Chinese Proverb",
+      "The capacity to learn is a gift; the ability to learn is a skill. - Brian Herbert",
+      "An investment in knowledge pays the best interest. - Benjamin Franklin"
+    ];
+
+    function renderQuoteDisplay(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      let quote = widgetData.data.quote;
+
+      if (!quote) {
+        quote = INSPIRATIONAL_QUOTES[Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length)];
+        widgetData.data.quote = quote;
+      }
+
+      const [text, author] = quote.split(' - ');
+
+      container.innerHTML = `
+        <div style="padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;height:100%;">
+          <div style="font-size:16px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:12px;">"${text}"</div>
+          <div style="font-size:13px;color:#8B9D83;font-weight:500;">- ${author || 'Anonymous'}</div>
+          <button onclick="refreshQuote('${widgetData.id}')" style="margin-top:16px;padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">New Quote</button>
+        </div>
+      `;
+    }
+
+    function refreshQuote(widgetId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const newQuote = INSPIRATIONAL_QUOTES[Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length)];
+      updateWidgetData(widgetId, { quote: newQuote });
+      renderQuoteDisplay(widgetData);
+    }
+
+    // Countdown widget
+    function renderCountdown(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const targetDate = widgetData.data.targetDate || '';
+      const label = widgetData.data.label || 'My Goal';
+
+      if (!targetDate) {
+        container.innerHTML = `
+          <div style="padding:20px;text-align:center;">
+            <div style="font-size:14px;color:#6B6B6B;margin-bottom:12px;">Set your deadline:</div>
+            <input type="text" id="countdown-label-${widgetData.id}" placeholder="Event name" value="${label}" style="width:100%;padding:8px;margin-bottom:8px;border:1px solid #E8DFD3;border-radius:6px;font-family:inherit;font-size:13px;">
+            <input type="date" id="countdown-date-${widgetData.id}" style="width:100%;padding:8px;margin-bottom:12px;border:1px solid #E8DFD3;border-radius:6px;font-family:inherit;font-size:13px;">
+            <button onclick="setCountdownDate('${widgetData.id}')" style="padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Start Countdown</button>
+          </div>
+        `;
+      } else {
+        const now = new Date();
+        const target = new Date(targetDate);
+        const diff = target - now;
+        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+        container.innerHTML = `
+          <div style="padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;height:100%;">
+            <div style="font-size:13px;color:#8B9D83;margin-bottom:8px;font-weight:500;">${label}</div>
+            <div style="font-size:48px;font-weight:300;color:#2C2C2C;line-height:1;">${days}</div>
+            <div style="font-size:14px;color:#6B6B6B;margin-top:4px;">days remaining</div>
+            <button onclick="clearCountdown('${widgetData.id}')" style="margin-top:16px;padding:6px 12px;background:rgba(255,255,255,0.7);color:#8B9D83;border:1px solid #E8DFD3;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;">Reset</button>
+          </div>
+        `;
+      }
+    }
+
+    function setCountdownDate(widgetId) {
+      const dateInput = document.getElementById(`countdown-date-${widgetId}`);
+      const labelInput = document.getElementById(`countdown-label-${widgetId}`);
+      if (!dateInput.value) return;
+
+      updateWidgetData(widgetId, {
+        targetDate: dateInput.value,
+        label: labelInput.value || 'My Goal'
+      });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderCountdown(widgetData);
+    }
+
+    function clearCountdown(widgetId) {
+      updateWidgetData(widgetId, { targetDate: '', label: 'My Goal' });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderCountdown(widgetData);
+    }
+
+    // Sticker Pack widget
+    const STICKER_OPTIONS = [
+      '⭐', '🌟', '✨', '💫', '🌈', '🔥', '💯', '✅', '🎯', '🏆',
+      '📚', '✏️', '📖', '💡', '🎓', '🧠', '💪', '👍', '✌️', '🙌',
+      '❤️', '💙', '💚', '💛', '🧡', '💜', '🌸', '🌺', '🌻', '🌹',
+      '☕', '🍕', '🍰', '🎵', '🎨', '🎭', '🎪', '🎬', '📱', '💻'
+    ];
+
+    function renderStickerPack(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const sticker = widgetData.data.sticker || '';
+
+      if (!sticker) {
+        container.innerHTML = `
+          <div style="padding:12px;text-align:center;">
+            <div style="font-size:13px;color:#6B6B6B;margin-bottom:8px;">Pick a sticker:</div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:180px;overflow-y:auto;">
+              ${STICKER_OPTIONS.map(s => `
+                <button onclick="selectSticker('${widgetData.id}', '${s}')" style="font-size:28px;padding:8px;background:rgba(255,255,255,0.5);border:1px solid #E8DFD3;border-radius:8px;cursor:pointer;">${s}</button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:120px;cursor:pointer;" onclick="clearSticker('${widgetData.id}')">
+            ${sticker}
+          </div>
+        `;
+      }
+    }
+
+    function selectSticker(widgetId, sticker) {
+      updateWidgetData(widgetId, { sticker });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderStickerPack(widgetData);
+    }
+
+    function clearSticker(widgetId) {
+      updateWidgetData(widgetId, { sticker: '' });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderStickerPack(widgetData);
+    }
+
+    // Divider Line widget
+    function renderDividerLine(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const orientation = widgetData.data.orientation || 'horizontal';
+      const color = widgetData.data.color || '#8B9D83';
+      const thickness = widgetData.data.thickness || 2;
+
+      const widgetElement = container.closest('.widget');
+
+      if (orientation === 'horizontal') {
+        widgetElement.style.width = '400px';
+        widgetElement.style.height = '40px';
+        container.innerHTML = `
+          <div style="width:100%;height:${thickness}px;background:${color};margin:${(40-thickness)/2}px 0;"></div>
+        `;
+      } else {
+        widgetElement.style.width = '40px';
+        widgetElement.style.height = '300px';
+        container.innerHTML = `
+          <div style="width:${thickness}px;height:100%;background:${color};margin:0 ${(40-thickness)/2}px;"></div>
+        `;
+      }
+
+      container.innerHTML += `
+        <div style="position:absolute;bottom:4px;right:4px;display:flex;gap:4px;flex-direction:column;">
+          <button onclick="toggleDividerOrientation('${widgetData.id}')" style="padding:4px 6px;background:rgba(255,255,255,0.9);border:1px solid #E8DFD3;border-radius:4px;cursor:pointer;font-size:10px;font-family:inherit;white-space:nowrap;">${orientation === 'horizontal' ? '↔️' : '↕️'}</button>
+          <input type="color" value="${color}" onchange="changeDividerColor('${widgetData.id}', this.value)" style="width:24px;height:24px;border-radius:4px;border:1px solid rgba(255,255,255,0.8);cursor:pointer;padding:0;">
+        </div>
+      `;
+    }
+
+    function toggleDividerOrientation(widgetId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const newOrientation = widgetData.data.orientation === 'horizontal' ? 'vertical' : 'horizontal';
+      updateWidgetData(widgetId, { orientation: newOrientation });
+      renderDividerLine(widgetData);
+    }
+
+    function changeDividerColor(widgetId, color) {
+      updateWidgetData(widgetId, { color });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderDividerLine(widgetData);
     }
 
     // Helper function to update widget data
