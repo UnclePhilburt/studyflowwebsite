@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="StudyFlow Suite compliance and security overview for university IT administrators and procurement teams.">
   <link rel="icon" type="image/png" href="icon128.png">
-  <title>Compliance and Security - StudyFlow Suite</title>
+  <title>Compliance and Trust Center - StudyFlow Suite</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -200,8 +200,8 @@
 </head>
 <body>
   <div class="header">
-    <h1>Compliance and Security</h1>
-    <p>Overview for university IT administrators and procurement teams evaluating StudyFlow Suite for institutional use.</p>
+    <h1>Compliance and Trust Center</h1>
+    <p>Technical compliance documentation for university IT administrators, procurement teams, and institutional partners evaluating StudyFlow Suite.</p>
   </div>
 
   <div class="container">
@@ -210,206 +210,249 @@
       Back to StudyFlow Suite
     </a>
 
-    <!-- Missouri AI Compliance -->
+    <p style="font-size:12px;color:#9ca3af;margin-bottom:24px;">Last Updated: March 2026</p>
+
+    <!-- 1. GUARD Act -->
     <div class="section">
       <div class="section-title">
-        Missouri AI Regulatory Compliance
+        1. Missouri GUARD Act (SB 1455) -- Age Verification
         <span class="badge compliant">Compliant</span>
       </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">Missouri's GUARD Act takes effect August 28, 2026 and requires age verification and AI disclosure for platforms using artificial intelligence with users under 18. StudyFlow Suite is built to exceed these requirements.</p>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">GUARD Act (SB 1455) -- Age Verification</div>
-          <div class="item-desc">All users must be 18 or older. Age verified at registration via self-certification. Phase 2 (government-grade ID verification via Veratad API) scheduled before August 28, 2026 deadline.</div>
+          <div class="item-title">Phase 1: Self-Certification (Operational)</div>
+          <div class="item-desc">All users must certify they are 18 years or older at registration. The platform enforces an 18+ age gate on account creation. Retrieval-Augmented Generation (RAG) sources, university-specific notes, and Nexus library access are gated behind verified .edu email domains, ensuring the academic knowledge base remains a closed-loop environment for adult college students.</div>
         </div>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">Transparency and Accountability Act (SB 1324)</div>
-          <div class="item-desc">All AI-generated content is marked with provenance headers. Steganographic watermarking (zero-width characters) embedded in AI responses. Clipboard provenance appended on copy. Every AI interaction logged with 7-year encrypted retention.</div>
+          <div class="item-title">Phase 2: Government-Grade ID Verification (Pre-Deadline)</div>
+          <div class="item-desc">Integration with <strong>Veratad</strong>, a government-grade identity verification API, is scheduled for completion by June 2026 -- two months ahead of the August 28, 2026 legal deadline. Veratad provides 2.5 Grade Level age verification at approximately $0.30 per student verified annually. This upgrade ensures compliance with the full letter of the GUARD Act's ID-based verification mandate.</div>
         </div>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">AI Disclosure</div>
-          <div class="item-desc">Mandatory disclosure statement on every AI interaction: "You are chatting with StudyFlow AI, an artificial intelligence assistant. I am not a human." Rolling 30-minute interval reminders during active sessions.</div>
-        </div>
-      </div>
-
-      <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="item-content">
-          <div class="item-title">DMCA Compliance</div>
-          <div class="item-desc">Full Digital Millennium Copyright Act compliance with takedown request processing, counter-notification support, and repeat infringer policies.</div>
+          <div class="item-title">AI Disclosure and Human-in-the-Loop</div>
+          <div class="item-desc">Every AI interaction begins with a mandatory disclosure: "You are chatting with StudyFlow AI, an artificial intelligence assistant. I am not a human." A rolling 30-minute interval disclosure automatically reminds users they are interacting with AI. The AI is constrained to answering from student-uploaded source material via RAG -- it does not generate content from general internet knowledge unless no relevant notes are found, in which case this is explicitly disclosed.</div>
         </div>
       </div>
     </div>
 
-    <!-- Data Security -->
+    <!-- 2. SB 1324 -->
     <div class="section">
       <div class="section-title">
-        Data Security
+        2. AI Transparency and Data Retention (SB 1324)
+        <span class="badge compliant">Compliant</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">Missouri SB 1324 requires AI content provenance marking and long-term record retention. StudyFlow Suite implements this at the database level with immutable audit logging.</p>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">7-Year Provenance Archive</div>
+          <div class="item-desc">Every AI interaction is written to the <code>ai_provenance_logs</code> table in PostgreSQL (Supabase) with the following fields: <strong>user_id</strong>, <strong>conversation_id</strong>, <strong>prompt_text</strong> (full user query), <strong>response_text</strong> (full AI output), <strong>sources_used</strong> (JSON array of note IDs and filenames the AI cited), <strong>model_used</strong> (e.g., gemini-3.1-flash-lite-preview), <strong>response_time_ms</strong>, and <strong>ip_address</strong>. These records are retained for a minimum of 7 years. Conversations are soft-deleted (hidden from the UI) but the underlying provenance log is never purged during the retention window.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">AI Content Marking</div>
+          <div class="item-desc">All AI-generated text includes visible provenance headers ("AI-Generated Content"). The StudyFlow Assistant sidebar in ONLYOFFICE automatically labels all AI output. Steganographic watermarking embeds invisible zero-width Unicode characters encoding "STUDYFLOW-AI" into AI responses for machine-readable provenance detection. When users copy AI-generated text to the clipboard, a provenance attribution line is automatically appended.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Source Traceability via RAG</div>
+          <div class="item-desc">Every AI response is linked to the specific note chunks that informed it via the <code>sources_used</code> field in the provenance log. Each source reference includes the <strong>note_id</strong> (UUID), <strong>filename</strong>, and <strong>similarity score</strong> from the pgvector semantic search. This creates a complete chain of custody: any AI output can be traced back to the exact uploaded document, the exact text chunk, and the user who uploaded it -- at any point within the 7-year retention window.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Upload Audit Trail</div>
+          <div class="item-desc">Every file upload is logged with <strong>SHA-256 hash</strong> (tamper detection), timestamp, file size, IP address, user ID, and sharing preference. This audit trail enables verification that a file has not been modified after upload and provides a forensic record for DMCA or academic integrity investigations.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Data Sovereignty -->
+    <div class="section">
+      <div class="section-title">
+        3. Data Sovereignty and Security
         <span class="badge active">Active</span>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">Encryption in Transit</div>
-          <div class="item-desc">All data transmitted over HTTPS/TLS. No unencrypted connections accepted.</div>
+          <div class="item-title">Self-Hosted Document Server</div>
+          <div class="item-desc">The Private Office (Word, Excel, PowerPoint) is powered by <strong>ONLYOFFICE Document Server</strong>, self-hosted on a dedicated <strong>DigitalOcean</strong> droplet under StudyFlow's sole control. Student documents are rendered, edited, and stored entirely on company-controlled infrastructure -- they are never processed by Google Docs, Microsoft 365, or any third-party SaaS document provider. This eliminates the data-sharing and terms-of-service risks inherent in third-party cloud document suites.</div>
         </div>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">Authentication</div>
-          <div class="item-desc">Supabase Auth with bcrypt password hashing, JWT session tokens, and .edu email verification for academic features.</div>
+          <div class="item-title">Encryption</div>
+          <div class="item-desc"><strong>In transit:</strong> All connections enforce TLS 1.2+ via HTTPS. No unencrypted HTTP connections are accepted. <strong>At rest:</strong> Database storage on Supabase uses AES-256 encryption. File storage (Supabase Storage, S3-compatible) encrypts objects at rest. The ONLYOFFICE server encrypts document storage on the DigitalOcean volume.</div>
         </div>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">Row-Level Security</div>
-          <div class="item-desc">PostgreSQL Row-Level Security (RLS) enforced on all user data tables. Users can only access their own data. Study Group data scoped to group membership.</div>
+          <div class="item-title">Authentication and Access Control</div>
+          <div class="item-desc"><strong>Supabase Auth</strong> handles user authentication with bcrypt password hashing and JWT session tokens. <strong>PostgreSQL Row-Level Security (RLS)</strong> is enforced on every user-facing data table -- users can only query their own data at the database level, regardless of application-layer logic. Study Group data is scoped to group membership via RLS policies. The backend API uses a service role key for server-to-server operations, with all user-facing endpoints validating the JWT bearer token.</div>
         </div>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="item-content">
-          <div class="item-title">Document Server</div>
-          <div class="item-desc">ONLYOFFICE Document Server self-hosted on company infrastructure (DigitalOcean). Student documents are not processed by third-party SaaS providers.</div>
-        </div>
-      </div>
-
-      <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="item-content">
-          <div class="item-title">Cyber Liability Insurance</div>
-          <div class="item-desc">Chubb cyber liability policy (A++ rated, AM Best) covering data breach response, regulatory defense, business interruption, and third-party liability.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Data Handling -->
-    <div class="section">
-      <div class="section-title">Data Handling and Retention</div>
-
-      <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="item-content">
-          <div class="item-title">AI Provenance Logging</div>
-          <div class="item-desc">Every AI interaction logged with user ID, conversation ID, prompt text, response text, sources used, model used, response time, and IP address. Retained for 7 years per Missouri SB 1324.</div>
-        </div>
-      </div>
-
-      <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <div class="item-content">
-          <div class="item-title">Upload Audit Trail</div>
-          <div class="item-desc">Every file upload logged with SHA-256 hash, timestamp, file size, IP address, and sharing preference for tamper verification.</div>
-        </div>
-      </div>
-
-      <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
           <div class="item-title">Student Data Isolation</div>
-          <div class="item-desc">Personal notes are private by default. Nexus sharing is opt-in per upload. Study Group notes are scoped to group membership. No student data is sold or shared with advertisers.</div>
+          <div class="item-desc">Personal notes are private by default. Nexus sharing is opt-in on a per-upload basis via an explicit toggle. Study Group notes are uploaded directly to the group and are only accessible to current group members -- they do not appear in the user's personal notes or the Nexus. When a user leaves a group or is removed, their access to group data is immediately revoked. No student data is sold, shared with advertisers, or used for purposes beyond the service described in the Terms of Service.</div>
         </div>
       </div>
 
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">Data Deletion</div>
-          <div class="item-desc">Users can request deletion of their account and all associated data at any time. Conversations are soft-deleted (retained for compliance) but hidden from the user interface.</div>
+          <div class="item-title">Cyber Liability Insurance</div>
+          <div class="item-desc"><strong>Chubb</strong> cyber liability policy (A++ rated, AM Best) providing coverage for data breach response costs, forensic investigation, regulatory defense, business interruption, third-party liability claims, ransomware response, and media liability for AI-generated content. This policy protects both the business and any institutional partner's risk exposure.</div>
         </div>
       </div>
     </div>
 
-    <!-- Infrastructure -->
+    <!-- 4. Nexus Safety -->
     <div class="section">
-      <div class="section-title">Infrastructure</div>
+      <div class="section-title">
+        4. The Nexus -- Content Safety and Copyright
+        <span class="badge active">Active</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">The Nexus is StudyFlow's community knowledge network where verified students share notes across universities. Content integrity is maintained through a combination of human review and automated safeguards.</p>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Human-in-the-Loop Content Vetting</div>
+          <div class="item-desc">Every community upload is manually reviewed by the Founder to verify: content is original student work (not copyrighted textbooks or exam keys), material meets academic integrity standards, no personally identifiable information (PII) is included, and content is appropriately categorized by university and course. This vetting process creates a labeled dataset that will train an AI content classifier for automated review at scale.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">DMCA Compliance</div>
+          <div class="item-desc">Full Digital Millennium Copyright Act compliance with a published <a href="dmca.html" style="color:#7c9885;font-weight:600;">DMCA Policy</a>. Takedown requests are processed within 48 hours. Counter-notification support and repeat infringer policies are in place. All uploads are logged with SHA-256 hashes for forensic verification in copyright disputes.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Wikipedia Content Attribution</div>
+          <div class="item-desc">When AI responses cite Wikipedia articles, the source is explicitly identified with a direct link and a CC BY-SA 4.0 license notice including the retrieval date. Wikipedia sources are tracked separately from student notes in the provenance log and are clearly labeled in the UI.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Infrastructure -->
+    <div class="section">
+      <div class="section-title">5. Infrastructure and Vendor Stack</div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">StudyFlow Suite uses a focused set of vetted infrastructure providers. No student academic content passes through vendors that do not appear in this list.</p>
       <div class="infra-grid">
         <div class="infra-item">
-          <div class="infra-label">Backend</div>
-          <div class="infra-value">Python/Flask on Render</div>
+          <div class="infra-label">Application Backend</div>
+          <div class="infra-value">Python/Flask on Render (US hosting)</div>
         </div>
         <div class="infra-item">
           <div class="infra-label">Database</div>
-          <div class="infra-value">PostgreSQL via Supabase</div>
+          <div class="infra-value">PostgreSQL 15 via Supabase (RLS enforced)</div>
         </div>
         <div class="infra-item">
           <div class="infra-label">File Storage</div>
-          <div class="infra-value">Supabase Storage (S3-compatible)</div>
+          <div class="infra-value">Supabase Storage (S3-compatible, AES-256)</div>
         </div>
         <div class="infra-item">
           <div class="infra-label">Document Server</div>
-          <div class="infra-value">ONLYOFFICE on DigitalOcean (self-hosted)</div>
+          <div class="infra-value">ONLYOFFICE Docs on DigitalOcean (self-hosted, US region)</div>
         </div>
         <div class="infra-item">
           <div class="infra-label">AI Model</div>
-          <div class="infra-value">Google Gemini 3 Flash Lite</div>
+          <div class="infra-value">Google Gemini 3 Flash Lite (via Google AI API)</div>
         </div>
         <div class="infra-item">
-          <div class="infra-label">Vector Search</div>
-          <div class="infra-value">Supabase pgvector (RAG)</div>
+          <div class="infra-label">Vector Search (RAG)</div>
+          <div class="infra-value">Supabase pgvector for semantic note retrieval</div>
         </div>
         <div class="infra-item">
           <div class="infra-label">Payments</div>
-          <div class="infra-value">Stripe (PCI DSS compliant)</div>
+          <div class="infra-value">Stripe (PCI DSS Level 1 compliant)</div>
         </div>
         <div class="infra-item">
-          <div class="infra-label">Email</div>
-          <div class="infra-value">Brevo transactional email</div>
+          <div class="infra-label">Age Verification (Phase 2)</div>
+          <div class="infra-value">Veratad (government-grade ID verification)</div>
+        </div>
+        <div class="infra-item">
+          <div class="infra-label">Transactional Email</div>
+          <div class="infra-value">Brevo (verification, notifications)</div>
+        </div>
+        <div class="infra-item">
+          <div class="infra-label">Cyber Insurance</div>
+          <div class="infra-value">Chubb (A++ rated, AM Best)</div>
         </div>
       </div>
     </div>
 
-    <!-- Veteran Ownership -->
+    <!-- 6. Veteran -->
     <div class="section">
-      <div class="section-title">Veteran-Owned Small Business</div>
+      <div class="section-title">6. Veteran-Led Accountability</div>
+
       <div class="item">
-        <div class="item-check">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="item-content">
-          <div class="item-title">100% Service-Disabled Veteran-Owned</div>
-          <div class="item-desc">StudyFlow Suite LLC is a single-member LLC owned by Cody Williams, a U.S. Army Infantry veteran with 5 years of honorable service. Eligible for SDVOSB certification and federal/state veteran small business programs.</div>
+          <div class="item-title">100% Service-Disabled Veteran-Owned (SDVOSB Eligible)</div>
+          <div class="item-desc">StudyFlow Suite LLC is a single-member LLC owned by Cody Williams, a U.S. Army Infantry veteran with 5 years of honorable service. As a veteran, the Founder held direct "Hand Receipt" accountability for over $2.5 Million in sensitive military equipment under the Command Supply Discipline Program (CSDP) -- weapons systems, communications equipment, night vision devices, and tactical vehicles subject to zero-tolerance inventory standards. That same standard of accountability is applied to student data, loan funds, and regulatory compliance. The company qualifies for SDVOSB (Service-Disabled Veteran-Owned Small Business) certification, opening doors for federal and state institutional contracting.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Technical Self-Sufficiency</div>
+          <div class="item-desc">The Founder designed, developed, and deployed the entire platform as a solo technical founder -- frontend, backend, AI infrastructure, RAG pipeline, document server integration, and database architecture. The business is not dependent on outside contractors or development agencies to maintain, update, or secure the platform. Compliance updates required by state deadlines are executed by the same person who wrote the code.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Data Deletion -->
+    <div class="section">
+      <div class="section-title">7. Data Deletion and User Rights</div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Account Deletion</div>
+          <div class="item-desc">Users can request deletion of their account and all associated data at any time. Personal notes, documents, and profile data are permanently removed. Conversations and AI interactions are soft-deleted (hidden from the user interface) but retained in the provenance log for the 7-year compliance window required by SB 1324. Notes previously shared with the Nexus may remain as per the license granted at upload.</div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="item-content">
+          <div class="item-title">Study Group Data</div>
+          <div class="item-desc">When a Study Group is deleted by its owner, all associated data is permanently removed: messages, shared files (deleted from storage), scheduled events, and membership records. When a member leaves or is removed, their access is immediately revoked. Group chat messages are retained in provenance logs per SB 1324.</div>
         </div>
       </div>
     </div>
@@ -417,9 +460,10 @@
     <!-- Contact -->
     <div class="contact-section">
       <h2>Institutional Inquiries</h2>
-      <p>For institutional licensing, security questionnaires, or compliance documentation:</p>
+      <p>For institutional licensing, security questionnaires, SOC 2 documentation, or compliance questions:</p>
       <p><a href="mailto:info@studyflowsuite.com" class="contact-link">info@studyflowsuite.com</a></p>
       <p style="margin-top: 8px;"><a href="https://studyflowsuite.com" class="contact-link">studyflowsuite.com</a></p>
+      <p style="margin-top:16px;font-size:12px;color:#9ca3af;">StudyFlow Suite LLC -- Springfield, Missouri -- Veteran-Owned Small Business</p>
     </div>
   </div>
 </body>
