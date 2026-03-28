@@ -684,6 +684,50 @@
       color: #c0c0c0;
     }
 
+    .invite-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .invite-input-wrap .invite-input {
+      width: 100%;
+    }
+
+    .invite-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      margin-top: 4px;
+      z-index: 10;
+      display: none;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .invite-results.active {
+      display: block;
+    }
+
+    .invite-result-item {
+      padding: 9px 14px;
+      font-size: 13px;
+      color: #2d2d2d;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .invite-result-item:hover {
+      background: rgba(124, 152, 133, 0.06);
+    }
+
+    .invite-result-item:first-child { border-radius: 10px 10px 0 0; }
+    .invite-result-item:last-child { border-radius: 0 0 10px 10px; }
+
     .invite-send-btn {
       height: 38px;
       padding: 0 16px;
@@ -1323,7 +1367,10 @@
           <div class="invite-section" id="inviteSection">
             <div class="invite-section-title">Invite Members</div>
             <div class="invite-row">
-              <input type="text" class="invite-input" id="inviteUsernameInput" placeholder="Enter username to invite">
+              <div class="invite-input-wrap">
+                <input type="text" class="invite-input" id="inviteUsernameInput" placeholder="Search by username..." autocomplete="off">
+                <div class="invite-results" id="inviteResults"></div>
+              </div>
               <button class="invite-send-btn" id="inviteSendBtn">Invite</button>
             </div>
             <div class="invite-section-title" style="margin-top:14px;">Invite Link</div>
@@ -1939,6 +1986,51 @@
         realtimeChannel = null;
       }
     }
+
+    // ---- Invite user search ----
+    let inviteSearchTimer = null;
+    const inviteResults = document.getElementById('inviteResults');
+
+    inviteUsernameInput.addEventListener('input', function() {
+      clearTimeout(inviteSearchTimer);
+      const q = this.value.trim();
+      if (q.length < 2) {
+        inviteResults.classList.remove('active');
+        return;
+      }
+      inviteSearchTimer = setTimeout(() => searchInviteUsers(q), 300);
+    });
+
+    async function searchInviteUsers(query) {
+      try {
+        const data = await apiFetch('/api/office/search-users?q=' + encodeURIComponent(query));
+        inviteResults.innerHTML = '';
+        if (data.users && data.users.length > 0) {
+          data.users.forEach(u => {
+            const item = document.createElement('div');
+            item.className = 'invite-result-item';
+            item.textContent = '@' + u.username;
+            item.addEventListener('click', () => {
+              inviteUsernameInput.value = u.username;
+              inviteResults.classList.remove('active');
+            });
+            inviteResults.appendChild(item);
+          });
+          inviteResults.classList.add('active');
+        } else {
+          inviteResults.classList.remove('active');
+        }
+      } catch (e) {
+        console.error('Search error:', e);
+      }
+    }
+
+    // Close results on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.invite-input-wrap')) {
+        inviteResults.classList.remove('active');
+      }
+    });
 
     // ---- Invite ----
     async function inviteByUsername() {
