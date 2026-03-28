@@ -3989,12 +3989,27 @@
         // Show messages
         const groupName = widgetData.data.groupName || 'Study Group';
         container.innerHTML = `
-          <div class="group-chat-header" onclick="selectGroupForChat('${widgetData.id}')">
-            <div style="font-weight:600;font-size:13px;color:#2C2C2C;">${groupName}</div>
-            <div style="font-size:11px;color:#8B9D83;cursor:pointer;">Change</div>
-          </div>
-          <div class="group-chat-messages" id="chat-messages-${widgetData.id}">
-            ${messages.length === 0 ? '<div style="text-align:center;padding:40px 20px;color:#9B8B7E;font-size:13px;">No messages yet</div>' : ''}
+          <div style="display:flex;flex-direction:column;height:100%;">
+            <div class="group-chat-header" onclick="selectGroupForChat('${widgetData.id}')">
+              <div style="font-weight:600;font-size:13px;color:#2C2C2C;">${groupName}</div>
+              <div style="font-size:11px;color:#8B9D83;cursor:pointer;">Change</div>
+            </div>
+            <div class="group-chat-messages" id="chat-messages-${widgetData.id}" style="flex:1;overflow-y:auto;min-height:0;">
+              ${messages.length === 0 ? '<div style="text-align:center;padding:40px 20px;color:#9B8B7E;font-size:13px;">No messages yet</div>' : ''}
+            </div>
+            <div style="padding:8px;border-top:1px solid #E8DFD3;display:flex;gap:6px;background:rgba(255,255,255,0.5);">
+              <input
+                type="text"
+                id="chat-input-${widgetData.id}"
+                placeholder="Type a message..."
+                style="flex:1;padding:6px 10px;border:1px solid #E8DFD3;border-radius:6px;font-size:12px;font-family:inherit;outline:none;"
+                onkeypress="if(event.key==='Enter') sendGroupMessage('${widgetData.id}')"
+              />
+              <button
+                onclick="sendGroupMessage('${widgetData.id}')"
+                style="padding:6px 12px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;"
+              >Send</button>
+            </div>
           </div>
         `;
 
@@ -4100,6 +4115,48 @@
         updateWidgetData(widgetId, { groupId, groupName, messages: [] });
         const widgetData = activeWidgets.find(w => w.id === widgetId);
         if (widgetData) renderGroupChat(widgetData);
+      }
+    }
+
+    async function sendGroupMessage(widgetId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData || !widgetData.data.groupId) return;
+
+      const input = document.getElementById(`chat-input-${widgetId}`);
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      try {
+        const res = await fetch(BACKEND_URL + `/api/groups/${widgetData.data.groupId}/chat`, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + authToken,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message })
+        });
+
+        if (res.ok) {
+          // Clear input
+          input.value = '';
+
+          // Immediately fetch updated messages
+          const messagesRes = await fetch(BACKEND_URL + `/api/groups/${widgetData.data.groupId}/messages`, {
+            headers: { 'Authorization': 'Bearer ' + authToken }
+          });
+
+          if (messagesRes.ok) {
+            const data = await messagesRes.json();
+            widgetData.data.messages = data.messages || [];
+            renderChatMessages(widgetId, widgetData.data.messages);
+          }
+        } else {
+          alert('Failed to send message');
+        }
+      } catch (e) {
+        console.error('Error sending message:', e);
+        alert('Failed to send message');
       }
     }
 
