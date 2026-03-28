@@ -377,16 +377,15 @@
       width: 320px;
       height: 100vh;
       height: 100dvh;
-      background: linear-gradient(to bottom, rgba(245, 243, 240, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      background: var(--bg-secondary);
       backdrop-filter: blur(60px);
       -webkit-backdrop-filter: blur(60px);
-      border-right: 3px solid transparent;
-      border-image: linear-gradient(to bottom, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      border-right: 3px solid var(--border-color);
       display: flex;
       flex-direction: column;
       transform: translateX(-100%);
       transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 12px 0 60px rgba(124, 152, 133, 0.1), 8px 0 40px rgba(232, 155, 95, 0.05);
+      box-shadow: 12px 0 60px var(--shadow), 8px 0 40px var(--shadow);
       z-index: 1000;
       opacity: 1;
     }
@@ -715,11 +714,11 @@
 
     .sidebar-header {
       padding: 28px 16px;
-      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(to bottom, rgba(124, 152, 133, 0.03) 0%, transparent 100%);
+      background: linear-gradient(to bottom, var(--gradient-start) 0%, transparent 100%);
     }
 
     .logo-text {
@@ -897,9 +896,9 @@
     .new-chat-btn {
       margin: 16px;
       padding: 14px;
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(107, 133, 117, 0.1) 100%);
+      background: var(--hover-bg);
       color: var(--text-primary);
-      border: 1px solid rgba(124, 152, 133, 0.3);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       font-size: 14px;
       font-weight: 600;
@@ -914,9 +913,9 @@
     }
 
     .new-chat-btn:hover {
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(107, 133, 117, 0.2) 100%);
-      border-color: rgba(124, 152, 133, 0.5);
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.3);
+      background: var(--hover-bg);
+      border-color: var(--accent-primary);
+      box-shadow: 0 8px 32px var(--shadow);
       transform: translateY(-2px);
     }
 
@@ -932,7 +931,7 @@
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color: #3d3d3d;
+      color: var(--text-primary);
       font-weight: 500;
       font-size: 14px;
       white-space: nowrap;
@@ -943,18 +942,18 @@
     }
 
     .conversation-item:hover {
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.08) 0%, rgba(232, 155, 95, 0.05) 100%);
+      background: var(--hover-bg);
       transform: translateX(4px);
-      border-color: rgba(232, 155, 95, 0.3);
-      box-shadow: 0 2px 8px rgba(232, 155, 95, 0.1);
+      border-color: var(--accent-tertiary);
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     .conversation-item.active {
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
       color: var(--text-primary);
       font-weight: 600;
-      border-color: #e89b5f;
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.15), 0 2px 12px rgba(232, 155, 95, 0.1);
+      border-color: var(--accent-tertiary);
+      box-shadow: 0 4px 16px var(--shadow);
     }
 
     /* Zen Delete Stone - appears on hover */
@@ -966,7 +965,7 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 240, 235, 0.8) 100%);
+      background: var(--bg-tertiary);
       border: 1.5px solid rgba(220, 100, 80, 0.3);
       display: flex;
       align-items: center;
@@ -974,7 +973,7 @@
       opacity: 0;
       pointer-events: none;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 6px rgba(45, 45, 45, 0.1);
+      box-shadow: 0 2px 6px var(--shadow);
       z-index: 10;
     }
 
@@ -991,7 +990,7 @@
     }
 
     .delete-stone:hover {
-      background: linear-gradient(135deg, rgba(220, 100, 80, 0.15) 0%, rgba(220, 100, 80, 0.1) 100%);
+      background: rgba(220, 100, 80, 0.12);
       border-color: rgba(220, 100, 80, 0.6);
       transform: translateY(-50%) scale(1.15);
       box-shadow: 0 3px 10px rgba(220, 100, 80, 0.25);
@@ -2232,15 +2231,14 @@
     }
 
     .settings-popup {
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      background: var(--bg-tertiary);
       border-radius: 16px;
       padding: 32px;
       max-width: 420px;
       width: 90%;
-      box-shadow: 0 20px 60px rgba(45, 45, 45, 0.2),
-                  0 8px 32px rgba(124, 152, 133, 0.15);
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      box-shadow: 0 20px 60px var(--shadow),
+                  0 8px 32px var(--shadow);
+      border: 2px solid var(--border-color);
       transform: scale(0.9);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -2256,7 +2254,7 @@
       color: var(--text-primary);
       margin-bottom: 24px;
       padding-bottom: 16px;
-      border-bottom: 2px solid rgba(124, 152, 133, 0.15);
+      border-bottom: 2px solid var(--border-color);
       text-align: center;
     }
 
@@ -2265,7 +2263,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 0;
-      border-bottom: 1px solid rgba(124, 152, 133, 0.08);
+      border-bottom: 1px solid var(--border-color);
     }
 
     .settings-option:last-child {
@@ -2276,13 +2274,13 @@
       text-align: center;
       margin-top: 20px;
       padding-top: 16px;
-      border-top: 1px solid rgba(124, 152, 133, 0.1);
+      border-top: 1px solid var(--border-color);
     }
 
     .settings-version-btn {
       background: none;
       border: none;
-      color: rgba(93, 93, 93, 0.5);
+      color: var(--text-muted);
       font-size: 12px;
       font-family: 'Inter', sans-serif;
       cursor: pointer;
