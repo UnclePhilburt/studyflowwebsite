@@ -1100,7 +1100,7 @@
     (async function() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session) {
-        window.location.href = 'chat.html';
+        window.location.href = 'dashboard.html';
       }
     })();
 
@@ -1299,7 +1299,7 @@
 
         showSuccess('Login successful! Redirecting...');
         setTimeout(() => {
-          window.location.href = 'chat.html';
+          window.location.href = 'dashboard.html';
         }, 500);
 
       } catch (error) {

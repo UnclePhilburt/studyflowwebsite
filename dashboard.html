@@ -3,500 +3,969 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="StudyFlow Suite Dashboard. Access your study tools and manage your account.">
+  <meta name="description" content="StudyFlow Suite Dashboard. Your central hub for AI chat, notes, study groups, and more.">
   <link rel="icon" type="image/png" href="icon128.png">
   <title>Dashboard - StudyFlow Suite</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .dashboard-page {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       min-height: 100vh;
-      background: var(--bg-secondary);
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    .dashboard-nav {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 20px 0;
-      position: sticky;
+    body::before {
+      content: '';
+      position: fixed;
       top: 0;
-      z-index: 100;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .dashboard-nav-container {
-      max-width: 1400px;
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 40px;
+      padding: 80px 24px 40px;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
       display: flex;
-      justify-content: space-between;
+      gap: 16px;
       align-items: center;
+      z-index: 1000;
     }
 
-    .dashboard-logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .dashboard-logo img {
-      width: 32px;
-      height: 32px;
-    }
-
-    .dashboard-user {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .user-info {
-      text-align: right;
-    }
-
-    .user-name {
-      font-weight: 600;
-      color: var(--text-primary);
+    .nav-link {
+      color: #5d5d5d;
+      text-decoration: none;
       font-size: 14px;
-    }
-
-    .user-email {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .btn-logout {
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       padding: 8px 16px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
       border-radius: 8px;
-      color: var(--text-primary);
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
     }
 
-    .btn-logout:hover {
-      border-color: var(--primary);
-      background: var(--card-bg);
+    .nav-link:hover {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
     }
 
-    .dashboard-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 40px;
+    .user-avatar-wrapper {
+      position: relative;
     }
 
-    .welcome-banner {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 16px;
-      padding: 40px;
-      color: white;
-      margin-bottom: 30px;
-    }
-
-    .welcome-banner h1 {
-      font-size: 32px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .welcome-banner p {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-bottom: 30px;
-    }
-
-    .dashboard-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 30px;
-      border: 1px solid var(--border-color);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .card-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-    }
-
-    .card-icon.purple {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-    }
-
-    .card-icon.green {
-      background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%);
-    }
-
-    .card-icon.blue {
-      background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.1) 100%);
-    }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 5px;
-    }
-
-    .card-subtitle {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .card-value {
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 10px;
-    }
-
-    .card-label {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .subscription-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .subscription-badge.free {
-      background: #e0e0e0;
-      color: #616161;
-    }
-
-    .subscription-badge.trialing {
-      background: #e3f2fd;
-      color: #1976d2;
-    }
-
-    .subscription-badge.active {
-      background: #e8f5e9;
-      color: #388e3c;
-    }
-
-    .subscription-badge.canceled {
-      background: #ffebee;
-      color: #d32f2f;
-    }
-
-    .btn-upgrade {
-      width: 100%;
-      padding: 14px;
-      background: var(--gradient);
       color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 15px;
-    }
-
-    .btn-upgrade:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-manage {
-      width: 100%;
-      padding: 14px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      color: var(--text-primary);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 10px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.2);
     }
 
-    .btn-manage:hover {
-      border-color: var(--primary);
+    .user-avatar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
     }
 
-    .trial-notice {
-      background: #fff9e6;
-      border: 1px solid #f0e5c0;
-      border-radius: 10px;
-      padding: 15px;
-      margin-top: 15px;
+    .user-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 12px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.15);
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10000;
+    }
+
+    .user-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .user-menu-header {
+      padding: 16px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .user-menu-email {
       font-size: 13px;
-      color: #6b5d00;
+      color: #5d5d5d;
+      font-weight: 500;
+      word-break: break-all;
     }
 
-    .quick-actions {
+    .user-menu-item {
+      padding: 12px 16px;
+      color: #2d2d2d;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .user-menu-item:hover {
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
+
+    .user-menu-item.logout {
+      color: #e89b5f;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .user-menu-item.logout:hover {
+      background: rgba(232, 155, 95, 0.08);
+      color: #d4783d;
+    }
+
+    /* Welcome Header */
+    .welcome-header {
+      margin-bottom: 40px;
+      padding-top: 16px;
+    }
+
+    .welcome-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+
+    .welcome-subtitle {
+      font-size: 15px;
+      color: #7a7a7a;
+      font-weight: 400;
+    }
+
+    /* Quick Access Grid */
+    .quick-access-grid {
       display: grid;
-      gap: 12px;
-      margin-top: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 48px;
     }
 
-    .action-btn {
+    .quick-card {
+      background: #f8f7f4;
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      border-left: 3px solid #7c9885;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .quick-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.12);
+    }
+
+    .quick-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(124, 152, 133, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #7c9885;
+    }
+
+    .quick-card-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .quick-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .quick-card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+    }
+
+    .quick-card-desc {
+      font-size: 13px;
+      color: #7a7a7a;
+      line-height: 1.4;
+    }
+
+    /* Activity Section */
+    .activity-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .activity-panel {
+      background: #f8f7f4;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      overflow: hidden;
+    }
+
+    .activity-panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d2d2d;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .activity-panel-header svg {
+      width: 18px;
+      height: 18px;
+      stroke: #7c9885;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .activity-panel-body {
+      padding: 8px 0;
+    }
+
+    .activity-empty {
+      padding: 32px 20px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .activity-loading {
+      padding: 32px 20px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    /* Conversation items */
+    .conv-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-weight: 600;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.15s;
       text-decoration: none;
-      transition: all 0.2s;
-      font-size: 14px;
+      color: inherit;
     }
 
-    .action-btn:hover {
-      border-color: var(--primary);
-      background: var(--card-bg);
+    .conv-item:hover {
+      background: rgba(124, 152, 133, 0.06);
     }
 
-    .section-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 20px;
+    .conv-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(124, 152, 133, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #7c9885;
+    }
+
+    .conv-item-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .conv-item-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .conv-item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #2d2d2d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .conv-item-time {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    /* Notification items */
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 20px;
+      transition: background 0.15s;
+    }
+
+    .notif-item.unread {
+      background: rgba(124, 152, 133, 0.04);
+    }
+
+    .notif-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .notif-item-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .notif-item-icon.download {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+    }
+
+    .notif-item-icon.course {
+      background: rgba(232, 155, 95, 0.1);
+      color: #e89b5f;
+    }
+
+    .notif-item-icon.invite {
+      background: rgba(124, 152, 133, 0.12);
+      color: #7c9885;
+    }
+
+    .notif-item-icon.default {
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
+
+    .notif-item-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notif-item-msg {
+      font-size: 13px;
+      color: #2d2d2d;
+      line-height: 1.4;
+    }
+
+    .notif-item-time {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .notif-item-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #7c9885;
+      flex-shrink: 0;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .notif-item.unread .notif-item-dot {
+      display: block;
+    }
+
+    .invite-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .invite-btn {
+      flex: 1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+
+    .invite-btn:hover {
+      opacity: 0.85;
+    }
+
+    .invite-btn.accept {
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+      border: none;
+    }
+
+    .invite-btn.decline {
+      background: none;
+      border: 1.5px solid rgba(156, 163, 175, 0.3);
+      color: #9ca3af;
+    }
+
+    /* Bottom Tab Bar (mobile) */
+    .bottom-tab-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+      justify-content: space-around;
+      align-items: center;
+      z-index: 9999;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-decoration: none;
+      color: #8a8a8a;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 6px 0;
+      min-width: 48px;
+      transition: color 0.2s;
+    }
+
+    .tab-item svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tab-item.active {
+      color: #7c9885;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 24px 16px 80px;
+      }
+
+      .top-nav {
+        display: none;
+      }
+
+      .bottom-tab-bar {
+        display: flex;
+      }
+
+      body {
+        padding-bottom: 56px;
+      }
+
+      .welcome-header {
+        margin-bottom: 28px;
+        padding-top: 8px;
+      }
+
+      .welcome-title {
+        font-size: 24px;
+      }
+
+      .quick-access-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+
+      .activity-section {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .quick-card {
+        padding: 18px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .quick-access-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="dashboard-page">
-    <!-- Dashboard Navigation -->
-    <nav class="dashboard-nav">
-      <div class="dashboard-nav-container">
-        <div class="dashboard-logo">
-          <img src="assets/logo.svg" alt="StudyFlowSuite">
-          <span>StudyFlowSuite</span>
+
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="notes.html" class="nav-link">Notes</a>
+    <a href="office.html" class="nav-link">Office</a>
+    <a href="browse.html" class="nav-link">Nexus</a>
+    <a href="calendar.html" class="nav-link">Calendar</a>
+    <div class="user-avatar-wrapper">
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-menu" id="userMenu">
+        <div class="user-menu-header">
+          <div class="user-menu-email" id="menuUserEmail">Loading...</div>
         </div>
-        <div class="dashboard-user">
-          <div class="user-info">
-            <div class="user-name" id="userName">Loading...</div>
-            <div class="user-email" id="userEmail">Loading...</div>
-          </div>
-          <button class="btn-logout" onclick="logout()">Logout</button>
+        <a href="account.html" class="user-menu-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Account
+        </a>
+        <button class="user-menu-item logout" onclick="logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+
+    <!-- Welcome Header -->
+    <div class="welcome-header">
+      <h1 class="welcome-title" id="welcomeTitle">Welcome back</h1>
+      <p class="welcome-subtitle">Your study hub</p>
+    </div>
+
+    <!-- Quick Access Grid -->
+    <div class="quick-access-grid">
+
+      <a href="chat.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">AI Chat</div>
+          <div class="quick-card-desc">Ask questions grounded in your notes</div>
+        </div>
+      </a>
+
+      <a href="upload.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">Upload Notes</div>
+          <div class="quick-card-desc">Add PDFs, docs, or images</div>
+        </div>
+      </a>
+
+      <a href="notes.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">My Notes</div>
+          <div class="quick-card-desc">Browse and manage your uploads</div>
+        </div>
+      </a>
+
+      <a href="office.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">Private Office</div>
+          <div class="quick-card-desc">Create and co-edit documents</div>
+        </div>
+      </a>
+
+      <a href="study-groups.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">Study Groups</div>
+          <div class="quick-card-desc">Chat, share notes, and schedule</div>
+        </div>
+      </a>
+
+      <a href="flashcards.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">Flashcards</div>
+          <div class="quick-card-desc">Quiz yourself from Nexus notes</div>
+        </div>
+      </a>
+
+      <a href="browse.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">Nexus</div>
+          <div class="quick-card-desc">Browse the community note library</div>
+        </div>
+      </a>
+
+      <a href="calendar.html" class="quick-card">
+        <div class="quick-card-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="quick-card-content">
+          <div class="quick-card-title">Calendar</div>
+          <div class="quick-card-desc">View your schedule</div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="activity-section">
+
+      <!-- Recent Conversations -->
+      <div class="activity-panel">
+        <div class="activity-panel-header">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Recent Conversations
+        </div>
+        <div class="activity-panel-body" id="conversationsList">
+          <div class="activity-loading">Loading...</div>
         </div>
       </div>
-    </nav>
 
-    <!-- Dashboard Content -->
-    <div class="dashboard-container">
-      <!-- Welcome Banner -->
-      <div class="welcome-banner" id="welcomeBanner" style="display: none;">
-        <h1>🎉 Welcome to StudyFlowSuite!</h1>
-        <p>Your account has been created successfully. Explore the dashboard to get started.</p>
-      </div>
-
-      <!-- Dashboard Grid -->
-      <div class="dashboard-grid">
-        <!-- Subscription Card -->
-        <div class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon purple">👤</div>
-            <div>
-              <div class="card-title">Your Plan</div>
-              <div class="card-subtitle">Subscription Status</div>
-            </div>
-          </div>
-          <div>
-            <span class="subscription-badge" id="subscriptionBadge">Free</span>
-            <div style="margin-top: 15px; font-size: 14px; color: var(--text-secondary);" id="subscriptionInfo">
-              Limited to 10 questions per day
-            </div>
-            <div id="upgradeSection">
-              <button class="btn-upgrade" onclick="window.location.href='checkout.html'">
-                Upgrade to Pro - $4.99/mo
-              </button>
-            </div>
-            <div id="manageSection" style="display: none;">
-              <button class="btn-manage" onclick="manageSubscription()">
-                Manage Subscription
-              </button>
-            </div>
-            <div id="trialNotice" class="trial-notice" style="display: none;">
-              <strong>Trial Active!</strong> Your free trial ends on <span id="trialEndDate"></span>. No charges until then.
-            </div>
-          </div>
+      <!-- Notifications -->
+      <div class="activity-panel">
+        <div class="activity-panel-header">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Notifications
         </div>
-
-        <!-- Usage Stats -->
-        <div class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon green">📊</div>
-            <div>
-              <div class="card-title">Usage Today</div>
-              <div class="card-subtitle">Questions Answered</div>
-            </div>
-          </div>
-          <div class="card-value" id="usageCount">0</div>
-          <div class="card-label" id="usageLimit">of 10 questions used</div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon blue">⚡</div>
-            <div>
-              <div class="card-title">Quick Actions</div>
-              <div class="card-subtitle">Get Started</div>
-            </div>
-          </div>
-          <div class="quick-actions">
-            <a href="demo.html" class="action-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              Try Demo Quizzes
-            </a>
-            <a href="docs.html" class="action-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="12" y1="18" x2="12" y2="12"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-              </svg>
-              Read Documentation
-            </a>
-          </div>
+        <div class="activity-panel-body" id="notificationsList">
+          <div class="activity-loading">Loading...</div>
         </div>
       </div>
 
     </div>
+
   </div>
 
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="bottom-tab-bar">
+    <a href="chat.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></a>
+    <a href="upload.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span></a>
+    <a href="notes.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notes</span></a>
+    <a href="office.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg><span>Office</span></a>
+    <a href="browse.html" class="tab-item"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Nexus</span></a>
+    <a href="calendar.html" class="tab-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
+    <a href="account.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const API_URL = 'https://studyflowsuite.onrender.com/api';
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
 
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = 'index.html';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let authToken = null;
+    let pendingInvites = [];
+    let notifData = [];
+
+    // Auth check
+    async function checkAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      authToken = session.access_token;
+
+      const username = session.user.user_metadata?.username || session.user.email.split('@')[0];
+      document.getElementById('welcomeTitle').textContent = 'Welcome back, ' + username;
+
+      const userAvatar = document.getElementById('userAvatar');
+      const menuUserEmail = document.getElementById('menuUserEmail');
+      if (session.user.email) {
+        userAvatar.textContent = session.user.email.charAt(0).toUpperCase();
+        menuUserEmail.textContent = session.user.email;
+      }
+
+      loadConversations();
+      loadNotifications();
     }
 
-    // Show welcome banner if redirected from signup
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('welcome') === 'true') {
-      document.getElementById('welcomeBanner').style.display = 'block';
+    // Time ago helper
+    function timeAgo(dateStr) {
+      const d = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - d;
+      const mins = Math.floor(diffMs / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins + 'm ago';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + 'h ago';
+      const days = Math.floor(hrs / 24);
+      if (days < 7) return days + 'd ago';
+      return d.toLocaleDateString();
     }
 
-    // Fetch user data
-    async function loadUserData() {
+    // Load recent conversations
+    async function loadConversations() {
+      const container = document.getElementById('conversationsList');
       try {
-        const response = await fetch(`${API_URL}/me`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        const response = await fetch(`${BACKEND_URL}/api/conversations`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
-        if (response.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = 'index.html';
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        const conversations = (data.conversations || []).slice(0, 5);
+
+        if (conversations.length === 0) {
+          container.innerHTML = '<div class="activity-empty">No conversations yet</div>';
           return;
         }
 
-        const user = await response.json();
-
-        // Update UI with user data
-        document.getElementById('userName').textContent = user.name || 'User';
-        document.getElementById('userEmail').textContent = user.email;
-
-        // Update subscription status
-        const status = user.subscription_status || 'free';
-        const badge = document.getElementById('subscriptionBadge');
-        badge.className = `subscription-badge ${status}`;
-        badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-
-        // Update subscription info
-        if (status === 'free') {
-          document.getElementById('subscriptionInfo').textContent = 'Limited to 10 questions per day';
-          document.getElementById('upgradeSection').style.display = 'block';
-          document.getElementById('manageSection').style.display = 'none';
-          document.getElementById('usageLimit').textContent = 'of 10 questions used';
-        } else if (status === 'trialing') {
-          document.getElementById('subscriptionInfo').textContent = 'Pro features enabled during trial';
-          document.getElementById('upgradeSection').style.display = 'none';
-          document.getElementById('manageSection').style.display = 'block';
-          document.getElementById('trialNotice').style.display = 'block';
-
-          if (user.trial_ends_at) {
-            const trialEnd = new Date(user.trial_ends_at);
-            document.getElementById('trialEndDate').textContent = trialEnd.toLocaleDateString();
-          }
-          document.getElementById('usageLimit').textContent = 'Unlimited questions';
-        } else if (status === 'active') {
-          document.getElementById('subscriptionInfo').textContent = 'All Pro features unlocked';
-          document.getElementById('upgradeSection').style.display = 'none';
-          document.getElementById('manageSection').style.display = 'block';
-          document.getElementById('usageLimit').textContent = 'Unlimited questions';
-        }
-
-        // Store user data
-        localStorage.setItem('user', JSON.stringify(user));
-
-      } catch (error) {
-        console.error('Error loading user data:', error);
+        container.innerHTML = conversations.map(conv => {
+          const title = conv.title || 'New conversation';
+          const displayTitle = title.length > 50 ? title.substring(0, 50) + '...' : title;
+          return `<a href="chat.html" class="conv-item">
+            <div class="conv-item-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="conv-item-body">
+              <div class="conv-item-title">${displayTitle}</div>
+              <div class="conv-item-time">${timeAgo(conv.updated_at)}</div>
+            </div>
+          </a>`;
+        }).join('');
+      } catch (e) {
+        console.error('Failed to load conversations:', e);
+        container.innerHTML = '<div class="activity-empty">Could not load conversations</div>';
       }
     }
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+    // Notification icon helper
+    function notifIcon(type) {
+      if (type === 'note_downloaded') return { cls: 'download', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' };
+      if (type === 'course_new_note') return { cls: 'course', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>' };
+      if (type === 'group_invite') return { cls: 'invite', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' };
+      return { cls: 'default', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' };
+    }
+
+    // Load notifications and group invites
+    async function loadNotifications() {
+      const container = document.getElementById('notificationsList');
+      try {
+        const [notifRes, inviteRes] = await Promise.all([
+          fetch(`${BACKEND_URL}/api/notifications`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
+          fetch(`${BACKEND_URL}/api/groups/invites`, { headers: { 'Authorization': `Bearer ${authToken}` } })
+        ]);
+
+        if (notifRes.ok) {
+          const json = await notifRes.json();
+          notifData = json.notifications || [];
+        }
+        if (inviteRes.ok) {
+          const json = await inviteRes.json();
+          pendingInvites = json.invites || [];
+        }
+
+        renderNotifications();
+      } catch (e) {
+        console.error('Failed to load notifications:', e);
+        container.innerHTML = '<div class="activity-empty">Could not load notifications</div>';
+      }
+    }
+
+    // Render notifications list
+    function renderNotifications() {
+      const container = document.getElementById('notificationsList');
+      const allItems = [];
+
+      // Pending invites first
+      pendingInvites.forEach(inv => {
+        allItems.push(`<div class="notif-item unread">
+          <div class="notif-item-icon invite">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="notif-item-body">
+            <div class="notif-item-msg">${inv.invited_by} invited you to '${inv.group_name}'</div>
+            <div class="notif-item-time">${timeAgo(inv.created_at)}</div>
+            <div class="invite-actions">
+              <button class="invite-btn accept" onclick="respondInvite('${inv.id}','accept',event)">Accept</button>
+              <button class="invite-btn decline" onclick="respondInvite('${inv.id}','decline',event)">Decline</button>
+            </div>
+          </div>
+        </div>`);
+      });
+
+      // Regular notifications (skip group_invite type, handled above)
+      notifData.forEach(n => {
+        if (n.type === 'group_invite') return;
+        const icon = notifIcon(n.type);
+        allItems.push(`<div class="notif-item ${n.is_read ? '' : 'unread'}">
+          <div class="notif-item-icon ${icon.cls}">${icon.svg}</div>
+          <div class="notif-item-body">
+            <div class="notif-item-msg">${n.message || n.title}</div>
+            <div class="notif-item-time">${timeAgo(n.created_at)}</div>
+          </div>
+          <div class="notif-item-dot"></div>
+        </div>`);
+      });
+
+      // Limit to 5 total
+      const displayItems = allItems.slice(0, 5);
+
+      if (displayItems.length === 0) {
+        container.innerHTML = '<div class="activity-empty">No notifications yet</div>';
+        return;
+      }
+
+      container.innerHTML = displayItems.join('');
+    }
+
+    // Respond to group invite
+    async function respondInvite(inviteId, action, event) {
+      event.stopPropagation();
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/groups/invites/${inviteId}/${action}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        pendingInvites = pendingInvites.filter(i => i.id !== inviteId);
+        renderNotifications();
+
+        if (action === 'accept') {
+          window.location.href = 'study-groups.html';
+        }
+      } catch (e) {
+        console.error('Invite response error:', e);
+        btn.disabled = false;
+        btn.textContent = action === 'accept' ? 'Accept' : 'Decline';
+      }
+    }
+
+    // User menu toggle
+    function toggleUserMenu() {
+      const menu = document.getElementById('userMenu');
+      menu.classList.toggle('show');
+    }
+
+    // Close menu on outside click
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('userMenu');
+      const avatar = document.getElementById('userAvatar');
+      if (!menu.contains(e.target) && e.target !== avatar) {
+        menu.classList.remove('show');
+      }
+    });
+
+    // Logout
+    async function logout() {
+      await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
 
-    async function manageSubscription() {
-      try {
-        const response = await fetch(`${API_URL}/create-portal-session`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          // Open Stripe Customer Portal in new tab
-          window.open(data.url, '_blank');
-        } else {
-          alert(data.error || 'Failed to open billing portal');
-        }
-      } catch (error) {
-        console.error('Error creating portal session:', error);
-        alert('Failed to open billing portal. Please try again.');
-      }
-    }
-
-    // Load user data on page load
-    loadUserData();
+    // Initialize
+    checkAuth();
   </script>
+
 </body>
 </html>
