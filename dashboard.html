@@ -3,83 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="StudyFlow Suite Dashboard. Your central hub for AI chat, notes, study groups, and more.">
+  <meta name="description" content="StudyFlow Suite Dashboard - Your study hub.">
   <link rel="icon" type="image/png" href="icon128.png">
   <title>Dashboard - StudyFlow Suite</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f4f0;
       min-height: 100vh;
       color: #2d2d2d;
-      position: relative;
-      overflow-x: hidden;
     }
 
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.04) 0%, transparent 50%);
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(124, 152, 133, 0.04) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(232, 155, 95, 0.03) 0%, transparent 50%);
       pointer-events: none;
-      z-index: 0;
     }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 80px 24px 40px;
-      min-height: 100vh;
-    }
-
-    /* Top Navigation */
+    /* Top nav */
     .top-nav {
       position: fixed;
       top: 24px;
       right: 24px;
       display: flex;
-      gap: 16px;
+      gap: 8px;
       align-items: center;
-      z-index: 1000;
+      z-index: 100;
     }
 
-    .nav-link {
-      color: #5d5d5d;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 8px 16px;
-      border-radius: 8px;
-    }
-
-    .nav-link:hover {
-      color: #7c9885;
-      background: rgba(124, 152, 133, 0.08);
-    }
-
-    .user-avatar-wrapper {
+    .nav-bell {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
       position: relative;
+      transition: all 0.2s;
     }
+
+    .nav-bell:hover { color: #7c9885; background: rgba(255, 255, 255, 0.9); }
+
+    .nav-bell svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .nav-bell-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e89b5f;
+      display: none;
+    }
+
+    .nav-bell-badge.visible { display: block; }
 
     .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -87,14 +82,10 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.2);
+      transition: all 0.2s;
     }
 
-    .user-avatar:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
-    }
+    .user-avatar:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3); }
 
     .user-menu {
       position: absolute;
@@ -103,384 +94,268 @@
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
       border-radius: 12px;
-      border: 2px solid rgba(124, 152, 133, 0.2);
-      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.15);
-      min-width: 200px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      min-width: 180px;
+      padding: 6px;
       opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 10000;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: all 0.2s;
+      z-index: 101;
     }
 
-    .user-menu.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
+    .user-menu.show { opacity: 1; transform: translateY(0); pointer-events: all; }
 
-    .user-menu-header {
-      padding: 16px;
-      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
-    }
-
-    .user-menu-email {
-      font-size: 13px;
-      color: #5d5d5d;
-      font-weight: 500;
-      word-break: break-all;
-    }
+    .user-menu-email { padding: 8px 12px; font-size: 11px; color: #9ca3af; border-bottom: 1px solid rgba(124, 152, 133, 0.08); margin-bottom: 4px; }
 
     .user-menu-item {
-      padding: 12px 16px;
-      color: #2d2d2d;
-      text-decoration: none;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 14px;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #2d2d2d;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
       border: none;
       background: none;
       width: 100%;
-      text-align: left;
       font-family: inherit;
+      transition: background 0.15s;
     }
 
-    .user-menu-item:hover {
-      background: rgba(124, 152, 133, 0.08);
-      color: #7c9885;
-    }
+    .user-menu-item:hover { background: rgba(124, 152, 133, 0.06); }
+    .user-menu-item.logout { color: #dc2626; }
+    .user-menu-item svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    .user-menu-item.logout {
-      color: #e89b5f;
-      border-top: 1px solid rgba(124, 152, 133, 0.15);
-    }
-
-    .user-menu-item.logout:hover {
-      background: rgba(232, 155, 95, 0.08);
-      color: #d4783d;
-    }
-
-    /* Welcome Header */
-    .welcome-header {
-      margin-bottom: 40px;
-      padding-top: 16px;
-    }
-
-    .welcome-title {
-      font-family: 'Lora', Georgia, serif;
-      font-size: 32px;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin-bottom: 6px;
-    }
-
-    .welcome-subtitle {
-      font-size: 15px;
-      color: #7a7a7a;
-      font-weight: 400;
-    }
-
-    /* Quick Access Grid */
-    .quick-access-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 48px;
-    }
-
-    .quick-card {
-      background: #f8f7f4;
-      border-radius: 12px;
-      padding: 24px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
+    /* Notification dropdown */
+    .notif-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 40px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
       border: 1px solid rgba(124, 152, 133, 0.1);
-      border-left: 3px solid #7c9885;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
+      width: 340px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 8px;
+      display: none;
+      z-index: 101;
     }
 
-    .quick-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.12);
+    .notif-dropdown.active { display: block; }
+
+    .notif-dropdown-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; }
+    .notif-dropdown-header h3 { font-size: 14px; font-weight: 600; }
+    .notif-mark-all { background: none; border: none; color: #7c9885; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 500; }
+
+    .notif-item { padding: 10px; border-radius: 10px; display: flex; gap: 10px; transition: background 0.15s; }
+    .notif-item:hover { background: rgba(124, 152, 133, 0.04); }
+    .notif-item.unread { background: rgba(124, 152, 133, 0.04); }
+    .notif-item-msg { font-size: 13px; color: #2d2d2d; }
+    .notif-item-time { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .notif-empty { padding: 24px; text-align: center; color: #9ca3af; font-size: 13px; }
+
+    /* Main content */
+    .main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 100px 24px 120px;
+      position: relative;
+      z-index: 1;
     }
 
-    .quick-card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: rgba(124, 152, 133, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: #7c9885;
+    /* Greeting */
+    .greeting {
+      margin-bottom: 40px;
     }
 
-    .quick-card-icon svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .quick-card-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .quick-card-title {
-      font-size: 15px;
-      font-weight: 600;
+    .greeting h1 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 400;
       color: #2d2d2d;
       margin-bottom: 4px;
     }
 
-    .quick-card-desc {
-      font-size: 13px;
-      color: #7a7a7a;
-      line-height: 1.4;
-    }
-
-    /* Activity Section */
-    .activity-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    .activity-panel {
-      background: #f8f7f4;
-      border-radius: 12px;
-      border: 1px solid rgba(124, 152, 133, 0.1);
-      overflow: hidden;
-    }
-
-    .activity-panel-header {
-      padding: 18px 20px;
-      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
-      font-size: 15px;
-      font-weight: 600;
-      color: #2d2d2d;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .activity-panel-header svg {
-      width: 18px;
-      height: 18px;
-      stroke: #7c9885;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .activity-panel-body {
-      padding: 8px 0;
-    }
-
-    .activity-empty {
-      padding: 32px 20px;
-      text-align: center;
+    .greeting p {
+      font-size: 14px;
       color: #9ca3af;
-      font-size: 13px;
+      font-weight: 400;
     }
 
-    .activity-loading {
-      padding: 32px 20px;
-      text-align: center;
-      color: #9ca3af;
-      font-size: 13px;
-    }
-
-    /* Conversation items */
-    .conv-item {
+    /* Icon dock */
+    .dock {
       display: flex;
+      gap: 6px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .dock-item {
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      cursor: pointer;
-      transition: background 0.15s;
+      gap: 6px;
+      padding: 12px 14px;
+      border-radius: 14px;
       text-decoration: none;
-      color: inherit;
+      color: #6b7280;
+      transition: all 0.2s;
+      min-width: 72px;
     }
 
-    .conv-item:hover {
-      background: rgba(124, 152, 133, 0.06);
+    .dock-item:hover {
+      background: rgba(255, 255, 255, 0.7);
+      color: #2d2d2d;
+      transform: translateY(-2px);
     }
 
-    .conv-item-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: rgba(124, 152, 133, 0.08);
+    .dock-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(124, 152, 133, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      color: #7c9885;
+      transition: all 0.2s;
     }
 
-    .conv-item-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    .dock-item:hover .dock-icon {
+      background: white;
+      border-color: rgba(124, 152, 133, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     }
 
-    .conv-item-body {
-      flex: 1;
-      min-width: 0;
-    }
+    .dock-icon svg { width: 20px; height: 20px; stroke: #7c9885; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-    .conv-item-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: #2d2d2d;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .dock-label { font-size: 11px; font-weight: 500; }
 
-    .conv-item-time {
-      font-size: 11px;
+    /* Sections */
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
       color: #9ca3af;
-      margin-top: 2px;
+      margin-bottom: 12px;
     }
 
-    /* Notification items */
-    .notif-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 12px 20px;
-      transition: background 0.15s;
-    }
-
-    .notif-item.unread {
-      background: rgba(124, 152, 133, 0.04);
-    }
-
-    .notif-item-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .notif-item-icon svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .notif-item-icon.download {
-      background: rgba(124, 152, 133, 0.1);
-      color: #7c9885;
-    }
-
-    .notif-item-icon.course {
-      background: rgba(232, 155, 95, 0.1);
-      color: #e89b5f;
-    }
-
-    .notif-item-icon.invite {
-      background: rgba(124, 152, 133, 0.12);
-      color: #7c9885;
-    }
-
-    .notif-item-icon.default {
-      background: rgba(124, 152, 133, 0.08);
-      color: #7c9885;
-    }
-
-    .notif-item-body {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .notif-item-msg {
-      font-size: 13px;
-      color: #2d2d2d;
-      line-height: 1.4;
-    }
-
-    .notif-item-time {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-
-    .notif-item-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #7c9885;
-      flex-shrink: 0;
-      margin-top: 6px;
+    /* Upcoming events */
+    .events-bar {
+      margin-bottom: 32px;
       display: none;
     }
 
-    .notif-item.unread .notif-item-dot {
-      display: block;
-    }
-
-    .invite-actions {
-      display: flex;
+    .event-chip {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-      margin-top: 8px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      border-radius: 10px;
+      font-size: 13px;
+      color: #2d2d2d;
+      text-decoration: none;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
     }
 
-    .invite-btn {
-      flex: 1;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
+    .event-chip:hover { background: white; border-color: rgba(124, 152, 133, 0.2); }
+
+    .event-chip-date { font-weight: 600; color: #7c9885; font-size: 12px; }
+
+    /* Conversations */
+    .conv-list { margin-bottom: 32px; }
+
+    .conv-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      margin-bottom: 6px;
       cursor: pointer;
-      font-family: inherit;
-      transition: opacity 0.15s;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.15s;
     }
 
-    .invite-btn:hover {
-      opacity: 0.85;
+    .conv-item:hover { background: rgba(255, 255, 255, 0.9); }
+
+    .conv-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2d2d2d;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 400px;
     }
 
-    .invite-btn.accept {
-      background: linear-gradient(135deg, #7c9885, #6a8573);
-      color: white;
-      border: none;
-    }
-
-    .invite-btn.decline {
-      background: none;
-      border: 1.5px solid rgba(156, 163, 175, 0.3);
+    .conv-time {
+      font-size: 12px;
       color: #9ca3af;
+      flex-shrink: 0;
     }
 
-    /* Bottom Tab Bar (mobile) */
+    .conv-empty {
+      text-align: center;
+      padding: 32px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .conv-empty a { color: #7c9885; text-decoration: none; font-weight: 600; }
+
+    /* Study Groups section */
+    .groups-section { margin-bottom: 32px; }
+
+    .group-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(124, 152, 133, 0.08);
+      border-radius: 12px;
+      font-size: 13px;
+      color: #2d2d2d;
+      text-decoration: none;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      transition: all 0.15s;
+    }
+
+    .group-chip:hover { background: rgba(255, 255, 255, 0.9); border-color: rgba(124, 152, 133, 0.2); }
+
+    .group-chip-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(124, 152, 133, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .group-chip-icon svg { width: 14px; height: 14px; stroke: #7c9885; fill: none; stroke-width: 2; }
+
+    .group-chip-name { font-weight: 500; }
+    .group-chip-count { font-size: 11px; color: #9ca3af; }
+
+    /* Mobile bottom tab bar */
     .bottom-tab-bar {
       display: none;
       position: fixed;
@@ -490,7 +365,6 @@
       height: 56px;
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(124, 152, 133, 0.15);
       justify-content: space-around;
       align-items: center;
@@ -502,470 +376,353 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 2px;
       text-decoration: none;
-      color: #8a8a8a;
+      color: #9ca3af;
       font-size: 10px;
       font-weight: 500;
-      padding: 6px 0;
-      min-width: 48px;
-      transition: color 0.2s;
     }
 
-    .tab-item svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
+    .tab-item:hover, .tab-item.active { color: #7c9885; }
+    .tab-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    .tab-item.active {
-      color: #7c9885;
-    }
-
-    /* Responsive */
     @media (max-width: 768px) {
-      .container {
-        padding: 24px 16px 80px;
-      }
-
-      .top-nav {
-        display: none;
-      }
-
-      .bottom-tab-bar {
-        display: flex;
-      }
-
-      body {
-        padding-bottom: 56px;
-      }
-
-      .welcome-header {
-        margin-bottom: 28px;
-        padding-top: 8px;
-      }
-
-      .welcome-title {
-        font-size: 24px;
-      }
-
-      .quick-access-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        margin-bottom: 32px;
-      }
-
-      .activity-section {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .quick-card {
-        padding: 18px;
-      }
-    }
-
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .quick-access-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .top-nav { display: none; }
+      .bottom-tab-bar { display: flex; }
+      .main { padding: 32px 20px 80px; }
+      .greeting h1 { font-size: 1.6rem; }
+      .dock { gap: 2px; }
+      .dock-item { min-width: 64px; padding: 10px 8px; }
+      .dock-icon { width: 40px; height: 40px; }
+      .dock-label { font-size: 10px; }
+      .conv-title { max-width: 200px; }
+      .notif-dropdown { right: 8px; width: calc(100vw - 16px); }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <!-- Top Navigation -->
-  <div class="top-nav">
-    <a href="chat.html" class="nav-link">Chat</a>
-    <a href="upload.html" class="nav-link">Upload</a>
-    <a href="notes.html" class="nav-link">Notes</a>
-    <a href="office.html" class="nav-link">Office</a>
-    <a href="browse.html" class="nav-link">Nexus</a>
-    <a href="calendar.html" class="nav-link">Calendar</a>
-    <div class="user-avatar-wrapper">
+  <!-- Top nav -->
+  <div class="top-nav" id="topNav">
+    <button class="nav-bell" id="notifBell" title="Notifications">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-bell-badge" id="notifBadge"></div>
+    </button>
+    <div style="position:relative;">
       <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
       <div class="user-menu" id="userMenu">
-        <div class="user-menu-header">
-          <div class="user-menu-email" id="menuUserEmail">Loading...</div>
-        </div>
+        <div class="user-menu-email" id="menuEmail">Loading...</div>
         <a href="account.html" class="user-menu-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Account
         </a>
         <button class="user-menu-item logout" onclick="logout()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Logout
         </button>
       </div>
     </div>
+
+    <!-- Notification dropdown -->
+    <div class="notif-dropdown" id="notifDropdown">
+      <div class="notif-dropdown-header">
+        <h3>Notifications</h3>
+        <button class="notif-mark-all" id="notifMarkAll">Mark all read</button>
+      </div>
+      <div id="notifList"><div class="notif-empty">No notifications</div></div>
+    </div>
   </div>
 
-  <!-- Main Container -->
-  <div class="container">
-
-    <!-- Welcome Header -->
-    <div class="welcome-header">
-      <h1 class="welcome-title" id="welcomeTitle">Welcome back</h1>
-      <p class="welcome-subtitle">Your study hub</p>
+  <!-- Main content -->
+  <div class="main">
+    <div class="greeting">
+      <h1 id="greetingText">Good morning</h1>
+      <p>Your study hub</p>
     </div>
 
-    <!-- Quick Access Grid -->
-    <div class="quick-access-grid">
-
-      <a href="chat.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">AI Chat</div>
-          <div class="quick-card-desc">Ask questions grounded in your notes</div>
-        </div>
+    <!-- Icon dock -->
+    <div class="dock">
+      <a href="chat.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <span class="dock-label">Chat</span>
       </a>
-
-      <a href="upload.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">Upload Notes</div>
-          <div class="quick-card-desc">Add PDFs, docs, or images</div>
-        </div>
+      <a href="upload.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <span class="dock-label">Upload</span>
       </a>
-
-      <a href="notes.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">My Notes</div>
-          <div class="quick-card-desc">Browse and manage your uploads</div>
-        </div>
+      <a href="notes.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <span class="dock-label">Notes</span>
       </a>
-
-      <a href="office.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">Private Office</div>
-          <div class="quick-card-desc">Create and co-edit documents</div>
-        </div>
+      <a href="office.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg></div>
+        <span class="dock-label">Office</span>
       </a>
-
-      <a href="study-groups.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">Study Groups</div>
-          <div class="quick-card-desc">Chat, share notes, and schedule</div>
-        </div>
+      <a href="study-groups.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <span class="dock-label">Groups</span>
       </a>
-
-      <a href="flashcards.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">Flashcards</div>
-          <div class="quick-card-desc">Quiz yourself from Nexus notes</div>
-        </div>
+      <a href="flashcards.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/></svg></div>
+        <span class="dock-label">Flashcards</span>
       </a>
-
-      <a href="browse.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">Nexus</div>
-          <div class="quick-card-desc">Browse the community note library</div>
-        </div>
+      <a href="browse.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+        <span class="dock-label">Nexus</span>
       </a>
-
-      <a href="calendar.html" class="quick-card">
-        <div class="quick-card-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </div>
-        <div class="quick-card-content">
-          <div class="quick-card-title">Calendar</div>
-          <div class="quick-card-desc">View your schedule</div>
-        </div>
+      <a href="calendar.html" class="dock-item">
+        <div class="dock-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <span class="dock-label">Calendar</span>
       </a>
-
     </div>
 
-    <!-- Recent Activity Section -->
-    <div class="activity-section">
+    <!-- Upcoming events -->
+    <div class="events-bar" id="eventsBar">
+      <div class="section-title">Upcoming</div>
+      <div id="eventsContent"></div>
+    </div>
 
-      <!-- Recent Conversations -->
-      <div class="activity-panel">
-        <div class="activity-panel-header">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          Recent Conversations
-        </div>
-        <div class="activity-panel-body" id="conversationsList">
-          <div class="activity-loading">Loading...</div>
-        </div>
+    <!-- Study Groups -->
+    <div class="groups-section" id="groupsSection" style="display:none;">
+      <div class="section-title">Your Groups</div>
+      <div id="groupsContent"></div>
+    </div>
+
+    <!-- Recent conversations -->
+    <div class="conv-list">
+      <div class="section-title">Recent Conversations</div>
+      <div id="convContent">
+        <div class="conv-empty">Loading...</div>
       </div>
-
-      <!-- Notifications -->
-      <div class="activity-panel">
-        <div class="activity-panel-header">
-          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Notifications
-        </div>
-        <div class="activity-panel-body" id="notificationsList">
-          <div class="activity-loading">Loading...</div>
-        </div>
-      </div>
-
     </div>
-
   </div>
 
-  <!-- Mobile Bottom Tab Bar -->
+  <!-- Mobile bottom tab bar -->
   <nav class="bottom-tab-bar">
+    <a href="dashboard.html" class="tab-item active"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></a>
     <a href="chat.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></a>
     <a href="upload.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span></a>
     <a href="notes.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notes</span></a>
-    <a href="office.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg><span>Office</span></a>
-    <a href="browse.html" class="tab-item"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Nexus</span></a>
-    <a href="calendar.html" class="tab-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
-    <a href="account.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></a>
+    <a href="study-groups.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Groups</span></a>
   </nav>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
     const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
-
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let authToken = null;
-    let pendingInvites = [];
-    let notifData = [];
 
-    // Auth check
-    async function checkAuth() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
+    let authToken = '';
+    let currentUser = null;
 
-      if (!session) {
-        window.location.href = 'index.html';
-        return;
-      }
-
-      authToken = session.access_token;
-
-      const username = session.user.user_metadata?.username || session.user.email.split('@')[0];
-      document.getElementById('welcomeTitle').textContent = 'Welcome back, ' + username;
-
-      const userAvatar = document.getElementById('userAvatar');
-      const menuUserEmail = document.getElementById('menuUserEmail');
-      if (session.user.email) {
-        userAvatar.textContent = session.user.email.charAt(0).toUpperCase();
-        menuUserEmail.textContent = session.user.email;
-      }
-
-      loadConversations();
-      loadNotifications();
+    // Time-aware greeting
+    function getGreeting() {
+      const h = new Date().getHours();
+      if (h < 12) return 'Good morning';
+      if (h < 17) return 'Good afternoon';
+      return 'Good evening';
     }
 
-    // Time ago helper
     function timeAgo(dateStr) {
-      const d = new Date(dateStr);
       const now = new Date();
-      const diffMs = now - d;
-      const mins = Math.floor(diffMs / 60000);
-      if (mins < 1) return 'just now';
+      const d = new Date(dateStr);
+      const secs = Math.floor((now - d) / 1000);
+      if (secs < 60) return 'just now';
+      const mins = Math.floor(secs / 60);
       if (mins < 60) return mins + 'm ago';
       const hrs = Math.floor(mins / 60);
       if (hrs < 24) return hrs + 'h ago';
       const days = Math.floor(hrs / 24);
       if (days < 7) return days + 'd ago';
-      return d.toLocaleDateString();
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    // Load recent conversations
+    // Auth
+    async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.location.href = 'index.html'; return; }
+
+      currentUser = session.user;
+      authToken = session.access_token;
+
+      const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
+      document.getElementById('greetingText').textContent = getGreeting() + ', ' + username;
+      document.getElementById('userAvatar').textContent = (currentUser.email || 'U').charAt(0).toUpperCase();
+      document.getElementById('menuEmail').textContent = currentUser.email;
+
+      loadConversations();
+      loadGroups();
+      loadNotifications();
+    }
+
+    // Conversations
     async function loadConversations() {
-      const container = document.getElementById('conversationsList');
       try {
-        const response = await fetch(`${BACKEND_URL}/api/conversations`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
+        const res = await fetch(BACKEND_URL + '/api/conversations', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
         });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const convs = (data.conversations || []).slice(0, 8);
+        const container = document.getElementById('convContent');
 
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        const conversations = (data.conversations || []).slice(0, 5);
-
-        if (conversations.length === 0) {
-          container.innerHTML = '<div class="activity-empty">No conversations yet</div>';
+        if (!convs.length) {
+          container.innerHTML = '<div class="conv-empty">No conversations yet. <a href="chat.html">Start chatting</a></div>';
           return;
         }
 
-        container.innerHTML = conversations.map(conv => {
-          const title = conv.title || 'New conversation';
-          const displayTitle = title.length > 50 ? title.substring(0, 50) + '...' : title;
-          return `<a href="chat.html" class="conv-item">
-            <div class="conv-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="conv-item-body">
-              <div class="conv-item-title">${displayTitle}</div>
-              <div class="conv-item-time">${timeAgo(conv.updated_at)}</div>
-            </div>
-          </a>`;
-        }).join('');
+        container.innerHTML = convs.map(c =>
+          '<a href="chat.html?c=' + c.id + '" class="conv-item">' +
+            '<span class="conv-title">' + (c.title || 'Untitled conversation') + '</span>' +
+            '<span class="conv-time">' + timeAgo(c.updated_at || c.created_at) + '</span>' +
+          '</a>'
+        ).join('');
       } catch (e) {
-        console.error('Failed to load conversations:', e);
-        container.innerHTML = '<div class="activity-empty">Could not load conversations</div>';
+        document.getElementById('convContent').innerHTML = '<div class="conv-empty">Could not load conversations</div>';
       }
     }
 
-    // Notification icon helper
-    function notifIcon(type) {
-      if (type === 'note_downloaded') return { cls: 'download', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' };
-      if (type === 'course_new_note') return { cls: 'course', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>' };
-      if (type === 'group_invite') return { cls: 'invite', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' };
-      return { cls: 'default', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' };
+    // Study Groups
+    async function loadGroups() {
+      try {
+        const res = await fetch(BACKEND_URL + '/api/groups', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const groups = data.groups || [];
+
+        if (!groups.length) return;
+
+        const section = document.getElementById('groupsSection');
+        const container = document.getElementById('groupsContent');
+        section.style.display = 'block';
+
+        container.innerHTML = groups.map(g =>
+          '<a href="study-groups.html?g=' + g.id + '" class="group-chip">' +
+            '<div class="group-chip-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>' +
+            '<span class="group-chip-name">' + (g.name || 'Group') + '</span>' +
+            '<span class="group-chip-count">' + (g.member_count || 0) + ' members</span>' +
+          '</a>'
+        ).join('');
+      } catch (e) {
+        console.error('Load groups error:', e);
+      }
     }
 
-    // Load notifications and group invites
+    // Notifications
+    let notifData = [];
+    let pendingInvites = [];
+
     async function loadNotifications() {
-      const container = document.getElementById('notificationsList');
       try {
         const [notifRes, inviteRes] = await Promise.all([
-          fetch(`${BACKEND_URL}/api/notifications`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
-          fetch(`${BACKEND_URL}/api/groups/invites`, { headers: { 'Authorization': `Bearer ${authToken}` } })
+          fetch(BACKEND_URL + '/api/notifications', { headers: { 'Authorization': 'Bearer ' + authToken } }),
+          fetch(BACKEND_URL + '/api/groups/invites', { headers: { 'Authorization': 'Bearer ' + authToken } })
         ]);
-
         if (notifRes.ok) {
-          const json = await notifRes.json();
-          notifData = json.notifications || [];
+          const d = await notifRes.json();
+          notifData = d.notifications || [];
         }
         if (inviteRes.ok) {
-          const json = await inviteRes.json();
-          pendingInvites = json.invites || [];
+          const d = await inviteRes.json();
+          pendingInvites = d.invites || [];
         }
-
         renderNotifications();
-      } catch (e) {
-        console.error('Failed to load notifications:', e);
-        container.innerHTML = '<div class="activity-empty">Could not load notifications</div>';
-      }
+      } catch (e) {}
     }
 
-    // Render notifications list
     function renderNotifications() {
-      const container = document.getElementById('notificationsList');
-      const allItems = [];
+      const list = document.getElementById('notifList');
+      const badge = document.getElementById('notifBadge');
+      const items = [];
 
-      // Pending invites first
       pendingInvites.forEach(inv => {
-        allItems.push(`<div class="notif-item unread">
-          <div class="notif-item-icon invite">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="notif-item-body">
-            <div class="notif-item-msg">${inv.invited_by} invited you to '${inv.group_name}'</div>
-            <div class="notif-item-time">${timeAgo(inv.created_at)}</div>
-            <div class="invite-actions">
-              <button class="invite-btn accept" onclick="respondInvite('${inv.id}','accept',event)">Accept</button>
-              <button class="invite-btn decline" onclick="respondInvite('${inv.id}','decline',event)">Decline</button>
-            </div>
-          </div>
-        </div>`);
+        items.push('<div class="notif-item unread">' +
+          '<div style="flex:1;">' +
+            '<div class="notif-item-msg">@' + inv.invited_by + ' invited you to \'' + inv.group_name + '\'</div>' +
+            '<div class="notif-item-time">' + timeAgo(inv.created_at) + '</div>' +
+            '<div style="display:flex;gap:8px;margin-top:8px;">' +
+              '<button onclick="respondInvite(\'' + inv.id + '\',\'accept\')" style="flex:1;padding:6px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Accept</button>' +
+              '<button onclick="respondInvite(\'' + inv.id + '\',\'decline\')" style="flex:1;padding:6px;background:none;border:1.5px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Decline</button>' +
+            '</div>' +
+          '</div></div>');
       });
 
-      // Regular notifications (skip group_invite type, handled above)
-      notifData.forEach(n => {
-        if (n.type === 'group_invite') return;
-        const icon = notifIcon(n.type);
-        allItems.push(`<div class="notif-item ${n.is_read ? '' : 'unread'}">
-          <div class="notif-item-icon ${icon.cls}">${icon.svg}</div>
-          <div class="notif-item-body">
-            <div class="notif-item-msg">${n.message || n.title}</div>
-            <div class="notif-item-time">${timeAgo(n.created_at)}</div>
-          </div>
-          <div class="notif-item-dot"></div>
-        </div>`);
+      notifData.filter(n => n.type !== 'group_invite').slice(0, 8).forEach(n => {
+        items.push('<div class="notif-item ' + (n.is_read ? '' : 'unread') + '">' +
+          '<div><div class="notif-item-msg">' + (n.message || n.title) + '</div>' +
+          '<div class="notif-item-time">' + timeAgo(n.created_at) + '</div></div></div>');
       });
 
-      // Limit to 5 total
-      const displayItems = allItems.slice(0, 5);
-
-      if (displayItems.length === 0) {
-        container.innerHTML = '<div class="activity-empty">No notifications yet</div>';
-        return;
+      if (!items.length) {
+        list.innerHTML = '<div class="notif-empty">No notifications</div>';
+        badge.classList.remove('visible');
+      } else {
+        list.innerHTML = items.join('');
+        const unread = notifData.filter(n => !n.is_read).length + pendingInvites.length;
+        if (unread > 0) badge.classList.add('visible');
+        else badge.classList.remove('visible');
       }
-
-      container.innerHTML = displayItems.join('');
     }
 
-    // Respond to group invite
-    async function respondInvite(inviteId, action, event) {
-      event.stopPropagation();
-      const btn = event.target;
-      btn.disabled = true;
-      btn.textContent = '...';
-
+    async function respondInvite(inviteId, action) {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups/invites/${inviteId}/${action}`, {
+        await fetch(BACKEND_URL + '/api/groups/invites/' + inviteId + '/' + action, {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${authToken}` }
+          headers: { 'Authorization': 'Bearer ' + authToken }
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-
         pendingInvites = pendingInvites.filter(i => i.id !== inviteId);
         renderNotifications();
-
-        if (action === 'accept') {
-          window.location.href = 'study-groups.html';
-        }
-      } catch (e) {
-        console.error('Invite response error:', e);
-        btn.disabled = false;
-        btn.textContent = action === 'accept' ? 'Accept' : 'Decline';
-      }
+        if (action === 'accept') loadGroups();
+      } catch (e) {}
     }
 
-    // User menu toggle
+    async function markAllRead() {
+      try {
+        await fetch(BACKEND_URL + '/api/notifications/read', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ all: true })
+        });
+        notifData.forEach(n => n.is_read = true);
+        renderNotifications();
+      } catch (e) {}
+    }
+
+    // UI interactions
     function toggleUserMenu() {
-      const menu = document.getElementById('userMenu');
-      menu.classList.toggle('show');
+      document.getElementById('userMenu').classList.toggle('show');
+      document.getElementById('notifDropdown').classList.remove('active');
     }
 
-    // Close menu on outside click
+    document.getElementById('notifBell').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('notifDropdown').classList.toggle('active');
+      document.getElementById('userMenu').classList.remove('show');
+    });
+
+    document.getElementById('notifMarkAll').addEventListener('click', (e) => {
+      e.stopPropagation();
+      markAllRead();
+    });
+
     document.addEventListener('click', (e) => {
-      const menu = document.getElementById('userMenu');
-      const avatar = document.getElementById('userAvatar');
-      if (!menu.contains(e.target) && e.target !== avatar) {
-        menu.classList.remove('show');
+      if (!e.target.closest('#userMenu') && !e.target.closest('#userAvatar')) {
+        document.getElementById('userMenu').classList.remove('show');
+      }
+      if (!e.target.closest('#notifDropdown') && !e.target.closest('#notifBell')) {
+        document.getElementById('notifDropdown').classList.remove('active');
       }
     });
 
-    // Logout
     async function logout() {
       await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
 
-    // Initialize
-    checkAuth();
+    init();
   </script>
-
 </body>
 </html>
