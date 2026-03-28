@@ -673,7 +673,7 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + authToken
         },
-        body: JSON.stringify({ message: prompt })
+        body: JSON.stringify({ message: prompt, source: 'flashcard' })
       });
 
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
