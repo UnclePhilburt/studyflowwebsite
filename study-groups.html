@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Study Groups - Collaborate with classmates using shared notes and AI-powered group chat on StudyFlow Suite.">
+  <meta name="description" content="Study Groups - Collaborate with classmates using shared notes and group chat on StudyFlow Suite.">
   <link rel="icon" type="image/png" href="icon128.png">
   <title>Study Groups - StudyFlow Suite</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1513,12 +1513,12 @@
           <div class="chat-empty" id="chatEmpty">
             <div>
               <h3>Group Chat</h3>
-              <p>Ask questions grounded in your group's shared notes.</p>
+              <p>Send messages to your study group.</p>
             </div>
           </div>
         </div>
         <div class="chat-input-area">
-          <textarea class="chat-input" id="chatInput" placeholder="Ask the group AI..." rows="1"></textarea>
+          <textarea class="chat-input" id="chatInput" placeholder="Message the group..." rows="1"></textarea>
           <button class="chat-send-btn" id="chatSendBtn" disabled title="Send message">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -1802,7 +1802,7 @@
     function renderGroupList() {
       groupListContent.style.display = 'block';
       if (!groups.length) {
-        groupListContent.innerHTML = '<div class="group-list-empty"><h3>No study groups yet</h3><p>Create a group to start collaborating with classmates using shared notes and AI chat.</p></div>';
+        groupListContent.innerHTML = '<div class="group-list-empty"><h3>No study groups yet</h3><p>Create a group to start collaborating with classmates using shared notes and group chat.</p></div>';
         return;
       }
       let html = '';
@@ -1873,7 +1873,7 @@
       groupListView.style.display = 'block';
       document.getElementById('contentHeader').style.display = '';
       unsubscribeRealtime();
-      chatMessages.innerHTML = '<div class="chat-empty" id="chatEmpty"><div><h3>Group Chat</h3><p>Ask questions grounded in your group\'s shared notes.</p></div></div>';
+      chatMessages.innerHTML = '<div class="chat-empty" id="chatEmpty"><div><h3>Group Chat</h3><p>Send messages to your study group.</p></div></div>';
       loadGroups();
     }
 
@@ -2045,7 +2045,7 @@
         const messages = data.messages || data || [];
         chatMessages.innerHTML = '';
         if (!messages.length) {
-          chatMessages.innerHTML = '<div class="chat-empty"><div><h3>Group Chat</h3><p>Ask questions grounded in your group\'s shared notes.</p></div></div>';
+          chatMessages.innerHTML = '<div class="chat-empty"><div><h3>Group Chat</h3><p>Send messages to your study group.</p></div></div>';
           return;
         }
         messages.forEach(m => appendMessage(m, false));
