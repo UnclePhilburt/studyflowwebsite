@@ -262,12 +262,383 @@
       font-weight: 300;
     }
 
-    /* Main empty canvas */
+    /* Main canvas with widget grid */
     .canvas {
       position: relative;
       min-height: calc(100vh - 120px);
       padding: 80px 40px 120px;
       z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      align-content: start;
+    }
+
+    /* Widget cards */
+    .widget {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 126, 115, 0.12);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+      cursor: move;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+      .widget {
+        cursor: default;
+      }
+    }
+
+    .widget:hover {
+      box-shadow: 0 8px 24px rgba(139, 157, 131, 0.12);
+      border-color: rgba(139, 157, 131, 0.2);
+    }
+
+    .widget.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    .widget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(139, 126, 115, 0.08);
+    }
+
+    .widget-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #2C2C2C;
+    }
+
+    .widget-remove {
+      background: none;
+      border: none;
+      color: #9B8B7E;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 18px;
+      line-height: 1;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .widget-remove:hover {
+      background: rgba(201, 122, 122, 0.1);
+      color: #C97A7A;
+    }
+
+    .widget-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* Recent Conversations widget */
+    .conv-item {
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(139, 126, 115, 0.08);
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+
+    .conv-item:hover {
+      background: rgba(139, 157, 131, 0.08);
+      border-color: rgba(139, 157, 131, 0.15);
+    }
+
+    .conv-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2C2C2C;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .conv-time {
+      font-size: 12px;
+      color: #9B8B7E;
+    }
+
+    /* Quick Stats widget */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(139, 126, 115, 0.08);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 500;
+      color: #8B9D83;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #9B8B7E;
+      font-weight: 400;
+    }
+
+    /* Upcoming Events widget */
+    .event-item {
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(139, 126, 115, 0.08);
+      border-left: 3px solid #8B9D83;
+    }
+
+    .event-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2C2C2C;
+      margin-bottom: 4px;
+    }
+
+    .event-time {
+      font-size: 12px;
+      color: #9B8B7E;
+    }
+
+    /* Study Groups widget */
+    .group-item {
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(139, 126, 115, 0.08);
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+
+    .group-item:hover {
+      background: rgba(139, 157, 131, 0.08);
+      border-color: rgba(139, 157, 131, 0.15);
+    }
+
+    .group-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2C2C2C;
+      margin-bottom: 4px;
+    }
+
+    .group-activity {
+      font-size: 12px;
+      color: #9B8B7E;
+    }
+
+    /* Quick Launch widget */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .quick-action-btn {
+      background: linear-gradient(135deg, rgba(139, 157, 131, 0.1), rgba(139, 157, 131, 0.05));
+      border: 1px solid rgba(139, 157, 131, 0.2);
+      border-radius: 12px;
+      padding: 20px 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      color: inherit;
+    }
+
+    .quick-action-btn:hover {
+      background: linear-gradient(135deg, #8B9D83, #7A8C73);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(139, 157, 131, 0.2);
+    }
+
+    .quick-action-btn:hover svg {
+      stroke: white;
+    }
+
+    .quick-action-btn:hover .quick-action-label {
+      color: white;
+    }
+
+    .quick-action-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke: #8B9D83;
+      fill: none;
+      stroke-width: 1.5;
+      transition: all 0.3s ease;
+    }
+
+    .quick-action-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #2C2C2C;
+      transition: all 0.3s ease;
+    }
+
+    /* Add widget button */
+    .add-widget-btn {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8B9D83;
+      font-size: 24px;
+      font-weight: 300;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      z-index: 100;
+    }
+
+    .add-widget-btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(139, 157, 131, 0.15);
+    }
+
+    /* Widget picker modal */
+    .widget-picker {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+    }
+
+    .widget-picker.active {
+      display: flex;
+    }
+
+    .widget-picker-content {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(30px);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .widget-picker-title {
+      font-size: 20px;
+      font-weight: 500;
+      color: #2C2C2C;
+      margin-bottom: 20px;
+    }
+
+    .widget-option {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(139, 126, 115, 0.12);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .widget-option:hover {
+      background: rgba(139, 157, 131, 0.08);
+      border-color: rgba(139, 157, 131, 0.2);
+    }
+
+    .widget-option-info {
+      flex: 1;
+    }
+
+    .widget-option-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #2C2C2C;
+      margin-bottom: 4px;
+    }
+
+    .widget-option-desc {
+      font-size: 12px;
+      color: #9B8B7E;
+    }
+
+    .widget-option-add {
+      background: linear-gradient(135deg, #8B9D83, #7A8C73);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .widget-option-add:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(139, 157, 131, 0.3);
+    }
+
+    .widget-option-add:disabled {
+      background: #E8E5E1;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #9B8B7E;
+      font-size: 14px;
+      padding: 40px 20px;
     }
 
     /* Mac-style dock */
@@ -376,6 +747,85 @@
         height: 40px;
       }
 
+      .add-widget-btn {
+        top: 16px;
+        left: 16px;
+        width: 40px;
+        height: 40px;
+      }
+
+      .canvas {
+        padding: 70px 16px 100px;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .widget {
+        min-height: auto;
+        padding: 16px;
+      }
+
+      .widget-header {
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+      }
+
+      .widget-title {
+        font-size: 15px;
+      }
+
+      .stat-grid {
+        gap: 10px;
+      }
+
+      .stat-box {
+        padding: 14px 12px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .quick-actions {
+        gap: 10px;
+      }
+
+      .quick-action-btn {
+        padding: 16px 12px;
+      }
+
+      .quick-action-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .quick-action-label {
+        font-size: 12px;
+      }
+
+      .conv-item,
+      .event-item,
+      .group-item {
+        padding: 10px;
+        margin-bottom: 6px;
+      }
+
+      .conv-title,
+      .event-title,
+      .group-name {
+        font-size: 13px;
+      }
+
+      .conv-time,
+      .event-time,
+      .group-activity {
+        font-size: 11px;
+      }
+
       .dock {
         bottom: 12px;
         padding: 10px 16px;
@@ -394,9 +844,94 @@
         height: 22px;
       }
 
+      .dock-item:hover .dock-icon {
+        transform: translateY(-8px) scale(1.05);
+      }
+
+      .dock-label {
+        bottom: -28px;
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+
       .notif-dropdown {
         right: 8px;
         width: calc(100vw - 16px);
+        max-height: 60vh;
+      }
+
+      .widget-picker-content {
+        padding: 24px;
+        max-width: 90%;
+      }
+
+      .widget-picker-title {
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+
+      .widget-option {
+        padding: 14px;
+      }
+
+      .widget-option-name {
+        font-size: 14px;
+      }
+
+      .widget-option-desc {
+        font-size: 11px;
+      }
+
+      .widget-option-add {
+        padding: 7px 14px;
+        font-size: 12px;
+      }
+
+      .widget-remove {
+        padding: 6px 10px;
+        font-size: 20px;
+        min-width: 32px;
+        min-height: 32px;
+      }
+
+      .empty-state {
+        padding: 30px 16px;
+        font-size: 13px;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 480px) {
+      .canvas {
+        padding: 60px 12px 90px;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .stat-box {
+        padding: 12px;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .dock {
+        padding: 8px 12px;
+        gap: 4px;
+      }
+
+      .dock-icon {
+        width: 44px;
+        height: 44px;
+      }
+
+      .dock-divider {
+        height: 40px;
       }
     }
   </style>
@@ -447,9 +982,20 @@
     </div>
   </div>
 
-  <!-- Empty canvas for widgets -->
+  <!-- Add widget button -->
+  <button class="add-widget-btn" id="addWidgetBtn" title="Add widget">+</button>
+
+  <!-- Canvas with widgets -->
   <div class="canvas" id="canvas">
-    <!-- Widgets will go here -->
+    <!-- Widgets will be dynamically added here -->
+  </div>
+
+  <!-- Widget picker modal -->
+  <div class="widget-picker" id="widgetPicker">
+    <div class="widget-picker-content">
+      <h2 class="widget-picker-title">Add Widget</h2>
+      <div id="widgetOptions"></div>
+    </div>
   </div>
 
   <!-- Mac-style dock -->
@@ -710,6 +1256,380 @@
     }
 
     init();
+
+    // ======= WIDGET SYSTEM =======
+    const WIDGET_TYPES = {
+      recentConversations: {
+        name: 'Recent Conversations',
+        desc: 'Your latest AI chat sessions',
+        render: renderRecentConversations
+      },
+      quickStats: {
+        name: 'Quick Stats',
+        desc: 'Your study progress at a glance',
+        render: renderQuickStats
+      },
+      upcomingEvents: {
+        name: 'Upcoming Events',
+        desc: 'Calendar events and deadlines',
+        render: renderUpcomingEvents
+      },
+      studyGroups: {
+        name: 'Study Groups',
+        desc: 'Active group activity',
+        render: renderStudyGroups
+      },
+      quickLaunch: {
+        name: 'Quick Launch',
+        desc: 'Fast access to common actions',
+        render: renderQuickLaunch
+      }
+    };
+
+    let activeWidgets = [];
+
+    // Load widgets from localStorage
+    function loadWidgets() {
+      const saved = localStorage.getItem('dashboardWidgets');
+      if (saved) {
+        activeWidgets = JSON.parse(saved);
+      } else {
+        // Default widgets
+        activeWidgets = ['quickLaunch', 'recentConversations', 'quickStats'];
+      }
+      renderWidgets();
+    }
+
+    function saveWidgets() {
+      localStorage.setItem('dashboardWidgets', JSON.stringify(activeWidgets));
+    }
+
+    function renderWidgets() {
+      const canvas = document.getElementById('canvas');
+      canvas.innerHTML = '';
+
+      if (activeWidgets.length === 0) {
+        canvas.innerHTML = '<div class="empty-state">Click the + button to add widgets</div>';
+        return;
+      }
+
+      const isMobile = window.innerWidth <= 768;
+
+      activeWidgets.forEach((widgetId, index) => {
+        const widgetDef = WIDGET_TYPES[widgetId];
+        if (!widgetDef) return;
+
+        const widget = document.createElement('div');
+        widget.className = 'widget';
+        widget.draggable = !isMobile; // Disable dragging on mobile
+        widget.dataset.widgetId = widgetId;
+        widget.dataset.index = index;
+
+        // Update cursor style for mobile
+        if (isMobile) {
+          widget.style.cursor = 'default';
+        }
+
+        widget.innerHTML = `
+          <div class="widget-header">
+            <div class="widget-title">${widgetDef.name}</div>
+            <button class="widget-remove" onclick="removeWidget('${widgetId}')">×</button>
+          </div>
+          <div class="widget-content" id="widget-${widgetId}">
+            <div style="text-align:center;padding:20px;color:#9B8B7E;">Loading...</div>
+          </div>
+        `;
+
+        // Drag events (only on desktop)
+        if (!isMobile) {
+          widget.addEventListener('dragstart', (e) => {
+            widget.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', index);
+          });
+
+          widget.addEventListener('dragend', () => {
+            widget.classList.remove('dragging');
+          });
+
+          widget.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const dragging = document.querySelector('.dragging');
+            if (dragging && dragging !== widget) {
+              const rect = widget.getBoundingClientRect();
+              const midpoint = rect.left + rect.width / 2;
+              if (e.clientX < midpoint) {
+                canvas.insertBefore(dragging, widget);
+              } else {
+                canvas.insertBefore(dragging, widget.nextSibling);
+              }
+            }
+          });
+
+          widget.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const widgets = Array.from(canvas.querySelectorAll('.widget'));
+            activeWidgets = widgets.map(w => w.dataset.widgetId);
+            saveWidgets();
+          });
+        }
+
+        canvas.appendChild(widget);
+
+        // Render widget content
+        setTimeout(() => widgetDef.render(widgetId), 100);
+      });
+    }
+
+    function removeWidget(widgetId) {
+      activeWidgets = activeWidgets.filter(id => id !== widgetId);
+      saveWidgets();
+      renderWidgets();
+    }
+
+    // Widget picker
+    document.getElementById('addWidgetBtn').addEventListener('click', () => {
+      document.getElementById('widgetPicker').classList.add('active');
+      renderWidgetOptions();
+    });
+
+    document.getElementById('widgetPicker').addEventListener('click', (e) => {
+      if (e.target.id === 'widgetPicker') {
+        document.getElementById('widgetPicker').classList.remove('active');
+      }
+    });
+
+    function renderWidgetOptions() {
+      const container = document.getElementById('widgetOptions');
+      container.innerHTML = '';
+
+      Object.entries(WIDGET_TYPES).forEach(([id, widget]) => {
+        const isAdded = activeWidgets.includes(id);
+        const option = document.createElement('div');
+        option.className = 'widget-option';
+        option.innerHTML = `
+          <div class="widget-option-info">
+            <div class="widget-option-name">${widget.name}</div>
+            <div class="widget-option-desc">${widget.desc}</div>
+          </div>
+          <button class="widget-option-add" onclick="addWidget('${id}')" ${isAdded ? 'disabled' : ''}>
+            ${isAdded ? 'Added' : 'Add'}
+          </button>
+        `;
+        container.appendChild(option);
+      });
+    }
+
+    function addWidget(widgetId) {
+      if (!activeWidgets.includes(widgetId)) {
+        activeWidgets.push(widgetId);
+        saveWidgets();
+        renderWidgets();
+        renderWidgetOptions();
+      }
+    }
+
+    // ======= WIDGET RENDERERS =======
+
+    async function renderRecentConversations(widgetId) {
+      const container = document.getElementById(`widget-${widgetId}`);
+      try {
+        const res = await fetch(BACKEND_URL + '/api/conversations', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        if (!res.ok) throw new Error('Failed to load');
+
+        const data = await res.json();
+        const conversations = data.conversations || [];
+
+        if (conversations.length === 0) {
+          container.innerHTML = '<div class="empty-state">No conversations yet</div>';
+          return;
+        }
+
+        container.innerHTML = conversations.slice(0, 5).map(conv => `
+          <a href="chat.html?id=${conv.id}" class="conv-item">
+            <div class="conv-title">${conv.title || 'Untitled Chat'}</div>
+            <div class="conv-time">${timeAgo(conv.updated_at || conv.created_at)}</div>
+          </a>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">Error loading conversations</div>';
+      }
+    }
+
+    async function renderQuickStats(widgetId) {
+      const container = document.getElementById(`widget-${widgetId}`);
+      try {
+        // Fetch user stats from backend
+        const res = await fetch(BACKEND_URL + '/api/user/stats', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        let stats = {
+          questions_answered: 0,
+          study_streak: 0,
+          total_time: 0,
+          flashcards_reviewed: 0
+        };
+
+        if (res.ok) {
+          const data = await res.json();
+          stats = { ...stats, ...data };
+        }
+
+        container.innerHTML = `
+          <div class="stat-grid">
+            <div class="stat-box">
+              <span class="stat-value">${stats.questions_answered || 0}</span>
+              <span class="stat-label">Questions</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-value">${stats.study_streak || 0}</span>
+              <span class="stat-label">Day Streak</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-value">${Math.floor((stats.total_time || 0) / 60)}h</span>
+              <span class="stat-label">Study Time</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-value">${stats.flashcards_reviewed || 0}</span>
+              <span class="stat-label">Cards</span>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">Error loading stats</div>';
+      }
+    }
+
+    async function renderUpcomingEvents(widgetId) {
+      const container = document.getElementById(`widget-${widgetId}`);
+      try {
+        const res = await fetch(BACKEND_URL + '/api/calendar/upcoming', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        if (!res.ok) throw new Error('Failed to load');
+
+        const data = await res.json();
+        const events = data.events || [];
+
+        if (events.length === 0) {
+          container.innerHTML = '<div class="empty-state">No upcoming events</div>';
+          return;
+        }
+
+        container.innerHTML = events.slice(0, 5).map(event => {
+          const eventDate = new Date(event.event_date || event.start_date);
+          const today = new Date();
+          const daysUntil = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+
+          let timeText = '';
+          if (daysUntil === 0) timeText = 'Today';
+          else if (daysUntil === 1) timeText = 'Tomorrow';
+          else if (daysUntil < 7) timeText = `In ${daysUntil} days`;
+          else timeText = eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+          return `
+            <div class="event-item">
+              <div class="event-title">${event.title || event.event_name}</div>
+              <div class="event-time">${timeText}</div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">No events scheduled</div>';
+      }
+    }
+
+    async function renderStudyGroups(widgetId) {
+      const container = document.getElementById(`widget-${widgetId}`);
+      try {
+        const res = await fetch(BACKEND_URL + '/api/groups', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        if (!res.ok) throw new Error('Failed to load');
+
+        const data = await res.json();
+        const groups = data.groups || [];
+
+        if (groups.length === 0) {
+          container.innerHTML = '<div class="empty-state">No study groups yet</div>';
+          return;
+        }
+
+        container.innerHTML = groups.slice(0, 5).map(group => {
+          const lastActivity = group.last_message_at || group.created_at;
+          return `
+            <a href="study-groups.html?id=${group.id}" class="group-item">
+              <div class="group-name">${group.name}</div>
+              <div class="group-activity">${group.member_count || 0} members • ${timeAgo(lastActivity)}</div>
+            </a>
+          `;
+        }).join('');
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">Error loading groups</div>';
+      }
+    }
+
+    function renderQuickLaunch(widgetId) {
+      const container = document.getElementById(`widget-${widgetId}`);
+      container.innerHTML = `
+        <div class="quick-actions">
+          <a href="chat.html" class="quick-action-btn">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span class="quick-action-label">New Chat</span>
+          </a>
+          <a href="upload.html" class="quick-action-btn">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span class="quick-action-label">Upload</span>
+          </a>
+          <a href="flashcards.html" class="quick-action-btn">
+            <svg viewBox="0 0 24 24">
+              <rect x="2" y="2" width="20" height="20" rx="2"/>
+              <path d="M8 6h8"/>
+              <path d="M8 10h8"/>
+              <path d="M8 14h4"/>
+            </svg>
+            <span class="quick-action-label">Flashcards</span>
+          </a>
+          <a href="study-groups.html" class="quick-action-btn">
+            <svg viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span class="quick-action-label">Groups</span>
+          </a>
+        </div>
+      `;
+    }
+
+    // Initialize widgets after auth
+    const originalInit = init;
+    init = async function() {
+      await originalInit();
+      loadWidgets();
+    };
+
+    // Re-render widgets on resize (to enable/disable dragging based on screen size)
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        renderWidgets();
+      }, 300);
+    });
   </script>
 </body>
 </html>
