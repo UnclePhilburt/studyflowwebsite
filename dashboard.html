@@ -4017,10 +4017,10 @@
         return `
           <div class="chat-message">
             <div class="chat-message-header">
-              <span class="chat-message-user">${msg.user_email?.split('@')[0] || 'User'}</span>
+              <span class="chat-message-user">${msg.username || 'User'}</span>
               <span class="chat-message-time">${time}</span>
             </div>
-            <div class="chat-message-text">${msg.message || ''}</div>
+            <div class="chat-message-text">${msg.content || ''}</div>
           </div>
         `;
       }).join('');
@@ -4058,7 +4058,7 @@
                 ${groups.map(group => `
                   <button onclick="setGroupForChat('${widgetId}', '${group.id}', '${group.name.replace(/'/g, "\\'")}');closeGroupSelectModal()" style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;color:#2C2C2C;transition:all 0.2s;">
                     <div style="font-weight:500;">${group.name}</div>
-                    <div style="font-size:11px;color:#8B9D83;margin-top:4px;">${group.members_count || 0} members</div>
+                    <div style="font-size:11px;color:#8B9D83;margin-top:4px;">${group.member_count || 0} members</div>
                   </button>
                 `).join('')}
               </div>
