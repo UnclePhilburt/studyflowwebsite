@@ -1460,9 +1460,9 @@
     // Load widgets from backend (per-user)
     async function loadWidgets() {
       const DEFAULT_WIDGETS = [
-        { id: 'recentConversations', x: 200, y: 200 },
-        { id: 'upcomingEvents', x: 620, y: 200 },
-        { id: 'studyGroups', x: 200, y: 500 }
+        { id: 'recentConversations', x: 20200, y: 20200 },
+        { id: 'upcomingEvents', x: 20620, y: 20200 },
+        { id: 'studyGroups', x: 20200, y: 20500 }
       ];
 
       try {
@@ -1478,10 +1478,20 @@
           if (layout.length > 0 && typeof layout[0] === 'string') {
             layout = layout.map((id, index) => ({
               id: id,
-              x: 200 + (index % 3) * 420,
-              y: 200 + Math.floor(index / 3) * 350
+              x: 20200 + (index % 3) * 420,
+              y: 20200 + Math.floor(index / 3) * 350
             }));
             // Save migrated format
+            await saveWidgets(layout);
+          }
+
+          // Migration: If widgets have old coordinates (< 10000), update them to new center
+          if (layout.length > 0 && typeof layout[0] === 'object' && layout[0].x < 10000) {
+            layout = layout.map(widget => ({
+              id: widget.id,
+              x: widget.x + 20000,
+              y: widget.y + 20000
+            }));
             await saveWidgets(layout);
           }
 
@@ -1501,8 +1511,8 @@
             .filter(id => !WIDGET_TYPES[id]?.comingSoon)
             .map((id, index) => ({
               id: id,
-              x: 200 + (index % 3) * 420,
-              y: 200 + Math.floor(index / 3) * 350
+              x: 20200 + (index % 3) * 420,
+              y: 20200 + Math.floor(index / 3) * 350
             }));
           await saveWidgets(activeWidgets);
           localStorage.removeItem('dashboardWidgets');
@@ -1711,11 +1721,11 @@
       const alreadyExists = activeWidgets.some(w => w.id === widgetId);
 
       if (!alreadyExists && widgetDef && !widgetDef.comingSoon) {
-        // Calculate position for new widget (stagger them)
+        // Calculate position for new widget (stagger them in center area)
         const newWidget = {
           id: widgetId,
-          x: 200 + (activeWidgets.length % 4) * 420,
-          y: 200 + Math.floor(activeWidgets.length / 4) * 350
+          x: 20200 + (activeWidgets.length % 4) * 420,
+          y: 20200 + Math.floor(activeWidgets.length / 4) * 350
         };
         activeWidgets.push(newWidget);
         await saveWidgets();
