@@ -386,6 +386,7 @@
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="university-data.js"></script>
 </head>
 <body>
   <div class="signup-container">
@@ -429,7 +430,14 @@
             </div>
           </div>
 
-          <!-- Address, city, state, zip, and DOB fields temporarily removed -->
+          <div class="form-group">
+            <label for="university">University (optional)</label>
+            <div style="position:relative;">
+              <input type="text" id="university" placeholder="Start typing your university..." autocomplete="off">
+              <div id="universityDropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid rgba(124,152,133,0.2);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);margin-top:4px;max-height:180px;overflow-y:auto;display:none;z-index:10;"></div>
+            </div>
+            <div class="form-hint">Select your university for personalized features</div>
+          </div>
         </div>
 
         <!-- Right: Legal Certifications -->
@@ -550,6 +558,7 @@
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
+      const university = document.getElementById('university').value.trim();
       const ageGate = document.getElementById('ageGate').checked;
       const aiTransparency = document.getElementById('aiTransparency').checked;
       const noteLicense = document.getElementById('noteLicense').checked;
@@ -604,7 +613,8 @@
             data: {
               full_name: legalName,
               username: username,
-              legal_name: legalName
+              legal_name: legalName,
+              university: university || null
             }
           }
         });
@@ -621,6 +631,31 @@
         showError(error.message || 'Signup failed. Please try again.');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Create Account';
+      }
+    });
+
+    // University autocomplete
+    const uniInput = document.getElementById('university');
+    const uniDropdown = document.getElementById('universityDropdown');
+    let uniTimer = null;
+
+    uniInput.addEventListener('input', () => {
+      clearTimeout(uniTimer);
+      uniTimer = setTimeout(() => {
+        const q = uniInput.value.trim();
+        if (q.length < 2) { uniDropdown.style.display = 'none'; return; }
+        const results = (typeof searchUniversities === 'function') ? searchUniversities(q).slice(0, 8) : [];
+        if (!results.length) { uniDropdown.style.display = 'none'; return; }
+        uniDropdown.innerHTML = results.map(u =>
+          '<div style="padding:9px 14px;cursor:pointer;font-size:13px;color:#2d2d2d;transition:background 0.1s;" onmouseenter="this.style.background=\'rgba(124,152,133,0.06)\'" onmouseleave="this.style.background=\'transparent\'" onclick="document.getElementById(\'university\').value=this.textContent;document.getElementById(\'universityDropdown\').style.display=\'none\'">' + u + '</div>'
+        ).join('');
+        uniDropdown.style.display = 'block';
+      }, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#university') && !e.target.closest('#universityDropdown')) {
+        uniDropdown.style.display = 'none';
       }
     });
   </script>
