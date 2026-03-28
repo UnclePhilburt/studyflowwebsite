@@ -3795,45 +3795,94 @@
     function notifIcon(type) {
       if (type === 'note_downloaded') return { cls: 'download', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' };
       if (type === 'course_new_note') return { cls: 'course', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>' };
+      if (type === 'group_invite') return { cls: 'invite', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' };
       return { cls: 'cited', svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' };
     }
 
+    let pendingInvites = [];
+
     function renderNotifications() {
-      if (!notifData.length) {
-        notifList.innerHTML = '<div class="notif-empty">No notifications yet</div>';
-        notifBadge.classList.remove('visible');
-        return;
-      }
-      const unreadCount = notifData.filter(n => !n.is_read).length;
-      if (unreadCount > 0) {
-        notifBadge.classList.add('visible');
-      } else {
-        notifBadge.classList.remove('visible');
-      }
-      notifList.innerHTML = notifData.map(n => {
+      const allItems = [];
+
+      // Add pending invites at the top
+      pendingInvites.forEach(inv => {
+        allItems.push(`<div class="notif-item unread" data-id="invite-${inv.id}">
+          <div class="notif-item-icon invite"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="notif-item-body" style="flex:1;">
+            <div class="notif-item-msg">@${inv.invited_by} invited you to '${inv.group_name}'</div>
+            <div class="notif-item-time">${timeAgo(inv.created_at)}</div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+              <button onclick="respondInvite('${inv.id}','accept',event)" style="flex:1;padding:6px 12px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Accept</button>
+              <button onclick="respondInvite('${inv.id}','decline',event)" style="flex:1;padding:6px 12px;background:none;border:1.5px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Decline</button>
+            </div>
+          </div>
+        </div>`);
+      });
+
+      // Add regular notifications
+      notifData.forEach(n => {
+        if (n.type === 'group_invite') return; // skip, handled by pendingInvites
         const icon = notifIcon(n.type);
-        return `<div class="notif-item ${n.is_read ? '' : 'unread'}" data-id="${n.id}" data-note="${n.note_id || ''}">
+        allItems.push(`<div class="notif-item ${n.is_read ? '' : 'unread'}" data-id="${n.id}" data-note="${n.note_id || ''}">
           <div class="notif-item-icon ${icon.cls}">${icon.svg}</div>
           <div class="notif-item-body">
             <div class="notif-item-msg">${n.message || n.title}</div>
             <div class="notif-item-time">${timeAgo(n.created_at)}</div>
           </div>
           <div class="notif-item-dot"></div>
-        </div>`;
-      }).join('');
+        </div>`);
+      });
+
+      if (!allItems.length) {
+        notifList.innerHTML = '<div class="notif-empty">No notifications yet</div>';
+        notifBadge.classList.remove('visible');
+        return;
+      }
+
+      const unreadCount = notifData.filter(n => !n.is_read).length + pendingInvites.length;
+      if (unreadCount > 0) {
+        notifBadge.classList.add('visible');
+      } else {
+        notifBadge.classList.remove('visible');
+      }
+      notifList.innerHTML = allItems.join('');
+    }
+
+    async function respondInvite(inviteId, action, event) {
+      event.stopPropagation();
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/groups/invites/${inviteId}/${action}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        pendingInvites = pendingInvites.filter(i => i.id !== inviteId);
+        renderNotifications();
+        if (action === 'accept') {
+          window.location.href = 'study-groups.html';
+        }
+      } catch (e) {
+        console.error('Invite response error:', e);
+      }
     }
 
     async function fetchNotifications() {
       if (!authToken) return;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/notifications`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        if (res.ok) {
-          const json = await res.json();
+        const [notifRes, inviteRes] = await Promise.all([
+          fetch(`${BACKEND_URL}/api/notifications`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
+          fetch(`${BACKEND_URL}/api/groups/invites`, { headers: { 'Authorization': `Bearer ${authToken}` } })
+        ]);
+        if (notifRes.ok) {
+          const json = await notifRes.json();
           notifData = json.notifications || [];
-          renderNotifications();
         }
+        if (inviteRes.ok) {
+          const json = await inviteRes.json();
+          pendingInvites = json.invites || [];
+        }
+        renderNotifications();
       } catch (e) {
         console.error('Failed to fetch notifications:', e);
       }
