@@ -4032,7 +4032,7 @@
     async function selectGroupForChat(widgetId) {
       try {
         // Fetch user's study groups
-        const res = await fetch(BACKEND_URL + '/api/groups/my-groups', {
+        const res = await fetch(BACKEND_URL + '/api/groups', {
           headers: { 'Authorization': 'Bearer ' + authToken }
         });
 
