@@ -322,6 +322,7 @@
       }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="dashboard-page">
@@ -442,41 +443,55 @@
   </div>
 
   <script>
-    const API_URL = 'https://studyflowsuite.onrender.com/api';
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = 'index.html';
+    let authToken = '';
+    let currentUser = null;
+
+    // Initialize
+    async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      currentUser = session.user;
+      authToken = session.access_token;
+
+      // Show welcome banner if redirected from signup
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('welcome') === 'true') {
+        document.getElementById('welcomeBanner').style.display = 'block';
+      }
+
+      // Update UI
+      const username = currentUser.user_metadata?.username || currentUser.email.split('@')[0];
+      document.getElementById('userName').textContent = username;
+      document.getElementById('userEmail').textContent = currentUser.email;
+
+      loadUserData();
     }
 
-    // Show welcome banner if redirected from signup
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('welcome') === 'true') {
-      document.getElementById('welcomeBanner').style.display = 'block';
-    }
-
-    // Fetch user data
+    // Fetch user data from backend
     async function loadUserData() {
       try {
-        const response = await fetch(`${API_URL}/me`, {
+        const response = await fetch(`${BACKEND_URL}/api/me`, {
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${authToken}`
           }
         });
 
         if (response.status === 401) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          await supabaseClient.auth.signOut();
           window.location.href = 'index.html';
           return;
         }
 
         const user = await response.json();
-
-        // Update UI with user data
-        document.getElementById('userName').textContent = user.name || 'User';
-        document.getElementById('userEmail').textContent = user.email;
 
         // Update subscription status
         const status = user.subscription_status || 'free';
@@ -508,33 +523,28 @@
           document.getElementById('usageLimit').textContent = 'Unlimited questions';
         }
 
-        // Store user data
-        localStorage.setItem('user', JSON.stringify(user));
-
       } catch (error) {
         console.error('Error loading user data:', error);
       }
     }
 
-    function logout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+    async function logout() {
+      await supabaseClient.auth.signOut();
       window.location.href = 'index.html';
     }
 
     async function manageSubscription() {
       try {
-        const response = await fetch(`${API_URL}/create-portal-session`, {
+        const response = await fetch(`${BACKEND_URL}/api/create-portal-session`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${authToken}`
           }
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          // Open Stripe Customer Portal in new tab
           window.open(data.url, '_blank');
         } else {
           alert(data.error || 'Failed to open billing portal');
@@ -545,8 +555,8 @@
       }
     }
 
-    // Load user data on page load
-    loadUserData();
+    // Start
+    init();
   </script>
 </body>
 </html>
