@@ -735,6 +735,16 @@
       word-wrap: break-word;
     }
 
+    /* Calendar widget */
+    .calendar-day {
+      transition: all 0.2s;
+    }
+
+    .calendar-day:hover {
+      background: rgba(139, 157, 131, 0.15) !important;
+      transform: scale(1.05);
+    }
+
     /* Recent Conversations widget */
     .conv-item {
       padding: 12px;
@@ -2130,6 +2140,13 @@
         name: 'Group Chat',
         desc: 'Live study group messages',
         render: renderGroupChat,
+        comingSoon: false,
+        category: 'app'
+      },
+      groupCalendar: {
+        name: 'Group Calendar',
+        desc: 'Study group events and schedules',
+        render: renderGroupCalendar,
         comingSoon: false,
         category: 'app'
       },
@@ -4202,6 +4219,263 @@
           console.error('Error polling messages:', e);
         }
       }, 5000);
+    }
+
+    // ========== GROUP CALENDAR WIDGET ==========
+    function renderGroupCalendar(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const widgetElement = container.closest('.widget');
+      const selectedGroupId = widgetData.data.groupId;
+      const events = widgetData.data.events || [];
+      const currentDate = widgetData.data.currentDate || new Date().toISOString().split('T')[0];
+
+      // Set fixed height for calendar widget
+      widgetElement.style.height = '500px';
+      widgetElement.style.maxHeight = '500px';
+
+      if (!selectedGroupId) {
+        // Show group selection screen
+        container.innerHTML = `
+          <div style="padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+            <div style="font-size:32px;margin-bottom:12px;">📅</div>
+            <div style="font-size:14px;color:#6B6B6B;margin-bottom:16px;">Select a study group to view calendar</div>
+            <button onclick="selectGroupForCalendar('${widgetData.id}')" style="padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Choose Group</button>
+          </div>
+        `;
+      } else {
+        // Show calendar
+        const groupName = widgetData.data.groupName || 'Study Group';
+        const date = new Date(currentDate);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        // Calculate calendar grid
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date().toISOString().split('T')[0];
+
+        container.innerHTML = `
+          <div style="display:flex;flex-direction:column;height:100%;">
+            <div style="padding:12px;border-bottom:1px solid #E8DFD3;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.5);">
+              <div>
+                <div style="font-weight:600;font-size:13px;color:#2C2C2C;" onclick="selectGroupForCalendar('${widgetData.id}')" style="cursor:pointer;">${groupName}</div>
+                <div style="font-size:11px;color:#8B9D83;cursor:pointer;" onclick="selectGroupForCalendar('${widgetData.id}')">Change</div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center;">
+                <button onclick="changeCalendarMonth('${widgetData.id}', -1)" style="padding:4px 8px;background:#8B9D83;color:white;border:none;border-radius:4px;cursor:pointer;font-size:10px;">←</button>
+                <span style="font-size:12px;font-weight:500;min-width:100px;text-align:center;">${monthNames[month]} ${year}</span>
+                <button onclick="changeCalendarMonth('${widgetData.id}', 1)" style="padding:4px 8px;background:#8B9D83;color:white;border:none;border-radius:4px;cursor:pointer;font-size:10px;">→</button>
+              </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:8px;">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Sun</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Mon</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Tue</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Wed</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Thu</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Fri</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Sat</div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+                ${Array.from({length: firstDay}, () => '<div></div>').join('')}
+                ${Array.from({length: daysInMonth}, (_, i) => {
+                  const day = i + 1;
+                  const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                  const dayEvents = events.filter(e => e.event_date === dateStr);
+                  const isToday = dateStr === today;
+                  return `
+                    <div style="
+                      aspect-ratio:1;
+                      background:${isToday ? 'rgba(139,157,131,0.1)' : 'rgba(255,255,255,0.5)'};
+                      border:${isToday ? '2px solid #8B9D83' : '1px solid #E8DFD3'};
+                      border-radius:6px;
+                      padding:4px;
+                      font-size:11px;
+                      font-weight:${isToday ? '600' : '400'};
+                      cursor:pointer;
+                      position:relative;
+                      display:flex;
+                      flex-direction:column;
+                    " onclick="showCalendarDayEvents('${widgetData.id}', '${dateStr}')">
+                      <div style="text-align:center;color:#2C2C2C;">${day}</div>
+                      ${dayEvents.length > 0 ? `
+                        <div style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:#8B9D83;border-radius:50%;"></div>
+                      ` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Start polling for new events
+        startCalendarPolling(widgetData.id);
+      }
+    }
+
+    async function selectGroupForCalendar(widgetId) {
+      try {
+        const res = await fetch(BACKEND_URL + '/api/groups', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        if (!res.ok) {
+          alert('Failed to load study groups');
+          return;
+        }
+
+        const data = await res.json();
+        const groups = data.groups || [];
+
+        if (groups.length === 0) {
+          alert('You have no study groups yet. Create one first!');
+          return;
+        }
+
+        const modalHtml = `
+          <div class="group-select-modal" id="calendarGroupSelectModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
+            <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
+              <h3 style="font-size:18px;font-weight:500;color:#2C2C2C;margin-bottom:20px;text-align:center;">Select Study Group</h3>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                ${groups.map(group => `
+                  <button onclick="setGroupForCalendar('${widgetId}', '${group.id}', '${group.name.replace(/'/g, "\\'")}');closeCalendarGroupSelectModal()" style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;color:#2C2C2C;transition:all 0.2s;">
+                    <div style="font-weight:500;">${group.name}</div>
+                    <div style="font-size:11px;color:#8B9D83;margin-top:4px;">${group.member_count || 0} members</div>
+                  </button>
+                `).join('')}
+              </div>
+              <button onclick="closeCalendarGroupSelectModal()" style="margin-top:16px;width:100%;padding:10px;background:transparent;border:1px solid #E8DFD3;color:#8B9D83;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;">Cancel</button>
+            </div>
+          </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+      } catch (e) {
+        console.error('Error loading groups:', e);
+        alert('Failed to load study groups');
+      }
+    }
+
+    function closeCalendarGroupSelectModal() {
+      const modal = document.getElementById('calendarGroupSelectModal');
+      if (modal) modal.remove();
+    }
+
+    async function setGroupForCalendar(widgetId, groupId, groupName) {
+      try {
+        const res = await fetch(BACKEND_URL + `/api/groups/${groupId}/events`, {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        let events = [];
+        if (res.ok) {
+          const data = await res.json();
+          events = data.events || [];
+        }
+
+        updateWidgetData(widgetId, {
+          groupId,
+          groupName,
+          events,
+          currentDate: new Date().toISOString().split('T')[0]
+        });
+        const widgetData = activeWidgets.find(w => w.id === widgetId);
+        if (widgetData) renderGroupCalendar(widgetData);
+      } catch (e) {
+        console.error('Error loading events:', e);
+        updateWidgetData(widgetId, { groupId, groupName, events: [] });
+        const widgetData = activeWidgets.find(w => w.id === widgetId);
+        if (widgetData) renderGroupCalendar(widgetData);
+      }
+    }
+
+    function changeCalendarMonth(widgetId, direction) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const currentDate = new Date(widgetData.data.currentDate || new Date());
+      currentDate.setMonth(currentDate.getMonth() + direction);
+
+      updateWidgetData(widgetId, { currentDate: currentDate.toISOString().split('T')[0] });
+      renderGroupCalendar(widgetData);
+    }
+
+    function showCalendarDayEvents(widgetId, dateStr) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const events = (widgetData.data.events || []).filter(e => e.event_date === dateStr);
+
+      if (events.length === 0) {
+        alert(`No events on ${new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`);
+        return;
+      }
+
+      const modalHtml = `
+        <div class="day-events-modal" id="dayEventsModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
+          <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
+            <h3 style="font-size:18px;font-weight:500;color:#2C2C2C;margin-bottom:8px;text-align:center;">${new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
+              ${events.map(event => `
+                <div style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;">
+                  <div style="font-weight:600;font-size:14px;color:#2C2C2C;margin-bottom:4px;">${event.title}</div>
+                  ${event.event_time ? `<div style="font-size:11px;color:#8B9D83;margin-bottom:4px;">⏰ ${event.event_time}</div>` : ''}
+                  ${event.description ? `<div style="font-size:12px;color:#6B6B6B;margin-top:8px;">${event.description}</div>` : ''}
+                  <div style="font-size:10px;color:#9B8B7E;margin-top:8px;">Created by ${event.created_by}</div>
+                </div>
+              `).join('')}
+            </div>
+            <button onclick="closeDayEventsModal()" style="margin-top:16px;width:100%;padding:10px;background:#8B9D83;color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;">Close</button>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function closeDayEventsModal() {
+      const modal = document.getElementById('dayEventsModal');
+      if (modal) modal.remove();
+    }
+
+    function startCalendarPolling(widgetId) {
+      if (window.calendarPollingIntervals && window.calendarPollingIntervals[widgetId]) {
+        clearInterval(window.calendarPollingIntervals[widgetId]);
+      }
+
+      if (!window.calendarPollingIntervals) {
+        window.calendarPollingIntervals = {};
+      }
+
+      // Poll every 30 seconds for events
+      window.calendarPollingIntervals[widgetId] = setInterval(async () => {
+        const widgetData = activeWidgets.find(w => w.id === widgetId);
+        if (!widgetData || !widgetData.data.groupId) {
+          clearInterval(window.calendarPollingIntervals[widgetId]);
+          return;
+        }
+
+        try {
+          const res = await fetch(BACKEND_URL + `/api/groups/${widgetData.data.groupId}/events`, {
+            headers: { 'Authorization': 'Bearer ' + authToken }
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const events = data.events || [];
+
+            if (JSON.stringify(events) !== JSON.stringify(widgetData.data.events)) {
+              widgetData.data.events = events;
+              renderGroupCalendar(widgetData);
+            }
+          }
+        } catch (e) {
+          console.error('Error polling events:', e);
+        }
+      }, 30000);
     }
 
     // Helper function to update widget data
