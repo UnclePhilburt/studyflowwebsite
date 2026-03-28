@@ -1830,7 +1830,7 @@
     }
 
     // ---- Group detail ----
-    async function openGroup(groupId) {
+    async function openGroup(groupId, keepTab) {
       currentGroup = groupId;
       groupListView.style.display = 'none';
       document.getElementById('contentHeader').style.display = 'none';
@@ -1838,11 +1838,13 @@
       groupDetailTitle.textContent = 'Loading...';
       groupDeleteBtn.style.display = 'none';
 
-      // Reset tabs to chat
-      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-      document.querySelector('.tab-item[data-tab="chat"]').classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      document.querySelector('.tab-panel[data-panel="chat"]').classList.add('active');
+      // Reset tabs to chat (unless keepTab is set)
+      if (!keepTab) {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.querySelector('.tab-item[data-tab="chat"]').classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelector('.tab-panel[data-panel="chat"]').classList.add('active');
+      }
 
       try {
         const data = await apiFetch('/api/groups/' + groupId);
@@ -1963,7 +1965,7 @@
           try {
             await apiFetch('/api/groups/' + currentGroup + '/notes/' + btn.dataset.noteId, { method: 'DELETE' });
             showToast('Note removed');
-            await openGroup(currentGroup);
+            await openGroup(currentGroup, true);
           } catch (e) {
             showToast('Error: ' + e.message);
           }
@@ -1990,7 +1992,7 @@
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Upload failed');
         showToast('Uploaded ' + file.name);
-        await openGroup(currentGroup);
+        await openGroup(currentGroup, true);
       } catch (e) {
         showToast('Error: ' + e.message);
       }
