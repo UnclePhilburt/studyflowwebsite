@@ -262,35 +262,58 @@
       font-weight: 300;
     }
 
-    /* Main canvas with widget layout */
-    .canvas {
-      position: relative;
-      min-height: calc(100vh - 120px);
-      padding: 80px 40px 120px;
+    /* Infinite canvas container */
+    .canvas-container {
+      position: fixed;
+      inset: 0;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      cursor: grab;
       z-index: 1;
-      display: flex !important;
-      flex-wrap: wrap;
-      gap: 20px;
-      align-content: flex-start;
-      align-items: stretch;
+    }
+
+    .canvas-container.panning {
+      cursor: grabbing;
+    }
+
+    /* Main infinite canvas */
+    .canvas {
+      position: absolute;
+      width: 10000px;
+      height: 10000px;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 99px, rgba(139, 157, 131, 0.05) 99px, rgba(139, 157, 131, 0.05) 100px),
+        repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(139, 157, 131, 0.05) 99px, rgba(139, 157, 131, 0.05) 100px);
+      z-index: 1;
+      transform-origin: 0 0;
     }
 
     /* Widget cards */
     .widget {
+      position: absolute;
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(139, 126, 115, 0.12);
       border-radius: 16px;
       padding: 20px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-      transition: all 0.3s ease;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
       cursor: grab;
       min-height: 200px;
+      width: 380px;
       display: flex;
       flex-direction: column;
       user-select: none;
-      flex: 1 1 320px;
-      max-width: 500px;
+      z-index: 10;
+    }
+
+    .widget:hover {
+      box-shadow: 0 8px 24px rgba(139, 157, 131, 0.15);
+      transform: translateY(-2px);
+      z-index: 11;
     }
 
     .widget:active {
@@ -299,7 +322,7 @@
 
     @media (max-width: 768px) {
       .widget {
-        cursor: default;
+        width: 320px;
       }
     }
 
@@ -661,12 +684,46 @@
     }
 
     .empty-state {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       text-align: center;
       color: #9B8B7E;
       font-size: 14px;
       padding: 40px 20px;
-      width: 100%;
-      flex: 1 1 100%;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      border: 1px solid rgba(139, 126, 115, 0.12);
+      pointer-events: none;
+    }
+
+    /* Canvas reset button */
+    .canvas-reset {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 126, 115, 0.12);
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #8B9D83;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .canvas-reset:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 4px 16px rgba(139, 157, 131, 0.15);
     }
 
     /* Mac-style dock */
@@ -782,16 +839,19 @@
         height: 40px;
       }
 
-      .canvas {
-        padding: 70px 16px 100px;
-        gap: 16px;
+      .canvas-container {
+        cursor: default;
       }
 
       .widget {
         min-height: auto;
         padding: 16px;
-        flex: 1 1 100%;
-        max-width: 100%;
+        width: 300px;
+        cursor: default;
+      }
+
+      .canvas-reset {
+        display: none;
       }
 
       .widget-header {
@@ -1074,9 +1134,14 @@
   <!-- Add widget button -->
   <button class="add-widget-btn" id="addWidgetBtn" title="Add widget">+</button>
 
-  <!-- Canvas with widgets -->
-  <div class="canvas" id="canvas">
-    <!-- Widgets will be dynamically added here -->
+  <!-- Reset canvas view button -->
+  <button class="canvas-reset" id="canvasReset" title="Reset view">Reset View</button>
+
+  <!-- Infinite canvas container -->
+  <div class="canvas-container" id="canvasContainer">
+    <div class="canvas" id="canvas">
+      <!-- Widgets will be dynamically added here -->
+    </div>
   </div>
 
   <!-- Widget picker modal -->
@@ -1380,12 +1445,21 @@
       }
     };
 
-    let activeWidgets = [];
+    let activeWidgets = []; // Array of {id, x, y}
     let isDragging = false;
+    let canvasPan = { x: 0, y: 0 }; // Canvas pan offset
+    let isPanningCanvas = false;
+    let panStart = { x: 0, y: 0 };
+    let draggedWidget = null;
+    let widgetDragStart = { x: 0, y: 0 };
 
     // Load widgets from backend (per-user)
     async function loadWidgets() {
-      const DEFAULT_WIDGETS = ['recentConversations', 'upcomingEvents', 'studyGroups'];
+      const DEFAULT_WIDGETS = [
+        { id: 'recentConversations', x: 200, y: 200 },
+        { id: 'upcomingEvents', x: 620, y: 200 },
+        { id: 'studyGroups', x: 200, y: 500 }
+      ];
 
       try {
         const res = await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
@@ -1394,9 +1468,22 @@
 
         if (res.ok) {
           const data = await res.json();
-          activeWidgets = data.layout || DEFAULT_WIDGETS;
+          let layout = data.layout || DEFAULT_WIDGETS;
+
+          // Migration: Convert old array format ['id1', 'id2'] to new format [{id, x, y}]
+          if (layout.length > 0 && typeof layout[0] === 'string') {
+            layout = layout.map((id, index) => ({
+              id: id,
+              x: 200 + (index % 3) * 420,
+              y: 200 + Math.floor(index / 3) * 350
+            }));
+            // Save migrated format
+            await saveWidgets(layout);
+          }
+
+          // Filter out coming soon widgets
+          activeWidgets = layout.filter(w => !WIDGET_TYPES[w.id]?.comingSoon);
         } else {
-          // Fallback to default
           activeWidgets = DEFAULT_WIDGETS;
         }
       } catch (e) {
@@ -1404,12 +1491,16 @@
         // Try localStorage fallback for migration
         const saved = localStorage.getItem('dashboardWidgets');
         if (saved) {
-          activeWidgets = JSON.parse(saved);
-          // Filter out coming soon widgets
-          activeWidgets = activeWidgets.filter(id => !WIDGET_TYPES[id]?.comingSoon);
-          // Save to backend
-          await saveWidgets();
-          // Clear localStorage
+          const oldFormat = JSON.parse(saved);
+          // Convert old format to new format
+          activeWidgets = oldFormat
+            .filter(id => !WIDGET_TYPES[id]?.comingSoon)
+            .map((id, index) => ({
+              id: id,
+              x: 200 + (index % 3) * 420,
+              y: 200 + Math.floor(index / 3) * 350
+            }));
+          await saveWidgets(activeWidgets);
           localStorage.removeItem('dashboardWidgets');
         } else {
           activeWidgets = DEFAULT_WIDGETS;
@@ -1418,7 +1509,8 @@
       renderWidgets();
     }
 
-    async function saveWidgets() {
+    async function saveWidgets(widgetsToSave) {
+      const toSave = widgetsToSave || activeWidgets;
       try {
         await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
           method: 'POST',
@@ -1426,53 +1518,23 @@
             'Authorization': 'Bearer ' + authToken,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ layout: activeWidgets })
+          body: JSON.stringify({ layout: toSave })
         });
       } catch (e) {
         console.error('Save widgets error:', e);
       }
     }
 
-    // Helper function to determine where to insert the dragged element
-    function getDragAfterElement(container, y, x) {
-      const draggableElements = [...container.querySelectorAll('.widget:not(.dragging)')];
+    // Apply canvas transform
+    function updateCanvasTransform() {
+      const canvas = document.getElementById('canvas');
+      canvas.style.transform = `translate(${canvasPan.x}px, ${canvasPan.y}px)`;
+    }
 
-      let closestElement = null;
-      let closestDistance = Number.POSITIVE_INFINITY;
-
-      draggableElements.forEach(child => {
-        const box = child.getBoundingClientRect();
-        const centerY = box.top + box.height / 2;
-        const centerX = box.left + box.width / 2;
-
-        // Calculate distance from mouse to center of this element
-        const distanceY = Math.abs(y - centerY);
-        const distanceX = Math.abs(x - centerX);
-        const totalDistance = distanceY + distanceX;
-
-        // Check if this is closer than previous closest
-        if (totalDistance < closestDistance) {
-          closestDistance = totalDistance;
-          closestElement = child;
-        }
-      });
-
-      // If we found an element, check if we should insert before or after it
-      if (closestElement) {
-        const box = closestElement.getBoundingClientRect();
-        const centerY = box.top + box.height / 2;
-        const centerX = box.left + box.width / 2;
-
-        // If mouse is before (above/left of) the element, return it to insert before
-        // Otherwise return next sibling to insert after
-        if (y < centerY || (y === centerY && x < centerX)) {
-          return closestElement;
-        } else {
-          return closestElement.nextSibling;
-        }
-      }
-
-      return null;
+    // Reset canvas view to center
+    function resetCanvasView() {
+      canvasPan = { x: 0, y: 0 };
+      updateCanvasTransform();
     }
 
     function renderWidgets() {
@@ -1486,106 +1548,125 @@
 
       const isMobile = window.innerWidth <= 768;
 
-      // Add canvas dragover and drop handlers for desktop
-      if (!isMobile) {
-        canvas.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
-        });
-
-        canvas.addEventListener('drop', async (e) => {
-          e.preventDefault();
-          // Make sure to update order on drop
-          const widgets = Array.from(canvas.querySelectorAll('.widget'));
-          activeWidgets = widgets.map(w => w.dataset.widgetId);
-          await saveWidgets();
-        });
-      }
-
-      activeWidgets.forEach((widgetId, index) => {
-        const widgetDef = WIDGET_TYPES[widgetId];
+      activeWidgets.forEach((widgetData) => {
+        const widgetDef = WIDGET_TYPES[widgetData.id];
         if (!widgetDef) return;
 
         const widget = document.createElement('div');
         widget.className = 'widget';
-        widget.draggable = !isMobile; // Disable dragging on mobile
-        widget.dataset.widgetId = widgetId;
-        widget.dataset.index = index;
+        widget.dataset.widgetId = widgetData.id;
+        widget.style.left = widgetData.x + 'px';
+        widget.style.top = widgetData.y + 'px';
 
         widget.innerHTML = `
           <div class="widget-header">
             <div class="widget-title">${widgetDef.name}</div>
-            <button class="widget-remove" onclick="removeWidget('${widgetId}')">×</button>
+            <button class="widget-remove" onclick="removeWidget('${widgetData.id}')">×</button>
           </div>
-          <div class="widget-content" id="widget-${widgetId}">
+          <div class="widget-content" id="widget-${widgetData.id}">
             <div style="text-align:center;padding:20px;color:#9B8B7E;">Loading...</div>
           </div>
         `;
 
-        // Drag events (only on desktop)
+        // Widget drag events (only on desktop)
         if (!isMobile) {
-          widget.addEventListener('dragstart', (e) => {
-            isDragging = true;
-            widget.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', widgetId);
-          });
-
-          widget.addEventListener('dragend', async () => {
-            widget.classList.remove('dragging');
-            isDragging = false;
-            // Save new order after drag ends
-            const widgets = Array.from(canvas.querySelectorAll('.widget'));
-            activeWidgets = widgets.map(w => w.dataset.widgetId);
-            await saveWidgets();
-          });
-
-          let dragOverTimeout;
-          widget.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-
-            const dragging = document.querySelector('.dragging');
-            if (!dragging || dragging === widget) return;
-
-            // Throttle to avoid too many DOM manipulations
-            if (dragOverTimeout) return;
-            dragOverTimeout = setTimeout(() => {
-              dragOverTimeout = null;
-            }, 50);
-
-            // Get all widgets and their positions
-            const allWidgets = Array.from(canvas.querySelectorAll('.widget:not(.dragging)'));
-            const afterElement = getDragAfterElement(canvas, e.clientY, e.clientX);
-
-            if (afterElement == null) {
-              canvas.appendChild(dragging);
-            } else {
-              canvas.insertBefore(dragging, afterElement);
+          widget.addEventListener('mousedown', (e) => {
+            // Don't start drag if clicking on remove button or widget content
+            if (e.target.closest('.widget-remove') || e.target.closest('.widget-content')) {
+              return;
             }
 
-            // Update activeWidgets array immediately to reflect new DOM order
-            const currentWidgets = Array.from(canvas.querySelectorAll('.widget'));
-            activeWidgets = currentWidgets.map(w => w.dataset.widgetId);
-          });
-
-          widget.addEventListener('drop', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            isDragging = true;
+            draggedWidget = widgetData;
+            widget.classList.add('dragging');
+            widget.style.zIndex = '100';
+
+            // Calculate drag offset accounting for canvas pan
+            widgetDragStart = {
+              x: e.clientX - widgetData.x - canvasPan.x,
+              y: e.clientY - widgetData.y - canvasPan.y
+            };
           });
         }
 
         canvas.appendChild(widget);
 
         // Render widget content
-        setTimeout(() => widgetDef.render(widgetId), 100);
+        setTimeout(() => widgetDef.render(widgetData.id), 100);
       });
+
+      updateCanvasTransform();
     }
 
     async function removeWidget(widgetId) {
-      activeWidgets = activeWidgets.filter(id => id !== widgetId);
+      activeWidgets = activeWidgets.filter(w => w.id !== widgetId);
       await saveWidgets();
       renderWidgets();
     }
+
+    // Canvas panning and widget dragging
+    const canvasContainer = document.getElementById('canvasContainer');
+    const canvas = document.getElementById('canvas');
+
+    // Mouse down on canvas container (start panning)
+    canvasContainer.addEventListener('mousedown', (e) => {
+      // Only start panning if not clicking on a widget
+      if (e.target === canvasContainer || e.target === canvas) {
+        isPanningCanvas = true;
+        canvasContainer.classList.add('panning');
+        panStart = {
+          x: e.clientX - canvasPan.x,
+          y: e.clientY - canvasPan.y
+        };
+      }
+    });
+
+    // Mouse move (pan canvas or drag widget)
+    document.addEventListener('mousemove', (e) => {
+      if (isPanningCanvas) {
+        // Pan the canvas
+        canvasPan.x = e.clientX - panStart.x;
+        canvasPan.y = e.clientY - panStart.y;
+        updateCanvasTransform();
+      } else if (isDragging && draggedWidget) {
+        // Drag the widget (account for canvas pan)
+        draggedWidget.x = e.clientX - widgetDragStart.x - canvasPan.x;
+        draggedWidget.y = e.clientY - widgetDragStart.y - canvasPan.y;
+
+        const widgetElement = canvas.querySelector(`[data-widget-id="${draggedWidget.id}"]`);
+        if (widgetElement) {
+          widgetElement.style.left = draggedWidget.x + 'px';
+          widgetElement.style.top = draggedWidget.y + 'px';
+        }
+      }
+    });
+
+    // Mouse up (stop panning or dragging)
+    document.addEventListener('mouseup', async () => {
+      if (isPanningCanvas) {
+        isPanningCanvas = false;
+        canvasContainer.classList.remove('panning');
+      }
+
+      if (isDragging && draggedWidget) {
+        isDragging = false;
+        const widgetElement = canvas.querySelector(`[data-widget-id="${draggedWidget.id}"]`);
+        if (widgetElement) {
+          widgetElement.classList.remove('dragging');
+          widgetElement.style.zIndex = '10';
+        }
+        draggedWidget = null;
+        // Save widget positions
+        await saveWidgets();
+      }
+    });
+
+    // Reset canvas view button
+    document.getElementById('canvasReset').addEventListener('click', () => {
+      resetCanvasView();
+    });
 
     // Widget picker
     document.getElementById('addWidgetBtn').addEventListener('click', () => {
@@ -1604,7 +1685,7 @@
       container.innerHTML = '';
 
       Object.entries(WIDGET_TYPES).forEach(([id, widget]) => {
-        const isAdded = activeWidgets.includes(id);
+        const isAdded = activeWidgets.some(w => w.id === id);
         const isComingSoon = widget.comingSoon;
         const option = document.createElement('div');
         option.className = 'widget-option' + (isComingSoon ? ' coming-soon' : '');
@@ -1623,8 +1704,16 @@
 
     async function addWidget(widgetId) {
       const widgetDef = WIDGET_TYPES[widgetId];
-      if (!activeWidgets.includes(widgetId) && widgetDef && !widgetDef.comingSoon) {
-        activeWidgets.push(widgetId);
+      const alreadyExists = activeWidgets.some(w => w.id === widgetId);
+
+      if (!alreadyExists && widgetDef && !widgetDef.comingSoon) {
+        // Calculate position for new widget (stagger them)
+        const newWidget = {
+          id: widgetId,
+          x: 200 + (activeWidgets.length % 4) * 420,
+          y: 200 + Math.floor(activeWidgets.length / 4) * 350
+        };
+        activeWidgets.push(newWidget);
         await saveWidgets();
         renderWidgets();
         renderWidgetOptions();
@@ -1829,8 +1918,8 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        // Don't re-render during drag
-        if (!isDragging) {
+        // Don't re-render during drag or pan
+        if (!isDragging && !isPanningCanvas) {
           renderWidgets();
         }
       }, 300);
