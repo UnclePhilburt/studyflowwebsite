@@ -280,10 +280,10 @@
       font-size: 14px;
     }
 
-    @media (max-width: 540px) {
-      .note-card { padding: 24px; }
+    @media (max-width: 768px) {
+      .note-card { padding: 20px; flex-direction: column !important; }
       .note-filename { font-size: 18px; }
-      .note-meta-grid { grid-template-columns: 1fr; }
+      #previewPane { min-height: 300px; }
     }
   </style>
 </head>
@@ -302,40 +302,51 @@
   <div class="review-area" id="reviewArea">
     <div class="loading" id="loadingState">Loading review queue...</div>
 
-    <div id="cardContainer" style="display:none;width:100%;max-width:500px;">
-      <div class="note-card" id="noteCard">
-        <div class="note-filename" id="noteFilename"></div>
-        <div class="note-meta-grid">
-          <div class="note-meta-item">
-            <div class="note-meta-label">University</div>
-            <div class="note-meta-value" id="noteUni">--</div>
-          </div>
-          <div class="note-meta-item">
-            <div class="note-meta-label">Course</div>
-            <div class="note-meta-value" id="noteCourse">--</div>
-          </div>
-          <div class="note-meta-item">
-            <div class="note-meta-label">Uploaded by</div>
-            <div class="note-meta-value" id="noteUploader">--</div>
-          </div>
-          <div class="note-meta-item">
-            <div class="note-meta-label">File size</div>
-            <div class="note-meta-value" id="noteSize">--</div>
-          </div>
+    <div id="cardContainer" style="display:none;width:100%;max-width:900px;">
+      <div class="note-card" id="noteCard" style="display:flex;gap:24px;max-width:900px;">
+        <!-- Preview pane -->
+        <div id="previewPane" style="flex:1;min-width:0;min-height:400px;max-height:70vh;background:rgba(0,0,0,0.02);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <div id="previewLoading" style="color:#9ca3af;font-size:13px;">Loading preview...</div>
+          <iframe id="previewFrame" style="width:100%;height:100%;border:none;display:none;"></iframe>
+          <img id="previewImage" style="max-width:100%;max-height:100%;object-fit:contain;display:none;">
+          <div id="previewText" style="width:100%;height:100%;overflow:auto;padding:16px;font-size:13px;color:#2d2d2d;white-space:pre-wrap;display:none;font-family:'Inter',sans-serif;"></div>
+          <div id="previewUnsupported" style="color:#9ca3af;font-size:13px;display:none;">Preview not available for this file type. <a id="previewDownloadLink" href="#" target="_blank" style="color:#7c9885;font-weight:600;">Download file</a></div>
         </div>
-        <a class="note-preview-link" id="notePreview" href="#" target="_blank">View / Download File</a>
-        <div class="action-bar">
-          <button class="action-btn reject" id="rejectBtn" title="Reject (Left Arrow)">
+        <!-- Info pane -->
+        <div style="width:240px;flex-shrink:0;display:flex;flex-direction:column;">
+          <div class="note-filename" id="noteFilename"></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+            <div class="note-meta-item">
+              <div class="note-meta-label">University</div>
+              <div class="note-meta-value" id="noteUni">--</div>
+            </div>
+            <div class="note-meta-item">
+              <div class="note-meta-label">Course</div>
+              <div class="note-meta-value" id="noteCourse">--</div>
+            </div>
+            <div class="note-meta-item">
+              <div class="note-meta-label">Uploaded by</div>
+              <div class="note-meta-value" id="noteUploader">--</div>
+            </div>
+            <div class="note-meta-item">
+              <div class="note-meta-label">File size</div>
+              <div class="note-meta-value" id="noteSize">--</div>
+            </div>
+          </div>
+          <div style="flex:1;"></div>
+          <div class="action-bar" style="flex-direction:column;gap:12px;">
+          <button class="action-btn reject" id="rejectBtn" title="Reject (Left Arrow)" style="width:100%;border-radius:12px;height:48px;">
             <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
-          <button class="action-btn approve" id="approveBtn" title="Approve (Right Arrow)">
+          <button class="action-btn approve" id="approveBtn" title="Approve (Right Arrow)" style="width:100%;border-radius:12px;height:48px;">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-        </div>
-        <div class="key-hints">
-          <div class="key-hint"><kbd>Left</kbd> Reject</div>
-          <div class="key-hint"><kbd>Right</kbd> Approve</div>
-        </div>
+          </div>
+          <div class="key-hints" style="margin-top:12px;">
+            <div class="key-hint"><kbd>Left</kbd> Reject</div>
+            <div class="key-hint"><kbd>Right</kbd> Approve</div>
+          </div>
+        </div><!-- end info pane -->
       </div>
     </div>
 
@@ -411,18 +422,72 @@
       document.getElementById('noteUploader').textContent = '@' + (note.uploader || 'Unknown');
       document.getElementById('noteSize').textContent = note.file_size ? Math.round(note.file_size / 1024) + ' KB' : '--';
 
-      const previewLink = document.getElementById('notePreview');
-      if (note.preview_url) {
-        previewLink.href = note.preview_url;
-        previewLink.style.display = 'block';
-      } else {
-        previewLink.href = 'note-viewer.html?id=' + note.id;
-        previewLink.style.display = 'block';
-      }
+      // Reset preview
+      document.getElementById('previewFrame').style.display = 'none';
+      document.getElementById('previewImage').style.display = 'none';
+      document.getElementById('previewText').style.display = 'none';
+      document.getElementById('previewUnsupported').style.display = 'none';
+      document.getElementById('previewLoading').style.display = 'block';
 
-      document.getElementById('cardContainer').style.display = 'block';
+      document.getElementById('cardContainer').style.display = 'flex';
       document.getElementById('emptyState').style.display = 'none';
       updateCounter();
+
+      // Load preview via note-viewer signed URL
+      loadPreview(note);
+    }
+
+    async function loadPreview(note) {
+      const ext = (note.filename || '').split('.').pop().toLowerCase();
+      const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext);
+      const isPdf = ext === 'pdf';
+      const isText = ['txt', 'md', 'csv'].includes(ext);
+
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/note-preview/' + note.id + '?key=' + encodeURIComponent(adminKey));
+        let fileUrl = '';
+        if (res.ok) {
+          const data = await res.json();
+          fileUrl = data.url || '';
+        }
+
+        document.getElementById('previewLoading').style.display = 'none';
+
+        if (isPdf && fileUrl) {
+          const frame = document.getElementById('previewFrame');
+          frame.src = fileUrl;
+          frame.style.display = 'block';
+        } else if (isImage && fileUrl) {
+          const img = document.getElementById('previewImage');
+          img.src = fileUrl;
+          img.style.display = 'block';
+        } else if (isText && fileUrl) {
+          try {
+            const textRes = await fetch(fileUrl);
+            const text = await textRes.text();
+            const textEl = document.getElementById('previewText');
+            textEl.textContent = text.substring(0, 5000);
+            textEl.style.display = 'block';
+          } catch (e) {
+            showUnsupported(fileUrl);
+          }
+        } else {
+          // Use note-viewer as iframe fallback
+          const frame = document.getElementById('previewFrame');
+          frame.src = 'note-viewer.html?id=' + note.id;
+          frame.style.display = 'block';
+        }
+      } catch (e) {
+        document.getElementById('previewLoading').style.display = 'none';
+        const frame = document.getElementById('previewFrame');
+        frame.src = 'note-viewer.html?id=' + note.id;
+        frame.style.display = 'block';
+      }
+    }
+
+    function showUnsupported(url) {
+      document.getElementById('previewUnsupported').style.display = 'block';
+      document.getElementById('previewDownloadLink').href = url || '#';
     }
 
     function showEmpty() {
