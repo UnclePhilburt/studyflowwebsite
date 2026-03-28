@@ -3973,8 +3973,13 @@
     // Group Chat widget
     function renderGroupChat(widgetData) {
       const container = document.getElementById(`widget-${widgetData.id}`);
+      const widgetElement = container.closest('.widget');
       const selectedGroupId = widgetData.data.groupId;
       const messages = widgetData.data.messages || [];
+
+      // Set fixed height for Group Chat widget
+      widgetElement.style.height = '500px';
+      widgetElement.style.maxHeight = '500px';
 
       if (!selectedGroupId) {
         // Show group selection screen
