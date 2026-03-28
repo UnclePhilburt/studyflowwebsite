@@ -43,49 +43,70 @@
       flex-direction: column;
     }
 
-    /* Top Bar */
+    /* Top Bar - Hidden */
     .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      flex-shrink: 0;
+      display: none !important;
     }
 
-    .back-btn {
+    /* Back to Dashboard Button */
+    .back-to-dashboard {
+      position: fixed;
+      top: 28px;
+      left: 28px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.3);
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: none;
-      border: none;
-      color: #7c9885;
-      font-size: 14px;
-      font-weight: 600;
+      justify-content: center;
       cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 10px;
-      transition: background 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 99;
+      color: #7c9885;
       text-decoration: none;
+      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
     }
 
-    .back-btn:hover { background: rgba(124, 152, 133, 0.1); }
-
-    .back-btn svg {
-      width: 18px; height: 18px;
-      stroke: currentColor; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    .back-to-dashboard:hover {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
+      box-shadow: 0 6px 30px rgba(124, 152, 133, 0.2);
+      transform: translateY(-2px);
+      border-color: rgba(124, 152, 133, 0.6);
     }
 
+    @media (max-width: 768px) {
+      .back-to-dashboard {
+        top: 16px;
+        left: 16px;
+        width: 44px;
+        height: 44px;
+      }
+    }
+
+    /* Streak Display - Top Right */
     .top-bar-info {
+      position: fixed;
+      top: 28px;
+      right: 28px;
       text-align: right;
       font-size: 12px;
       color: #9ca3af;
+      z-index: 99;
     }
 
     .streak-display {
       font-size: 14px;
       font-weight: 700;
       color: #e89b5f;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar-info {
+        top: 16px;
+        right: 16px;
+      }
     }
 
     /* ─── Topic Input Screen ─── */
@@ -525,6 +546,18 @@
   </style>
 </head>
 <body>
+
+<!-- Back to Dashboard Button -->
+<a href="dashboard.html" class="back-to-dashboard" title="Back to Dashboard">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 12H5M12 19l-7-7 7-7"/>
+  </svg>
+</a>
+
+<!-- Streak Display -->
+<div class="top-bar-info">
+  <div class="streak-display" id="streakDisplay"></div>
+</div>
 
 <div class="app">
   <!-- Top Bar -->
