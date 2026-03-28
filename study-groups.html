@@ -1920,29 +1920,10 @@
       });
 
       try {
-        const data = await apiFetch('/api/groups/' + currentGroup + '/chat', {
+        await apiFetch('/api/groups/' + currentGroup + '/chat', {
           method: 'POST',
           body: JSON.stringify({ message: text })
         });
-
-        // If realtime doesn't pick up the AI response, append it manually
-        if (data && data.response) {
-          // Give realtime a moment, then check
-          setTimeout(() => {
-            // Check if AI msg was already added by realtime
-            const lastMsg = chatMessages.querySelector('.chat-msg-wrapper:last-child');
-            const isLastAI = lastMsg && lastMsg.classList.contains('ai');
-            if (!isLastAI) {
-              appendMessage({
-                role: 'assistant',
-                is_ai: true,
-                content: data.response,
-                sources: data.sources || [],
-                created_at: new Date().toISOString()
-              });
-            }
-          }, 2000);
-        }
       } catch (e) {
         showToast('Error: ' + e.message);
       }
