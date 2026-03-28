@@ -594,6 +594,16 @@
       border-color: rgba(139, 157, 131, 0.2);
     }
 
+    .widget-option.coming-soon {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .widget-option.coming-soon:hover {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(139, 126, 115, 0.12);
+    }
+
     .widget-option-info {
       flex: 1;
     }
@@ -1322,27 +1332,32 @@
       recentConversations: {
         name: 'Recent Conversations',
         desc: 'Your latest AI chat sessions',
-        render: renderRecentConversations
+        render: renderRecentConversations,
+        comingSoon: false
       },
       quickStats: {
         name: 'Quick Stats',
         desc: 'Your study progress at a glance',
-        render: renderQuickStats
+        render: renderQuickStats,
+        comingSoon: true
       },
       upcomingEvents: {
         name: 'Upcoming Events',
         desc: 'Calendar events and deadlines',
-        render: renderUpcomingEvents
+        render: renderUpcomingEvents,
+        comingSoon: false
       },
       studyGroups: {
         name: 'Study Groups',
         desc: 'Active group activity',
-        render: renderStudyGroups
+        render: renderStudyGroups,
+        comingSoon: false
       },
       quickLaunch: {
         name: 'Quick Launch',
         desc: 'Fast access to common actions',
-        render: renderQuickLaunch
+        render: renderQuickLaunch,
+        comingSoon: true
       }
     };
 
@@ -1350,6 +1365,8 @@
 
     // Load widgets from backend (per-user)
     async function loadWidgets() {
+      const DEFAULT_WIDGETS = ['recentConversations', 'upcomingEvents', 'studyGroups'];
+
       try {
         const res = await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
           headers: { 'Authorization': 'Bearer ' + authToken }
@@ -1357,10 +1374,10 @@
 
         if (res.ok) {
           const data = await res.json();
-          activeWidgets = data.layout || ['quickLaunch', 'recentConversations', 'quickStats'];
+          activeWidgets = data.layout || DEFAULT_WIDGETS;
         } else {
           // Fallback to default
-          activeWidgets = ['quickLaunch', 'recentConversations', 'quickStats'];
+          activeWidgets = DEFAULT_WIDGETS;
         }
       } catch (e) {
         console.error('Load widgets error:', e);
@@ -1368,12 +1385,14 @@
         const saved = localStorage.getItem('dashboardWidgets');
         if (saved) {
           activeWidgets = JSON.parse(saved);
+          // Filter out coming soon widgets
+          activeWidgets = activeWidgets.filter(id => !WIDGET_TYPES[id]?.comingSoon);
           // Save to backend
           await saveWidgets();
           // Clear localStorage
           localStorage.removeItem('dashboardWidgets');
         } else {
-          activeWidgets = ['quickLaunch', 'recentConversations', 'quickStats'];
+          activeWidgets = DEFAULT_WIDGETS;
         }
       }
       renderWidgets();
@@ -1495,15 +1514,16 @@
 
       Object.entries(WIDGET_TYPES).forEach(([id, widget]) => {
         const isAdded = activeWidgets.includes(id);
+        const isComingSoon = widget.comingSoon;
         const option = document.createElement('div');
-        option.className = 'widget-option';
+        option.className = 'widget-option' + (isComingSoon ? ' coming-soon' : '');
         option.innerHTML = `
           <div class="widget-option-info">
-            <div class="widget-option-name">${widget.name}</div>
+            <div class="widget-option-name">${widget.name}${isComingSoon ? ' <span style="font-size:11px;color:#9B8B7E;font-weight:400;">(Coming Soon)</span>' : ''}</div>
             <div class="widget-option-desc">${widget.desc}</div>
           </div>
-          <button class="widget-option-add" onclick="addWidget('${id}')" ${isAdded ? 'disabled' : ''}>
-            ${isAdded ? 'Added' : 'Add'}
+          <button class="widget-option-add" onclick="addWidget('${id}')" ${isAdded || isComingSoon ? 'disabled' : ''}>
+            ${isComingSoon ? 'Coming Soon' : isAdded ? 'Added' : 'Add'}
           </button>
         `;
         container.appendChild(option);
@@ -1511,7 +1531,8 @@
     }
 
     async function addWidget(widgetId) {
-      if (!activeWidgets.includes(widgetId)) {
+      const widgetDef = WIDGET_TYPES[widgetId];
+      if (!activeWidgets.includes(widgetId) && widgetDef && !widgetDef.comingSoon) {
         activeWidgets.push(widgetId);
         await saveWidgets();
         renderWidgets();
