@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Study Groups - Collaborate with classmates using shared notes and AI-powered group chat on StudyFlow Suite.">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Study Groups - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: #2d2d2d;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(124, 152, 133, 0.03) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(232, 155, 95, 0.02) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    .page-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: rgba(248, 247, 244, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(124, 152, 133, 0.08);
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #7c9885;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: rgba(124, 152, 133, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .page-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .create-group-btn {
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8a74 100%);
+      border: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .create-group-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+    }
+
+    /* Main content */
+    .main-content {
+      padding-top: 64px;
+      padding-bottom: 80px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Group list view */
+    .group-list-view {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .group-list-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9ca3af;
+    }
+
+    .group-list-empty h3 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 20px;
+      font-weight: 500;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+
+    .group-list-empty p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .group-card {
+      background: rgba(248, 247, 244, 0.95);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .group-card:hover {
+      border-color: rgba(124, 152, 133, 0.3);
+      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .group-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .group-card-name {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .group-card-meta {
+      font-size: 13px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .group-card-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .role-badge.owner {
+      background: rgba(232, 155, 95, 0.12);
+      color: #d88850;
+      border: 1px solid rgba(232, 155, 95, 0.25);
+    }
+
+    .role-badge.member {
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+    }
+
+    .group-card-arrow {
+      color: #c0c0c0;
+    }
+
+    /* Group detail view */
+    .group-detail-view {
+      display: none;
+      height: calc(100vh - 64px - 72px);
+      height: calc(100dvh - 64px - 72px);
+      flex-direction: column;
+    }
+
+    .group-detail-view.active {
+      display: flex;
+    }
+
+    .group-detail-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.12);
+      background: rgba(248, 247, 244, 0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .group-back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(124, 152, 133, 0.08);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #7c9885;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .group-back-btn:hover {
+      background: rgba(124, 152, 133, 0.15);
+    }
+
+    .group-detail-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: #2d2d2d;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .group-delete-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(220, 80, 80, 0.08);
+      border: 1px solid rgba(220, 80, 80, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #dc5050;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .group-delete-btn:hover {
+      background: rgba(220, 80, 80, 0.15);
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.12);
+      background: rgba(248, 247, 244, 0.4);
+      padding: 0 20px;
+    }
+
+    .tab-item {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #9ca3af;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .tab-item:hover {
+      color: #7c9885;
+    }
+
+    .tab-item.active {
+      color: #7c9885;
+      border-bottom-color: #7c9885;
+    }
+
+    /* Tab panels */
+    .tab-panel {
+      display: none;
+      flex: 1;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    /* Chat tab */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+    }
+
+    .chat-msg-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 75%;
+    }
+
+    .chat-msg-wrapper.self {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .chat-msg-wrapper.other {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .chat-msg-wrapper.ai {
+      align-self: flex-start;
+      align-items: flex-start;
+      max-width: 85%;
+    }
+
+    .chat-msg-sender {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      margin-bottom: 3px;
+      padding: 0 8px;
+    }
+
+    .chat-msg-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.55;
+      word-wrap: break-word;
+    }
+
+    .chat-msg-wrapper.self .chat-msg-bubble {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8a74 100%);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-msg-wrapper.other .chat-msg-bubble {
+      background: rgba(0, 0, 0, 0.05);
+      color: #2d2d2d;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-msg-wrapper.ai .chat-msg-bubble {
+      background: rgba(248, 247, 244, 0.95);
+      color: #2d2d2d;
+      border: 1px solid rgba(124, 152, 133, 0.25);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-msg-bubble .ai-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #7c9885;
+      margin-bottom: 4px;
+    }
+
+    .chat-msg-time {
+      font-size: 10px;
+      color: #c0c0c0;
+      margin-top: 3px;
+      padding: 0 8px;
+    }
+
+    .chat-msg-sources {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .chat-msg-sources strong {
+      font-weight: 600;
+      color: #7c9885;
+    }
+
+    .chat-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #c0c0c0;
+      font-size: 14px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .chat-empty h3 {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .chat-input-area {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(124, 152, 133, 0.12);
+      background: rgba(248, 247, 244, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      background: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      max-height: 120px;
+      line-height: 1.5;
+      color: #2d2d2d;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: rgba(124, 152, 133, 0.5);
+    }
+
+    .chat-input::placeholder {
+      color: #c0c0c0;
+    }
+
+    .chat-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8a74 100%);
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .chat-send-btn:hover {
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Notes tab */
+    .notes-panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .notes-panel-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+
+    .add-note-btn {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8a74 100%);
+      border: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .add-note-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+    }
+
+    .note-item {
+      background: rgba(248, 247, 244, 0.95);
+      border: 1px solid rgba(124, 152, 133, 0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .note-item:hover {
+      border-color: rgba(124, 152, 133, 0.25);
+    }
+
+    .note-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .note-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+
+    .note-item-meta {
+      font-size: 12px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .note-item-meta .course-code {
+      font-weight: 600;
+      color: #e89b5f;
+    }
+
+    .note-remove-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(220, 80, 80, 0.06);
+      border: 1px solid rgba(220, 80, 80, 0.1);
+      color: #dc5050;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .note-remove-btn:hover {
+      background: rgba(220, 80, 80, 0.12);
+    }
+
+    .notes-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: #c0c0c0;
+      font-size: 14px;
+    }
+
+    /* Members tab */
+    .members-panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .invite-section {
+      background: rgba(124, 152, 133, 0.05);
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .invite-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .invite-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .invite-input {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      background: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      outline: none;
+      color: #2d2d2d;
+      transition: border-color 0.2s;
+    }
+
+    .invite-input:focus {
+      border-color: rgba(124, 152, 133, 0.5);
+    }
+
+    .invite-input::placeholder {
+      color: #c0c0c0;
+    }
+
+    .invite-send-btn {
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8a74 100%);
+      border: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .invite-send-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .invite-link-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .invite-link-display {
+      flex: 1;
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(124, 152, 133, 0.15);
+      background: rgba(255, 255, 255, 0.6);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: #7c9885;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      user-select: all;
+    }
+
+    .copy-link-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 10px;
+      background: rgba(124, 152, 133, 0.1);
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      color: #7c9885;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .copy-link-btn:hover {
+      background: rgba(124, 152, 133, 0.18);
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.08);
+    }
+
+    .member-item:last-child {
+      border-bottom: none;
+    }
+
+    .member-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .member-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.15) 0%, rgba(232, 155, 95, 0.1) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #7c9885;
+      flex-shrink: 0;
+    }
+
+    .member-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+
+    .member-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .member-remove-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(220, 80, 80, 0.06);
+      border: 1px solid rgba(220, 80, 80, 0.1);
+      color: #dc5050;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .member-remove-btn:hover {
+      background: rgba(220, 80, 80, 0.12);
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: rgba(248, 247, 244, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(124, 152, 133, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      color: #9ca3af;
+      font-size: 11px;
+      font-weight: 500;
+      transition: color 0.2s;
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+
+    .bottom-nav-item:hover {
+      color: #7c9885;
+    }
+
+    .bottom-nav-item.active {
+      color: #7c9885;
+    }
+
+    .bottom-nav-item svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #f8f7f4;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 24px;
+      animation: modalIn 0.25s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 20px;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 152, 133, 0.25);
+      background: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      outline: none;
+      color: #2d2d2d;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .modal-input:focus {
+      border-color: rgba(124, 152, 133, 0.6);
+    }
+
+    .modal-input::placeholder {
+      color: #c0c0c0;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-btn {
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(0, 0, 0, 0.05);
+      color: #6b7280;
+    }
+
+    .modal-btn.cancel:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .modal-btn.confirm {
+      background: linear-gradient(135deg, #7c9885 0%, #6b8a74 100%);
+      color: #fff;
+    }
+
+    .modal-btn.confirm:hover {
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .modal-btn.confirm:disabled {
+      opacity: 0.4;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Add notes modal - checklist */
+    .add-notes-list {
+      max-height: 350px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .add-note-check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+    }
+
+    .add-note-check-item:last-child {
+      border-bottom: none;
+    }
+
+    .add-note-check-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #7c9885;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .add-note-check-label {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .add-note-check-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #2d2d2d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .add-note-check-meta {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .add-note-already {
+      font-size: 11px;
+      color: #7c9885;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #2d2d2d;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Loading spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-top: 2px solid #7c9885;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+
+    /* Confirm dialog */
+    .confirm-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(4px);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .confirm-overlay.show {
+      display: flex;
+    }
+
+    .confirm-card {
+      background: #f8f7f4;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 380px;
+      padding: 28px 24px;
+    }
+
+    .confirm-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 10px;
+    }
+
+    .confirm-message {
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .confirm-btn {
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .confirm-btn.cancel {
+      background: rgba(0,0,0,0.05);
+      color: #6b7280;
+    }
+
+    .confirm-btn.danger {
+      background: rgba(220, 80, 80, 0.9);
+      color: #fff;
+    }
+
+    .confirm-btn.danger:hover {
+      background: rgba(200, 60, 60, 1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 0 14px;
+      }
+
+      .page-title {
+        font-size: 17px;
+      }
+
+      .create-group-btn span {
+        display: none;
+      }
+
+      .create-group-btn {
+        padding: 0 12px;
+        width: 38px;
+      }
+
+      .group-list-view {
+        padding: 16px 14px;
+      }
+
+      .group-card {
+        padding: 14px 16px;
+        border-radius: 12px;
+      }
+
+      .group-detail-header {
+        padding: 12px 14px;
+      }
+
+      .tab-item {
+        padding: 10px 14px;
+        font-size: 12px;
+      }
+
+      .chat-messages {
+        padding: 14px;
+      }
+
+      .chat-msg-wrapper {
+        max-width: 85%;
+      }
+
+      .chat-msg-wrapper.ai {
+        max-width: 92%;
+      }
+
+      .chat-input-area {
+        padding: 10px 12px;
+      }
+
+      .notes-panel-content {
+        padding: 14px;
+      }
+
+      .members-panel-content {
+        padding: 14px;
+      }
+
+      .invite-section {
+        padding: 14px;
+      }
+
+      .invite-row {
+        flex-direction: column;
+      }
+
+      .invite-link-row {
+        flex-direction: column;
+      }
+
+      .bottom-nav-item {
+        font-size: 10px;
+        padding: 6px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <a href="chat.html" class="back-btn" title="Back to Chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </a>
+      <h1 class="page-title">Study Groups</h1>
+    </div>
+    <div class="header-right">
+      <button class="create-group-btn" id="createGroupBtn" title="Create Group">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Create Group</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <!-- Group list view -->
+    <div class="group-list-view" id="groupListView">
+      <div class="loading-center" id="groupListLoading">
+        <div class="spinner"></div>
+      </div>
+      <div id="groupListContent" style="display:none;"></div>
+    </div>
+
+    <!-- Group detail view -->
+    <div class="group-detail-view" id="groupDetailView">
+      <div class="group-detail-header">
+        <button class="group-back-btn" id="groupBackBtn" title="Back to groups">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <div class="group-detail-title" id="groupDetailTitle"></div>
+        <button class="group-delete-btn" id="groupDeleteBtn" title="Delete group" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item active" data-tab="chat">Chat</div>
+        <div class="tab-item" data-tab="notes">Notes</div>
+        <div class="tab-item" data-tab="members">Members</div>
+      </div>
+
+      <!-- Chat panel -->
+      <div class="tab-panel active" data-panel="chat">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-empty" id="chatEmpty">
+            <div>
+              <h3>Group Chat</h3>
+              <p>Ask questions grounded in your group's shared notes.</p>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" id="chatInput" placeholder="Ask the group AI..." rows="1"></textarea>
+          <button class="chat-send-btn" id="chatSendBtn" disabled title="Send message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Notes panel -->
+      <div class="tab-panel" data-panel="notes">
+        <div class="notes-panel-content" id="notesPanelContent">
+          <div class="notes-panel-actions">
+            <button class="add-note-btn" id="addNoteBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Notes
+            </button>
+          </div>
+          <div id="notesListContainer">
+            <div class="notes-empty" id="notesEmpty">No shared notes yet. Add your notes to the group.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members panel -->
+      <div class="tab-panel" data-panel="members">
+        <div class="members-panel-content" id="membersPanelContent">
+          <div class="invite-section" id="inviteSection">
+            <div class="invite-section-title">Invite Members</div>
+            <div class="invite-row">
+              <input type="text" class="invite-input" id="inviteUsernameInput" placeholder="Enter username to invite">
+              <button class="invite-send-btn" id="inviteSendBtn">Invite</button>
+            </div>
+            <div class="invite-section-title" style="margin-top:14px;">Invite Link</div>
+            <div class="invite-link-row">
+              <div class="invite-link-display" id="inviteLinkDisplay">--</div>
+              <button class="copy-link-btn" id="copyLinkBtn">Copy</button>
+            </div>
+          </div>
+          <div id="membersListContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <a href="chat.html" class="bottom-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Chat
+    </a>
+    <a href="upload.html" class="bottom-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      Upload
+    </a>
+    <a href="notes.html" class="bottom-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      Notes
+    </a>
+    <a href="office.html" class="bottom-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="8" y1="13" x2="16" y2="13"/>
+        <line x1="8" y1="17" x2="12" y2="17"/>
+      </svg>
+      Office
+    </a>
+    <a href="browse.html" class="bottom-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      Nexus
+    </a>
+  </nav>
+
+  <!-- Create group modal -->
+  <div class="modal-overlay" id="createGroupModal">
+    <div class="modal-card">
+      <div class="modal-title">Create Study Group</div>
+      <input type="text" class="modal-input" id="createGroupNameInput" placeholder="Group name" maxlength="80" autocomplete="off">
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="createGroupCancel">Cancel</button>
+        <button class="modal-btn confirm" id="createGroupConfirm" disabled>Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add notes modal -->
+  <div class="modal-overlay" id="addNotesModal">
+    <div class="modal-card">
+      <div class="modal-title">Add Notes to Group</div>
+      <div class="add-notes-list" id="addNotesList">
+        <div class="loading-center"><div class="spinner"></div></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="addNotesCancel">Cancel</button>
+        <button class="modal-btn confirm" id="addNotesConfirm">Add Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-card">
+      <div class="confirm-title" id="confirmTitle"></div>
+      <div class="confirm-message" id="confirmMessage"></div>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" id="confirmCancel">Cancel</button>
+        <button class="confirm-btn danger" id="confirmDanger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Config ----
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ---- State ----
+    let currentUser = null;
+    let accessToken = null;
+    let groups = [];
+    let currentGroup = null;
+    let currentGroupDetail = null;
+    let realtimeChannel = null;
+    let chatSending = false;
+
+    // ---- DOM refs ----
+    const groupListView = document.getElementById('groupListView');
+    const groupListLoading = document.getElementById('groupListLoading');
+    const groupListContent = document.getElementById('groupListContent');
+    const groupDetailView = document.getElementById('groupDetailView');
+    const groupDetailTitle = document.getElementById('groupDetailTitle');
+    const groupDeleteBtn = document.getElementById('groupDeleteBtn');
+    const groupBackBtn = document.getElementById('groupBackBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatEmpty = document.getElementById('chatEmpty');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const notesListContainer = document.getElementById('notesListContainer');
+    const notesEmpty = document.getElementById('notesEmpty');
+    const membersListContainer = document.getElementById('membersListContainer');
+    const inviteLinkDisplay = document.getElementById('inviteLinkDisplay');
+    const inviteUsernameInput = document.getElementById('inviteUsernameInput');
+    const createGroupModal = document.getElementById('createGroupModal');
+    const createGroupNameInput = document.getElementById('createGroupNameInput');
+    const createGroupConfirm = document.getElementById('createGroupConfirm');
+    const addNotesModal = document.getElementById('addNotesModal');
+    const addNotesList = document.getElementById('addNotesList');
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    const confirmTitle = document.getElementById('confirmTitle');
+    const confirmMessage = document.getElementById('confirmMessage');
+    const confirmDanger = document.getElementById('confirmDanger');
+    const toastEl = document.getElementById('toast');
+
+    // ---- Helpers ----
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2500);
+    }
+
+    function authHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      };
+    }
+
+    async function apiFetch(path, opts = {}) {
+      const res = await fetch(BACKEND_URL + path, {
+        ...opts,
+        headers: { ...authHeaders(), ...(opts.headers || {}) }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || err.message || 'Request failed');
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    function formatTime(ts) {
+      if (!ts) return '';
+      const d = new Date(ts);
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (isToday) return time;
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + time;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ---- Auth ----
+    async function initAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'signup.html';
+        return false;
+      }
+      currentUser = session.user;
+      accessToken = session.access_token;
+      return true;
+    }
+
+    // ---- Join flow ----
+    async function handleJoinFlow() {
+      const params = new URLSearchParams(window.location.search);
+      const joinCode = params.get('join');
+      if (!joinCode) return false;
+
+      try {
+        const result = await apiFetch('/api/groups/join/' + encodeURIComponent(joinCode), { method: 'POST' });
+        // Clean URL
+        window.history.replaceState({}, '', 'study-groups.html');
+        if (result && result.group_id) {
+          showToast('Joined group successfully');
+          await openGroup(result.group_id);
+          return true;
+        }
+        showToast('Joined group');
+      } catch (e) {
+        showToast('Could not join: ' + e.message);
+      }
+      return false;
+    }
+
+    // ---- Group list ----
+    async function loadGroups() {
+      groupListLoading.style.display = 'flex';
+      groupListContent.style.display = 'none';
+      try {
+        const data = await apiFetch('/api/groups');
+        groups = data.groups || data || [];
+        renderGroupList();
+      } catch (e) {
+        groupListContent.innerHTML = '<div class="group-list-empty"><h3>Could not load groups</h3><p>' + escapeHtml(e.message) + '</p></div>';
+        groupListContent.style.display = 'block';
+      }
+      groupListLoading.style.display = 'none';
+    }
+
+    function renderGroupList() {
+      groupListContent.style.display = 'block';
+      if (!groups.length) {
+        groupListContent.innerHTML = '<div class="group-list-empty"><h3>No study groups yet</h3><p>Create a group to start collaborating with classmates using shared notes and AI chat.</p></div>';
+        return;
+      }
+      let html = '';
+      groups.forEach(g => {
+        const memberCount = g.member_count || g.members_count || '?';
+        const role = g.role || 'member';
+        html += '<div class="group-card" data-id="' + g.id + '">';
+        html += '<div class="group-card-info">';
+        html += '<div class="group-card-name">' + escapeHtml(g.name) + '</div>';
+        html += '<div class="group-card-meta">';
+        html += '<span>' + memberCount + ' member' + (memberCount === 1 ? '' : 's') + '</span>';
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="group-card-right">';
+        html += '<span class="role-badge ' + role + '">' + role + '</span>';
+        html += '<span class="group-card-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></span>';
+        html += '</div>';
+        html += '</div>';
+      });
+      groupListContent.innerHTML = html;
+
+      groupListContent.querySelectorAll('.group-card').forEach(card => {
+        card.addEventListener('click', () => openGroup(card.dataset.id));
+      });
+    }
+
+    // ---- Group detail ----
+    async function openGroup(groupId) {
+      currentGroup = groupId;
+      groupListView.style.display = 'none';
+      groupDetailView.classList.add('active');
+      groupDetailTitle.textContent = 'Loading...';
+      groupDeleteBtn.style.display = 'none';
+
+      // Reset tabs to chat
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      document.querySelector('.tab-item[data-tab="chat"]').classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('.tab-panel[data-panel="chat"]').classList.add('active');
+
+      try {
+        const data = await apiFetch('/api/groups/' + groupId);
+        currentGroupDetail = data;
+        groupDetailTitle.textContent = data.name || 'Group';
+
+        // Show delete button for owner
+        const me = (data.members || []).find(m => m.user_id === currentUser.id);
+        if (me && me.role === 'owner') {
+          groupDeleteBtn.style.display = 'flex';
+        }
+
+        renderMembers(data.members || []);
+        renderNotes(data.notes || []);
+        await loadChatHistory();
+        subscribeRealtime(groupId);
+        updateInviteLink(data.invite_code);
+      } catch (e) {
+        showToast('Error loading group: ' + e.message);
+        closeGroup();
+      }
+    }
+
+    function closeGroup() {
+      currentGroup = null;
+      currentGroupDetail = null;
+      groupDetailView.classList.remove('active');
+      groupListView.style.display = 'block';
+      unsubscribeRealtime();
+      chatMessages.innerHTML = '<div class="chat-empty" id="chatEmpty"><div><h3>Group Chat</h3><p>Ask questions grounded in your group\'s shared notes.</p></div></div>';
+      loadGroups();
+    }
+
+    function updateInviteLink(code) {
+      if (code) {
+        const link = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'study-groups.html?join=' + code;
+        inviteLinkDisplay.textContent = link;
+      } else {
+        inviteLinkDisplay.textContent = '--';
+      }
+    }
+
+    // ---- Members ----
+    function renderMembers(members) {
+      const isOwner = members.some(m => m.user_id === currentUser.id && m.role === 'owner');
+      let html = '';
+      members.forEach(m => {
+        const initials = (m.username || m.email || '?').charAt(0).toUpperCase();
+        html += '<div class="member-item">';
+        html += '<div class="member-info">';
+        html += '<div class="member-avatar">' + initials + '</div>';
+        html += '<div>';
+        html += '<div class="member-name">' + escapeHtml(m.username || m.email || 'Unknown') + '</div>';
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="member-actions">';
+        html += '<span class="role-badge ' + (m.role || 'member') + '">' + (m.role || 'member') + '</span>';
+        if (isOwner && m.user_id !== currentUser.id) {
+          html += '<button class="member-remove-btn" data-user-id="' + m.user_id + '" title="Remove member">';
+          html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+          html += '</button>';
+        }
+        html += '</div>';
+        html += '</div>';
+      });
+      membersListContainer.innerHTML = html;
+
+      membersListContainer.querySelectorAll('.member-remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => removeMember(btn.dataset.userId));
+      });
+    }
+
+    async function removeMember(userId) {
+      showConfirm('Remove Member', 'Are you sure you want to remove this member from the group?', 'Remove', async () => {
+        try {
+          await apiFetch('/api/groups/' + currentGroup + '/members/' + userId, { method: 'DELETE' });
+          showToast('Member removed');
+          await openGroup(currentGroup);
+        } catch (e) {
+          showToast('Error: ' + e.message);
+        }
+      });
+    }
+
+    // ---- Notes ----
+    function renderNotes(notes) {
+      if (!notes.length) {
+        notesListContainer.innerHTML = '<div class="notes-empty">No shared notes yet. Add your notes to the group.</div>';
+        return;
+      }
+      const isOwner = (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id && m.role === 'owner');
+      const isMember = (currentGroupDetail.members || []).some(m => m.user_id === currentUser.id);
+      let html = '';
+      notes.forEach(n => {
+        html += '<div class="note-item">';
+        html += '<div class="note-item-info">';
+        html += '<div class="note-item-name">' + escapeHtml(n.filename || n.title || 'Untitled') + '</div>';
+        html += '<div class="note-item-meta">';
+        if (n.course_code) html += '<span class="course-code">' + escapeHtml(n.course_code) + '</span>';
+        if (n.added_by_username || n.username) html += '<span>Added by ' + escapeHtml(n.added_by_username || n.username) + '</span>';
+        html += '</div>';
+        html += '</div>';
+        // Owner or the person who added can remove
+        if (isOwner || n.added_by === currentUser.id) {
+          html += '<button class="note-remove-btn" data-note-id="' + n.id + '" title="Remove note">';
+          html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+          html += '</button>';
+        }
+        html += '</div>';
+      });
+      notesListContainer.innerHTML = html;
+
+      notesListContainer.querySelectorAll('.note-remove-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          try {
+            await apiFetch('/api/groups/' + currentGroup + '/notes/' + btn.dataset.noteId, { method: 'DELETE' });
+            showToast('Note removed');
+            await openGroup(currentGroup);
+          } catch (e) {
+            showToast('Error: ' + e.message);
+          }
+        });
+      });
+    }
+
+    // ---- Add notes modal ----
+    async function openAddNotesModal() {
+      addNotesModal.classList.add('show');
+      addNotesList.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+      try {
+        const data = await apiFetch('/api/groups/' + currentGroup + '/my-notes');
+        const notes = data.notes || data || [];
+        if (!notes.length) {
+          addNotesList.innerHTML = '<div class="notes-empty">You have no notes to add. Upload some notes first.</div>';
+          return;
+        }
+        let html = '';
+        notes.forEach(n => {
+          const disabled = n.already_added ? ' disabled' : '';
+          const checked = n.already_added ? ' checked' : '';
+          html += '<label class="add-note-check-item">';
+          html += '<input type="checkbox" value="' + n.id + '"' + checked + disabled + '>';
+          html += '<div class="add-note-check-label">';
+          html += '<div class="add-note-check-name">' + escapeHtml(n.filename || n.title || 'Untitled') + '</div>';
+          if (n.course_code) html += '<div class="add-note-check-meta">' + escapeHtml(n.course_code) + '</div>';
+          html += '</div>';
+          if (n.already_added) html += '<span class="add-note-already">Added</span>';
+          html += '</label>';
+        });
+        addNotesList.innerHTML = html;
+      } catch (e) {
+        addNotesList.innerHTML = '<div class="notes-empty">Could not load notes: ' + escapeHtml(e.message) + '</div>';
+      }
+    }
+
+    async function addSelectedNotes() {
+      const checkboxes = addNotesList.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)');
+      if (!checkboxes.length) {
+        addNotesModal.classList.remove('show');
+        return;
+      }
+      let added = 0;
+      for (const cb of checkboxes) {
+        try {
+          await apiFetch('/api/groups/' + currentGroup + '/notes', {
+            method: 'POST',
+            body: JSON.stringify({ note_id: cb.value })
+          });
+          added++;
+        } catch (e) {
+          // skip
+        }
+      }
+      addNotesModal.classList.remove('show');
+      if (added > 0) {
+        showToast(added + ' note' + (added === 1 ? '' : 's') + ' added');
+        await openGroup(currentGroup);
+      }
+    }
+
+    // ---- Chat ----
+    async function loadChatHistory() {
+      try {
+        const data = await apiFetch('/api/groups/' + currentGroup + '/messages');
+        const messages = data.messages || data || [];
+        chatMessages.innerHTML = '';
+        if (!messages.length) {
+          chatMessages.innerHTML = '<div class="chat-empty"><div><h3>Group Chat</h3><p>Ask questions grounded in your group\'s shared notes.</p></div></div>';
+          return;
+        }
+        messages.forEach(m => appendMessage(m, false));
+        scrollChatBottom();
+      } catch (e) {
+        chatMessages.innerHTML = '<div class="chat-empty"><div><h3>Chat</h3><p>Could not load messages.</p></div></div>';
+      }
+    }
+
+    function appendMessage(msg, scroll = true) {
+      // Remove empty state if present
+      const empty = chatMessages.querySelector('.chat-empty');
+      if (empty) empty.remove();
+
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('chat-msg-wrapper');
+
+      const isAI = msg.role === 'assistant' || msg.is_ai;
+      const isSelf = !isAI && msg.user_id === currentUser.id;
+
+      if (isAI) {
+        wrapper.classList.add('ai');
+      } else if (isSelf) {
+        wrapper.classList.add('self');
+      } else {
+        wrapper.classList.add('other');
+      }
+
+      let html = '';
+
+      // Sender label
+      if (isAI) {
+        // AI label is inside bubble
+      } else {
+        const displayName = msg.sender_username || msg.username || 'User';
+        html += '<div class="chat-msg-sender">' + escapeHtml(displayName) + '</div>';
+      }
+
+      // Bubble
+      html += '<div class="chat-msg-bubble">';
+      if (isAI) {
+        html += '<div class="ai-label">AI Assistant</div>';
+      }
+      html += escapeHtml(msg.content || msg.message || '');
+
+      // Sources
+      if (isAI && msg.sources && msg.sources.length) {
+        html += '<div class="chat-msg-sources"><strong>Sources:</strong> ';
+        html += msg.sources.map(s => escapeHtml(s.filename || s.title || s)).join(', ');
+        html += '</div>';
+      }
+      html += '</div>';
+
+      // Timestamp
+      html += '<div class="chat-msg-time">' + formatTime(msg.created_at || msg.timestamp) + '</div>';
+
+      wrapper.innerHTML = html;
+      chatMessages.appendChild(wrapper);
+
+      if (scroll) scrollChatBottom();
+    }
+
+    function scrollChatBottom() {
+      requestAnimationFrame(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+    }
+
+    async function sendChatMessage() {
+      const text = chatInput.value.trim();
+      if (!text || chatSending) return;
+
+      chatSending = true;
+      chatSendBtn.disabled = true;
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+
+      // Optimistic: show user message immediately
+      appendMessage({
+        user_id: currentUser.id,
+        sender_username: currentUser.user_metadata?.username || currentUser.email,
+        content: text,
+        created_at: new Date().toISOString()
+      });
+
+      try {
+        const data = await apiFetch('/api/groups/' + currentGroup + '/chat', {
+          method: 'POST',
+          body: JSON.stringify({ message: text })
+        });
+
+        // If realtime doesn't pick up the AI response, append it manually
+        if (data && data.response) {
+          // Give realtime a moment, then check
+          setTimeout(() => {
+            // Check if AI msg was already added by realtime
+            const lastMsg = chatMessages.querySelector('.chat-msg-wrapper:last-child');
+            const isLastAI = lastMsg && lastMsg.classList.contains('ai');
+            if (!isLastAI) {
+              appendMessage({
+                role: 'assistant',
+                is_ai: true,
+                content: data.response,
+                sources: data.sources || [],
+                created_at: new Date().toISOString()
+              });
+            }
+          }, 2000);
+        }
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+
+      chatSending = false;
+      updateChatSendState();
+    }
+
+    function updateChatSendState() {
+      chatSendBtn.disabled = !chatInput.value.trim() || chatSending;
+    }
+
+    // ---- Realtime ----
+    function subscribeRealtime(groupId) {
+      unsubscribeRealtime();
+      realtimeChannel = supabaseClient.channel('group-' + groupId)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'study_group_messages',
+          filter: 'group_id=eq.' + groupId
+        }, (payload) => {
+          const msg = payload.new;
+          if (!msg) return;
+
+          // Don't duplicate the optimistic user message from current user
+          const isAI = msg.role === 'assistant' || msg.is_ai;
+          if (!isAI && msg.user_id === currentUser.id) {
+            // Already shown optimistically
+            return;
+          }
+
+          appendMessage(msg);
+        })
+        .subscribe();
+    }
+
+    function unsubscribeRealtime() {
+      if (realtimeChannel) {
+        supabaseClient.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
+    }
+
+    // ---- Invite ----
+    async function inviteByUsername() {
+      const username = inviteUsernameInput.value.trim();
+      if (!username) return;
+      try {
+        await apiFetch('/api/groups/' + currentGroup + '/invite', {
+          method: 'POST',
+          body: JSON.stringify({ username })
+        });
+        showToast('Invited ' + username);
+        inviteUsernameInput.value = '';
+        await openGroup(currentGroup);
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    // ---- Delete group ----
+    async function deleteGroup() {
+      showConfirm('Delete Group', 'This will permanently delete the group, all messages, and shared notes. This cannot be undone.', 'Delete', async () => {
+        try {
+          await apiFetch('/api/groups/' + currentGroup, { method: 'DELETE' });
+          showToast('Group deleted');
+          closeGroup();
+        } catch (e) {
+          showToast('Error: ' + e.message);
+        }
+      });
+    }
+
+    // ---- Create group ----
+    async function createGroup() {
+      const name = createGroupNameInput.value.trim();
+      if (!name) return;
+      createGroupConfirm.disabled = true;
+      try {
+        const data = await apiFetch('/api/groups', {
+          method: 'POST',
+          body: JSON.stringify({ name })
+        });
+        createGroupModal.classList.remove('show');
+        createGroupNameInput.value = '';
+        showToast('Group created');
+        if (data && (data.id || data.group_id)) {
+          await openGroup(data.id || data.group_id);
+        } else {
+          await loadGroups();
+        }
+      } catch (e) {
+        showToast('Error: ' + e.message);
+        createGroupConfirm.disabled = false;
+      }
+    }
+
+    // ---- Confirm dialog ----
+    let confirmCallback = null;
+
+    function showConfirm(title, message, actionLabel, callback) {
+      confirmTitle.textContent = title;
+      confirmMessage.textContent = message;
+      confirmDanger.textContent = actionLabel;
+      confirmCallback = callback;
+      confirmOverlay.classList.add('show');
+    }
+
+    function hideConfirm() {
+      confirmOverlay.classList.remove('show');
+      confirmCallback = null;
+    }
+
+    // ---- Tab switching ----
+    document.querySelectorAll('.tab-item').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelector('.tab-panel[data-panel="' + tab.dataset.tab + '"]').classList.add('active');
+        if (tab.dataset.tab === 'chat') {
+          scrollChatBottom();
+        }
+      });
+    });
+
+    // ---- Event listeners ----
+
+    // Create group modal
+    document.getElementById('createGroupBtn').addEventListener('click', () => {
+      createGroupModal.classList.add('show');
+      createGroupNameInput.value = '';
+      createGroupConfirm.disabled = true;
+      setTimeout(() => createGroupNameInput.focus(), 100);
+    });
+
+    document.getElementById('createGroupCancel').addEventListener('click', () => {
+      createGroupModal.classList.remove('show');
+    });
+
+    createGroupNameInput.addEventListener('input', () => {
+      createGroupConfirm.disabled = !createGroupNameInput.value.trim();
+    });
+
+    createGroupNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !createGroupConfirm.disabled) {
+        e.preventDefault();
+        createGroup();
+      }
+    });
+
+    createGroupConfirm.addEventListener('click', createGroup);
+
+    // Close modals on overlay click
+    createGroupModal.addEventListener('click', (e) => {
+      if (e.target === createGroupModal) createGroupModal.classList.remove('show');
+    });
+
+    addNotesModal.addEventListener('click', (e) => {
+      if (e.target === addNotesModal) addNotesModal.classList.remove('show');
+    });
+
+    confirmOverlay.addEventListener('click', (e) => {
+      if (e.target === confirmOverlay) hideConfirm();
+    });
+
+    // Group detail
+    groupBackBtn.addEventListener('click', closeGroup);
+    groupDeleteBtn.addEventListener('click', deleteGroup);
+
+    // Chat input
+    chatInput.addEventListener('input', () => {
+      updateChatSendState();
+      // Auto-resize
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    });
+
+    chatSendBtn.addEventListener('click', sendChatMessage);
+
+    // Add notes
+    document.getElementById('addNoteBtn').addEventListener('click', openAddNotesModal);
+    document.getElementById('addNotesCancel').addEventListener('click', () => {
+      addNotesModal.classList.remove('show');
+    });
+    document.getElementById('addNotesConfirm').addEventListener('click', addSelectedNotes);
+
+    // Invite
+    document.getElementById('inviteSendBtn').addEventListener('click', inviteByUsername);
+    inviteUsernameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        inviteByUsername();
+      }
+    });
+
+    // Copy invite link
+    document.getElementById('copyLinkBtn').addEventListener('click', () => {
+      const text = inviteLinkDisplay.textContent;
+      if (!text || text === '--') return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Invite link copied');
+      }).catch(() => {
+        // Fallback
+        const range = document.createRange();
+        range.selectNodeContents(inviteLinkDisplay);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('copy');
+        showToast('Invite link copied');
+      });
+    });
+
+    // Confirm dialog
+    document.getElementById('confirmCancel').addEventListener('click', hideConfirm);
+    confirmDanger.addEventListener('click', () => {
+      if (confirmCallback) {
+        confirmCallback();
+      }
+      hideConfirm();
+    });
+
+    // Keyboard: Escape closes modals
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        createGroupModal.classList.remove('show');
+        addNotesModal.classList.remove('show');
+        hideConfirm();
+      }
+    });
+
+    // ---- Init ----
+    (async function init() {
+      const authed = await initAuth();
+      if (!authed) return;
+
+      // Handle join flow first
+      const joined = await handleJoinFlow();
+      if (!joined) {
+        await loadGroups();
+      }
+    })();
+  </script>
+</body>
+</html>
