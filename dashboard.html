@@ -1348,20 +1348,50 @@
 
     let activeWidgets = [];
 
-    // Load widgets from localStorage
-    function loadWidgets() {
-      const saved = localStorage.getItem('dashboardWidgets');
-      if (saved) {
-        activeWidgets = JSON.parse(saved);
-      } else {
-        // Default widgets
-        activeWidgets = ['quickLaunch', 'recentConversations', 'quickStats'];
+    // Load widgets from backend (per-user)
+    async function loadWidgets() {
+      try {
+        const res = await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          activeWidgets = data.layout || ['quickLaunch', 'recentConversations', 'quickStats'];
+        } else {
+          // Fallback to default
+          activeWidgets = ['quickLaunch', 'recentConversations', 'quickStats'];
+        }
+      } catch (e) {
+        console.error('Load widgets error:', e);
+        // Try localStorage fallback for migration
+        const saved = localStorage.getItem('dashboardWidgets');
+        if (saved) {
+          activeWidgets = JSON.parse(saved);
+          // Save to backend
+          await saveWidgets();
+          // Clear localStorage
+          localStorage.removeItem('dashboardWidgets');
+        } else {
+          activeWidgets = ['quickLaunch', 'recentConversations', 'quickStats'];
+        }
       }
       renderWidgets();
     }
 
-    function saveWidgets() {
-      localStorage.setItem('dashboardWidgets', JSON.stringify(activeWidgets));
+    async function saveWidgets() {
+      try {
+        await fetch(BACKEND_URL + '/api/user/dashboard-layout', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + authToken,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ layout: activeWidgets })
+        });
+      } catch (e) {
+        console.error('Save widgets error:', e);
+      }
     }
 
     function renderWidgets() {
@@ -1426,11 +1456,11 @@
             }
           });
 
-          widget.addEventListener('drop', (e) => {
+          widget.addEventListener('drop', async (e) => {
             e.preventDefault();
             const widgets = Array.from(canvas.querySelectorAll('.widget'));
             activeWidgets = widgets.map(w => w.dataset.widgetId);
-            saveWidgets();
+            await saveWidgets();
           });
         }
 
@@ -1441,9 +1471,9 @@
       });
     }
 
-    function removeWidget(widgetId) {
+    async function removeWidget(widgetId) {
       activeWidgets = activeWidgets.filter(id => id !== widgetId);
-      saveWidgets();
+      await saveWidgets();
       renderWidgets();
     }
 
@@ -1480,10 +1510,10 @@
       });
     }
 
-    function addWidget(widgetId) {
+    async function addWidget(widgetId) {
       if (!activeWidgets.includes(widgetId)) {
         activeWidgets.push(widgetId);
-        saveWidgets();
+        await saveWidgets();
         renderWidgets();
         renderWidgetOptions();
       }
@@ -1679,7 +1709,7 @@
     const originalInit = init;
     init = async function() {
       await originalInit();
-      loadWidgets();
+      await loadWidgets();
     };
 
     // Re-render widgets on resize (to enable/disable dragging based on screen size)
