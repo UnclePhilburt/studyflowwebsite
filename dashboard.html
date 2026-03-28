@@ -14,11 +14,139 @@
       box-sizing: border-box;
     }
 
+    /* Theme Variables */
+    :root {
+      /* Default Theme (Earthy) */
+      --bg-primary: #FAF8F5;
+      --bg-secondary: rgba(255, 255, 255, 0.6);
+      --bg-tertiary: rgba(255, 255, 255, 0.9);
+      --text-primary: #2C2C2C;
+      --text-secondary: #8B7E73;
+      --text-muted: #9B8B7E;
+      --accent-primary: #8B9D83;
+      --accent-secondary: #7A8C73;
+      --accent-tertiary: #D4A574;
+      --border-color: rgba(139, 157, 131, 0.2);
+      --hover-bg: rgba(139, 157, 131, 0.06);
+      --gradient-start: rgba(139, 157, 131, 0.03);
+      --gradient-end: rgba(212, 196, 176, 0.03);
+      --widget-bg: rgba(255, 255, 255, 0.7);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
+    body[data-theme="dark"] {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: rgba(40, 40, 40, 0.8);
+      --bg-tertiary: rgba(50, 50, 50, 0.9);
+      --text-primary: #e8e8e8;
+      --text-secondary: #b8b8b8;
+      --text-muted: #888888;
+      --accent-primary: #7c9885;
+      --accent-secondary: #6a8573;
+      --accent-tertiary: #e89b5f;
+      --border-color: rgba(124, 152, 133, 0.3);
+      --hover-bg: rgba(124, 152, 133, 0.15);
+      --gradient-start: rgba(124, 152, 133, 0.08);
+      --gradient-end: rgba(232, 155, 95, 0.08);
+      --widget-bg: rgba(40, 40, 40, 0.8);
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    body[data-theme="ocean"] {
+      --bg-primary: #F0F8FF;
+      --bg-secondary: rgba(230, 245, 255, 0.6);
+      --bg-tertiary: rgba(240, 250, 255, 0.9);
+      --text-primary: #1e3a5f;
+      --text-secondary: #4a6b8a;
+      --text-muted: #7a9cb8;
+      --accent-primary: #4a90a4;
+      --accent-secondary: #3a7a8e;
+      --accent-tertiary: #5fb3c8;
+      --border-color: rgba(74, 144, 164, 0.2);
+      --hover-bg: rgba(74, 144, 164, 0.06);
+      --gradient-start: rgba(74, 144, 164, 0.03);
+      --gradient-end: rgba(95, 179, 200, 0.03);
+      --widget-bg: rgba(255, 255, 255, 0.7);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
+    body[data-theme="sunset"] {
+      --bg-primary: #FFF5F0;
+      --bg-secondary: rgba(255, 240, 230, 0.6);
+      --bg-tertiary: rgba(255, 245, 238, 0.9);
+      --text-primary: #4a2c2a;
+      --text-secondary: #8a5a4a;
+      --text-muted: #b88a7a;
+      --accent-primary: #d17a5f;
+      --accent-secondary: #b86a4f;
+      --accent-tertiary: #e89b7f;
+      --border-color: rgba(209, 122, 95, 0.2);
+      --hover-bg: rgba(209, 122, 95, 0.06);
+      --gradient-start: rgba(209, 122, 95, 0.03);
+      --gradient-end: rgba(232, 155, 127, 0.03);
+      --widget-bg: rgba(255, 255, 255, 0.7);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
+    body[data-theme="minimal"] {
+      --bg-primary: #ffffff;
+      --bg-secondary: rgba(245, 245, 245, 0.6);
+      --bg-tertiary: rgba(250, 250, 250, 0.9);
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --accent-primary: #4a4a4a;
+      --accent-secondary: #3a3a3a;
+      --accent-tertiary: #6a6a6a;
+      --border-color: rgba(74, 74, 74, 0.2);
+      --hover-bg: rgba(74, 74, 74, 0.06);
+      --gradient-start: rgba(74, 74, 74, 0.01);
+      --gradient-end: rgba(106, 106, 106, 0.01);
+      --widget-bg: rgba(250, 250, 250, 0.7);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
+    body[data-theme="forest"] {
+      --bg-primary: #F5F9F5;
+      --bg-secondary: rgba(235, 245, 235, 0.6);
+      --bg-tertiary: rgba(245, 250, 245, 0.9);
+      --text-primary: #2a3a2a;
+      --text-secondary: #4a6a4a;
+      --text-muted: #7a9a7a;
+      --accent-primary: #5a8a5a;
+      --accent-secondary: #4a7a4a;
+      --accent-tertiary: #7aaa7a;
+      --border-color: rgba(90, 138, 90, 0.2);
+      --hover-bg: rgba(90, 138, 90, 0.06);
+      --gradient-start: rgba(90, 138, 90, 0.03);
+      --gradient-end: rgba(122, 170, 122, 0.03);
+      --widget-bg: rgba(255, 255, 255, 0.7);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
+    body[data-theme="lavender"] {
+      --bg-primary: #F8F5FF;
+      --bg-secondary: rgba(245, 235, 255, 0.6);
+      --bg-tertiary: rgba(250, 245, 255, 0.9);
+      --text-primary: #3a2a4a;
+      --text-secondary: #6a5a8a;
+      --text-muted: #9a8ab8;
+      --accent-primary: #8a7aa4;
+      --accent-secondary: #7a6a94;
+      --accent-tertiary: #aa9ac8;
+      --border-color: rgba(138, 122, 164, 0.2);
+      --hover-bg: rgba(138, 122, 164, 0.06);
+      --gradient-start: rgba(138, 122, 164, 0.03);
+      --gradient-end: rgba(170, 154, 200, 0.03);
+      --widget-bg: rgba(255, 255, 255, 0.7);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: #FAF8F5;
+      background: var(--bg-primary);
       min-height: 100vh;
-      color: #2C2C2C;
+      color: var(--text-primary);
       overflow: hidden;
     }
 
@@ -28,8 +156,8 @@
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(circle at 20% 30%, rgba(139, 157, 131, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(212, 196, 176, 0.03) 0%, transparent 50%);
+        radial-gradient(circle at 20% 30%, var(--gradient-start) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, var(--gradient-end) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
@@ -50,21 +178,21 @@
       height: 44px;
       border-radius: 12px;
       border: none;
-      background: rgba(255, 255, 255, 0.6);
+      background: var(--bg-secondary);
       backdrop-filter: blur(20px);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #8B7E73;
+      color: var(--text-secondary);
       position: relative;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     .nav-bell:hover {
-      background: rgba(255, 255, 255, 0.9);
-      color: #8B9D83;
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
       transform: translateY(-2px);
     }
 
@@ -95,7 +223,7 @@
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #8B9D83, #7A8C73);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -298,12 +426,12 @@
     /* Widget cards */
     .widget {
       position: absolute;
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--widget-bg);
       backdrop-filter: blur(20px);
-      border: 1px solid rgba(139, 126, 115, 0.12);
+      border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 16px var(--shadow);
       transition: box-shadow 0.3s ease, transform 0.3s ease;
       cursor: grab;
       min-height: 200px;
@@ -315,7 +443,7 @@
     }
 
     .widget:hover {
-      box-shadow: 0 8px 24px rgba(139, 157, 131, 0.15);
+      box-shadow: 0 8px 24px var(--shadow);
       transform: translateY(-2px);
       z-index: 11;
     }
@@ -1353,14 +1481,14 @@
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.7);
+      background: var(--widget-bg);
       backdrop-filter: blur(40px);
-      border: 1px solid rgba(139, 126, 115, 0.12);
+      border: 1px solid var(--border-color);
       border-radius: 24px;
       padding: 12px 20px;
       display: flex;
       gap: 8px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+      box-shadow: 0 8px 32px var(--shadow), 0 0 0 1px var(--bg-secondary) inset;
       z-index: 1000;
     }
 
@@ -1378,26 +1506,26 @@
       width: 56px;
       height: 56px;
       border-radius: 16px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-      border: 1px solid rgba(139, 157, 131, 0.15);
+      background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+      border: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     .dock-item:hover .dock-icon {
       transform: translateY(-12px) scale(1.1);
-      background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9));
-      border-color: rgba(139, 157, 131, 0.25);
-      box-shadow: 0 8px 24px rgba(139, 157, 131, 0.15);
+      background: var(--bg-tertiary);
+      border-color: var(--accent-primary);
+      box-shadow: 0 8px 24px var(--shadow);
     }
 
     .dock-icon svg {
       width: 26px;
       height: 26px;
-      stroke: #8B9D83;
+      stroke: var(--accent-primary);
       fill: none;
       stroke-width: 1.5;
       stroke-linecap: round;
@@ -2024,7 +2152,16 @@
     let currentUser = null;
 
     // Auth check
+    // Load saved theme
+    function loadSavedTheme() {
+      const savedTheme = localStorage.getItem('dashboard-theme') || 'default';
+      document.body.setAttribute('data-theme', savedTheme);
+    }
+
     async function init() {
+      // Load theme before anything else
+      loadSavedTheme();
+
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
         window.location.href = 'index.html';
@@ -2038,6 +2175,22 @@
       document.getElementById('menuEmail').textContent = currentUser.email;
 
       loadNotifications();
+
+      // Try to load theme from Supabase
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/user/preferences`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.theme) {
+            document.body.setAttribute('data-theme', data.theme);
+            localStorage.setItem('dashboard-theme', data.theme);
+          }
+        }
+      } catch (err) {
+        console.log('Using local theme preference');
+      }
     }
 
     // Notifications
@@ -2293,6 +2446,13 @@
         name: 'Sticker Pack',
         desc: 'Decorative icons and emoji',
         render: renderStickerPack,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      themePicker: {
+        name: 'Theme Picker',
+        desc: 'Customize dashboard colors',
+        render: renderThemePicker,
         comingSoon: false,
         category: 'accessory'
       },
@@ -4195,6 +4355,89 @@
       updateWidgetData(widgetId, { sticker: '' });
       const widgetData = activeWidgets.find(w => w.id === widgetId);
       if (widgetData) renderStickerPack(widgetData);
+    }
+
+    // Theme Picker widget
+    const THEME_OPTIONS = [
+      { id: 'default', name: 'Earthy', icon: '🌿', desc: 'Warm greens and browns' },
+      { id: 'dark', name: 'Dark', icon: '🌙', desc: 'Dark mode' },
+      { id: 'ocean', name: 'Ocean', icon: '🌊', desc: 'Cool blues' },
+      { id: 'sunset', name: 'Sunset', icon: '🌅', desc: 'Warm oranges' },
+      { id: 'minimal', name: 'Minimal', icon: '⚫', desc: 'Black and white' },
+      { id: 'forest', name: 'Forest', icon: '🌲', desc: 'Deep greens' },
+      { id: 'lavender', name: 'Lavender', icon: '💜', desc: 'Soft purples' }
+    ];
+
+    function renderThemePicker(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const currentTheme = document.body.getAttribute('data-theme') || 'default';
+
+      container.innerHTML = `
+        <div style="padding:16px;">
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;font-weight:500;">Choose Theme</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto;">
+            ${THEME_OPTIONS.map(theme => `
+              <button
+                onclick="selectTheme('${theme.id}')"
+                style="
+                  padding:12px;
+                  background:${currentTheme === theme.id ? 'var(--accent-primary)' : 'var(--bg-secondary)'};
+                  color:${currentTheme === theme.id ? 'white' : 'var(--text-primary)'};
+                  border:2px solid ${currentTheme === theme.id ? 'var(--accent-primary)' : 'var(--border-color)'};
+                  border-radius:10px;
+                  cursor:pointer;
+                  font-family:inherit;
+                  display:flex;
+                  flex-direction:column;
+                  align-items:center;
+                  gap:6px;
+                  transition:all 0.2s ease;
+                "
+                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px var(--shadow)'"
+                onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'"
+              >
+                <div style="font-size:24px;">${theme.icon}</div>
+                <div style="font-size:11px;font-weight:600;">${theme.name}</div>
+                <div style="font-size:9px;opacity:0.8;text-align:center;">${theme.desc}</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    async function selectTheme(themeId) {
+      // Apply theme immediately
+      document.body.setAttribute('data-theme', themeId);
+
+      // Save to localStorage
+      localStorage.setItem('dashboard-theme', themeId);
+
+      // Update all theme picker widgets
+      activeWidgets.forEach(widget => {
+        if (widget.type === 'themePicker') {
+          renderThemePicker(widget);
+        }
+      });
+
+      // Save to Supabase if user is logged in
+      try {
+        const userId = localStorage.getItem('user_id');
+        const authToken = localStorage.getItem('auth_token');
+
+        if (userId && authToken) {
+          const response = await fetch(`${BACKEND_URL}/api/user/preferences`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ theme: themeId })
+          });
+        }
+      } catch (err) {
+        console.log('Theme saved locally only');
+      }
     }
 
     // Divider Line widget
