@@ -429,9 +429,10 @@
     /* Sticky Note styles */
     .sticky-note {
       width: 100%;
-      height: 100%;
-      min-height: 200px;
+      height: calc(100% - 70px);
+      min-height: 150px;
       padding: 16px;
+      padding-bottom: 40px;
       font-family: 'Comic Sans MS', cursive, sans-serif;
       font-size: 14px;
       line-height: 1.6;
@@ -444,14 +445,29 @@
 
     .widget[data-widget-type="stickyNote"] {
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      min-width: 250px;
-      width: 250px;
+      min-width: 270px;
+      width: 270px;
+      min-height: 250px;
     }
 
     .sticky-yellow { background: #FFF9C4; }
     .sticky-pink { background: #FFD1DC; }
     .sticky-blue { background: #B3E5FC; }
     .sticky-green { background: #C8E6C9; }
+    .sticky-orange { background: #FFE0B2; }
+    .sticky-purple { background: #E1BEE7; }
+
+    .sticky-toolbar {
+      display: flex;
+      gap: 6px;
+      padding: 6px 8px;
+      background: rgba(0, 0, 0, 0.03);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      flex-wrap: wrap;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
 
     /* Text Box styles */
     .textbox-toolbar {
@@ -2729,6 +2745,11 @@
       const container = document.getElementById(`widget-${widgetData.id}`);
       const color = widgetData.data.color || 'yellow';
       const text = widgetData.data.text || '';
+      const fontSize = widgetData.data.fontSize || '14px';
+      const fontFamily = widgetData.data.fontFamily || 'Comic Sans MS';
+      const textAlign = widgetData.data.textAlign || 'left';
+      const isBold = widgetData.data.isBold || false;
+      const isItalic = widgetData.data.isItalic || false;
 
       // Apply color to parent widget
       const widgetElement = container.closest('.widget');
@@ -2736,12 +2757,39 @@
       widgetElement.classList.add(`sticky-${color}`);
 
       container.innerHTML = `
-        <textarea class="sticky-note" placeholder="Type your note...">${text}</textarea>
+        <div class="sticky-toolbar">
+          <select onchange="changeStickyFont('${widgetData.id}', this.value)" style="padding:3px;font-size:10px;border:1px solid rgba(0,0,0,0.1);border-radius:4px;background:rgba(255,255,255,0.6);cursor:pointer;font-family:inherit;">
+            <option value="Comic Sans MS" ${fontFamily === 'Comic Sans MS' ? 'selected' : ''}>Comic Sans</option>
+            <option value="Courier New" ${fontFamily === 'Courier New' ? 'selected' : ''}>Courier</option>
+            <option value="Georgia" ${fontFamily === 'Georgia' ? 'selected' : ''}>Georgia</option>
+            <option value="Arial" ${fontFamily === 'Arial' ? 'selected' : ''}>Arial</option>
+            <option value="Brush Script MT" ${fontFamily === 'Brush Script MT' ? 'selected' : ''}>Brush Script</option>
+          </select>
+          <select onchange="changeStickySize('${widgetData.id}', this.value)" style="padding:3px;font-size:10px;border:1px solid rgba(0,0,0,0.1);border-radius:4px;background:rgba(255,255,255,0.6);cursor:pointer;font-family:inherit;">
+            <option value="11px" ${fontSize === '11px' ? 'selected' : ''}>XS</option>
+            <option value="14px" ${fontSize === '14px' ? 'selected' : ''}>S</option>
+            <option value="16px" ${fontSize === '16px' ? 'selected' : ''}>M</option>
+            <option value="18px" ${fontSize === '18px' ? 'selected' : ''}>L</option>
+            <option value="22px" ${fontSize === '22px' ? 'selected' : ''}>XL</option>
+          </select>
+          <div style="display:flex;gap:3px;">
+            <button onclick="toggleStickyBold('${widgetData.id}')" style="padding:3px 6px;font-size:10px;border:1px solid ${isBold ? '#8B9D83' : 'rgba(0,0,0,0.1)'};background:${isBold ? 'rgba(139,157,131,0.2)' : 'rgba(255,255,255,0.6)'};border-radius:3px;cursor:pointer;font-family:inherit;font-weight:bold;" title="Bold">B</button>
+            <button onclick="toggleStickyItalic('${widgetData.id}')" style="padding:3px 6px;font-size:10px;border:1px solid ${isItalic ? '#8B9D83' : 'rgba(0,0,0,0.1)'};background:${isItalic ? 'rgba(139,157,131,0.2)' : 'rgba(255,255,255,0.6)'};border-radius:3px;cursor:pointer;font-family:inherit;font-style:italic;" title="Italic">I</button>
+          </div>
+          <div style="display:flex;gap:3px;">
+            <button onclick="changeStickyAlign('${widgetData.id}', 'left')" style="padding:3px 5px;font-size:9px;border:1px solid ${textAlign === 'left' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};background:${textAlign === 'left' ? 'rgba(139,157,131,0.2)' : 'rgba(255,255,255,0.6)'};border-radius:3px;cursor:pointer;font-family:inherit;" title="Left">◧</button>
+            <button onclick="changeStickyAlign('${widgetData.id}', 'center')" style="padding:3px 5px;font-size:9px;border:1px solid ${textAlign === 'center' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};background:${textAlign === 'center' ? 'rgba(139,157,131,0.2)' : 'rgba(255,255,255,0.6)'};border-radius:3px;cursor:pointer;font-family:inherit;" title="Center">▬</button>
+            <button onclick="changeStickyAlign('${widgetData.id}', 'right')" style="padding:3px 5px;font-size:9px;border:1px solid ${textAlign === 'right' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};background:${textAlign === 'right' ? 'rgba(139,157,131,0.2)' : 'rgba(255,255,255,0.6)'};border-radius:3px;cursor:pointer;font-family:inherit;" title="Right">◨</button>
+          </div>
+        </div>
+        <textarea class="sticky-note" placeholder="Type your note..." style="font-size:${fontSize};font-family:${fontFamily},cursive,sans-serif;text-align:${textAlign};font-weight:${isBold ? 'bold' : 'normal'};font-style:${isItalic ? 'italic' : 'normal'};">${text}</textarea>
         <div style="position:absolute;bottom:8px;right:8px;display:flex;gap:4px;">
-          <button onclick="changeStickyColor('${widgetData.id}', 'yellow')" style="width:20px;height:20px;border-radius:50%;background:#FFF9C4;border:2px solid ${color === 'yellow' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
-          <button onclick="changeStickyColor('${widgetData.id}', 'pink')" style="width:20px;height:20px;border-radius:50%;background:#FFD1DC;border:2px solid ${color === 'pink' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
-          <button onclick="changeStickyColor('${widgetData.id}', 'blue')" style="width:20px;height:20px;border-radius:50%;background:#B3E5FC;border:2px solid ${color === 'blue' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
-          <button onclick="changeStickyColor('${widgetData.id}', 'green')" style="width:20px;height:20px;border-radius:50%;background:#C8E6C9;border:2px solid ${color === 'green' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'yellow')" style="width:18px;height:18px;border-radius:50%;background:#FFF9C4;border:2px solid ${color === 'yellow' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'pink')" style="width:18px;height:18px;border-radius:50%;background:#FFD1DC;border:2px solid ${color === 'pink' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'blue')" style="width:18px;height:18px;border-radius:50%;background:#B3E5FC;border:2px solid ${color === 'blue' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'green')" style="width:18px;height:18px;border-radius:50%;background:#C8E6C9;border:2px solid ${color === 'green' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'orange')" style="width:18px;height:18px;border-radius:50%;background:#FFE0B2;border:2px solid ${color === 'orange' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'purple')" style="width:18px;height:18px;border-radius:50%;background:#E1BEE7;border:2px solid ${color === 'purple' ? '#8B9D83' : 'rgba(0,0,0,0.1)'};cursor:pointer;"></button>
         </div>
       `;
 
@@ -2755,6 +2803,40 @@
       updateWidgetData(widgetId, { color });
       const widgetData = activeWidgets.find(w => w.id === widgetId);
       if (widgetData) renderStickyNote(widgetData);
+    }
+
+    function changeStickyFont(widgetId, fontFamily) {
+      updateWidgetData(widgetId, { fontFamily });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderStickyNote(widgetData);
+    }
+
+    function changeStickySize(widgetId, fontSize) {
+      updateWidgetData(widgetId, { fontSize });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderStickyNote(widgetData);
+    }
+
+    function changeStickyAlign(widgetId, textAlign) {
+      updateWidgetData(widgetId, { textAlign });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderStickyNote(widgetData);
+    }
+
+    function toggleStickyBold(widgetId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+      const isBold = !widgetData.data.isBold;
+      updateWidgetData(widgetId, { isBold });
+      renderStickyNote(widgetData);
+    }
+
+    function toggleStickyItalic(widgetId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+      const isItalic = !widgetData.data.isItalic;
+      updateWidgetData(widgetId, { isItalic });
+      renderStickyNote(widgetData);
     }
 
     function renderTextBox(widgetData) {
