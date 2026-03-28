@@ -958,13 +958,15 @@
 
     .clock-styles {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
       margin-bottom: 24px;
+      max-height: 60vh;
+      overflow-y: auto;
     }
 
     .clock-style-option {
-      padding: 20px;
+      padding: 16px;
       border-radius: 12px;
       background: rgba(250, 248, 245, 0.8);
       border: 2px solid #E8DFD3;
@@ -974,29 +976,34 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 120px;
+      min-height: 100px;
+      gap: 8px;
     }
 
     .clock-style-option:hover {
-      background: rgba(232, 223, 211, 0.5);
+      background: rgba(232, 223, 211, 0.7);
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .clock-style-option.selected {
       border-color: #8B9D83;
-      background: rgba(139, 157, 131, 0.08);
+      background: rgba(139, 157, 131, 0.12);
+      box-shadow: 0 0 0 1px #8B9D83;
     }
 
     .clock-style-preview {
-      font-size: 24px;
-      margin-bottom: 8px;
-      color: #2C2C2C;
+      font-size: 32px;
+      margin-bottom: 4px;
+      line-height: 1;
     }
 
     .clock-style-name {
-      font-size: 12px;
+      font-size: 11px;
       color: #6B6B6B;
       font-weight: 500;
+      text-align: center;
+      line-height: 1.3;
     }
 
     .clock-modal-close {
@@ -1410,7 +1417,21 @@
       }
 
       .clock-styles {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .clock-style-option {
+        padding: 12px;
+        min-height: 80px;
+      }
+
+      .clock-style-preview {
+        font-size: 20px;
+      }
+
+      .clock-style-name {
+        font-size: 10px;
       }
 
       .clock-tab {
@@ -2732,7 +2753,7 @@
     function renderClock(widgetData) {
       const container = document.getElementById(`widget-${widgetData.id}`);
       const mode = widgetData.data.mode || 'digital';
-      const style = widgetData.data.style || (mode === 'digital' ? 'standard' : 'classic');
+      const style = widgetData.data.style || (mode === 'digital' ? 'classic' : 'classic');
 
       container.innerHTML = `
         <div class="clock-container" id="clock-display-${widgetData.id}" onclick="openClockModal('${widgetData.id}')"></div>
@@ -2761,6 +2782,8 @@
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();
       const ampm = hours >= 12 ? 'PM' : 'AM';
+      const day = now.toLocaleDateString('en-US', { weekday: 'short' });
+      const date = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
       if (mode === 'digital') {
         const h24 = hours.toString().padStart(2, '0');
@@ -2768,79 +2791,321 @@
         const m = minutes.toString().padStart(2, '0');
         const s = seconds.toString().padStart(2, '0');
 
-        if (style === 'standard') {
-          display.innerHTML = `<div style="font-size:42px;font-weight:300;color:#2C2C2C;text-align:center;line-height:1;margin-top:60px;">${h24}:${m}:${s}</div>`;
-        } else if (style === '12hour') {
-          display.innerHTML = `<div style="text-align:center;margin-top:50px;"><div style="font-size:42px;font-weight:300;color:#2C2C2C;line-height:1;">${h12}:${m}:${s}</div><div style="font-size:14px;color:#8B9D83;margin-top:8px;">${ampm}</div></div>`;
-        } else if (style === 'minimal') {
-          display.innerHTML = `<div style="font-size:48px;font-weight:200;color:#2C2C2C;text-align:center;line-height:1;margin-top:55px;letter-spacing:2px;">${h24}:${m}</div>`;
-        } else if (style === 'bold') {
-          display.innerHTML = `<div style="font-size:48px;font-weight:700;color:#2C2C2C;text-align:center;line-height:1;margin-top:55px;">${h24}:${m}</div>`;
-        }
+        const styles = {
+          'classic': `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:monospace;"><div style="font-size:48px;font-weight:500;color:#2C2C2C;letter-spacing:4px;">${h24}:${m}</div></div>`,
+          'modern': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;"><div style="font-size:56px;font-weight:200;color:#2C2C2C;letter-spacing:6px;">${h24}:${m}</div><div style="font-size:12px;color:#8B9D83;margin-top:8px;letter-spacing:2px;">${s} SECONDS</div></div>`,
+          'elegant': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:300;color:#8B9D83;font-family:serif;">${h12}:${m}</div></div>`,
+          'bold': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:900;color:#2C2C2C;">${h24}:${m}</div></div>`,
+          'gradient': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:600;background:linear-gradient(135deg,#8B9D83,#2C2C2C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${h24}:${m}</div></div>`,
+          'neon': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#1a1a1a;border-radius:12px;"><div style="font-size:48px;font-weight:600;color:#00ff88;text-shadow:0 0 20px #00ff88,0 0 40px #00ff88;font-family:monospace;letter-spacing:4px;">${h24}:${m}:${s}</div></div>`,
+          'retro': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#ff6b35;border-radius:12px;"><div style="font-size:44px;font-weight:700;color:#fff;font-family:monospace;letter-spacing:3px;text-shadow:2px 2px 0 rgba(0,0,0,0.2);">${h24}:${m}</div></div>`,
+          'outline': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:700;color:transparent;-webkit-text-stroke:2px #2C2C2C;">${h24}:${m}</div></div>`,
+          'stacked': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;"><div style="font-size:48px;font-weight:600;color:#2C2C2C;">${h24}</div><div style="width:60px;height:2px;background:#8B9D83;"></div><div style="font-size:48px;font-weight:600;color:#2C2C2C;">${m}</div></div>`,
+          'minimal': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:64px;font-weight:100;color:#2C2C2C;letter-spacing:8px;">${h24}:${m}</div></div>`,
+          'boxed': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="background:#2C2C2C;color:white;padding:16px 12px;border-radius:8px;font-size:40px;font-weight:600;min-width:50px;text-align:center;">${h24}</div><div style="font-size:32px;color:#8B9D83;">:</div><div style="background:#2C2C2C;color:white;padding:16px 12px;border-radius:8px;font-size:40px;font-weight:600;min-width:50px;text-align:center;">${m}</div></div>`,
+          'shadow': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:700;color:#2C2C2C;text-shadow:4px 4px 0 rgba(139,157,131,0.3);">${h24}:${m}</div></div>`,
+          'bordered': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:48px;font-weight:500;color:#8B9D83;border:3px solid #8B9D83;padding:16px 24px;border-radius:12px;">${h24}:${m}</div></div>`,
+          'split': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:4px;"><div style="font-size:48px;font-weight:600;color:#8B9D83;">${h24}</div><div style="font-size:32px;color:#9B8B7E;">:</div><div style="font-size:48px;font-weight:600;color:#2C2C2C;">${m}</div></div>`,
+          'dots': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="font-size:52px;font-weight:500;color:#2C2C2C;">${h24}</div><div style="display:flex;flex-direction:column;gap:8px;"><div style="width:8px;height:8px;background:#8B9D83;border-radius:50%;"></div><div style="width:8px;height:8px;background:#8B9D83;border-radius:50%;"></div></div><div style="font-size:52px;font-weight:500;color:#2C2C2C;">${m}</div></div>`,
+          'serif': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:400;color:#2C2C2C;font-family:Georgia,serif;">${h12}:${m}</div></div>`,
+          'rounded': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:48px;font-weight:700;color:white;background:#8B9D83;padding:16px 32px;border-radius:50px;">${h24}:${m}</div></div>`,
+          'vertical': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;"><div style="font-size:40px;font-weight:600;color:#8B9D83;">${h24}</div><div style="font-size:40px;font-weight:600;color:#2C2C2C;">${m}</div><div style="font-size:20px;font-weight:400;color:#9B8B7E;">${s}</div></div>`,
+          'ampm': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;"><div style="font-size:56px;font-weight:600;color:#2C2C2C;">${h12}:${m}</div><div style="display:flex;flex-direction:column;gap:4px;"><div style="font-size:14px;font-weight:600;color:${ampm==='AM'?'#8B9D83':'#ccc'};padding:4px 8px;background:${ampm==='AM'?'rgba(139,157,131,0.1)':'transparent'};border-radius:4px;">AM</div><div style="font-size:14px;font-weight:600;color:${ampm==='PM'?'#8B9D83':'#ccc'};padding:4px 8px;background:${ampm==='PM'?'rgba(139,157,131,0.1)':'transparent'};border-radius:4px;">PM</div></div></div>`,
+          'vintage': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f4e9d8;border-radius:12px;border:4px solid #8B9D83;"><div style="font-size:44px;font-weight:600;color:#2C2C2C;font-family:Georgia,serif;">${h12}:${m}</div></div>`,
+          'digital': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#000;border-radius:8px;"><div style="font-size:48px;font-weight:700;color:#ff0000;font-family:'Courier New',monospace;letter-spacing:4px;text-shadow:0 0 10px rgba(255,0,0,0.5);">${h24}:${m}:${s}</div></div>`,
+          'soft': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:300;color:#8B9D83;opacity:0.8;">${h24}:${m}</div></div>`,
+          'card': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg,#8B9D83,#7A8C73);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.15);"><div style="font-size:48px;font-weight:600;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.2);">${h24}:${m}</div></div>`,
+          'date': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:4px;"><div style="font-size:52px;font-weight:600;color:#2C2C2C;">${h24}:${m}</div><div style="font-size:13px;color:#8B9D83;font-weight:500;letter-spacing:1px;">${day}, ${date}</div></div>`
+        };
+
+        display.innerHTML = styles[style] || styles['classic'];
       } else {
         // Analog clock
         const hourAngle = (hours12 * 30) + (minutes * 0.5);
         const minuteAngle = minutes * 6;
         const secondAngle = seconds * 6;
 
-        if (style === 'classic') {
-          display.innerHTML = `
-            <svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="4"/>
-              ${[...Array(12)].map((_, i) => {
-                const angle = (i * 30 - 90) * Math.PI / 180;
-                const x1 = 100 + 75 * Math.cos(angle);
-                const y1 = 100 + 75 * Math.sin(angle);
-                const x2 = 100 + 85 * Math.cos(angle);
-                const y2 = 100 + 85 * Math.sin(angle);
-                return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8B9D83" stroke-width="3"/>`;
-              }).join('')}
-              <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
-              <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="4" stroke-linecap="round"/>
-              <line x1="100" y1="100" x2="${100 + 70 * Math.cos((secondAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((secondAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="100" cy="100" r="6" fill="#2C2C2C"/>
-            </svg>
-          `;
-        } else if (style === 'modern') {
-          display.innerHTML = `
-            <svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="2"/>
-              ${[...Array(12)].map((_, i) => {
-                const angle = (i * 30 - 90) * Math.PI / 180;
-                const x = 100 + 80 * Math.cos(angle);
-                const y = 100 + 80 * Math.sin(angle);
-                return `<circle cx="${x}" cy="${y}" r="3" fill="#8B9D83"/>`;
-              }).join('')}
-              <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="5" stroke-linecap="round"/>
-              <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="3" stroke-linecap="round"/>
-              <circle cx="100" cy="100" r="4" fill="#8B9D83"/>
-            </svg>
-          `;
-        } else if (style === 'minimal') {
-          display.innerHTML = `
-            <svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="1"/>
-              <line x1="100" y1="100" x2="${100 + 50 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 50 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="3" stroke-linecap="round"/>
-              <line x1="100" y1="100" x2="${100 + 70 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="100" cy="100" r="3" fill="#2C2C2C"/>
-            </svg>
-          `;
-        } else if (style === 'numbers') {
-          display.innerHTML = `
-            <svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="3"/>
-              ${[...Array(12)].map((_, i) => {
-                const angle = (i * 30 - 90) * Math.PI / 180;
-                const x = 100 + 70 * Math.cos(angle);
-                const y = 100 + 70 * Math.sin(angle);
-                return `<text x="${x}" y="${y + 5}" text-anchor="middle" font-size="18" fill="#2C2C2C" font-weight="500">${i === 0 ? 12 : i}</text>`;
-              }).join('')}
-              <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
-              <line x1="100" y1="100" x2="${100 + 55 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 55 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="4" stroke-linecap="round"/>
-              <circle cx="100" cy="100" r="5" fill="#2C2C2C"/>
-            </svg>
-          `;
-        }
+        const analogStyles = {
+          'classic': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="4"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 75 * Math.cos(angle);
+              const y1 = 100 + 75 * Math.sin(angle);
+              const x2 = 100 + 85 * Math.cos(angle);
+              const y2 = 100 + 85 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8B9D83" stroke-width="3"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="4" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 70 * Math.cos((secondAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((secondAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="#2C2C2C"/>
+          </svg>`,
+          'minimal': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="1"/>
+            <line x1="100" y1="100" x2="${100 + 50 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 50 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="3" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 70 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="3" fill="#2C2C2C"/>
+          </svg>`,
+          'numbers': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="3"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 70 * Math.cos(angle);
+              const y = 100 + 70 * Math.sin(angle);
+              return `<text x="${x}" y="${y + 5}" text-anchor="middle" font-size="18" fill="#2C2C2C" font-weight="500">${i === 0 ? 12 : i}</text>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 55 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 55 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="5" fill="#2C2C2C"/>
+          </svg>`,
+          'dots': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="2"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 80 * Math.cos(angle);
+              const y = 100 + 80 * Math.sin(angle);
+              return `<circle cx="${x}" cy="${y}" r="3" fill="#8B9D83"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="5" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="4" fill="#8B9D83"/>
+          </svg>`,
+          'bold': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#2C2C2C" stroke-width="6"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 70 * Math.cos(angle);
+              const y1 = 100 + 70 * Math.sin(angle);
+              const x2 = 100 + 85 * Math.cos(angle);
+              const y2 = 100 + 85 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2C2C2C" stroke-width="5"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="8" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="8" fill="#2C2C2C"/>
+          </svg>`,
+          'elegant': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#8B9D83" stroke-width="2"/>
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#8B9D83" stroke-width="1"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 72 * Math.cos(angle);
+              const y = 100 + 72 * Math.sin(angle);
+              const isHour = [0, 3, 6, 9].includes(i);
+              return `<text x="${x}" y="${y + 6}" text-anchor="middle" font-size="${isHour ? 20 : 14}" fill="#8B9D83" font-family="serif" font-weight="${isHour ? 600 : 400}">${i === 0 ? 12 : i}</text>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 35 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 35 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="5" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 55 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 55 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="5" fill="#8B9D83"/>
+          </svg>`,
+          'neon': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;background:#1a1a1a;border-radius:50%;">
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#00ff88" stroke-width="2" style="filter:drop-shadow(0 0 8px #00ff88)"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 75 * Math.cos(angle);
+              const y = 100 + 75 * Math.sin(angle);
+              return `<circle cx="${x}" cy="${y}" r="4" fill="#00ff88" style="filter:drop-shadow(0 0 4px #00ff88)"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#00ff88" stroke-width="4" stroke-linecap="round" style="filter:drop-shadow(0 0 6px #00ff88)"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#00ff88" stroke-width="3" stroke-linecap="round" style="filter:drop-shadow(0 0 6px #00ff88)"/>
+            <circle cx="100" cy="100" r="5" fill="#00ff88" style="filter:drop-shadow(0 0 8px #00ff88)"/>
+          </svg>`,
+          'gradient': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <defs>
+              <linearGradient id="grad${widgetId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#8B9D83;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#2C2C2C;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" r="90" fill="none" stroke="url(#grad${widgetId})" stroke-width="4"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 75 * Math.cos(angle);
+              const y = 100 + 75 * Math.sin(angle);
+              return `<circle cx="${x}" cy="${y}" r="5" fill="url(#grad${widgetId})"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="url(#grad${widgetId})" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="url(#grad${widgetId})" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="url(#grad${widgetId})"/>
+          </svg>`,
+          'roman': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="3"/>
+            ${['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'].map((num, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 70 * Math.cos(angle);
+              const y = 100 + 70 * Math.sin(angle);
+              return `<text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" fill="#2C2C2C" font-family="serif" font-weight="600">${num}</text>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 58 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 58 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="5" fill="#2C2C2C"/>
+          </svg>`,
+          'retro': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;background:#ff6b35;border-radius:50%;">
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#fff" stroke-width="4"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 70 * Math.cos(angle);
+              const y1 = 100 + 70 * Math.sin(angle);
+              const x2 = 100 + 80 * Math.cos(angle);
+              const y2 = 100 + 80 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#fff" stroke-width="4"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="7" fill="#fff"/>
+          </svg>`,
+          'swiss': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="white" stroke="#2C2C2C" stroke-width="2"/>
+            ${[...Array(60)].map((_, i) => {
+              const angle = (i * 6 - 90) * Math.PI / 180;
+              const isHourMark = i % 5 === 0;
+              const r1 = isHourMark ? 75 : 82;
+              const r2 = 87;
+              const x1 = 100 + r1 * Math.cos(angle);
+              const y1 = 100 + r1 * Math.sin(angle);
+              const x2 = 100 + r2 * Math.cos(angle);
+              const y2 = 100 + r2 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2C2C2C" stroke-width="${isHourMark ? 3 : 1}"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="4" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((secondAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((secondAngle - 90) * Math.PI / 180)}" stroke="#ff0000" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="#2C2C2C"/>
+          </svg>`,
+          'skeleton': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="1"/>
+            ${[...Array(4)].map((_, i) => {
+              const angle = (i * 90 - 90) * Math.PI / 180;
+              const x = 100 + 78 * Math.cos(angle);
+              const y = 100 + 78 * Math.sin(angle);
+              return `<circle cx="${x}" cy="${y}" r="3" fill="#8B9D83"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 50 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 50 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="4" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 70 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="4" fill="#2C2C2C"/>
+          </svg>`,
+          'vintage': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;background:#f4e9d8;border-radius:50%;">
+            <circle cx="100" cy="100" r="88" fill="none" stroke="#8B9D83" stroke-width="6"/>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#8B9D83" stroke-width="2"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 65 * Math.cos(angle);
+              const y = 100 + 65 * Math.sin(angle);
+              return `<text x="${x}" y="${y + 6}" text-anchor="middle" font-size="16" fill="#2C2C2C" font-family="Georgia,serif" font-weight="600">${i === 0 ? 12 : i}</text>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 38 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 38 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="7" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 52 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 52 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="#2C2C2C"/>
+          </svg>`,
+          'modern': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="2"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 78 * Math.cos(angle);
+              const y = 100 + 78 * Math.sin(angle);
+              return i % 3 === 0 ? `<circle cx="${x}" cy="${y}" r="5" fill="#8B9D83"/>` : `<circle cx="${x}" cy="${y}" r="2" fill="#E8DFD3"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="5" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="4" fill="#2C2C2C"/>
+          </svg>`,
+          'luxury': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;background:linear-gradient(135deg,#2C2C2C,#1a1a1a);border-radius:50%;">
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#d4af37" stroke-width="3"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 72 * Math.cos(angle);
+              const y = 100 + 72 * Math.sin(angle);
+              return `<circle cx="${x}" cy="${y}" r="4" fill="#d4af37"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#d4af37" stroke-width="5" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#d4af37" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="5" fill="#d4af37"/>
+          </svg>`,
+          'pastel': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;background:#ffd1dc;border-radius:50%;">
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#fff" stroke-width="4"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 75 * Math.cos(angle);
+              const y = 100 + 75 * Math.sin(angle);
+              return `<circle cx="${x}" cy="${y}" r="5" fill="#fff"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 42 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 42 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 62 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 62 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="#fff"/>
+          </svg>`,
+          'sharp': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#2C2C2C" stroke-width="2"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 80 * Math.cos(angle);
+              const y = 100 + 80 * Math.sin(angle);
+              return `<rect x="${x-3}" y="${y-3}" width="6" height="6" fill="#2C2C2C" transform="rotate(45 ${x} ${y})"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="6" stroke-linecap="square"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="4" stroke-linecap="square"/>
+            <rect x="96" y="96" width="8" height="8" fill="#2C2C2C"/>
+          </svg>`,
+          'wood': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;background:#8B7355;border-radius:50%;">
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#5a4a3a" stroke-width="4"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 72 * Math.cos(angle);
+              const y1 = 100 + 72 * Math.sin(angle);
+              const x2 = 100 + 80 * Math.cos(angle);
+              const y2 = 100 + 80 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#5a4a3a" stroke-width="4"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 40 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 40 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#5a4a3a" stroke-width="7" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 60 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 60 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#5a4a3a" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="6" fill="#5a4a3a"/>
+          </svg>`,
+          'metro': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DFD3" stroke-width="1"/>
+            ${[0, 3, 6, 9].map((i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 82 * Math.cos(angle);
+              const y1 = 100 + 82 * Math.sin(angle);
+              const x2 = 100 + 90 * Math.cos(angle);
+              const y2 = 100 + 90 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8B9D83" stroke-width="3"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 50 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 50 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="4" stroke-linecap="square"/>
+            <line x1="100" y1="100" x2="${100 + 70 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 70 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="3" stroke-linecap="square"/>
+            <circle cx="100" cy="100" r="4" fill="#2C2C2C"/>
+          </svg>`,
+          'deco': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#8B9D83" stroke-width="3"/>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#E8DFD3" stroke-width="1"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#E8DFD3" stroke-width="1"/>
+            ${[...Array(12)].map((_, i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x1 = 100 + 68 * Math.cos(angle);
+              const y1 = 100 + 68 * Math.sin(angle);
+              const x2 = 100 + 75 * Math.cos(angle);
+              const y2 = 100 + 75 * Math.sin(angle);
+              return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#8B9D83" stroke-width="${i % 3 === 0 ? 4 : 2}"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 38 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 38 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="6" stroke-linecap="round"/>
+            <line x1="100" y1="100" x2="${100 + 55 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 55 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#8B9D83" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="100" cy="100" r="5" fill="#8B9D83"/>
+          </svg>`,
+          'bauhaus': `<svg width="180" height="180" viewBox="0 0 200 200" style="display:block;margin:20px auto;">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#2C2C2C" stroke-width="3"/>
+            ${[0, 3, 6, 9].map((i) => {
+              const angle = (i * 30 - 90) * Math.PI / 180;
+              const x = 100 + 75 * Math.cos(angle);
+              const y = 100 + 75 * Math.sin(angle);
+              const colors = ['#ff6b35', '#004e89', '#f7b801', '#8B9D83'];
+              return `<circle cx="${x}" cy="${y}" r="8" fill="${colors[i/3]}"/>`;
+            }).join('')}
+            <line x1="100" y1="100" x2="${100 + 45 * Math.cos((hourAngle - 90) * Math.PI / 180)}" y2="${100 + 45 * Math.sin((hourAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="7" stroke-linecap="square"/>
+            <line x1="100" y1="100" x2="${100 + 65 * Math.cos((minuteAngle - 90) * Math.PI / 180)}" y2="${100 + 65 * Math.sin((minuteAngle - 90) * Math.PI / 180)}" stroke="#2C2C2C" stroke-width="5" stroke-linecap="square"/>
+            <circle cx="100" cy="100" r="6" fill="#2C2C2C"/>
+          </svg>`
+        };
+
+        display.innerHTML = analogStyles[style] || analogStyles['classic'];
       }
     }
 
@@ -2879,24 +3144,61 @@
       const container = document.getElementById('clockStyles');
 
       const digitalStyles = [
-        { id: 'standard', name: '24-Hour Standard', preview: '14:32:05' },
-        { id: '12hour', name: '12-Hour AM/PM', preview: '2:32 PM' },
-        { id: 'minimal', name: 'Minimal', preview: '14:32' },
-        { id: 'bold', name: 'Bold', preview: '14:32' }
+        { id: 'classic', name: 'Classic', emoji: '⏰' },
+        { id: 'modern', name: 'Modern', emoji: '🕐' },
+        { id: 'elegant', name: 'Elegant Serif', emoji: '✨' },
+        { id: 'bold', name: 'Bold', emoji: '💪' },
+        { id: 'gradient', name: 'Gradient', emoji: '🌈' },
+        { id: 'neon', name: 'Neon Glow', emoji: '💚' },
+        { id: 'retro', name: 'Retro Orange', emoji: '🧡' },
+        { id: 'outline', name: 'Outline', emoji: '⭕' },
+        { id: 'stacked', name: 'Stacked', emoji: '📊' },
+        { id: 'minimal', name: 'Ultra Minimal', emoji: '▫️' },
+        { id: 'boxed', name: 'Boxed Digits', emoji: '📦' },
+        { id: 'shadow', name: 'Drop Shadow', emoji: '👤' },
+        { id: 'bordered', name: 'Bordered', emoji: '🔲' },
+        { id: 'split', name: 'Split Color', emoji: '🎨' },
+        { id: 'dots', name: 'Dot Separator', emoji: '⚫' },
+        { id: 'serif', name: 'Serif 12-Hour', emoji: '📖' },
+        { id: 'rounded', name: 'Rounded Pill', emoji: '💊' },
+        { id: 'vertical', name: 'Vertical Stack', emoji: '⬇️' },
+        { id: 'ampm', name: 'AM/PM Indicator', emoji: '🌓' },
+        { id: 'vintage', name: 'Vintage Frame', emoji: '🖼️' },
+        { id: 'digital', name: 'LED Display', emoji: '🔴' },
+        { id: 'soft', name: 'Soft Fade', emoji: '🌫️' },
+        { id: 'card', name: 'Card Style', emoji: '🃏' },
+        { id: 'date', name: 'With Date', emoji: '📅' }
       ];
 
       const analogStyles = [
-        { id: 'classic', name: 'Classic', preview: 'Classic face' },
-        { id: 'modern', name: 'Modern', preview: 'Dot markers' },
-        { id: 'minimal', name: 'Minimal', preview: 'No markers' },
-        { id: 'numbers', name: 'Numbers', preview: 'Roman style' }
+        { id: 'classic', name: 'Classic', emoji: '🕐' },
+        { id: 'minimal', name: 'Minimal', emoji: '⭕' },
+        { id: 'numbers', name: 'Numbers', emoji: '🔢' },
+        { id: 'dots', name: 'Dot Markers', emoji: '⚫' },
+        { id: 'bold', name: 'Bold', emoji: '💪' },
+        { id: 'elegant', name: 'Elegant', emoji: '✨' },
+        { id: 'neon', name: 'Neon Glow', emoji: '💚' },
+        { id: 'gradient', name: 'Gradient', emoji: '🌈' },
+        { id: 'roman', name: 'Roman Numerals', emoji: '🏛️' },
+        { id: 'retro', name: 'Retro', emoji: '🧡' },
+        { id: 'swiss', name: 'Swiss Railway', emoji: '🇨🇭' },
+        { id: 'skeleton', name: 'Skeleton', emoji: '💀' },
+        { id: 'vintage', name: 'Vintage', emoji: '📻' },
+        { id: 'modern', name: 'Modern', emoji: '⚡' },
+        { id: 'luxury', name: 'Luxury Gold', emoji: '✨' },
+        { id: 'pastel', name: 'Pastel Pink', emoji: '🌸' },
+        { id: 'sharp', name: 'Sharp Edges', emoji: '◆' },
+        { id: 'wood', name: 'Wood Grain', emoji: '🪵' },
+        { id: 'metro', name: 'Metro', emoji: '🚇' },
+        { id: 'deco', name: 'Art Deco', emoji: '🎭' },
+        { id: 'bauhaus', name: 'Bauhaus', emoji: '🎨' }
       ];
 
       const styles = mode === 'digital' ? digitalStyles : analogStyles;
 
       container.innerHTML = styles.map(s => `
         <div class="clock-style-option ${selectedStyle === s.id ? 'selected' : ''}" onclick="selectClockStyle('${s.id}', '${mode}')">
-          <div class="clock-style-preview">${s.preview}</div>
+          <div class="clock-style-preview">${s.emoji}</div>
           <div class="clock-style-name">${s.name}</div>
         </div>
       `).join('');
