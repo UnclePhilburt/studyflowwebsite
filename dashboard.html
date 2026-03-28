@@ -387,6 +387,224 @@
       overflow-x: hidden;
     }
 
+    .widget-content-full {
+      padding: 0;
+      height: 100%;
+    }
+
+    /* Minimal remove button for accessory widgets */
+    .widget-remove-minimal {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(139, 126, 115, 0.2);
+      color: #9B8B7E;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s;
+      z-index: 20;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+
+    .widget:hover .widget-remove-minimal {
+      opacity: 1;
+    }
+
+    .widget-remove-minimal:hover {
+      background: rgba(201, 122, 122, 0.9);
+      color: white;
+      border-color: #C97A7A;
+    }
+
+    /* Sticky Note styles */
+    .sticky-note {
+      width: 100%;
+      height: 100%;
+      min-height: 200px;
+      padding: 16px;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      color: #2C2C2C;
+    }
+
+    .widget[data-widget-type="stickyNote"] {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      min-width: 250px;
+      width: 250px;
+    }
+
+    .sticky-yellow { background: #FFF9C4; }
+    .sticky-pink { background: #FFD1DC; }
+    .sticky-blue { background: #B3E5FC; }
+    .sticky-green { background: #C8E6C9; }
+
+    /* Text Box styles */
+    .text-box {
+      width: 100%;
+      height: 100%;
+      min-height: 150px;
+      padding: 16px;
+      font-size: 16px;
+      line-height: 1.5;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      color: #2C2C2C;
+    }
+
+    .widget[data-widget-type="textBox"] {
+      min-width: 300px;
+      width: 300px;
+    }
+
+    /* To-Do List styles */
+    .todo-container {
+      padding: 16px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .todo-item:hover {
+      background: rgba(139, 157, 131, 0.05);
+    }
+
+    .todo-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #8B9D83;
+      border-radius: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .todo-text {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      color: #2C2C2C;
+      font-family: inherit;
+    }
+
+    .todo-text.completed {
+      text-decoration: line-through;
+      color: #9B8B7E;
+    }
+
+    .todo-delete {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: #C97A7A;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 6px;
+      font-family: inherit;
+    }
+
+    .todo-item:hover .todo-delete {
+      opacity: 1;
+    }
+
+    .todo-add {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      background: rgba(139, 157, 131, 0.1);
+      border: 1px dashed rgba(139, 157, 131, 0.3);
+      border-radius: 6px;
+      color: #8B9D83;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .todo-add:hover {
+      background: rgba(139, 157, 131, 0.15);
+    }
+
+    .widget[data-widget-type="todoList"] {
+      min-width: 280px;
+      width: 280px;
+    }
+
+    /* Image Widget styles */
+    .image-upload-area {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed rgba(139, 126, 115, 0.3);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      padding: 20px;
+    }
+
+    .image-upload-area:hover {
+      border-color: #8B9D83;
+      background: rgba(139, 157, 131, 0.05);
+    }
+
+    .image-display {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .widget[data-widget-type="imageWidget"] {
+      min-width: 300px;
+      width: 300px;
+    }
+
+    /* Shape Widget styles */
+    .shape-box {
+      width: 100%;
+      height: 100%;
+      min-height: 150px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .widget[data-widget-type="shape"] {
+      min-width: 200px;
+      width: 200px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .widget[data-widget-type="shape"]:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
     /* Recent Conversations widget */
     .conv-item {
       padding: 12px;
@@ -1417,35 +1635,77 @@
 
     // ======= WIDGET SYSTEM =======
     const WIDGET_TYPES = {
+      // App widgets
       recentConversations: {
         name: 'Recent Conversations',
         desc: 'Your latest AI chat sessions',
         render: renderRecentConversations,
-        comingSoon: false
+        comingSoon: false,
+        category: 'app'
       },
       quickStats: {
         name: 'Quick Stats',
         desc: 'Your study progress at a glance',
         render: renderQuickStats,
-        comingSoon: true
+        comingSoon: true,
+        category: 'app'
       },
       upcomingEvents: {
         name: 'Upcoming Events',
         desc: 'Calendar events and deadlines',
         render: renderUpcomingEvents,
-        comingSoon: false
+        comingSoon: false,
+        category: 'app'
       },
       studyGroups: {
         name: 'Study Groups',
         desc: 'Active group activity',
         render: renderStudyGroups,
-        comingSoon: false
+        comingSoon: false,
+        category: 'app'
       },
       quickLaunch: {
         name: 'Quick Launch',
         desc: 'Fast access to common actions',
         render: renderQuickLaunch,
-        comingSoon: true
+        comingSoon: true,
+        category: 'app'
+      },
+      // Accessory widgets
+      stickyNote: {
+        name: 'Sticky Note',
+        desc: 'Colorful quick notes',
+        render: renderStickyNote,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      textBox: {
+        name: 'Text Box',
+        desc: 'Customizable text area',
+        render: renderTextBox,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      todoList: {
+        name: 'To-Do List',
+        desc: 'Checklist for tasks',
+        render: renderTodoList,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      imageWidget: {
+        name: 'Image',
+        desc: 'Upload and display images',
+        render: renderImageWidget,
+        comingSoon: false,
+        category: 'accessory'
+      },
+      shape: {
+        name: 'Shape',
+        desc: 'Colored background boxes',
+        render: renderShape,
+        comingSoon: false,
+        category: 'accessory'
       }
     };
 
@@ -1457,12 +1717,17 @@
     let draggedWidget = null;
     let widgetDragStart = { x: 0, y: 0 };
 
+    // Generate unique widget ID
+    function generateWidgetId(type) {
+      return `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
     // Load widgets from backend (per-user)
     async function loadWidgets() {
       const DEFAULT_WIDGETS = [
-        { id: 'recentConversations', x: 20200, y: 20200 },
-        { id: 'upcomingEvents', x: 20620, y: 20200 },
-        { id: 'studyGroups', x: 20200, y: 20500 }
+        { id: 'recentConversations_1', type: 'recentConversations', x: 20200, y: 20200, data: {} },
+        { id: 'upcomingEvents_1', type: 'upcomingEvents', x: 20620, y: 20200, data: {} },
+        { id: 'studyGroups_1', type: 'studyGroups', x: 20200, y: 20500, data: {} }
       ];
 
       try {
@@ -1479,21 +1744,34 @@
             canvasPan = data.canvasPan;
           }
 
-          // Migration: Convert old array format ['id1', 'id2'] to new format [{id, x, y}]
+          // Migration: Convert old array format ['id1', 'id2'] to new format [{id, type, x, y, data}]
           if (layout.length > 0 && typeof layout[0] === 'string') {
-            layout = layout.map((id, index) => ({
-              id: id,
+            layout = layout.map((widgetType, index) => ({
+              id: generateWidgetId(widgetType),
+              type: widgetType,
               x: 20200 + (index % 3) * 420,
-              y: 20200 + Math.floor(index / 3) * 350
+              y: 20200 + Math.floor(index / 3) * 350,
+              data: {}
             }));
-            // Save migrated format
+            await saveWidgets(layout);
+          }
+
+          // Migration: If widgets don't have 'type' field, add it
+          if (layout.length > 0 && typeof layout[0] === 'object' && !layout[0].type) {
+            layout = layout.map(widget => ({
+              id: widget.id || generateWidgetId('recentConversations'),
+              type: widget.id || 'recentConversations',
+              x: widget.x < 10000 ? widget.x + 20000 : widget.x,
+              y: widget.y < 10000 ? widget.y + 20000 : widget.y,
+              data: widget.data || {}
+            }));
             await saveWidgets(layout);
           }
 
           // Migration: If widgets have old coordinates (< 10000), update them to new center
           if (layout.length > 0 && typeof layout[0] === 'object' && layout[0].x < 10000) {
             layout = layout.map(widget => ({
-              id: widget.id,
+              ...widget,
               x: widget.x + 20000,
               y: widget.y + 20000
             }));
@@ -1513,11 +1791,13 @@
           const oldFormat = JSON.parse(saved);
           // Convert old format to new format
           activeWidgets = oldFormat
-            .filter(id => !WIDGET_TYPES[id]?.comingSoon)
-            .map((id, index) => ({
-              id: id,
+            .filter(widgetType => !WIDGET_TYPES[widgetType]?.comingSoon)
+            .map((widgetType, index) => ({
+              id: generateWidgetId(widgetType),
+              type: widgetType,
               x: 20200 + (index % 3) * 420,
-              y: 20200 + Math.floor(index / 3) * 350
+              y: 20200 + Math.floor(index / 3) * 350,
+              data: {}
             }));
           await saveWidgets(activeWidgets);
           localStorage.removeItem('dashboardWidgets');
@@ -1571,24 +1851,35 @@
       const isMobile = window.innerWidth <= 768;
 
       activeWidgets.forEach((widgetData) => {
-        const widgetDef = WIDGET_TYPES[widgetData.id];
+        const widgetDef = WIDGET_TYPES[widgetData.type];
         if (!widgetDef) return;
 
         const widget = document.createElement('div');
         widget.className = 'widget';
         widget.dataset.widgetId = widgetData.id;
+        widget.dataset.widgetType = widgetData.type;
         widget.style.left = widgetData.x + 'px';
         widget.style.top = widgetData.y + 'px';
 
-        widget.innerHTML = `
-          <div class="widget-header">
-            <div class="widget-title">${widgetDef.name}</div>
-            <button class="widget-remove" onclick="removeWidget('${widgetData.id}')">×</button>
-          </div>
-          <div class="widget-content" id="widget-${widgetData.id}">
-            <div style="text-align:center;padding:20px;color:#9B8B7E;">Loading...</div>
-          </div>
-        `;
+        // Different layout for accessory widgets (no header for some)
+        if (widgetDef.category === 'accessory') {
+          widget.innerHTML = `
+            <button class="widget-remove widget-remove-minimal" onclick="removeWidget('${widgetData.id}')" title="Remove">×</button>
+            <div class="widget-content widget-content-full" id="widget-${widgetData.id}">
+              <div style="text-align:center;padding:20px;color:#9B8B7E;">Loading...</div>
+            </div>
+          `;
+        } else {
+          widget.innerHTML = `
+            <div class="widget-header">
+              <div class="widget-title">${widgetDef.name}</div>
+              <button class="widget-remove" onclick="removeWidget('${widgetData.id}')">×</button>
+            </div>
+            <div class="widget-content" id="widget-${widgetData.id}">
+              <div style="text-align:center;padding:20px;color:#9B8B7E;">Loading...</div>
+            </div>
+          `;
+        }
 
         // Widget drag events (only on desktop)
         if (!isMobile) {
@@ -1616,7 +1907,7 @@
         canvas.appendChild(widget);
 
         // Render widget content
-        setTimeout(() => widgetDef.render(widgetData.id), 100);
+        setTimeout(() => widgetDef.render(widgetData), 100);
       });
 
       updateCanvasTransform();
@@ -1708,34 +1999,96 @@
       const container = document.getElementById('widgetOptions');
       container.innerHTML = '';
 
-      Object.entries(WIDGET_TYPES).forEach(([id, widget]) => {
-        const isAdded = activeWidgets.some(w => w.id === id);
-        const isComingSoon = widget.comingSoon;
-        const option = document.createElement('div');
-        option.className = 'widget-option' + (isComingSoon ? ' coming-soon' : '');
-        option.innerHTML = `
-          <div class="widget-option-info">
-            <div class="widget-option-name">${widget.name}${isComingSoon ? ' <span style="font-size:11px;color:#9B8B7E;font-weight:400;">(Coming Soon)</span>' : ''}</div>
-            <div class="widget-option-desc">${widget.desc}</div>
-          </div>
-          <button class="widget-option-add" onclick="addWidget('${id}')" ${isAdded || isComingSoon ? 'disabled' : ''}>
-            ${isComingSoon ? 'Coming Soon' : isAdded ? 'Added' : 'Add'}
-          </button>
-        `;
-        container.appendChild(option);
+      // Group widgets by category
+      const appWidgets = [];
+      const accessoryWidgets = [];
+
+      Object.entries(WIDGET_TYPES).forEach(([type, widget]) => {
+        if (widget.category === 'app') {
+          appWidgets.push([type, widget]);
+        } else {
+          accessoryWidgets.push([type, widget]);
+        }
       });
+
+      // Render app widgets
+      if (appWidgets.length > 0) {
+        const appHeader = document.createElement('div');
+        appHeader.style.cssText = 'font-size:13px;font-weight:600;color:#8B7E73;padding:8px 16px;margin-top:8px;';
+        appHeader.textContent = 'App Widgets';
+        container.appendChild(appHeader);
+
+        appWidgets.forEach(([type, widget]) => {
+          const isAdded = activeWidgets.some(w => w.type === type);
+          const isComingSoon = widget.comingSoon;
+          const option = document.createElement('div');
+          option.className = 'widget-option' + (isComingSoon ? ' coming-soon' : '');
+          option.innerHTML = `
+            <div class="widget-option-info">
+              <div class="widget-option-name">${widget.name}${isComingSoon ? ' <span style="font-size:11px;color:#9B8B7E;font-weight:400;">(Coming Soon)</span>' : ''}</div>
+              <div class="widget-option-desc">${widget.desc}</div>
+            </div>
+            <button class="widget-option-add" onclick="addWidget('${type}')" ${isAdded || isComingSoon ? 'disabled' : ''}>
+              ${isComingSoon ? 'Coming Soon' : isAdded ? 'Added' : 'Add'}
+            </button>
+          `;
+          container.appendChild(option);
+        });
+      }
+
+      // Render accessory widgets
+      if (accessoryWidgets.length > 0) {
+        const accessoryHeader = document.createElement('div');
+        accessoryHeader.style.cssText = 'font-size:13px;font-weight:600;color:#8B7E73;padding:8px 16px;margin-top:16px;';
+        accessoryHeader.textContent = 'Accessory Widgets';
+        container.appendChild(accessoryHeader);
+
+        accessoryWidgets.forEach(([type, widget]) => {
+          const isComingSoon = widget.comingSoon;
+          const option = document.createElement('div');
+          option.className = 'widget-option' + (isComingSoon ? ' coming-soon' : '');
+          option.innerHTML = `
+            <div class="widget-option-info">
+              <div class="widget-option-name">${widget.name}${isComingSoon ? ' <span style="font-size:11px;color:#9B8B7E;font-weight:400;">(Coming Soon)</span>' : ''}</div>
+              <div class="widget-option-desc">${widget.desc}</div>
+            </div>
+            <button class="widget-option-add" onclick="addWidget('${type}')" ${isComingSoon ? 'disabled' : ''}>
+              ${isComingSoon ? 'Coming Soon' : 'Add'}
+            </button>
+          `;
+          container.appendChild(option);
+        });
+      }
     }
 
-    async function addWidget(widgetId) {
-      const widgetDef = WIDGET_TYPES[widgetId];
-      const alreadyExists = activeWidgets.some(w => w.id === widgetId);
+    async function addWidget(widgetType) {
+      const widgetDef = WIDGET_TYPES[widgetType];
 
-      if (!alreadyExists && widgetDef && !widgetDef.comingSoon) {
+      if (widgetDef && !widgetDef.comingSoon) {
+        // Generate unique ID for this widget instance
+        const widgetId = generateWidgetId(widgetType);
+
+        // Default data for different widget types
+        let defaultData = {};
+        if (widgetType === 'stickyNote') {
+          defaultData = { color: 'yellow', text: 'New note...' };
+        } else if (widgetType === 'textBox') {
+          defaultData = { text: 'Type here...', fontSize: 16 };
+        } else if (widgetType === 'todoList') {
+          defaultData = { items: [{id: Date.now(), text: 'New task', checked: false}] };
+        } else if (widgetType === 'shape') {
+          defaultData = { color: '#8B9D83', width: 200, height: 150 };
+        } else if (widgetType === 'imageWidget') {
+          defaultData = { imageUrl: '', width: 300 };
+        }
+
         // Calculate position for new widget (stagger them in center area)
         const newWidget = {
           id: widgetId,
+          type: widgetType,
           x: 20200 + (activeWidgets.length % 4) * 420,
-          y: 20200 + Math.floor(activeWidgets.length / 4) * 350
+          y: 20200 + Math.floor(activeWidgets.length / 4) * 350,
+          data: defaultData
         };
         activeWidgets.push(newWidget);
         await saveWidgets();
@@ -1744,10 +2097,10 @@
       }
     }
 
-    // ======= WIDGET RENDERERS =======
+    // ======= APP WIDGET RENDERERS =======
 
-    async function renderRecentConversations(widgetId) {
-      const container = document.getElementById(`widget-${widgetId}`);
+    async function renderRecentConversations(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
       try {
         const res = await fetch(BACKEND_URL + '/api/conversations', {
           headers: { 'Authorization': 'Bearer ' + authToken }
@@ -1774,8 +2127,8 @@
       }
     }
 
-    async function renderQuickStats(widgetId) {
-      const container = document.getElementById(`widget-${widgetId}`);
+    async function renderQuickStats(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
       try {
         // Fetch user stats from backend
         const res = await fetch(BACKEND_URL + '/api/user/stats', {
@@ -1819,8 +2172,8 @@
       }
     }
 
-    async function renderUpcomingEvents(widgetId) {
-      const container = document.getElementById(`widget-${widgetId}`);
+    async function renderUpcomingEvents(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
       try {
         const res = await fetch(BACKEND_URL + '/api/calendar/upcoming', {
           headers: { 'Authorization': 'Bearer ' + authToken }
@@ -1859,8 +2212,8 @@
       }
     }
 
-    async function renderStudyGroups(widgetId) {
-      const container = document.getElementById(`widget-${widgetId}`);
+    async function renderStudyGroups(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
       try {
         const res = await fetch(BACKEND_URL + '/api/groups', {
           headers: { 'Authorization': 'Bearer ' + authToken }
@@ -1890,8 +2243,8 @@
       }
     }
 
-    function renderQuickLaunch(widgetId) {
-      const container = document.getElementById(`widget-${widgetId}`);
+    function renderQuickLaunch(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
       container.innerHTML = `
         <div class="quick-actions">
           <a href="chat.html" class="quick-action-btn">
@@ -1928,6 +2281,204 @@
           </a>
         </div>
       `;
+    }
+
+    // ======= ACCESSORY WIDGET RENDERERS =======
+
+    function renderStickyNote(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const color = widgetData.data.color || 'yellow';
+      const text = widgetData.data.text || '';
+
+      // Apply color to parent widget
+      const widgetElement = container.closest('.widget');
+      widgetElement.className = widgetElement.className.replace(/sticky-\w+/g, '');
+      widgetElement.classList.add(`sticky-${color}`);
+
+      container.innerHTML = `
+        <textarea class="sticky-note" placeholder="Type your note...">${text}</textarea>
+        <div style="position:absolute;bottom:8px;right:8px;display:flex;gap:4px;">
+          <button onclick="changeStickyColor('${widgetData.id}', 'yellow')" style="width:20px;height:20px;border-radius:50%;background:#FFF9C4;border:2px solid ${color === 'yellow' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'pink')" style="width:20px;height:20px;border-radius:50%;background:#FFD1DC;border:2px solid ${color === 'pink' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'blue')" style="width:20px;height:20px;border-radius:50%;background:#B3E5FC;border:2px solid ${color === 'blue' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
+          <button onclick="changeStickyColor('${widgetData.id}', 'green')" style="width:20px;height:20px;border-radius:50%;background:#C8E6C9;border:2px solid ${color === 'green' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;"></button>
+        </div>
+      `;
+
+      const textarea = container.querySelector('.sticky-note');
+      textarea.addEventListener('input', debounce(() => {
+        updateWidgetData(widgetData.id, { text: textarea.value });
+      }, 500));
+    }
+
+    function changeStickyColor(widgetId, color) {
+      updateWidgetData(widgetId, { color });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderStickyNote(widgetData);
+    }
+
+    function renderTextBox(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const text = widgetData.data.text || '';
+
+      container.innerHTML = `
+        <textarea class="text-box" placeholder="Type here...">${text}</textarea>
+      `;
+
+      const textarea = container.querySelector('.text-box');
+      textarea.addEventListener('input', debounce(() => {
+        updateWidgetData(widgetData.id, { text: textarea.value });
+      }, 500));
+    }
+
+    function renderTodoList(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const items = widgetData.data.items || [];
+
+      container.innerHTML = `
+        <div class="todo-container">
+          <div id="todo-items-${widgetData.id}"></div>
+          <button class="todo-add" onclick="addTodoItem('${widgetData.id}')">+ Add Task</button>
+        </div>
+      `;
+
+      renderTodoItems(widgetData.id, items);
+    }
+
+    function renderTodoItems(widgetId, items) {
+      const itemsContainer = document.getElementById(`todo-items-${widgetId}`);
+      if (!itemsContainer) return;
+
+      itemsContainer.innerHTML = items.map(item => `
+        <div class="todo-item">
+          <input type="checkbox" class="todo-checkbox" ${item.checked ? 'checked' : ''} onchange="toggleTodoItem('${widgetId}', '${item.id}')">
+          <input type="text" class="todo-text ${item.checked ? 'completed' : ''}" value="${item.text}" onchange="updateTodoText('${widgetId}', '${item.id}', this.value)">
+          <button class="todo-delete" onclick="deleteTodoItem('${widgetId}', '${item.id}')">×</button>
+        </div>
+      `).join('');
+    }
+
+    function addTodoItem(widgetId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const newItem = { id: Date.now(), text: 'New task', checked: false };
+      widgetData.data.items.push(newItem);
+      renderTodoItems(widgetId, widgetData.data.items);
+      saveWidgets();
+    }
+
+    function toggleTodoItem(widgetId, itemId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const item = widgetData.data.items.find(i => i.id == itemId);
+      if (item) {
+        item.checked = !item.checked;
+        renderTodoItems(widgetId, widgetData.data.items);
+        saveWidgets();
+      }
+    }
+
+    function updateTodoText(widgetId, itemId, newText) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      const item = widgetData.data.items.find(i => i.id == itemId);
+      if (item) {
+        item.text = newText;
+        saveWidgets();
+      }
+    }
+
+    function deleteTodoItem(widgetId, itemId) {
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (!widgetData) return;
+
+      widgetData.data.items = widgetData.data.items.filter(i => i.id != itemId);
+      renderTodoItems(widgetId, widgetData.data.items);
+      saveWidgets();
+    }
+
+    function renderImageWidget(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const imageUrl = widgetData.data.imageUrl || '';
+
+      if (imageUrl) {
+        container.innerHTML = `
+          <img src="${imageUrl}" class="image-display" alt="Uploaded image">
+          <button onclick="clearImage('${widgetData.id}')" style="position:absolute;bottom:8px;right:8px;padding:6px 12px;background:rgba(255,255,255,0.9);border:1px solid #E8DFD3;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Change Image</button>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="image-upload-area" onclick="document.getElementById('image-input-${widgetData.id}').click()">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8B9D83" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <div style="margin-top:12px;font-size:14px;color:#8B9D83;">Click to upload image</div>
+            <div style="margin-top:4px;font-size:12px;color:#9B8B7E;">or paste from clipboard</div>
+          </div>
+          <input type="file" id="image-input-${widgetData.id}" accept="image/*" style="display:none;" onchange="handleImageUpload('${widgetData.id}', this)">
+        `;
+      }
+    }
+
+    function clearImage(widgetId) {
+      updateWidgetData(widgetId, { imageUrl: '' });
+      const widgetData = activeWidgets.find(w => w.id === widgetId);
+      if (widgetData) renderImageWidget(widgetData);
+    }
+
+    function handleImageUpload(widgetId, input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          updateWidgetData(widgetId, { imageUrl: e.target.result });
+          const widgetData = activeWidgets.find(w => w.id === widgetId);
+          if (widgetData) renderImageWidget(widgetData);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function renderShape(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      const color = widgetData.data.color || '#8B9D83';
+
+      container.innerHTML = `
+        <div class="shape-box" style="background:${color};"></div>
+        <div style="position:absolute;bottom:8px;right:8px;display:flex;gap:4px;">
+          <input type="color" value="${color}" onchange="changeShapeColor('${widgetData.id}', this.value)" style="width:28px;height:28px;border-radius:6px;border:2px solid rgba(255,255,255,0.8);cursor:pointer;">
+        </div>
+      `;
+    }
+
+    function changeShapeColor(widgetId, color) {
+      updateWidgetData(widgetId, { color });
+    }
+
+    // Helper function to update widget data
+    function updateWidgetData(widgetId, newData) {
+      const widget = activeWidgets.find(w => w.id === widgetId);
+      if (widget) {
+        widget.data = { ...widget.data, ...newData };
+        saveWidgets();
+      }
+    }
+
+    // Debounce helper
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
     }
 
     // Initialize widgets after auth
