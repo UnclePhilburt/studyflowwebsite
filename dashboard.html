@@ -262,16 +262,16 @@
       font-weight: 300;
     }
 
-    /* Main canvas with widget grid */
+    /* Main canvas with widget layout */
     .canvas {
       position: relative;
       min-height: calc(100vh - 120px);
       padding: 80px 40px 120px;
       z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 20px;
-      align-content: start;
+      align-content: flex-start;
     }
 
     /* Widget cards */
@@ -288,6 +288,8 @@
       display: flex;
       flex-direction: column;
       user-select: none;
+      flex: 1 1 320px;
+      max-width: 500px;
     }
 
     .widget:active {
@@ -306,10 +308,16 @@
     }
 
     .widget.dragging {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: grabbing !important;
-      transform: scale(0.95);
-      box-shadow: 0 8px 32px rgba(139, 157, 131, 0.3);
+      transform: scale(0.98) rotate(2deg);
+      box-shadow: 0 12px 40px rgba(139, 157, 131, 0.4);
+      border: 2px dashed rgba(139, 157, 131, 0.5);
+    }
+
+    .widget.drag-over {
+      border: 2px solid rgba(139, 157, 131, 0.4);
+      background: rgba(139, 157, 131, 0.05);
     }
 
     .widget-header {
@@ -773,13 +781,14 @@
 
       .canvas {
         padding: 70px 16px 100px;
-        grid-template-columns: 1fr;
         gap: 16px;
       }
 
       .widget {
         min-height: auto;
         padding: 16px;
+        flex: 1 1 100%;
+        max-width: 100%;
       }
 
       .widget-header {
@@ -1420,6 +1429,35 @@
       }
     }
 
+    // Helper function to determine where to insert the dragged element
+    function getDragAfterElement(container, y, x) {
+      const draggableElements = [...container.querySelectorAll('.widget:not(.dragging)')];
+
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+
+        // Calculate center points
+        const centerY = box.top + box.height / 2;
+        const centerX = box.left + box.width / 2;
+
+        // Calculate offsets from mouse position
+        const offsetY = y - centerY;
+        const offsetX = x - centerX;
+
+        // If mouse is above/left of this element
+        if (offsetY < 0 || (offsetY === 0 && offsetX < 0)) {
+          // Calculate distance
+          const distance = Math.abs(offsetY) + Math.abs(offsetX);
+
+          if (closest.offset > distance) {
+            return { offset: distance, element: child };
+          }
+        }
+
+        return closest;
+      }, { offset: Number.POSITIVE_INFINITY, element: null }).element;
+    }
+
     function renderWidgets() {
       const canvas = document.getElementById('canvas');
       canvas.innerHTML = '';
@@ -1474,26 +1512,28 @@
             await saveWidgets();
           });
 
+          let dragOverTimeout;
           widget.addEventListener('dragover', (e) => {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
-          });
 
-          widget.addEventListener('dragenter', (e) => {
-            e.preventDefault();
             const dragging = document.querySelector('.dragging');
-            if (dragging && dragging !== widget) {
-              // Get all widgets
-              const allWidgets = Array.from(canvas.querySelectorAll('.widget'));
-              const dragIndex = allWidgets.indexOf(dragging);
-              const targetIndex = allWidgets.indexOf(widget);
+            if (!dragging || dragging === widget) return;
 
-              // Insert before or after based on direction
-              if (dragIndex < targetIndex) {
-                widget.parentNode.insertBefore(dragging, widget.nextSibling);
-              } else {
-                widget.parentNode.insertBefore(dragging, widget);
-              }
+            // Throttle to avoid too many DOM manipulations
+            if (dragOverTimeout) return;
+            dragOverTimeout = setTimeout(() => {
+              dragOverTimeout = null;
+            }, 50);
+
+            // Get all widgets and their positions
+            const allWidgets = Array.from(canvas.querySelectorAll('.widget:not(.dragging)'));
+            const afterElement = getDragAfterElement(canvas, e.clientY, e.clientX);
+
+            if (afterElement == null) {
+              canvas.appendChild(dragging);
+            } else {
+              canvas.insertBefore(dragging, afterElement);
             }
           });
 
