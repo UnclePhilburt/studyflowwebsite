@@ -2842,11 +2842,22 @@
     }
 
     // Initialize widgets after auth
-    const originalInit = init;
-    init = async function() {
-      await originalInit();
+    // Note: init() has already been called by this point, so we need to load widgets manually
+    async function initWidgets() {
+      // Wait for auth to be ready
+      if (!authToken) {
+        console.log('Waiting for auth...');
+        setTimeout(initWidgets, 100);
+        return;
+      }
+      console.log('Auth ready, loading widgets');
       await loadWidgets();
-    };
+      updateCanvasTransform();
+      renderWidgets();
+    }
+
+    // Start loading widgets
+    initWidgets();
 
     // Re-render widgets on resize (to enable/disable dragging based on screen size)
     let resizeTimeout;
