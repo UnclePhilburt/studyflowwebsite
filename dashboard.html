@@ -40,9 +40,9 @@
       --bg-primary: #1a1a1a;
       --bg-secondary: rgba(40, 40, 40, 0.8);
       --bg-tertiary: rgba(50, 50, 50, 0.9);
-      --text-primary: #e8e8e8;
-      --text-secondary: #b8b8b8;
-      --text-muted: #888888;
+      --text-primary: #f5f5f5;
+      --text-secondary: #d0d0d0;
+      --text-muted: #a0a0a0;
       --accent-primary: #7c9885;
       --accent-secondary: #6a8573;
       --accent-tertiary: #e89b5f;
@@ -294,7 +294,7 @@
       padding: 10px 14px;
       border-radius: 10px;
       text-decoration: none;
-      color: #2C2C2C;
+      color: var(--text-primary);
       font-size: 14px;
       font-weight: 400;
       cursor: pointer;
@@ -354,7 +354,7 @@
     .notif-dropdown-header h3 {
       font-size: 15px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
     }
 
     .notif-mark-all {
@@ -386,7 +386,7 @@
 
     .notif-item-msg {
       font-size: 13px;
-      color: #2C2C2C;
+      color: var(--text-primary);
       line-height: 1.5;
     }
 
@@ -502,7 +502,7 @@
     .widget-title {
       font-size: 16px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
     }
 
     .widget-remove {
@@ -582,7 +582,7 @@
       outline: none;
       resize: none;
       background: transparent;
-      color: #2C2C2C;
+      color: var(--text-primary);
     }
 
     .widget[data-widget-type="stickyNote"] {
@@ -620,7 +620,7 @@
       outline: none;
       resize: none;
       background: transparent;
-      color: #2C2C2C;
+      color: var(--text-primary);
     }
 
     .widget[data-widget-type="textBox"] {
@@ -663,7 +663,7 @@
       outline: none;
       background: transparent;
       font-size: 14px;
-      color: #2C2C2C;
+      color: var(--text-primary);
       font-family: inherit;
     }
 
@@ -872,7 +872,7 @@
 
     .chat-message-text {
       font-size: 13px;
-      color: #2C2C2C;
+      color: var(--text-primary);
       line-height: 1.5;
       word-wrap: break-word;
     }
@@ -909,7 +909,7 @@
     .conv-title {
       font-size: 14px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -963,7 +963,7 @@
     .event-title {
       font-size: 14px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 4px;
     }
 
@@ -994,7 +994,7 @@
     .group-name {
       font-size: 14px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 4px;
     }
 
@@ -1051,7 +1051,7 @@
     .quick-action-label {
       font-size: 13px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       transition: all 0.3s ease;
     }
 
@@ -1115,7 +1115,7 @@
     .widget-picker-title {
       font-size: 20px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 20px;
     }
 
@@ -1150,7 +1150,7 @@
     .clock-modal-title {
       font-size: 20px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 20px;
       text-align: center;
     }
@@ -1229,7 +1229,7 @@
 
     .clock-style-name {
       font-size: 11px;
-      color: #6B6B6B;
+      color: var(--text-secondary);
       font-weight: 500;
       text-align: center;
       line-height: 1.3;
@@ -1284,7 +1284,7 @@
     .quote-modal-title {
       font-size: 20px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 20px;
       text-align: center;
     }
@@ -1331,7 +1331,7 @@
 
     .quote-category-name {
       font-size: 11px;
-      color: #6B6B6B;
+      color: var(--text-secondary);
       font-weight: 500;
       text-align: center;
       line-height: 1.3;
@@ -1390,7 +1390,7 @@
     .widget-option-name {
       font-size: 15px;
       font-weight: 500;
-      color: #2C2C2C;
+      color: var(--text-primary);
       margin-bottom: 4px;
     }
 
@@ -3528,30 +3528,30 @@
         const s = seconds.toString().padStart(2, '0');
 
         const styles = {
-          'classic': `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:monospace;"><div style="font-size:48px;font-weight:500;color:#2C2C2C;letter-spacing:4px;">${h24}:${m}</div></div>`,
-          'modern': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;"><div style="font-size:56px;font-weight:200;color:#2C2C2C;letter-spacing:6px;">${h24}:${m}</div><div style="font-size:12px;color:#8B9D83;margin-top:8px;letter-spacing:2px;">${s} SECONDS</div></div>`,
+          'classic': `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:monospace;"><div style="font-size:48px;font-weight:500;color:var(--text-primary);letter-spacing:4px;">${h24}:${m}</div></div>`,
+          'modern': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;"><div style="font-size:56px;font-weight:200;color:var(--text-primary);letter-spacing:6px;">${h24}:${m}</div><div style="font-size:12px;color:#8B9D83;margin-top:8px;letter-spacing:2px;">${s} SECONDS</div></div>`,
           'elegant': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:300;color:#8B9D83;font-family:serif;">${h12}:${m}</div></div>`,
-          'bold': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:900;color:#2C2C2C;">${h24}:${m}</div></div>`,
+          'bold': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:900;color:var(--text-primary);">${h24}:${m}</div></div>`,
           'gradient': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:600;background:linear-gradient(135deg,#8B9D83,#2C2C2C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${h24}:${m}</div></div>`,
           'neon': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#1a1a1a;border-radius:12px;"><div style="font-size:48px;font-weight:600;color:#00ff88;text-shadow:0 0 20px #00ff88,0 0 40px #00ff88;font-family:monospace;letter-spacing:4px;">${h24}:${m}:${s}</div></div>`,
           'retro': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#ff6b35;border-radius:12px;"><div style="font-size:44px;font-weight:700;color:#fff;font-family:monospace;letter-spacing:3px;text-shadow:2px 2px 0 rgba(0,0,0,0.2);">${h24}:${m}</div></div>`,
           'outline': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:700;color:transparent;-webkit-text-stroke:2px #2C2C2C;">${h24}:${m}</div></div>`,
-          'stacked': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;"><div style="font-size:48px;font-weight:600;color:#2C2C2C;">${h24}</div><div style="width:60px;height:2px;background:#8B9D83;"></div><div style="font-size:48px;font-weight:600;color:#2C2C2C;">${m}</div></div>`,
-          'minimal': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:64px;font-weight:100;color:#2C2C2C;letter-spacing:8px;">${h24}:${m}</div></div>`,
+          'stacked': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;"><div style="font-size:48px;font-weight:600;color:var(--text-primary);">${h24}</div><div style="width:60px;height:2px;background:#8B9D83;"></div><div style="font-size:48px;font-weight:600;color:var(--text-primary);">${m}</div></div>`,
+          'minimal': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:64px;font-weight:100;color:var(--text-primary);letter-spacing:8px;">${h24}:${m}</div></div>`,
           'boxed': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="background:#2C2C2C;color:white;padding:16px 12px;border-radius:8px;font-size:40px;font-weight:600;min-width:50px;text-align:center;">${h24}</div><div style="font-size:32px;color:#8B9D83;">:</div><div style="background:#2C2C2C;color:white;padding:16px 12px;border-radius:8px;font-size:40px;font-weight:600;min-width:50px;text-align:center;">${m}</div></div>`,
-          'shadow': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:700;color:#2C2C2C;text-shadow:4px 4px 0 rgba(139,157,131,0.3);">${h24}:${m}</div></div>`,
+          'shadow': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:700;color:var(--text-primary);text-shadow:4px 4px 0 rgba(139,157,131,0.3);">${h24}:${m}</div></div>`,
           'bordered': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:48px;font-weight:500;color:#8B9D83;border:3px solid #8B9D83;padding:16px 24px;border-radius:12px;">${h24}:${m}</div></div>`,
-          'split': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:4px;"><div style="font-size:48px;font-weight:600;color:#8B9D83;">${h24}</div><div style="font-size:32px;color:#9B8B7E;">:</div><div style="font-size:48px;font-weight:600;color:#2C2C2C;">${m}</div></div>`,
-          'dots': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="font-size:52px;font-weight:500;color:#2C2C2C;">${h24}</div><div style="display:flex;flex-direction:column;gap:8px;"><div style="width:8px;height:8px;background:#8B9D83;border-radius:50%;"></div><div style="width:8px;height:8px;background:#8B9D83;border-radius:50%;"></div></div><div style="font-size:52px;font-weight:500;color:#2C2C2C;">${m}</div></div>`,
-          'serif': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:400;color:#2C2C2C;font-family:Georgia,serif;">${h12}:${m}</div></div>`,
+          'split': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:4px;"><div style="font-size:48px;font-weight:600;color:#8B9D83;">${h24}</div><div style="font-size:32px;color:#9B8B7E;">:</div><div style="font-size:48px;font-weight:600;color:var(--text-primary);">${m}</div></div>`,
+          'dots': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:8px;"><div style="font-size:52px;font-weight:500;color:var(--text-primary);">${h24}</div><div style="display:flex;flex-direction:column;gap:8px;"><div style="width:8px;height:8px;background:#8B9D83;border-radius:50%;"></div><div style="width:8px;height:8px;background:#8B9D83;border-radius:50%;"></div></div><div style="font-size:52px;font-weight:500;color:var(--text-primary);">${m}</div></div>`,
+          'serif': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:56px;font-weight:400;color:var(--text-primary);font-family:Georgia,serif;">${h12}:${m}</div></div>`,
           'rounded': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:48px;font-weight:700;color:white;background:#8B9D83;padding:16px 32px;border-radius:50px;">${h24}:${m}</div></div>`,
-          'vertical': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;"><div style="font-size:40px;font-weight:600;color:#8B9D83;">${h24}</div><div style="font-size:40px;font-weight:600;color:#2C2C2C;">${m}</div><div style="font-size:20px;font-weight:400;color:#9B8B7E;">${s}</div></div>`,
-          'ampm': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;"><div style="font-size:56px;font-weight:600;color:#2C2C2C;">${h12}:${m}</div><div style="display:flex;flex-direction:column;gap:4px;"><div style="font-size:14px;font-weight:600;color:${ampm==='AM'?'#8B9D83':'#ccc'};padding:4px 8px;background:${ampm==='AM'?'rgba(139,157,131,0.1)':'transparent'};border-radius:4px;">AM</div><div style="font-size:14px;font-weight:600;color:${ampm==='PM'?'#8B9D83':'#ccc'};padding:4px 8px;background:${ampm==='PM'?'rgba(139,157,131,0.1)':'transparent'};border-radius:4px;">PM</div></div></div>`,
-          'vintage': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f4e9d8;border-radius:12px;border:4px solid #8B9D83;"><div style="font-size:44px;font-weight:600;color:#2C2C2C;font-family:Georgia,serif;">${h12}:${m}</div></div>`,
+          'vertical': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;"><div style="font-size:40px;font-weight:600;color:#8B9D83;">${h24}</div><div style="font-size:40px;font-weight:600;color:var(--text-primary);">${m}</div><div style="font-size:20px;font-weight:400;color:#9B8B7E;">${s}</div></div>`,
+          'ampm': `<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;"><div style="font-size:56px;font-weight:600;color:var(--text-primary);">${h12}:${m}</div><div style="display:flex;flex-direction:column;gap:4px;"><div style="font-size:14px;font-weight:600;color:${ampm==='AM'?'#8B9D83':'#ccc'};padding:4px 8px;background:${ampm==='AM'?'rgba(139,157,131,0.1)':'transparent'};border-radius:4px;">AM</div><div style="font-size:14px;font-weight:600;color:${ampm==='PM'?'#8B9D83':'#ccc'};padding:4px 8px;background:${ampm==='PM'?'rgba(139,157,131,0.1)':'transparent'};border-radius:4px;">PM</div></div></div>`,
+          'vintage': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f4e9d8;border-radius:12px;border:4px solid #8B9D83;"><div style="font-size:44px;font-weight:600;color:var(--text-primary);font-family:Georgia,serif;">${h12}:${m}</div></div>`,
           'digital': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#000;border-radius:8px;"><div style="font-size:48px;font-weight:700;color:#ff0000;font-family:'Courier New',monospace;letter-spacing:4px;text-shadow:0 0 10px rgba(255,0,0,0.5);">${h24}:${m}:${s}</div></div>`,
           'soft': `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div style="font-size:52px;font-weight:300;color:#8B9D83;opacity:0.8;">${h24}:${m}</div></div>`,
           'card': `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg,#8B9D83,#7A8C73);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.15);"><div style="font-size:48px;font-weight:600;color:white;text-shadow:0 2px 8px rgba(0,0,0,0.2);">${h24}:${m}</div></div>`,
-          'date': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:4px;"><div style="font-size:52px;font-weight:600;color:#2C2C2C;">${h24}:${m}</div><div style="font-size:13px;color:#8B9D83;font-weight:500;letter-spacing:1px;">${day}, ${date}</div></div>`
+          'date': `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:4px;"><div style="font-size:52px;font-weight:600;color:var(--text-primary);">${h24}:${m}</div><div style="font-size:13px;color:#8B9D83;font-weight:500;letter-spacing:1px;">${day}, ${date}</div></div>`
         };
 
         display.innerHTML = styles[style] || styles['classic'];
@@ -3651,7 +3651,7 @@
             <defs>
               <linearGradient id="grad${widgetId}" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style="stop-color:#8B9D83;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#2C2C2C;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:var(--text-primary);stop-opacity:1" />
               </linearGradient>
             </defs>
             <circle cx="100" cy="100" r="90" fill="none" stroke="url(#grad${widgetId})" stroke-width="4"/>
@@ -4197,7 +4197,7 @@
 
       container.innerHTML = `
         <div style="padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;height:100%;cursor:pointer;" onclick="openQuoteModal('${widgetData.id}')">
-          <div style="font-size:16px;font-style:italic;color:#2C2C2C;line-height:1.6;margin-bottom:12px;">"${text}"</div>
+          <div style="font-size:16px;font-style:italic;color:var(--text-primary);line-height:1.6;margin-bottom:12px;">"${text}"</div>
           <div style="font-size:13px;color:#8B9D83;font-weight:500;">- ${author || 'Anonymous'}</div>
           <button onclick="event.stopPropagation();refreshQuote('${widgetData.id}')" style="margin-top:16px;padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">New Quote</button>
           <div style="margin-top:8px;font-size:11px;color:#9B8B7E;cursor:pointer;">Change Category</div>
@@ -4285,7 +4285,7 @@
       if (!targetDate) {
         container.innerHTML = `
           <div style="padding:20px;text-align:center;">
-            <div style="font-size:14px;color:#6B6B6B;margin-bottom:12px;">Set your deadline:</div>
+            <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Set your deadline:</div>
             <input type="text" id="countdown-label-${widgetData.id}" placeholder="Event name" value="${label}" style="width:100%;padding:8px;margin-bottom:8px;border:1px solid #E8DFD3;border-radius:6px;font-family:inherit;font-size:13px;">
             <input type="date" id="countdown-date-${widgetData.id}" style="width:100%;padding:8px;margin-bottom:12px;border:1px solid #E8DFD3;border-radius:6px;font-family:inherit;font-size:13px;">
             <button onclick="setCountdownDate('${widgetData.id}')" style="padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Start Countdown</button>
@@ -4300,8 +4300,8 @@
         container.innerHTML = `
           <div style="padding:20px;text-align:center;display:flex;flex-direction:column;justify-content:center;height:100%;">
             <div style="font-size:13px;color:#8B9D83;margin-bottom:8px;font-weight:500;">${label}</div>
-            <div style="font-size:48px;font-weight:300;color:#2C2C2C;line-height:1;">${days}</div>
-            <div style="font-size:14px;color:#6B6B6B;margin-top:4px;">days remaining</div>
+            <div style="font-size:48px;font-weight:300;color:var(--text-primary);line-height:1;">${days}</div>
+            <div style="font-size:14px;color:var(--text-secondary);margin-top:4px;">days remaining</div>
             <button onclick="clearCountdown('${widgetData.id}')" style="margin-top:16px;padding:6px 12px;background:rgba(255,255,255,0.7);color:#8B9D83;border:1px solid #E8DFD3;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;">Reset</button>
           </div>
         `;
@@ -4342,7 +4342,7 @@
       if (!sticker) {
         container.innerHTML = `
           <div style="padding:12px;text-align:center;">
-            <div style="font-size:13px;color:#6B6B6B;margin-bottom:8px;">Pick a sticker:</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">Pick a sticker:</div>
             <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:180px;overflow-y:auto;">
               ${STICKER_OPTIONS.map(s => `
                 <button onclick="selectSticker('${widgetData.id}', '${s}')" style="font-size:28px;padding:8px;background:rgba(255,255,255,0.5);border:1px solid #E8DFD3;border-radius:8px;cursor:pointer;">${s}</button>
@@ -4516,7 +4516,7 @@
         container.innerHTML = `
           <div style="padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
             <div style="font-size:32px;margin-bottom:12px;">💬</div>
-            <div style="font-size:14px;color:#6B6B6B;margin-bottom:16px;">Select a study group to display chat</div>
+            <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">Select a study group to display chat</div>
             <button onclick="selectGroupForChat('${widgetData.id}')" style="padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Choose Group</button>
           </div>
         `;
@@ -4526,7 +4526,7 @@
         container.innerHTML = `
           <div style="display:flex;flex-direction:column;height:100%;">
             <div class="group-chat-header" onclick="selectGroupForChat('${widgetData.id}')">
-              <div style="font-weight:600;font-size:13px;color:#2C2C2C;">${groupName}</div>
+              <div style="font-weight:600;font-size:13px;color:var(--text-primary);">${groupName}</div>
               <div style="font-size:11px;color:#8B9D83;cursor:pointer;">Change</div>
             </div>
             <div class="group-chat-messages" id="chat-messages-${widgetData.id}" style="flex:1;overflow-y:auto;min-height:0;">
@@ -4603,10 +4603,10 @@
         const modalHtml = `
           <div class="group-select-modal" id="groupSelectModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
             <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
-              <h3 style="font-size:18px;font-weight:500;color:#2C2C2C;margin-bottom:20px;text-align:center;">Select Study Group</h3>
+              <h3 style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:20px;text-align:center;">Select Study Group</h3>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 ${groups.map(group => `
-                  <button onclick="setGroupForChat('${widgetId}', '${group.id}', '${group.name.replace(/'/g, "\\'")}');closeGroupSelectModal()" style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;color:#2C2C2C;transition:all 0.2s;">
+                  <button onclick="setGroupForChat('${widgetId}', '${group.id}', '${group.name.replace(/'/g, "\\'")}');closeGroupSelectModal()" style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;color:var(--text-primary);transition:all 0.2s;">
                     <div style="font-weight:500;">${group.name}</div>
                     <div style="font-size:11px;color:#8B9D83;margin-top:4px;">${group.member_count || 0} members</div>
                   </button>
@@ -4751,7 +4751,7 @@
         container.innerHTML = `
           <div style="padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
             <div style="font-size:32px;margin-bottom:12px;">📅</div>
-            <div style="font-size:14px;color:#6B6B6B;margin-bottom:16px;">Select a study group to view calendar</div>
+            <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">Select a study group to view calendar</div>
             <button onclick="selectGroupForCalendar('${widgetData.id}')" style="padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Choose Group</button>
           </div>
         `;
@@ -4772,7 +4772,7 @@
           <div style="display:flex;flex-direction:column;height:100%;">
             <div style="padding:12px;border-bottom:1px solid #E8DFD3;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.5);">
               <div>
-                <div style="font-weight:600;font-size:13px;color:#2C2C2C;" onclick="selectGroupForCalendar('${widgetData.id}')" style="cursor:pointer;">${groupName}</div>
+                <div style="font-weight:600;font-size:13px;color:var(--text-primary);" onclick="selectGroupForCalendar('${widgetData.id}')" style="cursor:pointer;">${groupName}</div>
                 <div style="font-size:11px;color:#8B9D83;cursor:pointer;" onclick="selectGroupForCalendar('${widgetData.id}')">Change</div>
               </div>
               <div style="display:flex;gap:4px;align-items:center;">
@@ -4783,13 +4783,13 @@
             </div>
             <div style="flex:1;overflow-y:auto;padding:8px;">
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Sun</div>
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Mon</div>
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Tue</div>
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Wed</div>
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Thu</div>
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Fri</div>
-                <div style="font-size:10px;font-weight:600;text-align:center;color:#6B6B6B;padding:4px;">Sat</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Sun</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Mon</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Tue</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Wed</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Thu</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Fri</div>
+                <div style="font-size:10px;font-weight:600;text-align:center;color:var(--text-secondary);padding:4px;">Sat</div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
                 ${Array.from({length: firstDay}, () => '<div></div>').join('')}
@@ -4812,7 +4812,7 @@
                       display:flex;
                       flex-direction:column;
                     " onclick="showCalendarDayEvents('${widgetData.id}', '${dateStr}')">
-                      <div style="text-align:center;color:#2C2C2C;">${day}</div>
+                      <div style="text-align:center;color:var(--text-primary);">${day}</div>
                       ${dayEvents.length > 0 ? `
                         <div style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:#8B9D83;border-radius:50%;"></div>
                       ` : ''}
@@ -4851,10 +4851,10 @@
         const modalHtml = `
           <div class="group-select-modal" id="calendarGroupSelectModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
             <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
-              <h3 style="font-size:18px;font-weight:500;color:#2C2C2C;margin-bottom:20px;text-align:center;">Select Study Group</h3>
+              <h3 style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:20px;text-align:center;">Select Study Group</h3>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 ${groups.map(group => `
-                  <button onclick="setGroupForCalendar('${widgetId}', '${group.id}', '${group.name.replace(/'/g, "\\'")}');closeCalendarGroupSelectModal()" style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;color:#2C2C2C;transition:all 0.2s;">
+                  <button onclick="setGroupForCalendar('${widgetId}', '${group.id}', '${group.name.replace(/'/g, "\\'")}');closeCalendarGroupSelectModal()" style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;text-align:left;cursor:pointer;font-family:inherit;font-size:13px;color:var(--text-primary);transition:all 0.2s;">
                     <div style="font-weight:500;">${group.name}</div>
                     <div style="font-size:11px;color:#8B9D83;margin-top:4px;">${group.member_count || 0} members</div>
                   </button>
@@ -4930,13 +4930,13 @@
       const modalHtml = `
         <div class="day-events-modal" id="dayEventsModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
           <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
-            <h3 style="font-size:18px;font-weight:500;color:#2C2C2C;margin-bottom:8px;text-align:center;">${new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
+            <h3 style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:8px;text-align:center;">${new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
             <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
               ${events.map(event => `
                 <div style="padding:12px;background:rgba(250,248,245,0.8);border:1px solid #E8DFD3;border-radius:8px;">
-                  <div style="font-weight:600;font-size:14px;color:#2C2C2C;margin-bottom:4px;">${event.title}</div>
+                  <div style="font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:4px;">${event.title}</div>
                   ${event.event_time ? `<div style="font-size:11px;color:#8B9D83;margin-bottom:4px;">⏰ ${event.event_time}</div>` : ''}
-                  ${event.description ? `<div style="font-size:12px;color:#6B6B6B;margin-top:8px;">${event.description}</div>` : ''}
+                  ${event.description ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:8px;">${event.description}</div>` : ''}
                   <div style="font-size:10px;color:#9B8B7E;margin-top:8px;">Created by ${event.created_by}</div>
                 </div>
               `).join('')}
