@@ -826,14 +826,15 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px 16px;
-      background: rgba(139, 157, 131, 0.08);
-      border-bottom: 1px solid rgba(139, 157, 131, 0.15);
+      background: var(--hover-bg);
+      border-bottom: 1px solid var(--border-color);
       cursor: pointer;
       transition: background 0.2s;
     }
 
     .group-chat-header:hover {
-      background: rgba(139, 157, 131, 0.12);
+      background: var(--hover-bg);
+      opacity: 0.9;
     }
 
     .group-chat-messages {
@@ -846,10 +847,10 @@
     }
 
     .chat-message {
-      background: rgba(250, 248, 245, 0.8);
+      background: var(--widget-bg);
       border-radius: 8px;
       padding: 10px 12px;
-      border: 1px solid rgba(139, 126, 115, 0.1);
+      border: 1px solid var(--border-color);
     }
 
     .chat-message-header {
@@ -862,12 +863,12 @@
     .chat-message-user {
       font-size: 12px;
       font-weight: 600;
-      color: #8B9D83;
+      color: var(--accent-primary);
     }
 
     .chat-message-time {
       font-size: 10px;
-      color: #9B8B7E;
+      color: var(--text-muted);
     }
 
     .chat-message-text {
@@ -918,7 +919,7 @@
 
     .conv-time {
       font-size: 12px;
-      color: #9B8B7E;
+      color: var(--text-muted);
     }
 
     /* Quick Stats widget */
