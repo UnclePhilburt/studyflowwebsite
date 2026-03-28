@@ -3061,14 +3061,14 @@
       if (!textarea) {
         // First render
         container.innerHTML = `
-          <textarea class="sticky-note" placeholder="Type your note..." style="padding-bottom:30px;">${text}</textarea>
-          <div class="sticky-color-buttons" style="position:absolute;bottom:6px;left:6px;right:6px;display:flex;gap:4px;justify-content:center;">
-            <button data-color="yellow" onclick="changeStickyColor('${widgetData.id}', 'yellow')" style="width:18px;height:18px;border-radius:50%;background:#FFF9C4;border:2px solid ${color === 'yellow' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
-            <button data-color="pink" onclick="changeStickyColor('${widgetData.id}', 'pink')" style="width:18px;height:18px;border-radius:50%;background:#FFD1DC;border:2px solid ${color === 'pink' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
-            <button data-color="blue" onclick="changeStickyColor('${widgetData.id}', 'blue')" style="width:18px;height:18px;border-radius:50%;background:#B3E5FC;border:2px solid ${color === 'blue' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
-            <button data-color="green" onclick="changeStickyColor('${widgetData.id}', 'green')" style="width:18px;height:18px;border-radius:50%;background:#C8E6C9;border:2px solid ${color === 'green' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
-            <button data-color="orange" onclick="changeStickyColor('${widgetData.id}', 'orange')" style="width:18px;height:18px;border-radius:50%;background:#FFE0B2;border:2px solid ${color === 'orange' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
-            <button data-color="purple" onclick="changeStickyColor('${widgetData.id}', 'purple')" style="width:18px;height:18px;border-radius:50%;background:#E1BEE7;border:2px solid ${color === 'purple' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
+          <textarea class="sticky-note" placeholder="Type your note..." style="padding-bottom:24px;">${text}</textarea>
+          <div class="sticky-color-buttons" style="position:absolute;bottom:6px;left:6px;right:6px;display:flex;gap:3px;justify-content:center;">
+            <button data-color="yellow" onclick="changeStickyColor('${widgetData.id}', 'yellow')" style="width:12px;height:12px;border-radius:50%;background:#FFF9C4;border:1px solid ${color === 'yellow' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
+            <button data-color="pink" onclick="changeStickyColor('${widgetData.id}', 'pink')" style="width:12px;height:12px;border-radius:50%;background:#FFD1DC;border:1px solid ${color === 'pink' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
+            <button data-color="blue" onclick="changeStickyColor('${widgetData.id}', 'blue')" style="width:12px;height:12px;border-radius:50%;background:#B3E5FC;border:1px solid ${color === 'blue' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
+            <button data-color="green" onclick="changeStickyColor('${widgetData.id}', 'green')" style="width:12px;height:12px;border-radius:50%;background:#C8E6C9;border:1px solid ${color === 'green' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
+            <button data-color="orange" onclick="changeStickyColor('${widgetData.id}', 'orange')" style="width:12px;height:12px;border-radius:50%;background:#FFE0B2;border:1px solid ${color === 'orange' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
+            <button data-color="purple" onclick="changeStickyColor('${widgetData.id}', 'purple')" style="width:12px;height:12px;border-radius:50%;background:#E1BEE7;border:1px solid ${color === 'purple' ? '#8B9D83' : '#E8DFD3'};cursor:pointer;flex-shrink:0;"></button>
           </div>
         `;
 
