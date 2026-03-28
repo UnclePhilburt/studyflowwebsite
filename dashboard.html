@@ -828,20 +828,37 @@
 
       .dock {
         bottom: 12px;
+        left: 12px;
+        right: 12px;
+        transform: none;
         padding: 10px 16px;
         gap: 6px;
         border-radius: 20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .dock::-webkit-scrollbar {
+        display: none;
       }
 
       .dock-icon {
         width: 48px;
         height: 48px;
         border-radius: 14px;
+        flex-shrink: 0;
       }
 
       .dock-icon svg {
         width: 22px;
         height: 22px;
+      }
+
+      .dock-item {
+        flex-shrink: 0;
       }
 
       .dock-item:hover .dock-icon {
@@ -852,6 +869,10 @@
         bottom: -28px;
         font-size: 11px;
         padding: 5px 10px;
+      }
+
+      .dock-divider {
+        flex-shrink: 0;
       }
 
       .notif-dropdown {
@@ -921,6 +942,9 @@
       }
 
       .dock {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
         padding: 8px 12px;
         gap: 4px;
       }
@@ -930,8 +954,44 @@
         height: 44px;
       }
 
+      .dock-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+
       .dock-divider {
         height: 40px;
+      }
+    }
+
+    /* Very narrow screens (Fold outer screen) */
+    @media (max-width: 380px) {
+      .dock {
+        left: 6px;
+        right: 6px;
+        bottom: 6px;
+        padding: 6px 10px;
+        gap: 3px;
+      }
+
+      .dock-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .dock-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .dock-divider {
+        height: 36px;
+        margin: 0 2px;
+      }
+
+      .dock-label {
+        font-size: 10px;
+        padding: 4px 8px;
       }
     }
   </style>
