@@ -48,7 +48,7 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(124, 152, 133, 0.15);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: space-between;
       padding: 0 20px;
@@ -118,12 +118,57 @@
 
     /* Main content */
     .main-content {
-      padding-top: 64px;
-      padding-bottom: 80px;
+      padding-top: 80px;
+      padding-bottom: 40px;
       min-height: 100vh;
       min-height: 100dvh;
       position: relative;
       z-index: 1;
+    }
+
+    .content-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 800px;
+      margin: 0 auto 24px;
+      padding: 0 20px;
+    }
+
+    .content-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 28px;
+      font-weight: 500;
+      color: #2d2d2d;
+    }
+
+    .content-create-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .content-create-btn:hover {
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .content-create-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
     }
 
     /* Group list view */
@@ -1306,6 +1351,7 @@
     /* Responsive */
     @media (max-width: 768px) {
       .page-header {
+        display: flex;
         padding: 0 14px;
       }
 
@@ -1387,6 +1433,14 @@
       body {
         padding-bottom: 56px;
       }
+
+      .main-content {
+        padding-top: 64px;
+      }
+
+      .content-header {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -1415,6 +1469,13 @@
 
   <!-- Main content -->
   <div class="main-content">
+    <div class="content-header" id="contentHeader">
+      <h1 class="content-title">Study Groups</h1>
+      <button class="content-create-btn" onclick="document.getElementById('createGroupModal').classList.add('active')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create Group
+      </button>
+    </div>
     <!-- Group list view -->
     <div class="group-list-view" id="groupListView">
       <div class="loading-center" id="groupListLoading">
@@ -1782,6 +1843,7 @@
     async function openGroup(groupId) {
       currentGroup = groupId;
       groupListView.style.display = 'none';
+      document.getElementById('contentHeader').style.display = 'none';
       groupDetailView.classList.add('active');
       groupDetailTitle.textContent = 'Loading...';
       groupDeleteBtn.style.display = 'none';
@@ -1819,6 +1881,7 @@
       currentGroupDetail = null;
       groupDetailView.classList.remove('active');
       groupListView.style.display = 'block';
+      document.getElementById('contentHeader').style.display = '';
       unsubscribeRealtime();
       chatMessages.innerHTML = '<div class="chat-empty" id="chatEmpty"><div><h3>Group Chat</h3><p>Ask questions grounded in your group\'s shared notes.</p></div></div>';
       loadGroups();
