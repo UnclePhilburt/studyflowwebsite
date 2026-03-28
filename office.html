@@ -637,6 +637,89 @@
       margin-top: 2px;
     }
 
+    /* Name Document Modal */
+    .name-modal {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      max-width: 400px;
+      width: 100%;
+      padding: 28px;
+      position: relative;
+    }
+
+    .name-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+      font-family: 'Lora', Georgia, serif;
+    }
+
+    .name-modal-subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+
+    .name-modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      background: white;
+      color: #2d2d2d;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+
+    .name-modal-input:focus {
+      outline: none;
+      border-color: #7c9885;
+    }
+
+    .name-modal-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .name-modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .name-modal-btn.cancel {
+      background: rgba(0, 0, 0, 0.04);
+      color: #5d5d5d;
+    }
+
+    .name-modal-btn.cancel:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .name-modal-btn.create {
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+    }
+
+    .name-modal-btn.create:hover {
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .name-modal-btn.create:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .doc-action-btn svg {
       width: 16px;
       height: 16px;
@@ -1199,6 +1282,19 @@
       </div>
     </div>
 
+    <!-- Name Document Modal -->
+    <div class="modal-overlay" id="nameModal">
+      <div class="name-modal">
+        <div class="name-modal-title" id="nameModalTitle">Name your document</div>
+        <div class="name-modal-subtitle" id="nameModalSubtitle">Choose a name for your new document</div>
+        <input type="text" class="name-modal-input" id="nameModalInput" placeholder="Untitled Document">
+        <div class="name-modal-buttons">
+          <button class="name-modal-btn cancel" onclick="closeNameModal(false)">Cancel</button>
+          <button class="name-modal-btn create" id="nameModalCreateBtn" onclick="confirmDocumentName()">Create</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- End container -->
 
   <!-- Bottom Tab Bar (Mobile) -->
@@ -1392,9 +1488,77 @@
     }
   }
 
+  // Name document modal functions
+  let nameModalResolve = null;
+
+  function showNameModal(type) {
+    return new Promise((resolve) => {
+      nameModalResolve = resolve;
+      const typeNames = { docx: 'Document', xlsx: 'Spreadsheet', pptx: 'Presentation' };
+      const typeName = typeNames[type] || type;
+
+      document.getElementById('nameModalTitle').textContent = `Name your ${typeName.toLowerCase()}`;
+      document.getElementById('nameModalSubtitle').textContent = `Choose a name for your new ${typeName.toLowerCase()}`;
+      document.getElementById('nameModalInput').value = `Untitled ${typeName}`;
+      document.getElementById('nameModalInput').placeholder = `Untitled ${typeName}`;
+      document.getElementById('nameModal').classList.add('active');
+
+      // Focus input and select text
+      setTimeout(() => {
+        const input = document.getElementById('nameModalInput');
+        input.focus();
+        input.select();
+      }, 100);
+    });
+  }
+
+  function closeNameModal(confirmed) {
+    const modal = document.getElementById('nameModal');
+    modal.classList.remove('active');
+
+    if (nameModalResolve) {
+      if (confirmed) {
+        const title = document.getElementById('nameModalInput').value.trim();
+        nameModalResolve(title || null);
+      } else {
+        nameModalResolve(null);
+      }
+      nameModalResolve = null;
+    }
+  }
+
+  function confirmDocumentName() {
+    const title = document.getElementById('nameModalInput').value.trim();
+    if (title) {
+      closeNameModal(true);
+    }
+  }
+
+  // Handle Enter key in modal
+  document.addEventListener('DOMContentLoaded', () => {
+    const nameInput = document.getElementById('nameModalInput');
+    if (nameInput) {
+      nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          confirmDocumentName();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          closeNameModal(false);
+        }
+      });
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('nameModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'nameModal') {
+        closeNameModal(false);
+      }
+    });
+  });
+
   async function createDocument(type) {
-    const typeNames = { docx: 'Document', xlsx: 'Spreadsheet', pptx: 'Presentation' };
-    const title = prompt(`Name your new ${typeNames[type] || type}:`, `Untitled ${typeNames[type]}`);
+    const title = await showNameModal(type);
     if (!title) return;
 
     try {
