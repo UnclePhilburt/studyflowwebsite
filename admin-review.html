@@ -357,6 +357,44 @@
     </div>
   </div>
 
+  <!-- Rejection reason picker -->
+  <div id="rejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:rgba(255,255,255,0.97);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.15);max-width:380px;width:100%;padding:24px;">
+      <div style="font-size:16px;font-weight:600;color:#2d2d2d;margin-bottom:4px;">Remove Note</div>
+      <div style="font-size:12px;color:#9ca3af;margin-bottom:16px;">Select a reason to notify the uploader:</div>
+      <div id="reasonButtons" style="display:flex;flex-direction:column;gap:8px;">
+        <button class="reason-btn" onclick="confirmReject('Does not meet quality standards')">Does not meet quality standards</button>
+        <button class="reason-btn" onclick="confirmReject('Contains copyrighted material')">Contains copyrighted material</button>
+        <button class="reason-btn" onclick="confirmReject('Contains personally identifiable information')">Contains personally identifiable information</button>
+        <button class="reason-btn" onclick="confirmReject('Not original student work')">Not original student work</button>
+        <button class="reason-btn" onclick="confirmReject('Duplicate or spam content')">Duplicate or spam content</button>
+        <button class="reason-btn" onclick="confirmReject('Inappropriate or offensive content')">Inappropriate or offensive content</button>
+        <button class="reason-btn" onclick="confirmReject('Incorrect university or course categorization')">Incorrect university or course categorization</button>
+      </div>
+      <button onclick="closeRejectModal()" style="width:100%;margin-top:12px;padding:10px;background:none;border:1px solid rgba(156,163,175,0.3);color:#9ca3af;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+  </div>
+
+  <style>
+    .reason-btn {
+      padding: 10px 14px;
+      background: rgba(220, 38, 38, 0.04);
+      border: 1px solid rgba(220, 38, 38, 0.15);
+      border-radius: 10px;
+      color: #dc2626;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .reason-btn:hover {
+      background: rgba(220, 38, 38, 0.08);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+  </style>
+
   <div class="flash approve" id="flashApprove">APPROVED</div>
   <div class="flash reject" id="flashReject">REMOVED</div>
 
@@ -502,7 +540,7 @@
       setTimeout(() => el.classList.remove('show'), 500);
     }
 
-    async function reviewNote(action) {
+    async function reviewNote(action, reason) {
       if (isProcessing || currentIndex >= queue.length) return;
       isProcessing = true;
 
@@ -513,11 +551,14 @@
       card.classList.add(action === 'approve' ? 'swipe-right' : 'swipe-left');
       flashResult(action);
 
+      const body = { key: adminKey, action: action };
+      if (reason) body.reason = reason;
+
       try {
         await fetch(BACKEND_URL + '/admin/review/' + note.id, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: adminKey, action: action })
+          body: JSON.stringify(body)
         });
       } catch (e) {
         console.error('Review error:', e);
@@ -533,9 +574,24 @@
       }, 400);
     }
 
+    // Reject flow: show reason picker
+    function openRejectModal() {
+      if (isProcessing || currentIndex >= queue.length) return;
+      document.getElementById('rejectModal').style.display = 'flex';
+    }
+
+    function closeRejectModal() {
+      document.getElementById('rejectModal').style.display = 'none';
+    }
+
+    function confirmReject(reason) {
+      closeRejectModal();
+      reviewNote('reject', reason);
+    }
+
     // Button clicks
     document.getElementById('approveBtn').addEventListener('click', () => reviewNote('approve'));
-    document.getElementById('rejectBtn').addEventListener('click', () => reviewNote('reject'));
+    document.getElementById('rejectBtn').addEventListener('click', openRejectModal);
 
     // Arrow keys
     document.addEventListener('keydown', (e) => {
@@ -544,7 +600,9 @@
         reviewNote('approve');
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        reviewNote('reject');
+        openRejectModal();
+      } else if (e.key === 'Escape') {
+        closeRejectModal();
       }
     });
 
