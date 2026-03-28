@@ -1486,7 +1486,7 @@
       }
 
       .zoom-indicator {
-        display: block;
+        display: none;
       }
 
       .widget-header {
@@ -2308,13 +2308,10 @@
     let activeWidgets = []; // Array of {id, x, y}
     let isDragging = false;
     let canvasPan = { x: 0, y: 0 }; // Canvas pan offset
-    let canvasZoom = 1; // Canvas zoom level
     let isPanningCanvas = false;
     let panStart = { x: 0, y: 0 };
     let draggedWidget = null;
     let widgetDragStart = { x: 0, y: 0 };
-    let lastTouchDistance = 0; // For pinch-to-zoom
-    let isPinching = false; // Track if currently pinching
 
     // Generate unique widget ID
     function generateWidgetId(type) {
@@ -2445,34 +2442,13 @@
     // Apply canvas transform
     function updateCanvasTransform() {
       const canvas = document.getElementById('canvas');
-      canvas.style.transform = `translate(${canvasPan.x}px, ${canvasPan.y}px) scale(${canvasZoom})`;
-
-      // Update zoom indicator on mobile
-      const zoomIndicator = document.getElementById('zoomIndicator');
-      if (zoomIndicator && window.innerWidth <= 768) {
-        zoomIndicator.textContent = `${Math.round(canvasZoom * 100)}%`;
-        zoomIndicator.classList.add('visible');
-
-        // Hide after 1 second
-        clearTimeout(window.zoomIndicatorTimeout);
-        window.zoomIndicatorTimeout = setTimeout(() => {
-          zoomIndicator.classList.remove('visible');
-        }, 1000);
-      }
+      canvas.style.transform = `translate(${canvasPan.x}px, ${canvasPan.y}px)`;
     }
 
     // Reset canvas view to center
     function resetCanvasView() {
       canvasPan = { x: 0, y: 0 };
-      canvasZoom = 1;
       updateCanvasTransform();
-    }
-
-    // Calculate distance between two touch points
-    function getTouchDistance(touch1, touch2) {
-      const dx = touch2.clientX - touch1.clientX;
-      const dy = touch2.clientY - touch1.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
     }
 
     function renderWidgets() {
@@ -2636,17 +2612,9 @@
 
     // Touch events for mobile support
     canvasContainer.addEventListener('touchstart', (e) => {
-      // Two fingers = start pinch zoom
-      if (e.touches.length === 2 && (e.target === canvasContainer || e.target === canvas)) {
-        isPinching = true;
-        isPanningCanvas = false;
-        lastTouchDistance = getTouchDistance(e.touches[0], e.touches[1]);
-        e.preventDefault();
-      }
-      // One finger = start panning (if not touching a widget)
-      else if (e.touches.length === 1 && (e.target === canvasContainer || e.target === canvas)) {
+      // Only start panning if not touching a widget (single touch only)
+      if (e.touches.length === 1 && (e.target === canvasContainer || e.target === canvas)) {
         isPanningCanvas = true;
-        isPinching = false;
         canvasContainer.classList.add('panning');
         const touch = e.touches[0];
         panStart = {
@@ -2658,41 +2626,8 @@
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
-      // Pinch to zoom (two fingers)
-      if (e.touches.length === 2 && isPinching) {
-        const distance = getTouchDistance(e.touches[0], e.touches[1]);
-
-        if (lastTouchDistance > 0 && Math.abs(distance - lastTouchDistance) > 5) {
-          const scale = distance / lastTouchDistance;
-          const newZoom = Math.max(0.5, Math.min(2, canvasZoom * scale));
-
-          if (newZoom !== canvasZoom) {
-            // Get center of viewport
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-
-            // Calculate the point in canvas space that's at the center of viewport
-            const canvasPointX = (centerX - canvasPan.x) / canvasZoom;
-            const canvasPointY = (centerY - canvasPan.y) / canvasZoom;
-
-            // Update zoom
-            const oldZoom = canvasZoom;
-            canvasZoom = newZoom;
-
-            // Adjust pan so the same canvas point stays at viewport center
-            canvasPan.x = centerX - canvasPointX * newZoom;
-            canvasPan.y = centerY - canvasPointY * newZoom;
-
-            updateCanvasTransform();
-          }
-
-          lastTouchDistance = distance;
-        }
-
-        e.preventDefault();
-      }
       // Pan canvas (one finger)
-      else if (isPanningCanvas && e.touches.length === 1 && !isPinching) {
+      if (isPanningCanvas && e.touches.length === 1) {
         const touch = e.touches[0];
         canvasPan.x = touch.clientX - panStart.x;
         canvasPan.y = touch.clientY - panStart.y;
@@ -2715,23 +2650,6 @@
     }, { passive: false });
 
     document.addEventListener('touchend', async (e) => {
-      // Reset pinch zoom tracking when all fingers lifted
-      if (e.touches.length === 0) {
-        lastTouchDistance = 0;
-        isPinching = false;
-      }
-
-      // If one finger lifted but one still down during pinch, switch to pan mode
-      if (e.touches.length === 1 && isPinching) {
-        isPinching = false;
-        isPanningCanvas = true;
-        const touch = e.touches[0];
-        panStart = {
-          x: touch.clientX - canvasPan.x,
-          y: touch.clientY - canvasPan.y
-        };
-      }
-
       // All fingers lifted - reset states
       if (e.touches.length === 0) {
         if (isPanningCanvas) {
