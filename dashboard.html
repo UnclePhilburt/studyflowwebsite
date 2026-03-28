@@ -2667,7 +2667,22 @@
           const newZoom = Math.max(0.5, Math.min(2, canvasZoom * scale));
 
           if (newZoom !== canvasZoom) {
+            // Get center of viewport
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            // Calculate the point in canvas space that's at the center of viewport
+            const canvasPointX = (centerX - canvasPan.x) / canvasZoom;
+            const canvasPointY = (centerY - canvasPan.y) / canvasZoom;
+
+            // Update zoom
+            const oldZoom = canvasZoom;
             canvasZoom = newZoom;
+
+            // Adjust pan so the same canvas point stays at viewport center
+            canvasPan.x = centerX - canvasPointX * newZoom;
+            canvasPan.y = centerY - canvasPointY * newZoom;
+
             updateCanvasTransform();
           }
 
