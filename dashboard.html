@@ -268,10 +268,11 @@
       min-height: calc(100vh - 120px);
       padding: 80px 40px 120px;
       z-index: 1;
-      display: flex;
+      display: flex !important;
       flex-wrap: wrap;
       gap: 20px;
       align-content: flex-start;
+      align-items: stretch;
     }
 
     /* Widget cards */
@@ -664,6 +665,8 @@
       color: #9B8B7E;
       font-size: 14px;
       padding: 40px 20px;
+      width: 100%;
+      flex: 1 1 100%;
     }
 
     /* Mac-style dock */
@@ -1378,6 +1381,7 @@
     };
 
     let activeWidgets = [];
+    let isDragging = false;
 
     // Load widgets from backend (per-user)
     async function loadWidgets() {
@@ -1433,29 +1437,42 @@
     function getDragAfterElement(container, y, x) {
       const draggableElements = [...container.querySelectorAll('.widget:not(.dragging)')];
 
-      return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
+      let closestElement = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
 
-        // Calculate center points
+      draggableElements.forEach(child => {
+        const box = child.getBoundingClientRect();
         const centerY = box.top + box.height / 2;
         const centerX = box.left + box.width / 2;
 
-        // Calculate offsets from mouse position
-        const offsetY = y - centerY;
-        const offsetX = x - centerX;
+        // Calculate distance from mouse to center of this element
+        const distanceY = Math.abs(y - centerY);
+        const distanceX = Math.abs(x - centerX);
+        const totalDistance = distanceY + distanceX;
 
-        // If mouse is above/left of this element
-        if (offsetY < 0 || (offsetY === 0 && offsetX < 0)) {
-          // Calculate distance
-          const distance = Math.abs(offsetY) + Math.abs(offsetX);
-
-          if (closest.offset > distance) {
-            return { offset: distance, element: child };
-          }
+        // Check if this is closer than previous closest
+        if (totalDistance < closestDistance) {
+          closestDistance = totalDistance;
+          closestElement = child;
         }
+      });
 
-        return closest;
-      }, { offset: Number.POSITIVE_INFINITY, element: null }).element;
+      // If we found an element, check if we should insert before or after it
+      if (closestElement) {
+        const box = closestElement.getBoundingClientRect();
+        const centerY = box.top + box.height / 2;
+        const centerX = box.left + box.width / 2;
+
+        // If mouse is before (above/left of) the element, return it to insert before
+        // Otherwise return next sibling to insert after
+        if (y < centerY || (y === centerY && x < centerX)) {
+          return closestElement;
+        } else {
+          return closestElement.nextSibling;
+        }
+      }
+
+      return null;
     }
 
     function renderWidgets() {
@@ -1469,10 +1486,19 @@
 
       const isMobile = window.innerWidth <= 768;
 
-      // Add canvas dragover handler for desktop
+      // Add canvas dragover and drop handlers for desktop
       if (!isMobile) {
         canvas.addEventListener('dragover', (e) => {
           e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        });
+
+        canvas.addEventListener('drop', async (e) => {
+          e.preventDefault();
+          // Make sure to update order on drop
+          const widgets = Array.from(canvas.querySelectorAll('.widget'));
+          activeWidgets = widgets.map(w => w.dataset.widgetId);
+          await saveWidgets();
         });
       }
 
@@ -1499,6 +1525,7 @@
         // Drag events (only on desktop)
         if (!isMobile) {
           widget.addEventListener('dragstart', (e) => {
+            isDragging = true;
             widget.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', widgetId);
@@ -1506,6 +1533,7 @@
 
           widget.addEventListener('dragend', async () => {
             widget.classList.remove('dragging');
+            isDragging = false;
             // Save new order after drag ends
             const widgets = Array.from(canvas.querySelectorAll('.widget'));
             activeWidgets = widgets.map(w => w.dataset.widgetId);
@@ -1535,6 +1563,10 @@
             } else {
               canvas.insertBefore(dragging, afterElement);
             }
+
+            // Update activeWidgets array immediately to reflect new DOM order
+            const currentWidgets = Array.from(canvas.querySelectorAll('.widget'));
+            activeWidgets = currentWidgets.map(w => w.dataset.widgetId);
           });
 
           widget.addEventListener('drop', (e) => {
@@ -1797,7 +1829,10 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        renderWidgets();
+        // Don't re-render during drag
+        if (!isDragging) {
+          renderWidgets();
+        }
       }, 300);
     });
   </script>
