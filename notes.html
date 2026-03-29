@@ -2489,7 +2489,12 @@
       const professor = document.getElementById('uploadProfessor').value.trim();
       const semester = document.getElementById('uploadSemester').value.trim();
 
-      const authToken = localStorage.getItem('auth_token');
+      // Use the global authToken from Supabase session (not localStorage)
+      if (!authToken) {
+        alert('Authentication error. Please refresh the page and try again.');
+        return;
+      }
+
       let uploadedCount = 0;
 
       try {
