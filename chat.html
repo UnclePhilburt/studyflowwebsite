@@ -3700,6 +3700,30 @@
             `;
 
             contentDiv.appendChild(citationsDiv);
+
+            // Add vote buttons for rating source helpfulness
+            const noteIds = noteSources.map(s => s.note_id);
+            if (noteIds.length > 0) {
+              const voteDiv = document.createElement('div');
+              voteDiv.className = 'source-vote-buttons';
+              voteDiv.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:12px;padding:8px 12px;background:var(--hover-bg);border-radius:8px;border:1px solid var(--border-color);';
+              voteDiv.innerHTML = `
+                <span style="font-size:12px;color:var(--text-secondary);margin-right:auto;">Were these sources helpful?</span>
+                <button class="vote-btn vote-up" data-note-ids='${JSON.stringify(noteIds)}' style="padding:6px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-tertiary);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg>
+                  Yes
+                </button>
+                <button class="vote-btn vote-down" data-note-ids='${JSON.stringify(noteIds)}' style="padding:6px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-tertiary);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                  No
+                </button>
+              `;
+              contentDiv.appendChild(voteDiv);
+            }
           }
         }
 
@@ -3735,6 +3759,56 @@
 
       messagesContainer.appendChild(messageDiv);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      // Attach vote button handlers (for assistant messages with sources)
+      if (role === 'assistant' && sources && sources.length > 0) {
+        const voteButtons = messageDiv.querySelectorAll('.vote-btn');
+        voteButtons.forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const target = e.currentTarget;
+            const isUpvote = target.classList.contains('vote-up');
+            const noteIds = JSON.parse(target.dataset.noteIds);
+
+            try {
+              // Generate a message ID for this response (or use existing if available)
+              // For now, use timestamp-based ID since we don't store message IDs in UI
+              const messageId = messageDiv.dataset.messageId || `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+              messageDiv.dataset.messageId = messageId;
+
+              const { data: { session } } = await supabaseClient.auth.getSession();
+              if (!session) return;
+
+              const response = await fetch('https://studyflowsuite.onrender.com/api/chat/rate-response', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${session.access_token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  message_id: messageId,
+                  conversation_id: currentConversationId,
+                  vote: isUpvote ? 1 : -1,
+                  cited_note_ids: noteIds
+                })
+              });
+
+              if (response.ok) {
+                // Update button states
+                voteButtons.forEach(b => {
+                  b.style.opacity = '0.5';
+                  b.style.pointerEvents = 'none';
+                });
+                target.style.opacity = '1';
+                target.style.background = 'var(--accent-primary)';
+                target.style.color = 'white';
+                target.style.borderColor = 'var(--accent-primary)';
+              }
+            } catch (error) {
+              console.error('Vote error:', error);
+            }
+          });
+        });
+      }
     }
 
     // Typing Indicator
