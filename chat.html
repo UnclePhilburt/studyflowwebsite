@@ -1818,8 +1818,7 @@
     .input-box {
       width: 100%;
       padding: 18px 64px 18px 24px;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      border: 2px solid var(--border-color);
       border-radius: 16px;
       font-size: 15px;
       font-family: 'Lora', Georgia, serif;
@@ -1827,24 +1826,23 @@
       resize: none;
       min-height: 58px;
       max-height: 200px;
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.02) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(232, 155, 95, 0.02) 100%);
-      backdrop-filter: blur(60px);
-      -webkit-backdrop-filter: blur(60px);
+      background: var(--bg-tertiary);
       color: var(--text-primary);
       box-shadow: 0 6px 32px rgba(45, 45, 45, 0.1);
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .input-box::placeholder {
-      color: rgba(124, 152, 133, 0.4);
+      color: var(--text-secondary);
+      opacity: 0.6;
       font-style: italic;
     }
 
     .input-box:focus {
       outline: none;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.6) 0%, rgba(232, 155, 95, 0.6) 100%) 1;
-      background: linear-gradient(to right, rgba(124, 152, 133, 0.04) 0%, rgba(255, 255, 255, 1) 50%, rgba(232, 155, 95, 0.04) 100%);
-      box-shadow: 0 8px 48px rgba(124, 152, 133, 0.15), 0 4px 24px rgba(232, 155, 95, 0.1);
+      border-color: var(--accent-primary);
+      background: var(--bg-secondary);
+      box-shadow: 0 8px 48px rgba(124, 152, 133, 0.15);
       transform: translateY(-3px);
     }
 
