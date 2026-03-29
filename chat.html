@@ -3636,8 +3636,8 @@
             const citationsDiv = document.createElement('div');
             citationsDiv.className = 'source-citations';
 
-            // Build consensus citation text - show ALL sources, not deduplicated
-            const allContributors = [];
+            // Build consensus citation with clickable links
+            const sourceLinks = [];
 
             // Add each Nexus note (show all, even from same user)
             if (noteSources.length > 0) {
@@ -3645,7 +3645,7 @@
                 const username = s.username ? `@${s.username}` : 'Anonymous';
                 // Use filename without extension for cleaner display
                 const noteName = s.filename.replace(/\s*\([^)]*\)$/, '').replace(/\.(txt|pdf|docx?)$/i, '');
-                allContributors.push(`${username}'s ${noteName}`);
+                sourceLinks.push(`<a href="note-viewer.html?id=${s.note_id}" target="_blank" style="color:#7c9885;text-decoration:none;font-weight:500;">${username}'s ${noteName}</a>`);
               });
             }
 
@@ -3653,19 +3653,19 @@
             if (wikiSources.length > 0) {
               wikiSources.forEach(s => {
                 const title = s.filename.replace('.txt', '').replace(/ \(Wikipedia.*\)/, '');
-                allContributors.push(`Wikipedia: ${title}`);
+                sourceLinks.push(`<a href="${s.wikipedia_url}" target="_blank" style="color:#7c9885;text-decoration:none;font-weight:500;">Wikipedia: ${title}</a>`);
               });
             }
 
             // Create consensus text with natural language formatting
-            let consensusText = 'Sources: ';
-            if (allContributors.length === 1) {
-              consensusText += allContributors[0];
-            } else if (allContributors.length === 2) {
-              consensusText += allContributors.join(' and ');
+            let consensusHTML = 'Sources: ';
+            if (sourceLinks.length === 1) {
+              consensusHTML += sourceLinks[0];
+            } else if (sourceLinks.length === 2) {
+              consensusHTML += sourceLinks.join(' and ');
             } else {
-              const last = allContributors.pop();
-              consensusText += allContributors.join(', ') + ', and ' + last;
+              const last = sourceLinks.pop();
+              consensusHTML += sourceLinks.join(', ') + ', and ' + last;
             }
 
             citationsDiv.innerHTML = `
@@ -3674,7 +3674,7 @@
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                 </svg>
-                ${consensusText}
+                ${consensusHTML}
               </div>
             `;
 
