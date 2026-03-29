@@ -402,6 +402,7 @@
       <div class="tabs">
         <div class="tab active" onclick="switchTab('contributors')">Top Contributors</div>
         <div class="tab" onclick="switchTab('universities')">Top Universities</div>
+        <div class="tab" onclick="switchTab('helpful')">Most Helpful</div>
         <div class="tab" onclick="switchTab('cited')">Most Cited Notes</div>
         <div class="tab" onclick="switchTab('downloaded')">Most Downloaded</div>
         <div class="tab" onclick="switchTab('rising')">Rising Stars</div>
@@ -421,6 +422,15 @@
           <div class="loading">
             <div class="loading-spinner"></div>
             <div>Loading universities...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="helpful-tab" class="tab-content">
+        <div id="helpfulList">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <div>Loading most helpful notes...</div>
           </div>
         </div>
       </div>
@@ -499,6 +509,8 @@
         loadContributors();
       } else if (tabName === 'universities' && !document.getElementById('universitiesList').dataset.loaded) {
         loadUniversities();
+      } else if (tabName === 'helpful' && !document.getElementById('helpfulList').dataset.loaded) {
+        loadMostHelpful();
       } else if (tabName === 'cited' && !document.getElementById('citedList').dataset.loaded) {
         loadMostCited();
       } else if (tabName === 'downloaded' && !document.getElementById('downloadedList').dataset.loaded) {
@@ -652,6 +664,56 @@
       } catch (error) {
         console.error('Downloaded error:', error);
         document.getElementById('downloadedList').innerHTML = '<div class="loading">Error loading downloaded notes</div>';
+      }
+    }
+
+    async function loadMostHelpful() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/leaderboard/most-helpful`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const notes = await response.json();
+
+        const listEl = document.getElementById('helpfulList');
+        listEl.dataset.loaded = 'true';
+
+        if (notes.length === 0) {
+          listEl.innerHTML = '<div class="loading">No ratings yet</div>';
+          return;
+        }
+
+        listEl.innerHTML = notes.map((note, index) => {
+          const rank = index + 1;
+          const isTop3 = rank <= 3;
+          const medal = rank === 1 ? '1st' : rank === 2 ? '2nd' : rank === 3 ? '3rd' : '';
+
+          return `
+            <div class="note-item ${isTop3 ? 'top-3' : ''}">
+              <div class="note-rank ${medal ? 'medal' : ''}">${medal || rank}</div>
+              <div class="note-info">
+                <div class="note-title">${note.filename || 'Untitled Note'}</div>
+                <div class="note-meta">
+                  <span>@${note.username || 'Anonymous'}</span>
+                  <span>•</span>
+                  <span>${note.university || 'Unknown'}</span>
+                  <span>•</span>
+                  <span>${note.course_code || 'N/A'}</span>
+                </div>
+              </div>
+              <div class="note-stat">
+                <div class="note-count">${note.helpfulness_score > 0 ? '+' : ''}${note.helpfulness_score}</div>
+                <div class="leader-label">Helpfulness</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Helpful notes error:', error);
+        document.getElementById('helpfulList').innerHTML = '<div class="loading">Error loading helpful notes</div>';
       }
     }
 
