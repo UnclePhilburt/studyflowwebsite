@@ -219,6 +219,103 @@
       letter-spacing: 0.5px;
     }
 
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: var(--hover-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      background: var(--gradient-start);
+      border-color: var(--accent-primary);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-tertiary) 100%);
+      color: white;
+      border-color: var(--accent-primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .note-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 20px;
+      margin-bottom: 12px;
+      background: var(--hover-bg);
+      border-radius: 16px;
+      border: 2px solid var(--border-color);
+      transition: all 0.3s;
+    }
+
+    .note-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--shadow);
+      border-color: var(--accent-primary);
+    }
+
+    .note-rank {
+      font-size: 20px;
+      font-weight: 700;
+      width: 50px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .note-info {
+      flex: 1;
+      margin-left: 20px;
+    }
+
+    .note-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .note-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .note-stat {
+      text-align: right;
+    }
+
+    .note-count {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+
     .back-btn {
       position: fixed;
       top: 20px;
@@ -302,11 +399,46 @@
     </div>
 
     <div class="leaderboard-container">
-      <div class="leaderboard-title">Top Contributors</div>
-      <div id="leaderboardList">
-        <div class="loading">
-          <div class="loading-spinner"></div>
-          <div>Loading leaderboard...</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('contributors')">Top Contributors</div>
+        <div class="tab" onclick="switchTab('cited')">Most Cited Notes</div>
+        <div class="tab" onclick="switchTab('downloaded')">Most Downloaded</div>
+        <div class="tab" onclick="switchTab('rising')">Rising Stars</div>
+      </div>
+
+      <div id="contributors-tab" class="tab-content active">
+        <div id="contributorsList">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <div>Loading contributors...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cited-tab" class="tab-content">
+        <div id="citedList">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <div>Loading most cited notes...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="downloaded-tab" class="tab-content">
+        <div id="downloadedList">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <div>Loading most downloaded notes...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="rising-tab" class="tab-content">
+        <div id="risingList">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <div>Loading rising stars...</div>
+          </div>
         </div>
       </div>
     </div>
@@ -326,6 +458,9 @@
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    let authToken = null;
+    let currentTab = 'contributors';
+
     async function init() {
       // Check auth
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -334,19 +469,40 @@
         return;
       }
 
-      const authToken = session.access_token;
-      loadLeaderboard(authToken);
+      authToken = session.access_token;
+      loadContributors();
     }
 
-    async function loadLeaderboard(authToken) {
+    function switchTab(tabName) {
+      currentTab = tabName;
+
+      // Update tab buttons
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+
+      // Load data for tab if not already loaded
+      if (tabName === 'contributors' && !document.getElementById('contributorsList').dataset.loaded) {
+        loadContributors();
+      } else if (tabName === 'cited' && !document.getElementById('citedList').dataset.loaded) {
+        loadMostCited();
+      } else if (tabName === 'downloaded' && !document.getElementById('downloadedList').dataset.loaded) {
+        loadMostDownloaded();
+      } else if (tabName === 'rising' && !document.getElementById('risingList').dataset.loaded) {
+        loadRisingStars();
+      }
+    }
+
+    async function loadContributors() {
       try {
         const response = await fetch(`${BACKEND_URL}/api/leaderboard`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to load leaderboard');
-        }
+        if (!response.ok) throw new Error('Failed to load');
 
         const leaders = await response.json();
 
@@ -358,8 +514,9 @@
         document.getElementById('totalPages').textContent = totalPages.toLocaleString();
         document.getElementById('totalUniversities').textContent = uniqueUniversities;
 
-        // Render leaderboard
-        const listEl = document.getElementById('leaderboardList');
+        // Render contributors
+        const listEl = document.getElementById('contributorsList');
+        listEl.dataset.loaded = 'true';
 
         if (leaders.length === 0) {
           listEl.innerHTML = '<div class="loading">No contributors yet. Be the first!</div>';
@@ -387,8 +544,143 @@
         }).join('');
 
       } catch (error) {
-        console.error('Leaderboard error:', error);
-        document.getElementById('leaderboardList').innerHTML = '<div class="loading">Error loading leaderboard</div>';
+        console.error('Contributors error:', error);
+        document.getElementById('contributorsList').innerHTML = '<div class="loading">Error loading contributors</div>';
+      }
+    }
+
+    async function loadMostCited() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/leaderboard/cited`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const notes = await response.json();
+
+        const listEl = document.getElementById('citedList');
+        listEl.dataset.loaded = 'true';
+
+        if (notes.length === 0) {
+          listEl.innerHTML = '<div class="loading">No citations yet</div>';
+          return;
+        }
+
+        listEl.innerHTML = notes.map((note, index) => {
+          const rank = index + 1;
+          return `
+            <div class="note-item">
+              <div class="note-rank">${rank}</div>
+              <div class="note-info">
+                <div class="note-title">${note.filename || 'Untitled Note'}</div>
+                <div class="note-meta">
+                  <span>@${note.username || 'Anonymous'}</span>
+                  <span>•</span>
+                  <span>${note.university || 'Unknown'}</span>
+                  <span>•</span>
+                  <span>${note.course_code || 'N/A'}</span>
+                </div>
+              </div>
+              <div class="note-stat">
+                <div class="note-count">${(note.citation_count || 0).toLocaleString()}</div>
+                <div class="leader-label">Citations</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Cited error:', error);
+        document.getElementById('citedList').innerHTML = '<div class="loading">Error loading cited notes</div>';
+      }
+    }
+
+    async function loadMostDownloaded() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/leaderboard/downloaded`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const notes = await response.json();
+
+        const listEl = document.getElementById('downloadedList');
+        listEl.dataset.loaded = 'true';
+
+        if (notes.length === 0) {
+          listEl.innerHTML = '<div class="loading">No downloads yet</div>';
+          return;
+        }
+
+        listEl.innerHTML = notes.map((note, index) => {
+          const rank = index + 1;
+          return `
+            <div class="note-item">
+              <div class="note-rank">${rank}</div>
+              <div class="note-info">
+                <div class="note-title">${note.filename || 'Untitled Note'}</div>
+                <div class="note-meta">
+                  <span>@${note.username || 'Anonymous'}</span>
+                  <span>•</span>
+                  <span>${note.university || 'Unknown'}</span>
+                  <span>•</span>
+                  <span>${note.course_code || 'N/A'}</span>
+                </div>
+              </div>
+              <div class="note-stat">
+                <div class="note-count">${(note.download_count || 0).toLocaleString()}</div>
+                <div class="leader-label">Downloads</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Downloaded error:', error);
+        document.getElementById('downloadedList').innerHTML = '<div class="loading">Error loading downloaded notes</div>';
+      }
+    }
+
+    async function loadRisingStars() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/leaderboard/rising`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const leaders = await response.json();
+
+        const listEl = document.getElementById('risingList');
+        listEl.dataset.loaded = 'true';
+
+        if (leaders.length === 0) {
+          listEl.innerHTML = '<div class="loading">No new contributors this month</div>';
+          return;
+        }
+
+        listEl.innerHTML = leaders.map((leader, index) => {
+          const rank = index + 1;
+          return `
+            <div class="leader-item">
+              <div class="leader-rank">${rank}</div>
+              <div class="leader-info">
+                <div class="leader-name">${leader.username || 'Anonymous'}</div>
+                <div class="leader-university">${leader.university || 'Unknown University'}</div>
+              </div>
+              <div class="leader-stats">
+                <div class="leader-pages">${(leader.pages_contributed || 0).toLocaleString()}</div>
+                <div class="leader-label">Pages (30 days)</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Rising stars error:', error);
+        document.getElementById('risingList').innerHTML = '<div class="loading">Error loading rising stars</div>';
       }
     }
 
