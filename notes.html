@@ -916,14 +916,13 @@
     }
 
     .modal {
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      background: var(--bg-tertiary);
       border-radius: 16px;
       padding: 32px;
       max-width: 400px;
       width: 90%;
-      border: 2px solid transparent;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.3) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
-      box-shadow: 0 20px 60px rgba(45, 45, 45, 0.2);
+      border: 2px solid var(--border-color);
+      box-shadow: 0 20px 60px var(--shadow);
       transform: scale(0.9);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -936,7 +935,7 @@
       font-size: 20px;
       font-weight: 500;
       font-family: 'Lora', Georgia, serif;
-      color: #2d2d2d;
+      color: var(--text-primary);
       margin-bottom: 20px;
       text-align: center;
     }
@@ -944,21 +943,21 @@
     .modal-input {
       width: 100%;
       padding: 12px 16px;
-      border: 2px solid rgba(124, 152, 133, 0.2);
+      border: 2px solid var(--border-color);
       border-radius: 10px;
       font-size: 15px;
       font-family: 'Inter', sans-serif;
-      background: rgba(255, 255, 255, 0.8);
+      background: var(--bg-secondary);
       margin-bottom: 24px;
-      color: #2d2d2d;
+      color: var(--text-primary);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .modal-input:focus {
       outline: none;
-      border-color: rgba(124, 152, 133, 0.5);
-      background: white;
-      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.1);
+      border-color: var(--accent-primary);
+      background: var(--bg-tertiary);
+      box-shadow: 0 4px 16px var(--shadow);
     }
 
     .modal-actions {
@@ -979,20 +978,20 @@
     }
 
     .modal-btn.cancel {
-      background: rgba(124, 152, 133, 0.1);
-      color: #7c9885;
-      border-color: rgba(124, 152, 133, 0.3);
+      background: var(--hover-bg);
+      color: var(--accent-primary);
+      border-color: var(--border-color);
     }
 
     .modal-btn.cancel:hover {
-      background: rgba(124, 152, 133, 0.2);
+      background: var(--gradient-start);
       transform: translateY(-2px);
     }
 
     .modal-btn.confirm {
-      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.15) 100%);
-      color: #2d2d2d;
-      border-image: linear-gradient(135deg, rgba(124, 152, 133, 0.4) 0%, rgba(232, 155, 95, 0.3) 100%) 1;
+      background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+      color: var(--text-primary);
+      border-color: var(--border-color);
     }
 
     .modal-btn.confirm:hover {
