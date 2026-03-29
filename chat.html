@@ -3636,25 +3636,28 @@
             const citationsDiv = document.createElement('div');
             citationsDiv.className = 'source-citations';
 
-            // Build consensus citation text
+            // Build consensus citation text - show ALL sources, not deduplicated
             const allContributors = [];
 
-            // Add Nexus contributors
+            // Add each Nexus note (show all, even from same user)
             if (noteSources.length > 0) {
-              const uniqueUsers = new Set();
               noteSources.forEach(s => {
                 const username = s.username ? `@${s.username}` : 'Anonymous';
-                uniqueUsers.add(username);
+                // Use filename without extension for cleaner display
+                const noteName = s.filename.replace(/\s*\([^)]*\)$/, '').replace(/\.(txt|pdf|docx?)$/i, '');
+                allContributors.push(`${username}'s ${noteName}`);
               });
-              allContributors.push(...Array.from(uniqueUsers));
             }
 
-            // Add Wikipedia if present
+            // Add Wikipedia sources
             if (wikiSources.length > 0) {
-              allContributors.push('Wikipedia');
+              wikiSources.forEach(s => {
+                const title = s.filename.replace('.txt', '').replace(/ \(Wikipedia.*\)/, '');
+                allContributors.push(`Wikipedia: ${title}`);
+              });
             }
 
-            // Create consensus text
+            // Create consensus text with natural language formatting
             let consensusText = 'Sources: ';
             if (allContributors.length === 1) {
               consensusText += allContributors[0];
