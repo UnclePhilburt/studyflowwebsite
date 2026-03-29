@@ -3649,80 +3649,86 @@
           const noteSources = (userProfile && userProfile.edu_verified) ? sources.filter(s => !s.from_wikipedia) : [];
 
           if (wikiSources.length > 0 || noteSources.length > 0) {
-            const citationsDiv = document.createElement('div');
-            citationsDiv.className = 'source-citations';
+            // Add sources header with consensus badge
+            const sourcesHeader = document.createElement('div');
+            sourcesHeader.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:16px;margin-bottom:12px;';
+            const consensusBadge = (noteSources.length >= 2)
+              ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(124,152,133,0.15);border:1px solid rgba(124,152,133,0.3);border-radius:12px;font-size:11px;font-weight:600;color:#5a7861;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="20 6 9 17 4 12"></polyline></svg>Verified Consensus</span>`
+              : '';
+            sourcesHeader.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--text-secondary);">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">Sources</span>
+              ${consensusBadge}
+            `;
+            contentDiv.appendChild(sourcesHeader);
 
-            // Build consensus citation with clickable links
-            const sourceLinks = [];
-
-            // Add each Nexus note (show all, even from same user)
+            // Display each Nexus note as a separate card with individual vote buttons
             if (noteSources.length > 0) {
               noteSources.forEach(s => {
+                const sourceCard = document.createElement('div');
+                sourceCard.className = 'source-card';
+                sourceCard.style.cssText = 'margin-bottom:8px;padding:12px;background:var(--hover-bg);border:1px solid var(--border-color);border-radius:8px;';
+
                 const username = s.username ? `@${s.username}` : 'Anonymous';
-                // Use filename without extension for cleaner display
                 const noteName = s.filename.replace(/\s*\([^)]*\)$/, '').replace(/\.(txt|pdf|docx?)$/i, '');
-                sourceLinks.push(`<a href="note-viewer.html?id=${s.note_id}" target="_blank" style="color:#7c9885;text-decoration:none;font-weight:500;">${username}'s ${noteName}</a>`);
+                const university = s.university || 'Unknown University';
+                const courseCode = s.course_code || 'N/A';
+
+                sourceCard.innerHTML = `
+                  <div style="display:flex;align-items:start;justify-content:space-between;gap:12px;">
+                    <div style="flex:1;min-width:0;">
+                      <a href="note-viewer.html?id=${s.note_id}" target="_blank" style="color:#7c9885;text-decoration:none;font-weight:600;font-size:13px;display:block;margin-bottom:4px;">${noteName}</a>
+                      <div style="font-size:11px;color:var(--text-secondary);">
+                        <span>${username}</span>
+                        <span style="margin:0 4px;">•</span>
+                        <span>${university}</span>
+                        <span style="margin:0 4px;">•</span>
+                        <span>${courseCode}</span>
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-shrink:0;">
+                      <button class="vote-btn vote-up" data-note-id="${s.note_id}" style="padding:6px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-tertiary);color:var(--text-secondary);font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
+                          <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                        Yes
+                      </button>
+                      <button class="vote-btn vote-down" data-note-id="${s.note_id}" style="padding:6px 10px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-tertiary);color:var(--text-secondary);font-size:11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                        No
+                      </button>
+                    </div>
+                  </div>
+                `;
+                contentDiv.appendChild(sourceCard);
               });
             }
 
-            // Add Wikipedia sources
+            // Display Wikipedia sources (no voting for Wikipedia)
             if (wikiSources.length > 0) {
               wikiSources.forEach(s => {
+                const wikiCard = document.createElement('div');
+                wikiCard.style.cssText = 'margin-bottom:8px;padding:12px;background:var(--hover-bg);border:1px solid var(--border-color);border-radius:8px;';
+
                 const title = s.filename.replace('.txt', '').replace(/ \(Wikipedia.*\)/, '');
-                sourceLinks.push(`<a href="${s.wikipedia_url}" target="_blank" style="color:#7c9885;text-decoration:none;font-weight:500;">Wikipedia: ${title}</a>`);
+
+                wikiCard.innerHTML = `
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;color:var(--text-secondary);flex-shrink:0;">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <a href="${s.wikipedia_url}" target="_blank" style="color:#7c9885;text-decoration:none;font-weight:600;font-size:13px;">Wikipedia: ${title}</a>
+                  </div>
+                `;
+                contentDiv.appendChild(wikiCard);
               });
-            }
-
-            // Create consensus text with natural language formatting
-            let consensusHTML = 'Sources: ';
-            if (sourceLinks.length === 1) {
-              consensusHTML += sourceLinks[0];
-            } else if (sourceLinks.length === 2) {
-              consensusHTML += sourceLinks.join(' and ');
-            } else {
-              const last = sourceLinks.pop();
-              consensusHTML += sourceLinks.join(', ') + ', and ' + last;
-            }
-
-            // Add consensus badge if multiple sources agree (2+ sources)
-            const consensusBadge = (noteSources.length >= 2)
-              ? `<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:3px 8px;background:rgba(124,152,133,0.15);border:1px solid rgba(124,152,133,0.3);border-radius:12px;font-size:11px;font-weight:600;color:#5a7861;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;"><polyline points="20 6 9 17 4 12"></polyline></svg>Verified Consensus</span>`
-              : '';
-
-            citationsDiv.innerHTML = `
-              <div class="source-citations-label">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;margin-right:6px;">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                </svg>
-                ${consensusHTML}${consensusBadge}
-              </div>
-            `;
-
-            contentDiv.appendChild(citationsDiv);
-
-            // Add vote buttons for rating source helpfulness
-            const noteIds = noteSources.map(s => s.note_id);
-            if (noteIds.length > 0) {
-              const voteDiv = document.createElement('div');
-              voteDiv.className = 'source-vote-buttons';
-              voteDiv.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:12px;padding:8px 12px;background:var(--hover-bg);border-radius:8px;border:1px solid var(--border-color);';
-              voteDiv.innerHTML = `
-                <span style="font-size:12px;color:var(--text-secondary);margin-right:auto;">Were these sources helpful?</span>
-                <button class="vote-btn vote-up" data-note-ids='${JSON.stringify(noteIds)}' style="padding:6px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-tertiary);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
-                    <polyline points="18 15 12 9 6 15"></polyline>
-                  </svg>
-                  Yes
-                </button>
-                <button class="vote-btn vote-down" data-note-ids='${JSON.stringify(noteIds)}' style="padding:6px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-tertiary);color:var(--text-secondary);font-size:12px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                  No
-                </button>
-              `;
-              contentDiv.appendChild(voteDiv);
             }
           }
         }
@@ -3767,13 +3773,14 @@
           btn.addEventListener('click', async (e) => {
             const target = e.currentTarget;
             const isUpvote = target.classList.contains('vote-up');
-            const noteIds = JSON.parse(target.dataset.noteIds);
+            const noteId = target.dataset.noteId;
+
+            if (!noteId) return; // Skip if no note ID (e.g., Wikipedia sources)
 
             try {
-              // Generate a message ID for this response (or use existing if available)
-              // For now, use timestamp-based ID since we don't store message IDs in UI
-              const messageId = messageDiv.dataset.messageId || `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-              messageDiv.dataset.messageId = messageId;
+              // Generate a unique message ID for this specific note vote
+              // Format: msg_[timestamp]_[noteId]_[random]
+              const messageId = `msg_${Date.now()}_${noteId}_${Math.random().toString(36).substr(2, 9)}`;
 
               const { data: { session } } = await supabaseClient.auth.getSession();
               if (!session) return;
@@ -3788,20 +3795,24 @@
                   message_id: messageId,
                   conversation_id: conversationId,
                   vote: isUpvote ? 1 : -1,
-                  cited_note_ids: noteIds
+                  cited_note_ids: [noteId] // Send as array with single note
                 })
               });
 
               if (response.ok) {
-                // Update button states
-                voteButtons.forEach(b => {
-                  b.style.opacity = '0.5';
-                  b.style.pointerEvents = 'none';
-                });
-                target.style.opacity = '1';
-                target.style.background = 'var(--accent-primary)';
-                target.style.color = 'white';
-                target.style.borderColor = 'var(--accent-primary)';
+                // Update only the buttons for this specific note card
+                const sourceCard = target.closest('.source-card');
+                if (sourceCard) {
+                  const cardButtons = sourceCard.querySelectorAll('.vote-btn');
+                  cardButtons.forEach(b => {
+                    b.style.opacity = '0.5';
+                    b.style.pointerEvents = 'none';
+                  });
+                  target.style.opacity = '1';
+                  target.style.background = 'var(--accent-primary)';
+                  target.style.color = 'white';
+                  target.style.borderColor = 'var(--accent-primary)';
+                }
               }
             } catch (error) {
               console.error('Vote error:', error);
