@@ -3635,55 +3635,45 @@
           if (wikiSources.length > 0 || noteSources.length > 0) {
             const citationsDiv = document.createElement('div');
             citationsDiv.className = 'source-citations';
-            citationsDiv.innerHTML = '<div class="source-citations-label">Sources</div>';
 
-            wikiSources.forEach(source => {
-              const link = document.createElement('a');
-              link.className = 'source-citation';
-              link.href = source.wikipedia_url;
-              link.target = '_blank';
-              link.rel = 'noopener noreferrer';
+            // Build consensus citation text
+            const allContributors = [];
 
-              const title = source.filename.replace('.txt', '').replace(/ \(Wikipedia.*\)/, '');
+            // Add Nexus contributors
+            if (noteSources.length > 0) {
+              const uniqueUsers = new Set();
+              noteSources.forEach(s => {
+                const username = s.username ? `@${s.username}` : 'Anonymous';
+                uniqueUsers.add(username);
+              });
+              allContributors.push(...Array.from(uniqueUsers));
+            }
 
-              link.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-                <div class="source-citation-text">
-                  <div class="source-citation-title">${title}</div>
-                  <div class="source-citation-meta">Wikipedia</div>
-                </div>
-                <span class="source-citation-badge">View</span>
-              `;
-              citationsDiv.appendChild(link);
-            });
+            // Add Wikipedia if present
+            if (wikiSources.length > 0) {
+              allContributors.push('Wikipedia');
+            }
 
-            noteSources.forEach(source => {
-              const link = document.createElement('a');
-              link.className = 'source-citation';
-              link.href = `note-viewer.html?id=${source.note_id}`;
-              link.target = '_blank';
-              link.rel = 'noopener noreferrer';
+            // Create consensus text
+            let consensusText = 'Sources: ';
+            if (allContributors.length === 1) {
+              consensusText += allContributors[0];
+            } else if (allContributors.length === 2) {
+              consensusText += allContributors.join(' and ');
+            } else {
+              const last = allContributors.pop();
+              consensusText += allContributors.join(', ') + ', and ' + last;
+            }
 
-              const username = source.username ? `@${source.username}` : 'Anonymous';
-              const meta = source.course_code ? `${username} -- ${source.course_code}` : username;
-
-              link.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            citationsDiv.innerHTML = `
+              <div class="source-citations-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;margin-right:6px;">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                 </svg>
-                <div class="source-citation-text">
-                  <div class="source-citation-title">${source.filename}</div>
-                  <div class="source-citation-meta">${meta}</div>
-                </div>
-                <span class="source-citation-badge">View</span>
-              `;
-              citationsDiv.appendChild(link);
-            });
+                ${consensusText}
+              </div>
+            `;
 
             contentDiv.appendChild(citationsDiv);
           }
