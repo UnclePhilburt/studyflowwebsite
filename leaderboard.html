@@ -401,6 +401,7 @@
     <div class="leaderboard-container">
       <div class="tabs">
         <div class="tab active" onclick="switchTab('contributors')">Top Contributors</div>
+        <div class="tab" onclick="switchTab('universities')">Top Universities</div>
         <div class="tab" onclick="switchTab('cited')">Most Cited Notes</div>
         <div class="tab" onclick="switchTab('downloaded')">Most Downloaded</div>
         <div class="tab" onclick="switchTab('rising')">Rising Stars</div>
@@ -411,6 +412,15 @@
           <div class="loading">
             <div class="loading-spinner"></div>
             <div>Loading contributors...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="universities-tab" class="tab-content">
+        <div id="universitiesList">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            <div>Loading universities...</div>
           </div>
         </div>
       </div>
@@ -487,6 +497,8 @@
       // Load data for tab if not already loaded
       if (tabName === 'contributors' && !document.getElementById('contributorsList').dataset.loaded) {
         loadContributors();
+      } else if (tabName === 'universities' && !document.getElementById('universitiesList').dataset.loaded) {
+        loadUniversities();
       } else if (tabName === 'cited' && !document.getElementById('citedList').dataset.loaded) {
         loadMostCited();
       } else if (tabName === 'downloaded' && !document.getElementById('downloadedList').dataset.loaded) {
@@ -681,6 +693,60 @@
       } catch (error) {
         console.error('Rising stars error:', error);
         document.getElementById('risingList').innerHTML = '<div class="loading">Error loading rising stars</div>';
+      }
+    }
+
+    async function loadUniversities() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/leaderboard/universities`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const universities = await response.json();
+
+        const listEl = document.getElementById('universitiesList');
+        listEl.dataset.loaded = 'true';
+
+        if (universities.length === 0) {
+          listEl.innerHTML = '<div class="loading">No universities yet</div>';
+          return;
+        }
+
+        const universityEmojis = {
+          'Missouri State University': '🐻',
+          'Ozarks Technical Community College': '🦅',
+          'Drury University': '🐾',
+          'University of Missouri': '🐯',
+          'Washington University in St. Louis': '🦁',
+          'Saint Louis University': '💙'
+        };
+
+        listEl.innerHTML = universities.map((uni, index) => {
+          const rank = index + 1;
+          const isTop3 = rank <= 3;
+          const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+          const emoji = universityEmojis[uni.university] || '🎓';
+
+          return `
+            <div class="leader-item ${isTop3 ? 'top-3' : ''}">
+              <div class="leader-rank ${medal ? 'medal' : ''}">${medal || rank}</div>
+              <div class="leader-info">
+                <div class="leader-name">${emoji} ${uni.university}</div>
+                <div class="leader-university">${uni.contributor_count} contributors • ${uni.total_notes} notes</div>
+              </div>
+              <div class="leader-stats">
+                <div class="leader-pages">${(uni.total_pages || 0).toLocaleString()}</div>
+                <div class="leader-label">Pages</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Universities error:', error);
+        document.getElementById('universitiesList').innerHTML = '<div class="loading">Error loading universities</div>';
       }
     }
 
