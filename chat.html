@@ -933,6 +933,7 @@
       if (draggedCard !== null) {
         const card = cards.find(c => c.id === draggedCard);
         if (card) card.element.classList.remove('dragging');
+        if (isDragging) saveLayout();
         draggedCard = null;
         viewport.classList.remove('dragging-card');
         setTimeout(() => isDragging = false, 50);
@@ -1367,6 +1368,7 @@
           : ['Tell me more about this', 'Give me an example'];
         createFollowupBubbles(card, suggestions);
         panToCard(card);
+        saveLayout();
         loadConversations();
 
       } catch (err) {
@@ -1496,36 +1498,79 @@
 
     async function loadConversation(convId) {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/conversations/${convId}/messages`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        if (!res.ok) return;
-        const data = await res.json();
+        // Fetch messages and saved layout in parallel
+        const [msgRes, savedLayout] = await Promise.all([
+          fetch(`${BACKEND_URL}/api/conversations/${convId}/messages`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          }),
+          getSavedLayout(convId)
+        ]);
+
+        if (!msgRes.ok) return;
+        const data = await msgRes.json();
 
         // Clear canvas
         clearCanvas();
         conversationId = convId;
         document.getElementById('welcomeScreen').classList.add('hidden');
 
-        // Rebuild cards from messages in a natural tree layout
+        // Build a lookup from saved layout by question text
+        const savedPositions = {};
+        if (savedLayout && savedLayout.cards) {
+          savedLayout.cards.forEach((sc, i) => {
+            savedPositions[sc.question] = { x: sc.x, y: sc.y, parentId: sc.parentId, index: i };
+          });
+        }
+
+        // Rebuild cards from messages, using saved positions if available
         let lastCardId = null;
         let pendingQuestion = null;
-        let layoutX = 0, layoutY = 0;
-        let direction = 1; // Alternate left/right slightly
+        let fallbackY = 0;
+        let fallbackDir = 1;
 
         for (const msg of (data.messages || [])) {
           if (msg.role === 'user') {
             pendingQuestion = msg.content;
           } else if (msg.role === 'assistant' && pendingQuestion) {
-            const offsetX = direction * (40 + Math.random() * 30);
-            direction *= -1;
-            const card = createCard(pendingQuestion, layoutX + offsetX, layoutY, lastCardId);
+            const saved = savedPositions[pendingQuestion];
+            let cx, cy, parentId;
+
+            if (saved) {
+              cx = saved.x;
+              cy = saved.y;
+              // Map saved parentId to actual card id
+              parentId = saved.parentId !== null && saved.parentId !== undefined
+                ? (saved.parentId < cards.length ? saved.parentId : lastCardId)
+                : lastCardId;
+            } else {
+              // Fallback: zigzag layout
+              const offsetX = fallbackDir * (40 + Math.random() * 30);
+              fallbackDir *= -1;
+              cx = offsetX;
+              cy = fallbackY;
+              parentId = lastCardId;
+            }
+
+            const card = createCard(pendingQuestion, cx, cy, parentId);
             populateCard(card, msg.content, msg.sources, []);
-            layoutY += (card.element.offsetHeight || 200) + 100;
-            layoutX += offsetX * 0.3;
+
+            if (!saved) {
+              fallbackY += (card.element.offsetHeight || 200) + 100;
+            }
+
             lastCardId = card.id;
             pendingQuestion = null;
           }
+        }
+
+        // Restore pan/zoom from saved layout
+        if (savedLayout && savedLayout.panX !== undefined) {
+          panX = savedLayout.panX;
+          panY = savedLayout.panY;
+          scale = savedLayout.scale || 1;
+          updateTransform();
+        } else if (cards.length > 0) {
+          panToCard(cards[0]);
         }
 
         // Add follow-ups to the last card
@@ -1536,9 +1581,6 @@
             'What else should I know?'
           ]);
         }
-
-        // Pan to first card
-        if (cards.length > 0) panToCard(cards[0]);
 
         // Update sidebar active state
         document.querySelectorAll('.conversation-item').forEach(i => i.classList.toggle('active', i.dataset.id === convId));
@@ -1590,6 +1632,41 @@
       nextCardId = 0;
       panX = 0; panY = 0; scale = 1;
       updateTransform();
+    }
+
+    // ============ LAYOUT SAVE/RESTORE (SUPABASE) ============
+    let _saveTimeout = null;
+
+    function saveLayout() {
+      if (!conversationId || cards.length === 0) return;
+      // Debounce -- save 1 second after last change
+      clearTimeout(_saveTimeout);
+      _saveTimeout = setTimeout(async () => {
+        const layout = cards.map(c => ({
+          question: c.question,
+          x: c.x,
+          y: c.y,
+          parentId: c.parentId
+        }));
+        try {
+          await fetch(`${BACKEND_URL}/api/conversations/${conversationId}/layout`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cards: layout, panX, panY, scale })
+          });
+        } catch (e) {}
+      }, 1000);
+    }
+
+    async function getSavedLayout(convId) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/conversations/${convId}/layout`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data;
+      } catch (e) { return null; }
     }
 
     // ============ NOTIFICATIONS ============
