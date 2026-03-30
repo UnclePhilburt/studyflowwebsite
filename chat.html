@@ -137,6 +137,16 @@
 
     .canvas-card:hover { box-shadow: 0 8px 32px var(--shadow); }
     .canvas-card.dragging { cursor: grabbing; box-shadow: 0 12px 40px var(--shadow); z-index: 100; }
+    .canvas-card.drag-mode {
+      box-shadow: 0 12px 40px var(--shadow), 0 0 0 3px var(--accent-primary);
+      z-index: 100;
+      opacity: 0.95;
+      animation: dragModePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes dragModePulse {
+      0%, 100% { box-shadow: 0 12px 40px var(--shadow), 0 0 0 3px var(--accent-primary); }
+      50% { box-shadow: 0 12px 40px var(--shadow), 0 0 0 3px rgba(99, 102, 241, 0.5); }
+    }
     .canvas-card.expanding { animation: cardExpand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     .canvas-card.child-card { width: 520px; border-left: 3px solid var(--accent-primary); }
     .canvas-card.collapsed .card-response { display: none; }
@@ -2446,8 +2456,11 @@
       let longPressTimeout = null;
       let touchStartTime = 0;
       let touchMoved = false;
+      let isDragMode = false;
+      let touchStartX = 0;
+      let touchStartY = 0;
 
-      // Double-tap to zoom to card
+      // Touch interactions on card
       el.addEventListener('touchstart', (e) => {
         const cardObj = cards.find(c => c.id === id);
         if (!cardObj) return;
@@ -2455,43 +2468,109 @@
         // Don't trigger viewport panning when touching card
         e.stopPropagation();
 
+        const isHeaderTouch = e.target.closest('.card-question');
         touchStartTime = Date.now();
         touchMoved = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
 
         // Long press detection
         longPressTimeout = setTimeout(() => {
           if (!touchMoved) {
-            // Show context menu for this card
-            showCardContextMenu(cardObj, e.touches[0].clientX, e.touches[0].clientY);
+            if (isHeaderTouch) {
+              // Long-press on header = show context menu
+              showCardContextMenu(cardObj, e.touches[0].clientX, e.touches[0].clientY);
+            } else {
+              // Long-press on card body = enter drag mode
+              isDragMode = true;
+              el.classList.add('drag-mode');
+              // Haptic feedback if available
+              if (navigator.vibrate) navigator.vibrate(50);
+              draggedCard = id;
+              dragOffsetX = cardObj.x;
+              dragOffsetY = cardObj.y;
+              dragStartX = e.touches[0].clientX;
+              dragStartY = e.touches[0].clientY;
+            }
           }
         }, 500); // 500ms long press
 
-        // Double-tap detection
-        tapCount++;
-        if (tapCount === 1) {
-          tapTimeout = setTimeout(() => {
+        // Double-tap detection (only if not in drag mode)
+        if (!isDragMode) {
+          tapCount++;
+          if (tapCount === 1) {
+            tapTimeout = setTimeout(() => {
+              tapCount = 0;
+            }, 300); // 300ms window for double-tap
+          } else if (tapCount === 2) {
+            clearTimeout(tapTimeout);
+            clearTimeout(longPressTimeout);
             tapCount = 0;
-          }, 300); // 300ms window for double-tap
-        } else if (tapCount === 2) {
-          clearTimeout(tapTimeout);
-          tapCount = 0;
-          // Double-tap detected - zoom to this card
-          zoomToCard(cardObj);
-          e.preventDefault();
+            // Double-tap detected - zoom to this card
+            zoomToCard(cardObj);
+            e.preventDefault();
+          }
         }
       });
 
       el.addEventListener('touchmove', (e) => {
-        touchMoved = true;
-        clearTimeout(longPressTimeout);
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+
+        // If moved more than 5px, cancel tap gestures
+        if (dx > 5 || dy > 5) {
+          touchMoved = true;
+          clearTimeout(longPressTimeout);
+          tapCount = 0;
+          clearTimeout(tapTimeout);
+        }
+
+        // If in drag mode, move the card
+        if (isDragMode) {
+          e.preventDefault();
+          const cardObj = cards.find(c => c.id === id);
+          if (cardObj) {
+            const moveX = (e.touches[0].clientX - dragStartX) / scale;
+            const moveY = (e.touches[0].clientY - dragStartY) / scale;
+            cardObj.x = dragOffsetX + moveX;
+            cardObj.y = dragOffsetY + moveY;
+            cardObj.element.style.left = cardObj.x + 'px';
+            cardObj.element.style.top = cardObj.y + 'px';
+            updateFollowupPositions(cardObj);
+            updateConnections();
+          }
+        }
       });
 
       el.addEventListener('touchend', (e) => {
         clearTimeout(longPressTimeout);
+
+        // Exit drag mode
+        if (isDragMode) {
+          isDragMode = false;
+          el.classList.remove('drag-mode');
+          draggedCard = null;
+
+          // Save card position to backend
+          saveLayout();
+        }
+
+        // Reset touch tracking
+        setTimeout(() => {
+          touchMoved = false;
+        }, 50);
       });
 
       el.addEventListener('touchcancel', (e) => {
         clearTimeout(longPressTimeout);
+
+        // Exit drag mode
+        if (isDragMode) {
+          isDragMode = false;
+          el.classList.remove('drag-mode');
+          draggedCard = null;
+        }
+
         touchMoved = false;
       });
 
