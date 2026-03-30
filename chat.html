@@ -1304,6 +1304,7 @@
       if (!text.trim()) return;
 
       document.getElementById('welcomeScreen').classList.add('hidden');
+      document.querySelector('.input-bar').style.display = 'none';
 
       // Position the new card
       let cx, cy;
@@ -1513,6 +1514,7 @@
         clearCanvas();
         conversationId = convId;
         document.getElementById('welcomeScreen').classList.add('hidden');
+        document.querySelector('.input-bar').style.display = 'none';
 
         // Build a lookup from saved layout by question text
         const savedPositions = {};
@@ -1611,6 +1613,7 @@
       clearCanvas();
       conversationId = null;
       document.getElementById('welcomeScreen').classList.remove('hidden');
+      document.querySelector('.input-bar').style.display = 'flex';
       document.querySelectorAll('.conversation-item').forEach(i => i.classList.remove('active'));
       sidebar.classList.remove('active');
       document.getElementById('chatInput').focus();
