@@ -764,7 +764,7 @@
           <div class="section-title">DMCA History</div>
           ${u.dmca_history.map(d => `
             <div class="dmca-item">
-              <strong>${d.status || 'pending'}</strong> - ${d.note_filename || 'Unknown file'}
+              <strong>${d.status || 'pending'}</strong> - Note: ${d.note_id ? d.note_id.substring(0, 8) + '...' : 'Unknown'}
               <br><span style="color:#9ca3af;">${d.reason || ''}</span>
               <br><span style="color:#bbb;font-size:11px;">${d.created_at ? new Date(d.created_at).toLocaleDateString() : ''}</span>
             </div>
