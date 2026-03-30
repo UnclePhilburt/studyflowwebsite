@@ -263,11 +263,11 @@
     .search-input {
       flex: 1;
       padding: 16px 20px;
-      border: 1px solid rgba(124, 152, 133, 0.2);
+      border: 2px solid rgba(124, 152, 133, 0.2);
       border-radius: 14px;
       font-size: 1rem;
       font-family: 'Inter', sans-serif;
-      transition: all 0.3s ease;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       background: rgba(255, 255, 255, 0.7);
     }
 
@@ -276,6 +276,67 @@
       border-color: rgba(124, 152, 133, 0.4);
       box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.08);
       background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Subject-based accent colors for search bar */
+    .search-input.accent-biology {
+      border-color: rgba(76, 175, 80, 0.4);
+      box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.1);
+    }
+
+    .search-input.accent-chemistry {
+      border-color: rgba(156, 39, 176, 0.4);
+      box-shadow: 0 0 0 1px rgba(156, 39, 176, 0.1);
+    }
+
+    .search-input.accent-physics {
+      border-color: rgba(33, 150, 243, 0.4);
+      box-shadow: 0 0 0 1px rgba(33, 150, 243, 0.1);
+    }
+
+    .search-input.accent-math {
+      border-color: rgba(255, 152, 0, 0.4);
+      box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.1);
+    }
+
+    .search-input.accent-history {
+      border-color: rgba(121, 85, 72, 0.4);
+      box-shadow: 0 0 0 1px rgba(121, 85, 72, 0.1);
+    }
+
+    .search-input.accent-literature {
+      border-color: rgba(233, 30, 99, 0.4);
+      box-shadow: 0 0 0 1px rgba(233, 30, 99, 0.1);
+    }
+
+    .search-input.accent-computer {
+      border-color: rgba(0, 188, 212, 0.4);
+      box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.1);
+    }
+
+    .search-input.accent-engineering {
+      border-color: rgba(255, 87, 34, 0.4);
+      box-shadow: 0 0 0 1px rgba(255, 87, 34, 0.1);
+    }
+
+    .search-input.accent-business {
+      border-color: rgba(103, 58, 183, 0.4);
+      box-shadow: 0 0 0 1px rgba(103, 58, 183, 0.1);
+    }
+
+    .search-input.accent-psychology {
+      border-color: rgba(244, 67, 54, 0.4);
+      box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.1);
+    }
+
+    .search-input.accent-law {
+      border-color: rgba(96, 125, 139, 0.4);
+      box-shadow: 0 0 0 1px rgba(96, 125, 139, 0.1);
+    }
+
+    .search-input.accent-medicine {
+      border-color: rgba(205, 220, 57, 0.4);
+      box-shadow: 0 0 0 1px rgba(205, 220, 57, 0.1);
     }
 
     .search-btn {
@@ -1260,6 +1321,9 @@
               search();
             }
           });
+
+          // Setup scroll-to-top gesture for power users
+          setupScrollGestures();
         }
       } catch (error) {
         console.error('Error checking .edu verification:', error);
@@ -1338,6 +1402,41 @@
         if (scrollPosition >= pageHeight - threshold && !isLoadingMore && hasMoreNotes) {
           console.log('[Infinite Scroll] Loading more notes...');
           loadNotes(true); // Append mode
+        }
+      });
+    }
+
+    // Setup scroll gestures for power users
+    function setupScrollGestures() {
+      let lastScrollY = window.scrollY;
+      let scrollVelocity = 0;
+      let scrollTimeout;
+
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        scrollVelocity = lastScrollY - currentScrollY; // Positive = scrolling up
+        lastScrollY = currentScrollY;
+
+        // Detect rapid upward scroll gesture (scroll to top)
+        if (scrollVelocity > 30 && currentScrollY > 200) {
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            // Smooth scroll to top
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }, 100); // Debounce to avoid accidental triggers
+        }
+      }, { passive: true });
+
+      // ESC key to scroll to top
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && window.scrollY > 100) {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
         }
       });
     }
@@ -1562,6 +1661,57 @@
       }
 
       filterNotes();
+      updateSearchBarAccent();
+    }
+
+    // Update search bar accent color based on top result's subject
+    function updateSearchBarAccent() {
+      const searchInput = document.getElementById('searchInput');
+
+      // Remove all accent classes
+      searchInput.className = searchInput.className.replace(/accent-\w+/g, '').trim() + ' search-input';
+
+      // If no filtered notes, reset to default
+      if (!filteredNotes || filteredNotes.length === 0) {
+        return;
+      }
+
+      // Get the top result
+      const topNote = filteredNotes[0];
+      if (!topNote) return;
+
+      // Detect subject from course code, filename, or tags
+      const courseCode = (topNote.course_code || '').toLowerCase();
+      const filename = (topNote.filename || '').toLowerCase();
+      const tags = (topNote.topic_tags || []).map(t => t.toLowerCase()).join(' ');
+      const combinedText = `${courseCode} ${filename} ${tags}`;
+
+      // Subject detection patterns
+      const subjectPatterns = {
+        'biology': /bio|anatomy|physiology|genetics|ecology|microbio|botany|zoology/,
+        'chemistry': /chem|organic|inorganic|biochem/,
+        'physics': /phys|mechanics|thermodynamics|quantum|relativity/,
+        'math': /math|calc|algebra|geometry|statistics|trig|differential/,
+        'history': /hist|historical|civilization|world war|ancient|medieval/,
+        'literature': /lit|english|writing|poetry|novel|shakespeare/,
+        'computer': /cs|comp|programming|software|algorithm|data struct|coding|javascript|python/,
+        'engineering': /eng|mechanical|electrical|civil|chemical eng|thermofluids/,
+        'business': /bus|econ|finance|accounting|marketing|management|mba/,
+        'psychology': /psych|cognitive|behavioral|development|personality/,
+        'law': /law|legal|constitutional|criminal|civil law|tort/,
+        'medicine': /med|nursing|pharmacology|pathology|clinical|health/
+      };
+
+      // Find matching subject
+      for (const [subject, pattern] of Object.entries(subjectPatterns)) {
+        if (pattern.test(combinedText)) {
+          searchInput.classList.add(`accent-${subject}`);
+          console.log(`Applied accent: ${subject}`);
+          return;
+        }
+      }
+
+      // Default: no accent (keeps zen green)
     }
 
     // Filter notes
