@@ -1365,6 +1365,9 @@
       folderElements = [];
       convoElements.forEach(el => { if (el._cleanup) el._cleanup(); el.remove(); });
       convoElements = [];
+      // Clear sticky notes (just DOM, data persists in DB)
+      stickyNotes.forEach(n => { if (n.element._cleanup) n.element._cleanup(); n.element.remove(); });
+      stickyNotes = [];
     }
 
     async function navigateHome() {
@@ -1487,8 +1490,11 @@
         });
       }
 
+      // Load sticky notes for home level
+      await loadStickyNotes(null);
+
       // Show empty state hint if nothing on canvas
-      if (folders.length === 0 && unfiledConvos.length === 0) {
+      if (folders.length === 0 && unfiledConvos.length === 0 && stickyNotes.length === 0) {
         showEmptyHint('Your workspace is empty', 'Right-click anywhere to create a folder or start a chat');
       }
 
@@ -1851,8 +1857,11 @@
           }
         } catch (e) {}
 
+        // Load sticky notes for this folder
+        await loadStickyNotes(folderId);
+
         // Show empty hint if folder is empty
-        if (convos.length === 0 && convoElements.length === 0) {
+        if (convos.length === 0 && convoElements.length === 0 && stickyNotes.length === 0) {
           showEmptyHint('This folder is empty', 'Right-click to add a chat or subfolder');
         }
 
@@ -3446,7 +3455,30 @@
 
     let stickyNotes = [];
 
-    function createStickyNote(x, y, text = '') {
+    async function createStickyNote(x, y, text = '') {
+      // Save to backend first
+      let noteId = null;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/sticky-notes`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: text,
+            position_x: x,
+            position_y: y,
+            folder_id: currentFolderId || null
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          noteId = data.id;
+        }
+      } catch (e) {}
+
+      renderStickyNote(noteId, x, y, text);
+    }
+
+    function renderStickyNote(noteId, x, y, text) {
       const note = document.createElement('div');
       note.className = 'sticky-note';
       note.style.left = x + 'px';
@@ -3456,41 +3488,92 @@
         <div class="sticky-note-header">
           <button class="sticky-note-delete" title="Delete">&times;</button>
         </div>
-        <textarea placeholder="Write a note...">${text}</textarea>
+        <textarea placeholder="Write a note...">${text || ''}</textarea>
       `;
 
-      // Drag from header area
       let dragState = null;
+      let saveTimeout = null;
+
       note.addEventListener('mousedown', (e) => {
         if (e.target.closest('textarea') || e.target.closest('button')) return;
         e.preventDefault();
         e.stopPropagation();
-        const rect = { x: parseFloat(note.style.left), y: parseFloat(note.style.top) };
-        dragState = { startX: e.clientX, startY: e.clientY, origX: rect.x, origY: rect.y };
+        dragState = { startX: e.clientX, startY: e.clientY, origX: parseFloat(note.style.left), origY: parseFloat(note.style.top) };
       });
 
-      window.addEventListener('mousemove', (e) => {
+      const moveHandler = (e) => {
         if (!dragState) return;
         const dx = (e.clientX - dragState.startX) / scale;
         const dy = (e.clientY - dragState.startY) / scale;
         note.style.left = (dragState.origX + dx) + 'px';
         note.style.top = (dragState.origY + dy) + 'px';
-      });
+      };
 
-      window.addEventListener('mouseup', () => { dragState = null; });
+      const upHandler = () => {
+        if (dragState && noteId) {
+          const nx = parseFloat(note.style.left);
+          const ny = parseFloat(note.style.top);
+          fetch(`${BACKEND_URL}/api/sticky-notes/${noteId}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ position_x: nx, position_y: ny })
+          }).catch(() => {});
+        }
+        dragState = null;
+      };
+
+      window.addEventListener('mousemove', moveHandler);
+      window.addEventListener('mouseup', upHandler);
+
+      // Auto-save content on typing
+      note.querySelector('textarea').addEventListener('input', () => {
+        if (!noteId) return;
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          fetch(`${BACKEND_URL}/api/sticky-notes/${noteId}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: note.querySelector('textarea').value })
+          }).catch(() => {});
+        }, 1000);
+      });
 
       // Delete
       note.querySelector('.sticky-note-delete').addEventListener('click', (e) => {
         e.stopPropagation();
         note.remove();
         stickyNotes = stickyNotes.filter(n => n.element !== note);
+        if (noteId) {
+          fetch(`${BACKEND_URL}/api/sticky-notes/${noteId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          }).catch(() => {});
+        }
       });
 
-      world.appendChild(note);
-      stickyNotes.push({ element: note, x, y });
+      note._cleanup = () => {
+        window.removeEventListener('mousemove', moveHandler);
+        window.removeEventListener('mouseup', upHandler);
+      };
 
-      // Focus textarea
+      world.appendChild(note);
+      stickyNotes.push({ element: note, id: noteId });
+
       setTimeout(() => note.querySelector('textarea').focus(), 100);
+    }
+
+    async function loadStickyNotes(folderId) {
+      try {
+        const url = folderId
+          ? `${BACKEND_URL}/api/sticky-notes?folder_id=${folderId}`
+          : `${BACKEND_URL}/api/sticky-notes`;
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        (data.notes || []).forEach(n => {
+          renderStickyNote(n.id, n.position_x || 0, n.position_y || 0, n.content || '');
+        });
+      } catch (e) {}
     }
 
     // Context menu shortcuts
