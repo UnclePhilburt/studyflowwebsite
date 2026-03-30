@@ -265,6 +265,39 @@
       opacity: 1;
     }
 
+    /* ============ BRANCH BUTTON ============ */
+    .branch-btn {
+      position: absolute;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid var(--accent-primary);
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 2px 8px var(--shadow);
+      transform: scale(0.8);
+    }
+
+    .branch-btn.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .branch-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+      transform: scale(1.15);
+    }
+
     /* ============ WELCOME SCREEN ============ */
     #welcomeScreen {
       position: fixed;
@@ -1110,7 +1143,61 @@
       path.setAttribute('fill', 'none');
       path.setAttribute('opacity', '0.35');
       svgLayer.appendChild(path);
-      connections.push({ fromId, toId, path });
+
+      // Create branch button on the line
+      const branchBtn = document.createElement('div');
+      branchBtn.className = 'branch-btn';
+      branchBtn.textContent = '+';
+      branchBtn.title = 'Branch from here';
+      world.appendChild(branchBtn);
+
+      // Show on hover near the line area
+      let hoverZone = document.createElement('div');
+      hoverZone.style.cssText = 'position:absolute;width:40px;pointer-events:all;z-index:2;cursor:pointer;';
+      world.appendChild(hoverZone);
+
+      hoverZone.addEventListener('mouseenter', () => branchBtn.classList.add('visible'));
+      hoverZone.addEventListener('mouseleave', () => {
+        setTimeout(() => {
+          if (!branchBtn.matches(':hover')) branchBtn.classList.remove('visible');
+        }, 100);
+      });
+      branchBtn.addEventListener('mouseleave', () => branchBtn.classList.remove('visible'));
+
+      branchBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        branchBtn.classList.remove('visible');
+        // Regenerate follow-up bubbles on the parent card
+        const parentCard = cards.find(c => c.id === fromId);
+        if (parentCard && parentCard.response) {
+          // Remove existing followups if any
+          parentCard.followups.forEach(f => f.element.remove());
+          if (parentCard._followupPaths) parentCard._followupPaths.forEach(p => p.remove());
+          parentCard.followups = [];
+          parentCard._followupPaths = [];
+
+          // Generate new follow-ups
+          const newFollowups = generateFollowups(parentCard.response, parentCard.question);
+          if (newFollowups.length > 0) {
+            parentCard.followups = newFollowups.map(text => {
+              const bubble = document.createElement('div');
+              bubble.className = 'followup-bubble';
+              bubble.textContent = text;
+              bubble.title = text;
+              world.appendChild(bubble);
+              bubble.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                if (isDragging) return;
+                askFollowup(parentCard.id, text, bubble);
+              });
+              return { text, element: bubble };
+            });
+            updateFollowupPositions(parentCard);
+          }
+        }
+      });
+
+      connections.push({ fromId, toId, path, branchBtn, hoverZone });
       updateConnections();
     }
 
@@ -1127,6 +1214,23 @@
         const cy1 = y1 + (y2 - y1) * 0.5;
         const cy2 = y2 - (y2 - y1) * 0.5;
         conn.path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${cy1}, ${x2} ${cy2}, ${x2} ${y2}`);
+
+        // Position branch button at midpoint of the line (in world coords, not SVG coords)
+        const midX = (from.x + fw / 2 + to.x + tw / 2) / 2 - 12;
+        const midY = ((from.y + fh) + to.y) / 2 - 12;
+        if (conn.branchBtn) {
+          conn.branchBtn.style.left = midX + 'px';
+          conn.branchBtn.style.top = midY + 'px';
+        }
+        // Position hover zone along the line
+        if (conn.hoverZone) {
+          const hx = Math.min(from.x + fw / 2, to.x + tw / 2) - 20;
+          const hy = from.y + fh;
+          const hh = Math.max(to.y - (from.y + fh), 40);
+          conn.hoverZone.style.left = hx + 'px';
+          conn.hoverZone.style.top = hy + 'px';
+          conn.hoverZone.style.height = hh + 'px';
+        }
       });
     }
 
@@ -1442,7 +1546,11 @@
         c.followups.forEach(f => f.element.remove());
         if (c._followupPaths) c._followupPaths.forEach(p => p.remove());
       });
-      connections.forEach(c => c.path.remove());
+      connections.forEach(c => {
+        c.path.remove();
+        if (c.branchBtn) c.branchBtn.remove();
+        if (c.hoverZone) c.hoverZone.remove();
+      });
       cards = [];
       connections = [];
       nextCardId = 0;
