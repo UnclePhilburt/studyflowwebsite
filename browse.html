@@ -16,256 +16,251 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f8f6f3;
+      background: #e8e4df;
       color: #2d2d2d;
-      transition: background-color 1s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow-x: hidden;
+      overflow: hidden;
       min-height: 100vh;
+      position: relative;
     }
 
-    /* Active background color shifts based on subject */
-    body.subject-biology { background: linear-gradient(135deg, #f0f8f0 0%, #f8f6f3 50%); }
-    body.subject-chemistry { background: linear-gradient(135deg, #f5f0f8 0%, #f8f6f3 50%); }
-    body.subject-physics { background: linear-gradient(135deg, #f0f5f8 0%, #f8f6f3 50%); }
-    body.subject-math { background: linear-gradient(135deg, #fff8f0 0%, #f8f6f3 50%); }
-    body.subject-history { background: linear-gradient(135deg, #f5f3f0 0%, #f8f6f3 50%); }
-    body.subject-literature { background: linear-gradient(135deg, #fff0f5 0%, #f8f6f3 50%); }
-    body.subject-computer { background: linear-gradient(135deg, #f0f8ff 0%, #f8f6f3 50%); }
-    body.subject-engineering { background: linear-gradient(135deg, #fff5f0 0%, #f8f6f3 50%); }
-
-    /* Search container - center stage */
+    /* Search box fixed at top */
     .search-stage {
       position: fixed;
-      top: 50%;
+      top: 32px;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       width: 90%;
-      max-width: 700px;
-      z-index: 100;
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .search-stage.has-results {
-      top: 100px;
-      transform: translate(-50%, 0);
-    }
-
-    .search-stage.viewing-note {
-      opacity: 0;
-      pointer-events: none;
-      transform: translate(-50%, -100px);
+      max-width: 600px;
+      z-index: 1000;
     }
 
     .search-input {
       width: 100%;
-      padding: 24px 32px;
-      border: 2px solid rgba(124, 152, 133, 0.2);
-      border-radius: 24px;
-      font-size: 1.25rem;
+      padding: 16px 24px;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      border-radius: 16px;
+      font-size: 1rem;
       font-family: 'Inter', sans-serif;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s;
       outline: none;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
 
     .search-input::placeholder {
-      color: rgba(124, 152, 133, 0.4);
-      font-weight: 300;
+      color: rgba(124, 152, 133, 0.5);
     }
 
     .search-input:focus {
-      border-color: rgba(124, 152, 133, 0.5);
-      box-shadow: 0 8px 32px rgba(124, 152, 133, 0.12);
-      text-align: left;
+      border-color: rgba(124, 152, 133, 0.6);
+      box-shadow: 0 6px 20px rgba(124, 152, 133, 0.15);
     }
 
-    /* Subject-based accent colors for search */
-    .search-input.accent-biology { border-color: rgba(76, 175, 80, 0.5); }
-    .search-input.accent-chemistry { border-color: rgba(156, 39, 176, 0.5); }
-    .search-input.accent-physics { border-color: rgba(33, 150, 243, 0.5); }
-    .search-input.accent-math { border-color: rgba(255, 152, 0, 0.5); }
-    .search-input.accent-history { border-color: rgba(121, 85, 72, 0.5); }
-    .search-input.accent-literature { border-color: rgba(233, 30, 99, 0.5); }
-    .search-input.accent-computer { border-color: rgba(0, 188, 212, 0.5); }
-    .search-input.accent-engineering { border-color: rgba(255, 87, 34, 0.5); }
-
-    /* Results container */
-    .results-flow {
-      position: fixed;
-      top: 200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 800px;
-      max-height: calc(100vh - 240px);
-      overflow-y: auto;
-      padding: 20px;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .results-flow.visible {
-      opacity: 1;
-    }
-
-    .results-flow::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .results-flow::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .results-flow::-webkit-scrollbar-thumb {
-      background: rgba(124, 152, 133, 0.2);
-      border-radius: 3px;
-    }
-
-    /* Individual note result - ink spreading effect */
-    .note-result {
-      margin-bottom: 32px;
-      padding: 24px;
-      background: rgba(255, 255, 255, 0.6);
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      opacity: 0;
-      filter: blur(8px);
-      transform: scale(0.95);
-      animation: inkSpread 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-
-    @keyframes inkSpread {
-      0% {
-        opacity: 0;
-        filter: blur(8px);
-        transform: scale(0.95);
-      }
-      60% {
-        opacity: 0.7;
-        filter: blur(4px);
-        transform: scale(0.98);
-      }
-      100% {
-        opacity: 1;
-        filter: blur(0);
-        transform: scale(1);
-      }
-    }
-
-    .note-result:hover {
-      background: rgba(255, 255, 255, 0.9);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.15);
-    }
-
-    .note-result.holding {
-      transform: scale(1.02);
-      box-shadow: 0 12px 32px rgba(124, 152, 133, 0.25);
-    }
-
-    .note-title {
-      font-family: 'Lora', Georgia, serif;
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: #2d2d2d;
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-
-    .note-preview {
-      font-size: 0.9375rem;
-      line-height: 1.7;
-      color: #5d5d5d;
-      margin-bottom: 16px;
-      font-style: italic;
-    }
-
-    .note-preview mark {
-      background: rgba(232, 155, 95, 0.25);
-      color: inherit;
-      padding: 2px 4px;
-      border-radius: 3px;
-      font-weight: 500;
-    }
-
-    .note-meta {
-      font-size: 0.75rem;
-      color: #9a9a9a;
-      opacity: 0.5;
-      transition: opacity 0.3s;
-      letter-spacing: 0.02em;
-    }
-
-    .note-result:hover .note-meta {
-      opacity: 0.7;
-    }
-
-    .note-meta .username {
-      color: #7c9885;
-      font-weight: 500;
-    }
-
-    /* Note viewer - full screen */
-    .note-viewer {
+    /* Card table - where cards are thrown */
+    .card-table {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #fff;
-      z-index: 200;
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(0.95);
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 120px 40px 40px;
+      overflow: auto;
+    }
+
+    /* Individual card */
+    .note-card {
+      position: absolute;
+      width: 300px;
+      height: 200px;
+      cursor: grab;
+      perspective: 1000px;
+      transition: transform 0.1s, z-index 0s;
+      z-index: 1;
+    }
+
+    .note-card:active {
+      cursor: grabbing;
+      z-index: 999 !important;
+    }
+
+    .note-card.flipped {
+      z-index: 50;
+      width: 400px;
+      height: 300px;
+    }
+
+    /* Card throw animation */
+    @keyframes cardThrow {
+      0% {
+        opacity: 0;
+        transform: translateY(-200px) rotate(0deg) scale(0.5);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(10px) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Card inner - for 3D flip */
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .note-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* Card sides */
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
       overflow: hidden;
     }
 
-    .note-viewer.active {
-      opacity: 1;
-      pointer-events: all;
-      transform: scale(1);
+    /* Front of card */
+    .card-front {
+      background: linear-gradient(135deg, #ffffff 0%, #f5f3f0 100%);
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s;
     }
 
-    .note-viewer iframe {
-      width: 100%;
-      height: 100%;
+    .card-front:hover {
+      border-color: rgba(124, 152, 133, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Back of card */
+    .card-back {
+      background: #fff;
+      border: 2px solid rgba(124, 152, 133, 0.25);
+      transform: rotateY(180deg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 10px;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .card-preview {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: #5d5d5d;
+      margin-bottom: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      flex: 1;
+    }
+
+    .card-preview mark {
+      background: rgba(232, 155, 95, 0.3);
+      color: inherit;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    .card-meta {
+      font-size: 0.7rem;
+      color: #9a9a9a;
+      opacity: 0.7;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-meta .username {
+      color: #7c9885;
+      font-weight: 500;
+    }
+
+    /* Back side content */
+    .card-back-header {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #7c9885;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.2);
+    }
+
+    .card-back-content {
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #2d2d2d;
+      overflow-y: auto;
+      flex: 1;
+      margin-bottom: 12px;
+    }
+
+    .card-back-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .card-back-content::-webkit-scrollbar-thumb {
+      background: rgba(124, 152, 133, 0.3);
+      border-radius: 2px;
+    }
+
+    .card-back-footer {
+      padding-top: 12px;
+      border-top: 1px solid rgba(124, 152, 133, 0.2);
+      text-align: center;
+    }
+
+    .view-full-btn {
+      background: #7c9885;
+      color: white;
       border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
     }
 
-    /* Loading states */
-    .loading-shimmer {
-      text-align: center;
-      padding: 40px;
-      color: #9a9a9a;
-      font-size: 0.875rem;
-    }
-
-    /* Empty state */
-    .empty-state {
-      position: fixed;
-      top: 60%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: #9a9a9a;
-      font-size: 0.9375rem;
-      opacity: 0.6;
+    .view-full-btn:hover {
+      background: #6a8473;
     }
 
     /* Top nav */
     .top-nav {
       position: fixed;
-      top: 24px;
-      right: 24px;
+      top: 32px;
+      right: 32px;
       z-index: 1000;
       display: flex;
       gap: 16px;
-      align-items: center;
     }
 
     .nav-link {
@@ -275,27 +270,36 @@
       font-weight: 500;
       padding: 8px 16px;
       border-radius: 8px;
+      background: rgba(255, 255, 255, 0.8);
       transition: all 0.3s;
     }
 
     .nav-link:hover {
-      background: rgba(124, 152, 133, 0.08);
+      background: rgba(124, 152, 133, 0.15);
       color: #7c9885;
     }
 
-    .scroll-hint {
+    /* Loading state */
+    .loading-msg {
       position: fixed;
-      bottom: 40px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #9a9a9a;
+      font-size: 0.9rem;
+    }
+
+    /* Hint text */
+    .hint-text {
+      position: fixed;
+      bottom: 32px;
       left: 50%;
       transform: translateX(-50%);
       font-size: 0.75rem;
       color: #9a9a9a;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .scroll-hint.visible {
-      opacity: 0.5;
+      opacity: 0.6;
+      text-align: center;
     }
   </style>
 </head>
@@ -306,27 +310,24 @@
     <a href="notes.html" class="nav-link">My Notes</a>
   </div>
 
-  <!-- Search Stage -->
-  <div class="search-stage" id="searchStage">
+  <!-- Search -->
+  <div class="search-stage">
     <input
       type="text"
       class="search-input"
       id="searchInput"
-      placeholder="What are you looking for?"
+      placeholder="Search for notes..."
       autocomplete="off"
     >
   </div>
 
-  <!-- Results Flow -->
-  <div class="results-flow" id="resultsFlow"></div>
+  <!-- Card Table -->
+  <div class="card-table" id="cardTable"></div>
 
-  <!-- Note Viewer -->
-  <div class="note-viewer" id="noteViewer">
-    <iframe id="noteFrame" src=""></iframe>
+  <!-- Hint -->
+  <div class="hint-text">
+    Click cards to flip · Drag to rearrange
   </div>
-
-  <!-- Scroll Hint -->
-  <div class="scroll-hint" id="scrollHint">Scroll up to return</div>
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -340,9 +341,9 @@
 
     let authToken = null;
     let searchTimeout = null;
-    let currentResults = [];
-    let holdTimeout = null;
-    let currentHoldingNote = null;
+    let draggedCard = null;
+    let offsetX = 0;
+    let offsetY = 0;
 
     // Initialize
     (async function init() {
@@ -354,36 +355,27 @@
 
       authToken = session.access_token;
 
-      // Setup real-time search
+      // Setup search
       document.getElementById('searchInput').addEventListener('input', handleSearchInput);
-
-      // Setup scroll gesture to dismiss note viewer
-      setupScrollGestures();
     })();
 
-    // Real-time search with debouncing
+    // Real-time search
     function handleSearchInput(e) {
       const query = e.target.value.trim();
 
       clearTimeout(searchTimeout);
 
       if (!query) {
-        // Clear results
-        document.getElementById('resultsFlow').innerHTML = '';
-        document.getElementById('resultsFlow').classList.remove('visible');
-        document.getElementById('searchStage').classList.remove('has-results');
-        document.body.className = '';
-        document.getElementById('searchInput').className = 'search-input';
+        document.getElementById('cardTable').innerHTML = '';
         return;
       }
 
-      // Debounce search (300ms)
       searchTimeout = setTimeout(() => {
         performSearch(query);
       }, 300);
     }
 
-    // Perform semantic search
+    // Perform search
     async function performSearch(query) {
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/semantic-browse`, {
@@ -402,187 +394,128 @@
         }
 
         const results = await response.json();
-        currentResults = results;
-
-        displayResults(results, query);
-        updateSubjectContext(results);
+        displayCards(results, query);
 
       } catch (error) {
         console.error('Search error:', error);
-        document.getElementById('resultsFlow').innerHTML = '<div class="loading-shimmer">Unable to search. Please try again.</div>';
+        document.getElementById('cardTable').innerHTML = '<div class="loading-msg">Unable to search. Please try again.</div>';
       }
     }
 
-    // Display results with ink-spreading effect
-    function displayResults(results, query) {
-      const resultsContainer = document.getElementById('resultsFlow');
-      const searchStage = document.getElementById('searchStage');
+    // Display cards scattered on table
+    function displayCards(results, query) {
+      const cardTable = document.getElementById('cardTable');
 
       if (results.length === 0) {
-        resultsContainer.innerHTML = '<div class="loading-shimmer">No notes found</div>';
-        resultsContainer.classList.add('visible');
-        searchStage.classList.add('has-results');
+        cardTable.innerHTML = '<div class="loading-msg">No notes found</div>';
         return;
       }
 
-      // Group by note_id to show each note once
-      const noteMap = new Map();
-      results.forEach(r => {
-        if (!noteMap.has(r.note_id)) {
-          noteMap.set(r.note_id, r);
-        }
-      });
+      // Clear existing cards
+      cardTable.innerHTML = '';
 
-      const uniqueResults = Array.from(noteMap.values());
-
-      // Create HTML for results
-      const html = uniqueResults.map((result, index) => {
+      // Create cards with random scatter positions
+      results.forEach((result, index) => {
         const filename = result.filename || 'Untitled';
         const preview = result.content || '';
         const username = result.username || 'Anonymous';
         const university = result.university || 'Unknown';
         const year = result.created_at ? new Date(result.created_at).getFullYear() : new Date().getFullYear();
 
-        // Highlight search terms in preview
+        // Highlight search terms
         let highlightedPreview = preview;
         if (query) {
           const regex = new RegExp(`(${query})`, 'gi');
           highlightedPreview = highlightedPreview.replace(regex, '<mark>$1</mark>');
         }
 
-        return `
-          <div class="note-result"
-               data-note-id="${result.note_id}"
-               data-index="${index}"
-               style="animation-delay: ${index * 0.1}s"
-               onmousedown="startHold('${result.note_id}')"
-               onmouseup="endHold()"
-               onmouseleave="endHold()">
-            <div class="note-title">${filename}</div>
-            <div class="note-preview">${highlightedPreview.substring(0, 200)}...</div>
-            <div class="note-meta">
-              <span class="username">@${username}</span> · ${university} · ${year}
+        // Random position and rotation
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const randomX = Math.random() * (viewportWidth - 400) + 50;
+        const randomY = Math.random() * (viewportHeight - 350) + 150;
+        const randomRotation = (Math.random() - 0.5) * 12; // -6 to +6 degrees
+
+        // Create card element
+        const card = document.createElement('div');
+        card.className = 'note-card';
+        card.dataset.noteId = result.note_id;
+        card.style.left = `${randomX}px`;
+        card.style.top = `${randomY}px`;
+        card.style.transform = `rotate(${randomRotation}deg)`;
+        card.style.animation = `cardThrow ${0.5 + index * 0.05}s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`;
+
+        card.innerHTML = `
+          <div class="card-inner">
+            <!-- Front of card -->
+            <div class="card-front">
+              <div class="card-title">${filename}</div>
+              <div class="card-preview">${highlightedPreview.substring(0, 150)}...</div>
+              <div class="card-meta">
+                <span class="username">@${username}</span> · ${university} · ${year}
+              </div>
+            </div>
+
+            <!-- Back of card -->
+            <div class="card-back">
+              <div class="card-back-header">${filename}</div>
+              <div class="card-back-content">${highlightedPreview}</div>
+              <div class="card-back-footer">
+                <button class="view-full-btn" onclick="openFullNote('${result.note_id}')">View Full Note</button>
+              </div>
             </div>
           </div>
         `;
-      }).join('');
 
-      resultsContainer.innerHTML = html;
-      resultsContainer.classList.add('visible');
-      searchStage.classList.add('has-results');
-    }
+        // Click to flip
+        card.addEventListener('click', (e) => {
+          if (e.target.classList.contains('view-full-btn')) return;
+          card.classList.toggle('flipped');
+        });
 
-    // Update subject context (background color + search accent)
-    function updateSubjectContext(results) {
-      if (results.length === 0) return;
+        // Drag functionality
+        card.addEventListener('mousedown', startDrag);
 
-      const topResult = results[0];
-      const courseCode = (topResult.course_code || '').toLowerCase();
-      const filename = (topResult.filename || '').toLowerCase();
-      const combinedText = `${courseCode} ${filename}`;
-
-      const subjectPatterns = {
-        'biology': /bio|anatomy|physiology|genetics|ecology|microbio/,
-        'chemistry': /chem|organic|inorganic|biochem/,
-        'physics': /phys|mechanics|thermodynamics|quantum/,
-        'math': /math|calc|algebra|geometry|statistics/,
-        'history': /hist|historical|civilization|war|ancient/,
-        'literature': /lit|english|writing|poetry|novel/,
-        'computer': /cs|comp|programming|software|algorithm|coding/,
-        'engineering': /eng|mechanical|electrical|civil/
-      };
-
-      // Remove existing classes
-      document.body.className = '';
-      document.getElementById('searchInput').className = 'search-input';
-
-      // Find matching subject
-      for (const [subject, pattern] of Object.entries(subjectPatterns)) {
-        if (pattern.test(combinedText)) {
-          document.body.classList.add(`subject-${subject}`);
-          document.getElementById('searchInput').classList.add(`accent-${subject}`);
-          console.log(`Context: ${subject}`);
-          return;
-        }
-      }
-    }
-
-    // Hover-and-hold to open note
-    function startHold(noteId) {
-      currentHoldingNote = noteId;
-      const noteElement = document.querySelector(`[data-note-id="${noteId}"]`);
-
-      holdTimeout = setTimeout(() => {
-        if (currentHoldingNote === noteId) {
-          noteElement.classList.add('holding');
-          setTimeout(() => {
-            openNote(noteId);
-          }, 200);
-        }
-      }, 500); // Hold for 500ms
-    }
-
-    function endHold() {
-      clearTimeout(holdTimeout);
-      if (currentHoldingNote) {
-        const noteElement = document.querySelector(`[data-note-id="${currentHoldingNote}"]`);
-        if (noteElement) {
-          noteElement.classList.remove('holding');
-        }
-      }
-      currentHoldingNote = null;
-    }
-
-    // Open note in viewer
-    function openNote(noteId) {
-      const noteViewer = document.getElementById('noteViewer');
-      const noteFrame = document.getElementById('noteFrame');
-      const searchStage = document.getElementById('searchStage');
-      const scrollHint = document.getElementById('scrollHint');
-
-      searchStage.classList.add('viewing-note');
-      noteFrame.src = `note-viewer.html?id=${noteId}`;
-      noteViewer.classList.add('active');
-      scrollHint.classList.add('visible');
-    }
-
-    // Scroll gestures to zoom in/out
-    function setupScrollGestures() {
-      let lastScrollY = window.scrollY;
-
-      window.addEventListener('scroll', () => {
-        const noteViewer = document.getElementById('noteViewer');
-
-        if (noteViewer.classList.contains('active')) {
-          // If viewing note and scrolled to very top, zoom out
-          if (window.scrollY === 0 && lastScrollY > 0) {
-            closeNoteViewer();
-          }
-        }
-
-        lastScrollY = window.scrollY;
-      }, { passive: true });
-
-      // ESC key also closes
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeNoteViewer();
-        }
+        cardTable.appendChild(card);
       });
     }
 
-    function closeNoteViewer() {
-      const noteViewer = document.getElementById('noteViewer');
-      const searchStage = document.getElementById('searchStage');
-      const scrollHint = document.getElementById('scrollHint');
+    // Drag handlers
+    function startDrag(e) {
+      if (e.target.classList.contains('view-full-btn')) return;
 
-      noteViewer.classList.remove('active');
-      searchStage.classList.remove('viewing-note');
-      scrollHint.classList.remove('visible');
+      draggedCard = e.currentTarget;
+      const rect = draggedCard.getBoundingClientRect();
 
-      setTimeout(() => {
-        document.getElementById('noteFrame').src = '';
-      }, 600);
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', stopDrag);
+
+      e.preventDefault();
+    }
+
+    function drag(e) {
+      if (!draggedCard) return;
+
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+
+      draggedCard.style.left = `${x}px`;
+      draggedCard.style.top = `${y}px`;
+      draggedCard.style.transform = 'rotate(0deg)'; // Straighten while dragging
+    }
+
+    function stopDrag() {
+      draggedCard = null;
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', stopDrag);
+    }
+
+    // Open full note
+    function openFullNote(noteId) {
+      window.location.href = `note-viewer.html?id=${noteId}`;
     }
   </script>
 </body>
