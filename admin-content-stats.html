@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Content Stats - StudyFlow Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f4f0;
+      color: #2d2d2d;
+      min-height: 100vh;
+    }
+
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(248, 247, 244, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .header a {
+      color: #7c9885;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .header h1 { font-size: 16px; font-weight: 600; }
+
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px 40px;
+    }
+
+    /* Tab navigation */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: white;
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      width: fit-content;
+    }
+
+    .tab {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #666;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .tab:hover { color: #2d2d2d; }
+    .tab.active { background: #7c9885; color: white; }
+
+    /* Table card */
+    .table-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .table-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .table-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      padding: 10px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    td {
+      font-size: 13px;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    tr:hover td { background: rgba(124, 152, 133, 0.03); }
+
+    .rank {
+      font-weight: 700;
+      color: #9ca3af;
+      width: 40px;
+    }
+
+    .rank.gold { color: #d97706; }
+    .rank.silver { color: #6b7280; }
+    .rank.bronze { color: #b45309; }
+
+    .filename {
+      font-weight: 500;
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta-cell {
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    .stat-cell {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-cell.views { color: #6366f1; }
+    .stat-cell.downloads { color: #7c9885; }
+    .stat-cell.votes { color: #d97706; }
+    .stat-cell.notes { color: #e89b5f; }
+
+    /* Uploader rows */
+    .uploader-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .loading {
+      text-align: center;
+      padding: 80px 24px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 40px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .filename { max-width: 150px; }
+      td, th { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="admin.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <h1>Content Stats</h1>
+  </div>
+
+  <div class="content">
+    <div class="loading" id="loadingState">Loading content stats...</div>
+    <div id="dashboard" style="display:none;">
+
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('viewed', this)">Most Viewed</button>
+        <button class="tab" onclick="showTab('downloaded', this)">Most Downloaded</button>
+        <button class="tab" onclick="showTab('cited', this)">Most Cited</button>
+        <button class="tab" onclick="showTab('uploaders', this)">Top Uploaders</button>
+      </div>
+
+      <div class="tab-panel active" id="panel-viewed"></div>
+      <div class="tab-panel" id="panel-downloaded"></div>
+      <div class="tab-panel" id="panel-cited"></div>
+      <div class="tab-panel" id="panel-uploaders"></div>
+
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
+    if (!adminKey) window.location.href = 'admin.html';
+
+    function showTab(name, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+    }
+
+    function rankClass(i) {
+      if (i === 0) return 'gold';
+      if (i === 1) return 'silver';
+      if (i === 2) return 'bronze';
+      return '';
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/content-stats?key=' + encodeURIComponent(adminKey));
+        if (!res.ok) {
+          if (res.status === 403) {
+            sessionStorage.removeItem('studyflow_admin_key');
+            window.location.href = 'admin.html';
+            return;
+          }
+          throw new Error('Failed');
+        }
+
+        const data = await res.json();
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        renderViewed(data.most_viewed);
+        renderDownloaded(data.most_downloaded);
+        renderCited(data.most_cited);
+        renderUploaders(data.top_uploaders);
+
+      } catch (e) {
+        document.getElementById('loadingState').textContent = 'Failed to load: ' + e.message;
+      }
+    }
+
+    function renderViewed(notes) {
+      const el = document.getElementById('panel-viewed');
+      if (!notes || notes.length === 0) {
+        el.innerHTML = '<div class="empty-msg">No view data yet</div>';
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Most Viewed Notes</div>
+            <div class="table-subtitle">All time</div>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>Note</th><th>Uploader</th><th>University</th><th>Views</th></tr></thead>
+            <tbody>
+              ${notes.map((n, i) => `
+                <tr>
+                  <td class="rank ${rankClass(i)}">${i + 1}</td>
+                  <td class="filename" title="${n.filename}">${n.filename}</td>
+                  <td class="meta-cell">@${n.uploader}</td>
+                  <td class="meta-cell">${n.university || '--'}</td>
+                  <td class="stat-cell views">${n.views.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderDownloaded(notes) {
+      const el = document.getElementById('panel-downloaded');
+      if (!notes || notes.length === 0) {
+        el.innerHTML = '<div class="empty-msg">No download data yet</div>';
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Most Downloaded Notes</div>
+            <div class="table-subtitle">All time</div>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>Note</th><th>Uploader</th><th>University</th><th>Downloads</th></tr></thead>
+            <tbody>
+              ${notes.map((n, i) => `
+                <tr>
+                  <td class="rank ${rankClass(i)}">${i + 1}</td>
+                  <td class="filename" title="${n.filename}">${n.filename}</td>
+                  <td class="meta-cell">@${n.uploader}</td>
+                  <td class="meta-cell">${n.university || '--'}</td>
+                  <td class="stat-cell downloads">${n.downloads.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderCited(notes) {
+      const el = document.getElementById('panel-cited');
+      if (!notes || notes.length === 0) {
+        el.innerHTML = '<div class="empty-msg">No citation data yet</div>';
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Most Cited in AI Chat</div>
+            <div class="table-subtitle">By net upvotes on AI responses that cited the note</div>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>Note</th><th>Uploader</th><th>University</th><th>Net Votes</th></tr></thead>
+            <tbody>
+              ${notes.map((n, i) => `
+                <tr>
+                  <td class="rank ${rankClass(i)}">${i + 1}</td>
+                  <td class="filename" title="${n.filename}">${n.filename}</td>
+                  <td class="meta-cell">@${n.uploader}</td>
+                  <td class="meta-cell">${n.university || '--'}</td>
+                  <td class="stat-cell votes">${n.net_votes > 0 ? '+' : ''}${n.net_votes}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderUploaders(uploaders) {
+      const el = document.getElementById('panel-uploaders');
+      if (!uploaders || uploaders.length === 0) {
+        el.innerHTML = '<div class="empty-msg">No uploader data yet</div>';
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Top Uploaders</div>
+            <div class="table-subtitle">By number of notes uploaded</div>
+          </div>
+          <table>
+            <thead><tr><th>#</th><th>User</th><th>University</th><th>Notes</th></tr></thead>
+            <tbody>
+              ${uploaders.map((u, i) => {
+                const initial = (u.username || '?')[0].toUpperCase();
+                return `
+                  <tr>
+                    <td class="rank ${rankClass(i)}">${i + 1}</td>
+                    <td><span class="uploader-avatar">${initial}</span>@${u.username}</td>
+                    <td class="meta-cell">${u.university || '--'}</td>
+                    <td class="stat-cell notes">${u.note_count}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    loadStats();
+  </script>
+</body>
+</html>
