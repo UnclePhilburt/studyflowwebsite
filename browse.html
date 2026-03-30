@@ -778,9 +778,17 @@
       }
     }
 
+    // Show loading state on the card table
+    function showLoading() {
+      document.getElementById('cardTable').innerHTML = '<div class="loading-msg">Loading notes...</div>';
+      document.getElementById('hintText').style.display = 'none';
+    }
+
     // Load initial notes on page load so the page isn't empty
     async function loadInitialNotes() {
       try {
+        showLoading();
+
         // First, try to get the user's university from their profile
         let university = null;
         try {
@@ -1135,6 +1143,10 @@
     // Perform search
     async function performSearch(query, offset = 0) {
       try {
+        // Show loading state only for new searches (not load-more)
+        if (offset === 0) {
+          showLoading();
+        }
         const requestBody = {
           question: query,
           offset: offset
