@@ -142,6 +142,12 @@
       z-index: 100;
       opacity: 0.95;
       animation: dragModePulse 1.5s ease-in-out infinite;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .canvas-card.no-select {
+      -webkit-user-select: none;
+      user-select: none;
     }
     @keyframes dragModePulse {
       0%, 100% { box-shadow: 0 12px 40px var(--shadow), 0 0 0 3px var(--accent-primary); }
@@ -2469,20 +2475,34 @@
         e.stopPropagation();
 
         const isHeaderTouch = e.target.closest('.card-question');
+        const isResponseTouch = e.target.closest('.card-response');
+
+        // Prevent text selection unless touching response area
+        if (!isResponseTouch) {
+          e.preventDefault();
+        }
+
         touchStartTime = Date.now();
         touchMoved = false;
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
+
+        // Prevent text selection during long-press detection
+        if (!isResponseTouch) {
+          el.classList.add('no-select');
+        }
 
         // Long press detection
         longPressTimeout = setTimeout(() => {
           if (!touchMoved) {
             if (isHeaderTouch) {
               // Long-press on header = show context menu
+              el.classList.remove('no-select');
               showCardContextMenu(cardObj, e.touches[0].clientX, e.touches[0].clientY);
             } else {
               // Long-press on card body = enter drag mode
               isDragMode = true;
+              el.classList.remove('no-select');
               el.classList.add('drag-mode');
               // Haptic feedback if available
               if (navigator.vibrate) navigator.vibrate(50);
@@ -2523,6 +2543,7 @@
           clearTimeout(longPressTimeout);
           tapCount = 0;
           clearTimeout(tapTimeout);
+          el.classList.remove('no-select');
         }
 
         // If in drag mode, move the card
@@ -2544,6 +2565,7 @@
 
       el.addEventListener('touchend', (e) => {
         clearTimeout(longPressTimeout);
+        el.classList.remove('no-select');
 
         // Exit drag mode
         if (isDragMode) {
@@ -2563,6 +2585,7 @@
 
       el.addEventListener('touchcancel', (e) => {
         clearTimeout(longPressTimeout);
+        el.classList.remove('no-select');
 
         // Exit drag mode
         if (isDragMode) {
