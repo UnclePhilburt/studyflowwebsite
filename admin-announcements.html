@@ -127,9 +127,38 @@
     .uni-select-row {
       display: none;
       margin-top: 10px;
+      position: relative;
     }
 
     .uni-select-row.visible { display: block; }
+
+    .uni-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      border: 1.5px solid rgba(124, 152, 133, 0.3);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .uni-dropdown.open { display: block; }
+
+    .uni-option {
+      padding: 9px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #2d2d2d;
+    }
+
+    .uni-option:hover { background: rgba(124, 152, 133, 0.08); }
+    .uni-option.selected { background: rgba(124, 152, 133, 0.12); font-weight: 600; }
 
     .send-btn {
       width: 100%;
@@ -310,9 +339,9 @@
           <button class="audience-btn" data-audience="university" onclick="setAudience('university', this)">University</button>
         </div>
         <div class="uni-select-row" id="uniSelectRow">
-          <select class="form-select" id="uniSelect">
-            <option value="">Select university...</option>
-          </select>
+          <input type="text" class="form-input" id="uniSearch" placeholder="Search universities..." autocomplete="off">
+          <div class="uni-dropdown" id="uniDropdown"></div>
+          <input type="hidden" id="uniSelect">
         </div>
       </div>
 
@@ -347,15 +376,37 @@
 
     let selectedAudience = 'all';
 
-    // Populate university dropdown
-    if (typeof UNIVERSITIES !== 'undefined') {
-      const select = document.getElementById('uniSelect');
-      UNIVERSITIES.forEach(u => {
-        const opt = document.createElement('option');
-        opt.value = u;
-        opt.textContent = u;
-        select.appendChild(opt);
-      });
+    // Searchable university dropdown
+    const uniList = typeof UNIVERSITIES !== 'undefined' ? UNIVERSITIES : [];
+    const uniSearch = document.getElementById('uniSearch');
+    const uniDropdown = document.getElementById('uniDropdown');
+    const uniHidden = document.getElementById('uniSelect');
+
+    function renderUniOptions(filter) {
+      const query = (filter || '').toLowerCase();
+      const matches = query ? uniList.filter(u => u.toLowerCase().includes(query)) : uniList;
+      uniDropdown.innerHTML = matches.slice(0, 50).map(u =>
+        `<div class="uni-option${u === uniHidden.value ? ' selected' : ''}" onclick="selectUni('${u.replace(/'/g, "\\'")}')">${u}</div>`
+      ).join('');
+      uniDropdown.classList.toggle('open', matches.length > 0);
+    }
+
+    uniSearch.addEventListener('focus', () => renderUniOptions(uniSearch.value));
+    uniSearch.addEventListener('input', () => {
+      uniHidden.value = '';
+      renderUniOptions(uniSearch.value);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.uni-select-row')) {
+        uniDropdown.classList.remove('open');
+      }
+    });
+
+    function selectUni(name) {
+      uniHidden.value = name;
+      uniSearch.value = name;
+      uniDropdown.classList.remove('open');
     }
 
     // Character counters
