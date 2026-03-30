@@ -1235,7 +1235,7 @@
       let unfiledData = { conversations: [] };
       try {
         const [foldersRes, unfiledRes] = await Promise.all([
-          fetch(`${BACKEND_URL}/api/folders`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
+          fetch(`${BACKEND_URL}/api/chat-folders`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
           fetch(`${BACKEND_URL}/api/conversations/unfiled`, { headers: { 'Authorization': `Bearer ${authToken}` } })
         ]);
         if (foldersRes.ok) foldersData = await foldersRes.json();
@@ -1323,7 +1323,7 @@
 
       try {
         const url = folderId
-          ? `${BACKEND_URL}/api/folders/${folderId}/conversations`
+          ? `${BACKEND_URL}/api/chat-folders/${folderId}/conversations`
           : `${BACKEND_URL}/api/conversations/unfiled`;
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${authToken}` } });
         const data = res.ok ? await res.json() : { conversations: [] };
@@ -1406,7 +1406,7 @@
       const name = prompt('Folder name:');
       if (!name || !name.trim()) return;
       try {
-        await fetch(`${BACKEND_URL}/api/folders`, {
+        await fetch(`${BACKEND_URL}/api/chat-folders`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name.trim() })
