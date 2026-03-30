@@ -481,8 +481,34 @@
   <!-- Card Table -->
   <div class="card-table" id="cardTable"></div>
 
+  <!-- Load More Button -->
+  <div id="loadMoreContainer" style="
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: none;
+  ">
+    <button id="loadMoreBtn" style="
+      background: #7c9885;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s;
+    " onmouseover="this.style.background='#6a8473'; this.style.transform='translateY(-2px)'"
+       onmouseout="this.style.background='#7c9885'; this.style.transform='translateY(0)'">
+      Load More Notes
+    </button>
+  </div>
+
   <!-- Hint -->
-  <div class="hint-text">
+  <div class="hint-text" id="hintText">
     Click cards to open · Drag to rearrange
   </div>
 
@@ -510,6 +536,9 @@
     let userUniversity = null;
     let filterEnabled = false;
     let selectedUniversity = null;
+    let currentOffset = 0;
+    let currentQuery = '';
+    let hasMore = false;
 
     // Initialize
     (async function init() {
@@ -530,9 +559,20 @@
       // Setup search
       document.getElementById('searchInput').addEventListener('input', handleSearchInput);
 
+      // Setup load more button
+      document.getElementById('loadMoreBtn').addEventListener('click', loadMoreNotes);
+
       // Restore previous state if exists
       restoreState();
     })();
+
+    // Load more notes (next batch)
+    function loadMoreNotes() {
+      if (currentQuery && hasMore) {
+        const nextOffset = currentOffset + 10;
+        performSearch(currentQuery, nextOffset);
+      }
+    }
 
     // Fetch user's university from profile
     async function fetchUserUniversity() {
@@ -606,9 +646,10 @@
         input.disabled = !filterEnabled;
 
         // If enabled and there's a search query, re-run search
-        const currentQuery = document.getElementById('searchInput').value.trim();
-        if (currentQuery) {
-          performSearch(currentQuery);
+        const searchQuery = document.getElementById('searchInput').value.trim();
+        if (searchQuery) {
+          currentOffset = 0; // Reset offset
+          performSearch(searchQuery, 0);
         }
       });
 
@@ -676,9 +717,10 @@
       });
 
       // Re-run search if there's a query
-      const currentQuery = document.getElementById('searchInput').value.trim();
-      if (currentQuery && filterEnabled) {
-        performSearch(currentQuery);
+      const searchQuery = document.getElementById('searchInput').value.trim();
+      if (searchQuery && filterEnabled) {
+        currentOffset = 0; // Reset offset
+        performSearch(searchQuery, 0);
       }
     }
 
@@ -690,6 +732,8 @@
         cardPositions: cardPositions,
         filterEnabled: filterEnabled,
         selectedUniversity: selectedUniversity,
+        currentOffset: currentOffset,
+        hasMore: hasMore,
         timestamp: Date.now()
       }));
     }
@@ -722,14 +766,34 @@
           document.getElementById('universityFilter').value = state.selectedUniversity;
         }
 
+        // Restore pagination state
+        if (state.currentOffset !== undefined) {
+          currentOffset = state.currentOffset;
+        }
+        if (state.hasMore !== undefined) {
+          hasMore = state.hasMore;
+        }
+
         // Restore search query
         if (state.query) {
+          currentQuery = state.query;
           document.getElementById('searchInput').value = state.query;
         }
 
         // Restore results with saved positions
         if (state.results && state.results.length > 0) {
           displayCards(state.results, state.query, state.cardPositions);
+
+          // Show/hide load more button
+          const loadMoreContainer = document.getElementById('loadMoreContainer');
+          const hintText = document.getElementById('hintText');
+          if (hasMore) {
+            loadMoreContainer.style.display = 'block';
+            hintText.style.display = 'none';
+          } else {
+            loadMoreContainer.style.display = 'none';
+            hintText.style.display = 'block';
+          }
         }
       } catch (e) {
         console.error('Error restoring state:', e);
@@ -745,20 +809,26 @@
 
       if (!query) {
         document.getElementById('cardTable').innerHTML = '';
+        document.getElementById('loadMoreContainer').style.display = 'none';
+        document.getElementById('hintText').style.display = 'block';
         sessionStorage.removeItem('browseState'); // Clear saved state
+        currentOffset = 0;
+        currentQuery = '';
         return;
       }
 
       searchTimeout = setTimeout(() => {
-        performSearch(query);
+        currentOffset = 0; // Reset offset for new search
+        performSearch(query, 0);
       }, 300);
     }
 
     // Perform search
-    async function performSearch(query) {
+    async function performSearch(query, offset = 0) {
       try {
         const requestBody = {
-          question: query
+          question: query,
+          offset: offset
         };
 
         // Add university filter if enabled
@@ -806,8 +876,26 @@
           throw new Error('Search failed');
         }
 
-        const results = await response.json();
+        const data = await response.json();
+        const results = data.notes || data; // Handle both new and old format
+        hasMore = data.has_more || false;
+        currentQuery = query;
+        currentOffset = offset;
+
         displayCards(results, query);
+
+        // Show/hide load more button
+        const loadMoreContainer = document.getElementById('loadMoreContainer');
+        const hintText = document.getElementById('hintText');
+        if (hasMore && results.length > 0) {
+          loadMoreContainer.style.display = 'block';
+          hintText.style.display = 'none';
+        } else {
+          loadMoreContainer.style.display = 'none';
+          if (results.length > 0) {
+            hintText.style.display = 'block';
+          }
+        }
 
         // Save state
         saveState(query, results, null);
