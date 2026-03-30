@@ -542,13 +542,23 @@
 
     // Initialize
     (async function init() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) {
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+
+      if (sessionError || !session) {
+        console.log('No valid session, redirecting to login...');
         window.location.href = 'index.html';
         return;
       }
 
       authToken = session.access_token;
+
+      // Listen for auth state changes (logout, session expiry)
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
+          console.log('Auth state changed:', event);
+          window.location.href = 'index.html';
+        }
+      });
 
       // Get user's university
       await fetchUserUniversity();
@@ -577,14 +587,31 @@
     // Fetch user's university from profile
     async function fetchUserUniversity() {
       try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) return;
+        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
-        const { data: profile } = await supabaseClient
+        // Check for auth errors (expired token, etc.)
+        if (authError) {
+          console.error('Auth error:', authError);
+          // Redirect to login if auth fails
+          window.location.href = 'index.html';
+          return;
+        }
+
+        if (!user) {
+          window.location.href = 'index.html';
+          return;
+        }
+
+        const { data: profile, error: profileError } = await supabaseClient
           .from('user_profiles')
           .select('university, edu_email_verified')
           .eq('id', user.id)
           .single();
+
+        if (profileError) {
+          console.error('Profile fetch error:', profileError);
+          return;
+        }
 
         if (!profile) return;
 
@@ -846,6 +873,13 @@
         });
 
         if (!response.ok) {
+          // Check if it's a 401 (unauthorized - session expired)
+          if (response.status === 401) {
+            console.log('Session expired, redirecting to login...');
+            window.location.href = 'index.html';
+            return;
+          }
+
           // Check if it's a 403 (edu verification required)
           if (response.status === 403) {
             const errorData = await response.json();
