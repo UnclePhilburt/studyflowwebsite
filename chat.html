@@ -123,7 +123,7 @@
       border: 1px solid var(--border-color);
       border-radius: 16px;
       box-shadow: 0 4px 24px var(--shadow);
-      width: 380px;
+      width: 550px;
       overflow: hidden;
       cursor: grab;
       transition: box-shadow 0.2s, max-height 0.3s ease;
@@ -133,7 +133,7 @@
     .canvas-card:hover { box-shadow: 0 8px 32px var(--shadow); }
     .canvas-card.dragging { cursor: grabbing; box-shadow: 0 12px 40px var(--shadow); z-index: 100; }
     .canvas-card.expanding { animation: cardExpand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .canvas-card.child-card { width: 350px; border-left: 3px solid var(--accent-primary); }
+    .canvas-card.child-card { width: 520px; border-left: 3px solid var(--accent-primary); }
     .canvas-card.collapsed .card-response { display: none; }
     .canvas-card.collapsed { max-height: 52px; }
 
@@ -754,7 +754,8 @@
 
     /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
-      .canvas-card { width: 300px; }
+      .canvas-card { width: 90vw; max-width: 550px; }
+      .canvas-card.child-card { width: 85vw; max-width: 520px; }
       .input-bar { width: 95%; bottom: 12px; }
       .sidebar { width: 260px; }
       .followup-bubble { max-width: 160px; font-size: 11px; }
@@ -1144,7 +1145,7 @@
     }
 
     function updateFollowupPositions(card) {
-      const cardW = card.element.classList.contains('child-card') ? 350 : 380;
+      const cardW = card.element.classList.contains('child-card') ? 520 : 550;
       const cardH = card.element.offsetHeight || 200;
       const count = card.followups.length;
       const startY = card.y + cardH + 40;
@@ -1245,8 +1246,8 @@
         const from = cards.find(c => c.id === conn.fromId);
         const to = cards.find(c => c.id === conn.toId);
         if (!from || !to) return;
-        const fw = from.element.classList.contains('child-card') ? 350 : 380;
-        const tw = to.element.classList.contains('child-card') ? 350 : 380;
+        const fw = from.element.classList.contains('child-card') ? 520 : 550;
+        const tw = to.element.classList.contains('child-card') ? 520 : 550;
         const fh = from.element.offsetHeight || 200;
         const x1 = from.x + fw / 2 + SVG_OFFSET, y1 = from.y + fh + SVG_OFFSET;
         const x2 = to.x + tw / 2 + SVG_OFFSET, y2 = to.y + SVG_OFFSET;
@@ -1288,7 +1289,7 @@
         cy = parent.y + ph + 120;
       } else {
         // New root card: center of viewport
-        cx = (window.innerWidth / 2 - panX) / scale - 190;
+        cx = (window.innerWidth / 2 - panX) / scale - 275;
         cy = (window.innerHeight / 2 - panY) / scale - 100 + cards.length * 30;
       }
 
@@ -1327,12 +1328,12 @@
           clickedBubbleInfo = { x: bx, y: by, w: bw, h: bh, parentCard };
 
           // Position new card below the clicked bubble
-          const cardW = 350; // child card width
+          const cardW = 520; // child card width
           cx = bx + bw / 2 - cardW / 2;
           cy = by + bh + 40;
 
           // Draw line from parent card bottom to clicked bubble top
-          const pcW = parentCard.element.classList.contains('child-card') ? 350 : 380;
+          const pcW = parentCard.element.classList.contains('child-card') ? 520 : 550;
           const pcH = parentCard.element.offsetHeight || 200;
           const pcAx = parentCard.x + pcW / 2 + SVG_OFFSET;
           const pcAy = parentCard.y + pcH + SVG_OFFSET;
@@ -1361,7 +1362,7 @@
         const bubblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const bCx = clickedBubbleInfo.x + clickedBubbleInfo.w / 2 + SVG_OFFSET;
         const bCy = clickedBubbleInfo.y + clickedBubbleInfo.h + SVG_OFFSET;
-        const cardCx = cx + 175 + SVG_OFFSET;
+        const cardCx = cx + 260 + SVG_OFFSET;
         const cardCy = cy + SVG_OFFSET;
         const midY = bCy + (cardCy - bCy) * 0.5;
         bubblePath.setAttribute('d', `M ${bCx} ${bCy} C ${bCx} ${midY}, ${cardCx} ${midY}, ${cardCx} ${cardCy}`);
@@ -1397,7 +1398,12 @@
         if (data.conversation_id) conversationId = data.conversation_id;
 
         populateCard(card, data.response || 'Sorry, something went wrong.', data.sources, []);
-        createFollowupBubbles(card, data.followup_suggestions);
+
+        // Use AI suggestions if available, fallback to generic
+        const suggestions = (data.followup_suggestions && data.followup_suggestions.length > 0)
+          ? data.followup_suggestions
+          : ['Tell me more about this', 'Give me an example'];
+        createFollowupBubbles(card, suggestions);
         panToCard(card);
         loadConversations();
 
@@ -1474,7 +1480,7 @@
     }
 
     function panToCard(card) {
-      const targetX = -(card.x * scale) + window.innerWidth / 2 - 190 * scale;
+      const targetX = -(card.x * scale) + window.innerWidth / 2 - 275 * scale;
       const targetY = -(card.y * scale) + window.innerHeight / 2 - 100 * scale;
 
       const startX = panX, startY = panY;
@@ -1715,7 +1721,7 @@
       // Find bounds of all cards
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
       cards.forEach(c => {
-        const w = c.element.classList.contains('child-card') ? 350 : 380;
+        const w = c.element.classList.contains('child-card') ? 520 : 550;
         const h = c.element.offsetHeight || 200;
         minX = Math.min(minX, c.x);
         minY = Math.min(minY, c.y);
@@ -1731,7 +1737,7 @@
 
       // Draw cards as small rectangles
       cards.forEach(c => {
-        const w = c.element.classList.contains('child-card') ? 350 : 380;
+        const w = c.element.classList.contains('child-card') ? 520 : 550;
         const h = c.element.offsetHeight || 200;
         const rx = (c.x - minX) * mapScale;
         const ry = (c.y - minY) * mapScale;
@@ -1749,10 +1755,10 @@
         const from = cards.find(c => c.id === conn.fromId);
         const to = cards.find(c => c.id === conn.toId);
         if (!from || !to) return;
-        const fw = from.element.classList.contains('child-card') ? 350 : 380;
+        const fw = from.element.classList.contains('child-card') ? 520 : 550;
         ctx.beginPath();
         ctx.moveTo((from.x + fw / 2 - minX) * mapScale, (from.y + (from.element.offsetHeight || 200) - minY) * mapScale);
-        const tw = to.element.classList.contains('child-card') ? 350 : 380;
+        const tw = to.element.classList.contains('child-card') ? 520 : 550;
         ctx.lineTo((to.x + tw / 2 - minX) * mapScale, (to.y - minY) * mapScale);
         ctx.stroke();
       });
@@ -1773,7 +1779,7 @@
 
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
       cards.forEach(c => {
-        const w = c.element.classList.contains('child-card') ? 350 : 380;
+        const w = c.element.classList.contains('child-card') ? 520 : 550;
         const h = c.element.offsetHeight || 200;
         minX = Math.min(minX, c.x);
         minY = Math.min(minY, c.y);
