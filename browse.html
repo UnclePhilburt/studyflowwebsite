@@ -794,22 +794,17 @@
       }
     }
 
-    // Load initial notes on page load using backend API
+    // Load initial notes on page load using cached top upvoted notes
     async function loadInitialNotes() {
       try {
         showLoading();
 
-        // Use backend API with a generic query to get popular/recent notes
-        const response = await fetch(`${BACKEND_URL}/api/notes/semantic-browse`, {
-          method: 'POST',
+        // Use new top-browse endpoint (faster - uses Redis cache)
+        const response = await fetch(`${BACKEND_URL}/api/notes/top-browse`, {
+          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            question: 'study notes materials',  // Generic query to get diverse results
-            offset: 0
-          })
+            'Authorization': `Bearer ${authToken}`
+          }
         });
 
         if (!response.ok) {
