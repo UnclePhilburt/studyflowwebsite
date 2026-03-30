@@ -265,6 +265,55 @@
       opacity: 1;
     }
 
+    /* ============ INPUT BUBBLE ============ */
+    .followup-input-bubble {
+      position: absolute;
+      background: var(--bg-tertiary);
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 0;
+      z-index: 2;
+      box-shadow: 0 2px 12px var(--shadow);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      animation: bubbleAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+    }
+
+    .followup-input-bubble input {
+      border: none;
+      outline: none;
+      background: none;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--text-primary);
+      width: 180px;
+    }
+
+    .followup-input-bubble input::placeholder { color: var(--text-muted); }
+
+    .followup-input-bubble button {
+      border: none;
+      background: var(--accent-primary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .followup-input-bubble button:hover { background: var(--accent-secondary); }
+
+    .followup-input-bubble:focus-within {
+      border-color: var(--accent-primary);
+    }
+
     /* ============ BRANCH BUTTON ============ */
     .branch-btn {
       position: absolute;
@@ -1167,33 +1216,12 @@
       branchBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         branchBtn.classList.remove('visible');
-        // Regenerate follow-up bubbles on the parent card
         const parentCard = cards.find(c => c.id === fromId);
         if (parentCard && parentCard.response) {
-          // Remove existing followups if any
-          parentCard.followups.forEach(f => f.element.remove());
-          if (parentCard._followupPaths) parentCard._followupPaths.forEach(p => p.remove());
-          parentCard.followups = [];
-          parentCard._followupPaths = [];
-
-          // Generate new follow-ups
-          const newFollowups = generateFollowups(parentCard.response, parentCard.question);
-          if (newFollowups.length > 0) {
-            parentCard.followups = newFollowups.map(text => {
-              const bubble = document.createElement('div');
-              bubble.className = 'followup-bubble';
-              bubble.textContent = text;
-              bubble.title = text;
-              world.appendChild(bubble);
-              bubble.addEventListener('click', (ev) => {
-                ev.stopPropagation();
-                if (isDragging) return;
-                askFollowup(parentCard.id, text, bubble);
-              });
-              return { text, element: bubble };
-            });
-            updateFollowupPositions(parentCard);
-          }
+          createFollowupBubbles(parentCard, [
+            'Tell me more about this',
+            'How does this connect to other topics?'
+          ]);
         }
       });
 
@@ -1357,10 +1385,8 @@
 
         if (data.conversation_id) conversationId = data.conversation_id;
 
-        // Generate follow-up suggestions from the response
-        const followups = generateFollowups(data.response, text);
-
-        populateCard(card, data.response || 'Sorry, something went wrong.', data.sources, followups);
+        populateCard(card, data.response || 'Sorry, something went wrong.', data.sources, []);
+        createFollowupBubbles(card, data.followup_suggestions);
         panToCard(card);
         loadConversations();
 
@@ -1374,23 +1400,66 @@
       sendMessage(text, parentId, bubbleEl);
     }
 
-    function generateFollowups(response, question) {
-      // Extract potential follow-up topics from the response
-      const followups = [];
-      const text = response.toLowerCase();
+    function createFollowupBubbles(card, aiSuggestions) {
+      // Remove existing followups
+      card.followups.forEach(f => f.element.remove());
+      if (card._followupPaths) card._followupPaths.forEach(p => p.remove());
+      card.followups = [];
+      card._followupPaths = [];
 
-      // Simple heuristic: suggest deepening, examples, and connections
-      if (text.length > 200) {
-        followups.push('Explain this in simpler terms');
-      }
-      if (text.includes('example') || text.length > 300) {
-        followups.push('Give me a specific example');
-      }
-      if (!text.includes('quiz') && !text.includes('test')) {
-        followups.push('Quiz me on this');
+      const items = [];
+
+      // 1. Text input bubble
+      const inputBubble = document.createElement('div');
+      inputBubble.className = 'followup-input-bubble';
+      inputBubble.innerHTML = `
+        <input type="text" placeholder="Ask a follow-up..." />
+        <button>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      `;
+      world.appendChild(inputBubble);
+
+      const inputEl = inputBubble.querySelector('input');
+      const sendEl = inputBubble.querySelector('button');
+
+      function submitInput() {
+        const val = inputEl.value.trim();
+        if (!val) return;
+        askFollowup(card.id, val, inputBubble);
       }
 
-      return followups.slice(0, 3);
+      sendEl.addEventListener('click', (e) => { e.stopPropagation(); submitInput(); });
+      inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); submitInput(); }
+      });
+      inputEl.addEventListener('click', (e) => e.stopPropagation());
+
+      items.push({ text: '', element: inputBubble, isInput: true });
+
+      // 2. AI-generated suggestion bubbles
+      const suggestions = (aiSuggestions || []).slice(0, 2);
+      suggestions.forEach(text => {
+        const bubble = document.createElement('div');
+        bubble.className = 'followup-bubble';
+        bubble.textContent = text;
+        bubble.title = text;
+        world.appendChild(bubble);
+
+        bubble.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (isDragging) return;
+          askFollowup(card.id, text, bubble);
+        });
+
+        items.push({ text, element: bubble, isInput: false });
+      });
+
+      card.followups = items;
+      updateFollowupPositions(card);
     }
 
     function panToCard(card) {
@@ -1483,23 +1552,10 @@
         // Add follow-ups to the last card
         if (cards.length > 0) {
           const last = cards[cards.length - 1];
-          const followups = generateFollowups(last.response || '', last.question);
-          if (followups.length > 0) {
-            last.followups = followups.map(text => {
-              const bubble = document.createElement('div');
-              bubble.className = 'followup-bubble';
-              bubble.textContent = text;
-              bubble.title = text;
-              world.appendChild(bubble);
-              bubble.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (isDragging) return;
-                askFollowup(last.id, text, bubble);
-              });
-              return { text, element: bubble };
-            });
-            updateFollowupPositions(last);
-          }
+          createFollowupBubbles(last, [
+            'Tell me more about this',
+            'What else should I know?'
+          ]);
         }
 
         // Pan to first card
