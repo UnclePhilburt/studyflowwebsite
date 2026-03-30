@@ -327,6 +327,117 @@
       opacity: 0.6;
       text-align: center;
     }
+
+    /* University filter */
+    .filter-container {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-label {
+      font-size: 0.8rem;
+      color: #5d5d5d;
+      font-weight: 500;
+    }
+
+    .filter-toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      background: #ccc;
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .filter-toggle.active {
+      background: #7c9885;
+    }
+
+    .filter-toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .filter-toggle.active .filter-toggle-slider {
+      transform: translateX(18px);
+    }
+
+    .university-select {
+      position: relative;
+      min-width: 200px;
+    }
+
+    .university-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.5px solid rgba(124, 152, 133, 0.3);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      outline: none;
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+    }
+
+    .university-input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: rgba(200, 200, 200, 0.3);
+    }
+
+    .university-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      max-height: 250px;
+      overflow-y: auto;
+      display: none;
+      z-index: 100;
+    }
+
+    .university-dropdown.visible {
+      display: block;
+    }
+
+    .university-option {
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #2d2d2d;
+      transition: background 0.2s;
+    }
+
+    .university-option:hover {
+      background: rgba(124, 152, 133, 0.1);
+    }
+
+    .university-option.selected {
+      background: rgba(124, 152, 133, 0.15);
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -334,6 +445,26 @@
   <div class="top-nav">
     <a href="dashboard.html" class="nav-link">Dashboard</a>
     <a href="notes.html" class="nav-link">My Notes</a>
+  </div>
+
+  <!-- University Filter -->
+  <div class="filter-container">
+    <span class="filter-label">Filter by University:</span>
+    <div class="filter-toggle" id="filterToggle">
+      <div class="filter-toggle-slider"></div>
+    </div>
+    <div class="university-select">
+      <input
+        type="text"
+        class="university-input"
+        id="universityFilter"
+        placeholder="Select university..."
+        autocomplete="off"
+        disabled
+        readonly
+      >
+      <div class="university-dropdown" id="universityDropdown"></div>
+    </div>
   </div>
 
   <!-- Search -->
@@ -355,6 +486,9 @@
     Click cards to open · Drag to rearrange
   </div>
 
+  <!-- University Data -->
+  <script src="university-data.js"></script>
+
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -373,6 +507,9 @@
     let isDragging = false;
     let dragStartX = 0;
     let dragStartY = 0;
+    let userUniversity = null;
+    let filterEnabled = false;
+    let selectedUniversity = null;
 
     // Initialize
     (async function init() {
@@ -384,6 +521,12 @@
 
       authToken = session.access_token;
 
+      // Get user's university
+      await fetchUserUniversity();
+
+      // Setup university filter
+      setupUniversityFilter();
+
       // Setup search
       document.getElementById('searchInput').addEventListener('input', handleSearchInput);
 
@@ -391,12 +534,128 @@
       restoreState();
     })();
 
+    // Fetch user's university from profile
+    async function fetchUserUniversity() {
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabaseClient
+          .from('user_profiles')
+          .select('university')
+          .eq('id', user.id)
+          .single();
+
+        if (profile && profile.university) {
+          userUniversity = profile.university;
+          selectedUniversity = profile.university;
+          document.getElementById('universityFilter').value = profile.university;
+        }
+      } catch (error) {
+        console.error('Error fetching user university:', error);
+      }
+    }
+
+    // Setup university filter dropdown
+    function setupUniversityFilter() {
+      const toggle = document.getElementById('filterToggle');
+      const input = document.getElementById('universityFilter');
+      const dropdown = document.getElementById('universityDropdown');
+
+      // Populate dropdown with universities
+      populateUniversityDropdown();
+
+      // Toggle filter on/off
+      toggle.addEventListener('click', () => {
+        filterEnabled = !filterEnabled;
+        toggle.classList.toggle('active', filterEnabled);
+        input.disabled = !filterEnabled;
+
+        // If enabled and there's a search query, re-run search
+        const currentQuery = document.getElementById('searchInput').value.trim();
+        if (currentQuery) {
+          performSearch(currentQuery);
+        }
+      });
+
+      // Show dropdown on input click
+      input.addEventListener('click', () => {
+        if (!input.disabled) {
+          dropdown.classList.add('visible');
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.university-select')) {
+          dropdown.classList.remove('visible');
+        }
+      });
+
+      // Handle input for search
+      input.addEventListener('input', () => {
+        if (!input.disabled) {
+          filterUniversityDropdown(input.value);
+        }
+      });
+    }
+
+    // Populate university dropdown
+    function populateUniversityDropdown() {
+      const dropdown = document.getElementById('universityDropdown');
+      dropdown.innerHTML = '';
+
+      UNIVERSITIES.forEach(uni => {
+        const option = document.createElement('div');
+        option.className = 'university-option';
+        if (uni === selectedUniversity) {
+          option.classList.add('selected');
+        }
+        option.textContent = uni;
+        option.addEventListener('click', () => selectUniversity(uni));
+        dropdown.appendChild(option);
+      });
+    }
+
+    // Filter university dropdown based on search
+    function filterUniversityDropdown(query) {
+      const dropdown = document.getElementById('universityDropdown');
+      const options = dropdown.querySelectorAll('.university-option');
+
+      options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        const matches = text.includes(query.toLowerCase());
+        option.style.display = matches ? 'block' : 'none';
+      });
+    }
+
+    // Select a university from dropdown
+    function selectUniversity(uni) {
+      selectedUniversity = uni;
+      document.getElementById('universityFilter').value = uni;
+      document.getElementById('universityDropdown').classList.remove('visible');
+
+      // Update dropdown selected state
+      const options = document.querySelectorAll('.university-option');
+      options.forEach(opt => {
+        opt.classList.toggle('selected', opt.textContent === uni);
+      });
+
+      // Re-run search if there's a query
+      const currentQuery = document.getElementById('searchInput').value.trim();
+      if (currentQuery && filterEnabled) {
+        performSearch(currentQuery);
+      }
+    }
+
     // Save state to sessionStorage
     function saveState(query, results, cardPositions) {
       sessionStorage.setItem('browseState', JSON.stringify({
         query: query,
         results: results,
         cardPositions: cardPositions,
+        filterEnabled: filterEnabled,
+        selectedUniversity: selectedUniversity,
         timestamp: Date.now()
       }));
     }
@@ -413,6 +672,20 @@
         if (Date.now() - state.timestamp > 30 * 60 * 1000) {
           sessionStorage.removeItem('browseState');
           return;
+        }
+
+        // Restore filter state
+        if (state.filterEnabled !== undefined) {
+          filterEnabled = state.filterEnabled;
+          const toggle = document.getElementById('filterToggle');
+          const input = document.getElementById('universityFilter');
+          toggle.classList.toggle('active', filterEnabled);
+          input.disabled = !filterEnabled;
+        }
+
+        if (state.selectedUniversity) {
+          selectedUniversity = state.selectedUniversity;
+          document.getElementById('universityFilter').value = state.selectedUniversity;
         }
 
         // Restore search query
@@ -450,15 +723,22 @@
     // Perform search
     async function performSearch(query) {
       try {
+        const requestBody = {
+          question: query
+        };
+
+        // Add university filter if enabled
+        if (filterEnabled && selectedUniversity) {
+          requestBody.university = selectedUniversity;
+        }
+
         const response = await fetch(`${BACKEND_URL}/api/notes/semantic-browse`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            question: query
-          })
+          body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
