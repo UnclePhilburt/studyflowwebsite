@@ -565,6 +565,13 @@
       console.log('[Browse Init] Valid session found, user:', session.user.email);
       authToken = session.access_token;
 
+      // Explicitly set the session on the Supabase client for database queries
+      await supabaseClient.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token
+      });
+      console.log('[Browse Init] Session set on Supabase client');
+
       // Listen for auth state changes (only logout)
       supabaseClient.auth.onAuthStateChange((event, newSession) => {
         console.log('[Browse Auth] Auth state changed:', event, 'Has session:', !!newSession);
