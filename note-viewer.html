@@ -468,6 +468,71 @@
         font-size: 12px;
       }
     }
+
+    /* Related Notes */
+    .related-section {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .related-title {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 16px;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .related-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+      display: block;
+    }
+
+    .related-card:hover {
+      border-color: rgba(124, 152, 133, 0.3);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .related-card-filename {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .related-card-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .related-card-votes {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
   </style>
 </head>
 <body>
@@ -614,6 +679,12 @@
         <strong>Transaction ID:</strong> <span id="attr-transaction-id">#00000</span>
         <br>
         <strong>Notice:</strong> This note is provided for reference only. Do not submit as your own work.
+      </div>
+
+      <!-- Related Notes -->
+      <div class="related-section" id="relatedSection" style="display: none;">
+        <div class="related-title">Related Notes</div>
+        <div class="related-grid" id="relatedGrid"></div>
       </div>
     </div>
   </div>
@@ -866,8 +937,9 @@
 
         document.getElementById('loading').style.display = 'none';
 
-        // Track view
+        // Track view and load related notes
         trackView(noteId);
+        loadRelatedNotes(noteId);
 
       } catch (error) {
         console.error('Error loading note:', error);
@@ -885,6 +957,42 @@
         });
       } catch (error) {
         console.error('Failed to track view:', error);
+      }
+    }
+
+    async function loadRelatedNotes(noteId) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/related`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const related = data.related || [];
+
+        if (related.length === 0) return;
+
+        const grid = document.getElementById('relatedGrid');
+        grid.innerHTML = related.map(n => {
+          const voteBadge = n.net_votes !== 0
+            ? `<span class="related-card-votes">${n.net_votes > 0 ? '+' : ''}${n.net_votes}</span>`
+            : '';
+
+          return `
+            <a href="note-viewer.html?id=${n.id}" class="related-card">
+              <div class="related-card-filename" title="${n.filename}">${n.filename}</div>
+              <div class="related-card-meta">
+                @${n.username}${n.university ? ' - ' + n.university : ''}${n.course_code ? ' - ' + n.course_code : ''}
+              </div>
+              ${voteBadge}
+            </a>
+          `;
+        }).join('');
+
+        document.getElementById('relatedSection').style.display = 'block';
+      } catch (e) {
+        console.error('Failed to load related notes:', e);
       }
     }
 
