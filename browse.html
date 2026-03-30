@@ -386,15 +386,14 @@
     // Perform semantic search
     async function performSearch(query) {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/notes/search`, {
+        const response = await fetch(`${BACKEND_URL}/api/notes/semantic-browse`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            query: query,
-            match_count: 10
+            question: query
           })
         });
 
