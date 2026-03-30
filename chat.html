@@ -1236,10 +1236,6 @@
       // Only show top-level folders (no parent) on home
       folders = (foldersData.folders || []).filter(f => !f.parent_id);
 
-      // Render folders centered on canvas
-      const startX = -(totalItems * 210) / 2;
-      const y = -70;
-
       // Use saved positions or scatter randomly
       folders.forEach((f, i) => {
         const fx = f.position_x || (Math.random() - 0.5) * 500;
