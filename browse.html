@@ -562,7 +562,7 @@
         return;
       }
 
-      console.log('[Browse Init] Valid session found');
+      console.log('[Browse Init] Valid session found, user:', session.user.email);
       authToken = session.access_token;
 
       // Listen for auth state changes (only logout)
@@ -582,10 +582,10 @@
         }
       });
 
-      // Get user's university (don't let errors block page load)
+      // Get user's university using session user (don't let errors block page load)
       try {
         console.log('[Browse Init] Fetching user university...');
-        await fetchUserUniversity();
+        await fetchUserUniversity(session.user);
         console.log('[Browse Init] User university fetched');
       } catch (error) {
         console.error('[Browse Init] Error fetching university (non-blocking):', error);
@@ -618,23 +618,14 @@
     }
 
     // Fetch user's university from profile
-    async function fetchUserUniversity() {
+    async function fetchUserUniversity(user) {
       try {
-        console.log('[fetchUserUniversity] Getting user...');
-        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-
-        if (authError) {
-          console.error('[fetchUserUniversity] Auth error:', authError);
-          // Don't redirect - let main init handle auth
-          return;
-        }
-
         if (!user) {
-          console.log('[fetchUserUniversity] No user found');
+          console.log('[fetchUserUniversity] No user provided');
           return;
         }
 
-        console.log('[fetchUserUniversity] User found, fetching profile...');
+        console.log('[fetchUserUniversity] User provided, fetching profile for:', user.id);
         const { data: profile, error: profileError } = await supabaseClient
           .from('user_profiles')
           .select('university, edu_email_verified')
