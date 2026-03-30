@@ -1371,6 +1371,7 @@
       let didDrag = false;
 
       el.addEventListener('mousedown', (e) => {
+        if (e.button === 2) return; // Ignore right-click
         e.preventDefault();
         e.stopPropagation();
         dragState = { startX: e.clientX, startY: e.clientY, origX: x, origY: y };
@@ -1387,7 +1388,6 @@
           y = dragState.origY + dy;
           el.style.left = x + 'px';
           el.style.top = y + 'px';
-          // Check breadcrumb hover for drag-to-move
           if (folder.id) checkBreadcrumbHover(e.clientX, e.clientY);
         }
       };
@@ -1440,6 +1440,7 @@
       let didDrag = false;
 
       el.addEventListener('mousedown', (e) => {
+        if (e.button === 2) return; // Ignore right-click
         e.preventDefault();
         e.stopPropagation();
         dragState = { startX: e.clientX, startY: e.clientY, origX: x, origY: y };
@@ -1594,6 +1595,22 @@
             loadConversation(c.id);
           }, { type: 'conversation', id: c.id });
           el._convoId = c.id;
+
+          // Right-click menu on conversation previews
+          el.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            ctxMenu.innerHTML = `
+              <button class="ctx-item" onclick="deleteConversation('${c.id}')">
+                <svg viewBox="0 0 24 24" style="stroke:#dc2626;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                <span style="color:#dc2626;">Delete conversation</span>
+              </button>
+            `;
+            ctxMenu.style.left = e.clientX + 'px';
+            ctxMenu.style.top = e.clientY + 'px';
+            ctxMenu.classList.add('active');
+          });
+
           convoElements.push(el);
         });
 
@@ -2403,19 +2420,22 @@
     }
 
     async function deleteConversation(convId, el) {
+      ctxMenu.classList.remove('active');
       if (!confirm('Delete this conversation?')) return;
       try {
-        el.style.opacity = '0';
+        if (el) el.style.opacity = '0';
         await fetch(`${BACKEND_URL}/api/conversations/${convId}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        setTimeout(() => {
-          if (convId === conversationId) startNewChat();
-          loadConversations();
-        }, 300);
+        // Refresh current view
+        if (currentLevel === 'folder') {
+          navigateToFolder(currentFolderId, currentFolderName);
+        } else if (currentLevel === 'home') {
+          navigateHome();
+        }
       } catch (e) {
-        el.style.opacity = '1';
+        if (el) el.style.opacity = '1';
         console.error('Delete error:', e);
       }
     }
