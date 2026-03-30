@@ -1055,10 +1055,19 @@
     }
 
     function updateFollowupPositions(card) {
-      const cardW = 380, cardH = card.element.offsetHeight || 200;
+      const cardW = card.element.classList.contains('child-card') ? 350 : 380;
+      const cardH = card.element.offsetHeight || 200;
       const count = card.followups.length;
-      const spacing = 60;
       const startY = card.y + cardH + 40;
+
+      // Remove old followup lines
+      if (card._followupPaths) {
+        card._followupPaths.forEach(p => p.remove());
+      }
+      card._followupPaths = [];
+
+      const anchorX = card.x + cardW / 2;
+      const anchorY = card.y + cardH;
 
       card.followups.forEach((f, i) => {
         const offsetX = (i - (count - 1) / 2) * (cardW / count + 20);
@@ -1066,8 +1075,23 @@
         const fy = startY + Math.abs(offsetX) * 0.15;
         f.element.style.left = fx + 'px';
         f.element.style.top = fy + 'px';
-        f.cx = fx + 60;
-        f.cy = fy;
+
+        // Bubble center
+        const bw = f.element.offsetWidth || 120;
+        const bcx = fx + bw / 2;
+        const bcy = fy;
+
+        // Draw bezier line from card bottom to bubble
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const midY = anchorY + (bcy - anchorY) * 0.5;
+        path.setAttribute('d', `M ${anchorX} ${anchorY} C ${anchorX} ${midY}, ${bcx} ${midY}, ${bcx} ${bcy}`);
+        path.setAttribute('stroke', 'var(--accent-primary)');
+        path.setAttribute('stroke-width', '1.5');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('opacity', '0.3');
+        path.setAttribute('stroke-dasharray', '4 3');
+        svgLayer.appendChild(path);
+        card._followupPaths.push(path);
       });
     }
 
@@ -1114,7 +1138,7 @@
         cy = (window.innerHeight / 2 - panY) / scale - 100 + cards.length * 30;
       }
 
-      // Remove the bubble that was clicked
+      // Remove the bubble that was clicked (lines will be redrawn by updateFollowupPositions)
       if (originBubble) {
         const parentCard = cards.find(c => c.id === parentId);
         if (parentCard) {
@@ -1125,6 +1149,11 @@
             }
             return true;
           });
+          // Clean old paths and redraw for remaining bubbles
+          if (parentCard._followupPaths) {
+            parentCard._followupPaths.forEach(p => p.remove());
+            parentCard._followupPaths = [];
+          }
           updateFollowupPositions(parentCard);
         }
       }
@@ -1332,12 +1361,13 @@
     }
 
     function clearCanvas() {
-      // Remove all cards and followup bubbles
+      // Remove all cards, followup bubbles, and followup paths
       cards.forEach(c => {
         c.element.remove();
         c.followups.forEach(f => f.element.remove());
+        if (c._followupPaths) c._followupPaths.forEach(p => p.remove());
       });
-      connections.forEach(c => c.line.remove());
+      connections.forEach(c => c.path.remove());
       cards = [];
       connections = [];
       nextCardId = 0;
