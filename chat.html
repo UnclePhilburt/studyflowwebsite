@@ -1320,7 +1320,7 @@
       // Only show top-level folders (no parent) on home
       folders = (foldersData.folders || []).filter(f => !f.parent_id);
 
-      // Use saved positions or scatter randomly
+      // Render folder cards
       folders.forEach((f, i) => {
         const fx = f.position_x || (Math.random() - 0.5) * 500;
         const fy = f.position_y || (Math.random() - 0.5) * 300;
@@ -1328,15 +1328,86 @@
         folderElements.push(el);
       });
 
-      // "Unfiled" folder
-      const unfiledCount = (unfiledData.conversations || []).length;
-      const unfiledEl = createDraggableFolderCard({
-        name: 'Unfiled',
-        color: '#9ca3af',
-        _count: unfiledCount,
-        _icon: '<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>'
-      }, 300, -20, (clickedEl) => navigateToFolder(null, 'Unfiled', clickedEl));
-      folderElements.push(unfiledEl);
+      // Load unfiled conversations as card clusters directly on home canvas
+      const unfiledConvos = unfiledData.conversations || [];
+      if (unfiledConvos.length > 0) {
+        const msgPromises = unfiledConvos.map(c =>
+          fetch(`${BACKEND_URL}/api/conversations/${c.id}/messages`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          }).then(r => r.ok ? r.json() : { messages: [] }).catch(() => ({ messages: [] }))
+        );
+        const allMsgs = await Promise.all(msgPromises);
+
+        let clusterX = 500; // Start to the right of folders
+        unfiledConvos.forEach((conv, ci) => {
+          const messages = allMsgs[ci].messages || [];
+          const savedLayout = conv.canvas_layout;
+          const clusterOffsetX = clusterX;
+
+          // Title label
+          const titleLabel = document.createElement('div');
+          titleLabel.className = 'cluster-title';
+          titleLabel.textContent = conv.title || 'New Chat';
+          titleLabel.style.left = clusterOffsetX + 'px';
+          titleLabel.style.top = '-40px';
+          world.appendChild(titleLabel);
+          folderElements.push(titleLabel);
+
+          const savedPositions = {};
+          if (savedLayout && savedLayout.cards) {
+            savedLayout.cards.forEach(sc => { savedPositions[sc.question] = sc; });
+          }
+
+          let lastCardId = null;
+          let pendingQuestion = null;
+          let fallbackY = 0;
+
+          for (const msg of messages) {
+            if (msg.role === 'user') {
+              pendingQuestion = msg.content;
+            } else if (msg.role === 'assistant' && pendingQuestion) {
+              const saved = savedPositions[pendingQuestion];
+              let cx, cy, parentId;
+              if (saved) {
+                cx = saved.x + clusterOffsetX;
+                cy = saved.y;
+                parentId = saved.parentId !== null && saved.parentId !== undefined
+                  ? (saved.parentId < cards.length ? saved.parentId : lastCardId) : lastCardId;
+              } else {
+                cx = clusterOffsetX;
+                cy = fallbackY;
+                parentId = lastCardId;
+              }
+
+              const card = createCard(pendingQuestion, cx, cy, parentId);
+              card._conversationId = conv.id;
+              populateCard(card, msg.content, msg.sources, []);
+
+              if (saved && saved.collapsed) {
+                card.element.classList.add('collapsed');
+                const btn = card.element.querySelector('.card-collapse-btn');
+                if (btn) btn.textContent = '+';
+              }
+
+              if (!saved) fallbackY += (card.element.offsetHeight || 200) + 100;
+              clusterX = Math.max(clusterX, cx + 600);
+              lastCardId = card.id;
+              pendingQuestion = null;
+            }
+          }
+
+          // Follow-up bubbles on leaf cards
+          const clusterCards = cards.filter(c => c._conversationId === conv.id);
+          const parentIds = new Set(clusterCards.map(c => c.parentId).filter(id => id !== null));
+          clusterCards.forEach(c => {
+            if (!parentIds.has(c.id) && c.response) {
+              createFollowupBubbles(c, ['Tell me more', 'What else?']);
+            }
+          });
+
+          clusterX += 200;
+        });
+      }
 
     }
 
