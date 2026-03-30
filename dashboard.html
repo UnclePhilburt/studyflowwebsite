@@ -1736,30 +1736,36 @@
         transform: translateX(-50%);
         right: auto;
         max-width: calc(100% - 24px);
-        padding: 10px 16px;
-        gap: 6px;
-        border-radius: 20px;
+        padding: 12px 20px;
+        gap: 10px;
+        border-radius: 22px;
         overflow-x: auto;
         overflow-y: hidden;
-        justify-content: center;
+        justify-content: flex-start;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
+        scroll-snap-type: x proximity;
+        scroll-padding: 20px;
       }
 
       .dock::-webkit-scrollbar {
         display: none;
       }
 
+      .dock-item {
+        scroll-snap-align: center;
+      }
+
       .dock-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
         flex-shrink: 0;
       }
 
       .dock-icon svg {
-        width: 22px;
-        height: 22px;
+        width: 26px;
+        height: 26px;
       }
 
       .dock-item {
@@ -1778,6 +1784,7 @@
 
       .dock-divider {
         flex-shrink: 0;
+        height: 52px;
       }
 
       .notif-dropdown {
@@ -1913,22 +1920,22 @@
         transform: translateX(-50%);
         max-width: calc(100% - 16px);
         bottom: 8px;
-        padding: 8px 12px;
-        gap: 4px;
+        padding: 10px 16px;
+        gap: 8px;
       }
 
       .dock-icon {
-        width: 44px;
-        height: 44px;
+        width: 52px;
+        height: 52px;
       }
 
       .dock-icon svg {
-        width: 20px;
-        height: 20px;
+        width: 24px;
+        height: 24px;
       }
 
       .dock-divider {
-        height: 40px;
+        height: 48px;
       }
     }
 
@@ -1940,23 +1947,23 @@
         transform: translateX(-50%);
         max-width: calc(100% - 12px);
         bottom: 6px;
-        padding: 6px 10px;
-        gap: 3px;
+        padding: 8px 12px;
+        gap: 6px;
       }
 
       .dock-icon {
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
       }
 
       .dock-icon svg {
-        width: 18px;
-        height: 18px;
+        width: 22px;
+        height: 22px;
       }
 
       .dock-divider {
-        height: 36px;
-        margin: 0 2px;
+        height: 44px;
+        margin: 0 3px;
       }
 
       .dock-label {
