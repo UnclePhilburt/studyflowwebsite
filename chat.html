@@ -863,6 +863,8 @@
     }, { passive: false });
 
     // ============ CARD CREATION ============
+    let _skipNextParentConnection = false;
+
     function createCard(question, x, y, parentId = null) {
       const id = nextCardId++;
       const el = document.createElement('div');
@@ -909,10 +911,11 @@
       const card = { id, element: el, x, y, parentId, question, response: null, sources: null, followups: [] };
       cards.push(card);
 
-      // Draw connection to parent
-      if (parentId !== null) {
+      // Draw connection to parent (skip if bubble connection handles it)
+      if (parentId !== null && !_skipNextParentConnection) {
         drawConnection(parentId, id);
       }
+      _skipNextParentConnection = false;
 
       return card;
     }
@@ -1146,27 +1149,70 @@
         cy = (window.innerHeight / 2 - panY) / scale - 100 + cards.length * 30;
       }
 
-      // Remove the bubble that was clicked (lines will be redrawn by updateFollowupPositions)
+      // Keep clicked bubble, remove the others
+      let clickedBubbleInfo = null;
       if (originBubble) {
         const parentCard = cards.find(c => c.id === parentId);
         if (parentCard) {
+          // Remove all followup paths
+          if (parentCard._followupPaths) {
+            parentCard._followupPaths.forEach(p => p.remove());
+            parentCard._followupPaths = [];
+          }
+
+          // Remove other bubbles, keep the clicked one
           parentCard.followups = parentCard.followups.filter(f => {
-            if (f.element === originBubble) {
+            if (f.element !== originBubble) {
               f.element.remove();
               return false;
             }
             return true;
           });
-          // Clean old paths and redraw for remaining bubbles
-          if (parentCard._followupPaths) {
-            parentCard._followupPaths.forEach(p => p.remove());
-            parentCard._followupPaths = [];
-          }
-          updateFollowupPositions(parentCard);
+
+          // Style the clicked bubble as a permanent label
+          originBubble.style.animation = 'none';
+          originBubble.style.opacity = '0.7';
+          originBubble.style.cursor = 'default';
+          originBubble.style.pointerEvents = 'none';
+          originBubble.style.borderStyle = 'dashed';
+
+          // Get bubble position for card placement
+          const bx = parseFloat(originBubble.style.left) || 0;
+          const by = parseFloat(originBubble.style.top) || 0;
+          const bw = originBubble.offsetWidth || 120;
+          clickedBubbleInfo = { x: bx, y: by, w: bw };
+
+          // Position new card below the clicked bubble
+          const cardW = 350; // child card width
+          cx = bx + bw / 2 - cardW / 2;
+          cy = by + 50;
         }
       }
 
+      if (clickedBubbleInfo) _skipNextParentConnection = true;
       const card = createCard(text, cx, cy, parentId);
+
+      // Draw connection line from clicked bubble to new card
+      if (clickedBubbleInfo) {
+        const bubblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const bCx = clickedBubbleInfo.x + clickedBubbleInfo.w / 2 + SVG_OFFSET;
+        const bCy = clickedBubbleInfo.y + 30 + SVG_OFFSET;
+        const cardCx = cx + 175 + SVG_OFFSET;
+        const cardCy = cy + SVG_OFFSET;
+        const midY = bCy + (cardCy - bCy) * 0.5;
+        bubblePath.setAttribute('d', `M ${bCx} ${bCy} C ${bCx} ${midY}, ${cardCx} ${midY}, ${cardCx} ${cardCy}`);
+        bubblePath.setAttribute('stroke', '#7c9885');
+        bubblePath.setAttribute('stroke-width', '1.5');
+        bubblePath.setAttribute('fill', 'none');
+        bubblePath.setAttribute('opacity', '0.35');
+        svgLayer.appendChild(bubblePath);
+        // Store so it can be cleaned up
+        const parentCard = cards.find(c => c.id === parentId);
+        if (parentCard) {
+          if (!parentCard._followupPaths) parentCard._followupPaths = [];
+          parentCard._followupPaths.push(bubblePath);
+        }
+      }
 
       // Pan to show the new card
       panToCard(card);
