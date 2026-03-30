@@ -272,6 +272,64 @@
       opacity: 1;
     }
 
+    /* ============ EMPTY STATE HINT ============ */
+    .empty-hint {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+      animation: emptyHintFade 0.6s ease forwards;
+    }
+
+    @keyframes emptyHintFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .empty-hint-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--hover-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-hint-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--text-muted);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .empty-hint-text {
+      font-family: 'Lora', serif;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .empty-hint-sub {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .empty-hint-key {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--hover-bg);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+
     /* ============ CLUSTER TITLE ============ */
     .cluster-title {
       position: absolute;
@@ -1273,6 +1331,24 @@
       }
     }
 
+    function showEmptyHint(title, subtitle) {
+      const hint = document.createElement('div');
+      hint.className = 'empty-hint';
+      hint.style.left = '-120px';
+      hint.style.top = '-50px';
+      hint.innerHTML = `
+        <div class="empty-hint-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="empty-hint-text">${title}</div>
+        <div class="empty-hint-sub">
+          <span class="empty-hint-key">Right-click</span> ${subtitle}
+        </div>
+      `;
+      world.appendChild(hint);
+      folderElements.push(hint);
+    }
+
     function clearLevelElements() {
       folderElements.forEach(el => { if (el._cleanup) el._cleanup(); el.remove(); });
       folderElements = [];
@@ -1398,6 +1474,11 @@
 
           clusterX += 200;
         });
+      }
+
+      // Show empty state hint if nothing on canvas
+      if (folders.length === 0 && unfiledConvos.length === 0) {
+        showEmptyHint('Your workspace is empty', 'Right-click anywhere to create a folder or start a chat');
       }
 
     }
@@ -1741,8 +1822,10 @@
           }
         } catch (e) {}
 
-        // Set conversationId when interacting with a card's followups
-        // (override sendMessage to use the card's conversation)
+        // Show empty hint if folder is empty
+        if (convos.length === 0 && convoElements.length === 0) {
+          showEmptyHint('This folder is empty', 'Right-click to add a chat or subfolder');
+        }
 
       } catch (e) { console.error('Folder load error:', e); }
     }
