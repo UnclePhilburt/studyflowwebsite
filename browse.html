@@ -326,7 +326,7 @@
 
   <!-- Hint -->
   <div class="hint-text">
-    Click cards to flip · Drag to rearrange
+    Click cards to open · Drag to rearrange
   </div>
 
   <!-- Supabase -->
@@ -344,6 +344,9 @@
     let draggedCard = null;
     let offsetX = 0;
     let offsetY = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
 
     // Initialize
     (async function init() {
@@ -461,16 +464,23 @@
               <div class="card-back-header">${filename}</div>
               <div class="card-back-content">${highlightedPreview}</div>
               <div class="card-back-footer">
-                <button class="view-full-btn" onclick="openFullNote('${result.note_id}')">View Full Note</button>
+                <div style="color: #7c9885; font-size: 0.7rem;">Opening note...</div>
               </div>
             </div>
           </div>
         `;
 
-        // Click to flip
+        // Click to flip and open
         card.addEventListener('click', (e) => {
-          if (e.target.classList.contains('view-full-btn')) return;
-          card.classList.toggle('flipped');
+          if (isDragging) return; // Don't flip if user was dragging
+
+          // Play flip animation
+          card.classList.add('flipped');
+
+          // Wait for flip animation, then open note
+          setTimeout(() => {
+            openFullNote(result.note_id);
+          }, 600); // Match the CSS transition time
         });
 
         // Drag functionality
@@ -482,13 +492,14 @@
 
     // Drag handlers
     function startDrag(e) {
-      if (e.target.classList.contains('view-full-btn')) return;
-
       draggedCard = e.currentTarget;
       const rect = draggedCard.getBoundingClientRect();
 
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      isDragging = false; // Reset drag flag
 
       document.addEventListener('mousemove', drag);
       document.addEventListener('mouseup', stopDrag);
@@ -498,6 +509,13 @@
 
     function drag(e) {
       if (!draggedCard) return;
+
+      // Check if mouse moved more than 5px to consider it a drag
+      const deltaX = Math.abs(e.clientX - dragStartX);
+      const deltaY = Math.abs(e.clientY - dragStartY);
+      if (deltaX > 5 || deltaY > 5) {
+        isDragging = true;
+      }
 
       const x = e.clientX - offsetX;
       const y = e.clientY - offsetY;
@@ -511,6 +529,11 @@
       draggedCard = null;
       document.removeEventListener('mousemove', drag);
       document.removeEventListener('mouseup', stopDrag);
+
+      // Reset drag flag after a short delay to prevent click from firing
+      setTimeout(() => {
+        isDragging = false;
+      }, 100);
     }
 
     // Open full note
