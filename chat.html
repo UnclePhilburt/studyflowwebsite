@@ -1062,14 +1062,8 @@
     </div>
   </div>
 
-  <!-- Welcome Screen -->
-  <div id="welcomeScreen">
-    <h1>A space for learning</h1>
-    <p>Ask anything, explore freely</p>
-  </div>
-
-  <!-- Input Bar -->
-  <div class="input-bar">
+  <!-- Input Bar (hidden by default, shown only inside conversations) -->
+  <div class="input-bar" style="display:none;">
     <textarea id="chatInput" placeholder="What would you like to explore?" rows="1"></textarea>
     <button id="sendBtn" disabled>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1226,7 +1220,7 @@
       currentLevel = 'home';
       currentFolderId = null;
       conversationId = null;
-      document.getElementById('welcomeScreen').classList.add('hidden');
+      // (welcome screen removed)
       document.querySelector('.input-bar').style.display = 'none';
       updateBreadcrumb();
 
@@ -1320,7 +1314,7 @@
       currentFolderId = folderId;
       currentFolderName = folderName;
       conversationId = null;
-      document.getElementById('welcomeScreen').classList.add('hidden');
+      // (welcome screen removed)
       document.querySelector('.input-bar').style.display = 'none';
       updateBreadcrumb();
 
@@ -1401,7 +1395,7 @@
           conversationId = null;
           clearCanvas();
           document.querySelector('.input-bar').style.display = 'flex';
-          document.getElementById('welcomeScreen').classList.remove('hidden');
+          // (welcome screen removed)
           document.getElementById('chatInput').focus();
         });
         world.appendChild(newEl);
@@ -1853,7 +1847,7 @@
     async function sendMessage(text, parentId = null, originBubble = null) {
       if (!text.trim()) return;
 
-      document.getElementById('welcomeScreen').classList.add('hidden');
+      // (welcome screen removed)
       document.querySelector('.input-bar').style.display = 'none';
 
       // SB 1455: Disclosure at initiation of first card
@@ -2068,7 +2062,7 @@
         // Clear canvas
         clearCanvas();
         conversationId = convId;
-        document.getElementById('welcomeScreen').classList.add('hidden');
+        // (welcome screen removed)
         document.querySelector('.input-bar').style.display = 'none';
 
         // Build a lookup from saved layout by question text
@@ -2176,7 +2170,7 @@
       conversationId = null;
       currentLevel = 'conversation';
       updateBreadcrumb();
-      document.getElementById('welcomeScreen').classList.remove('hidden');
+      // (welcome screen removed)
       document.querySelector('.input-bar').style.display = 'flex';
       document.getElementById('chatInput').focus();
     }
@@ -2525,7 +2519,7 @@
     // New question at right-click position
     document.getElementById('ctxNewCard').addEventListener('click', () => {
       ctxMenu.classList.remove('active');
-      document.getElementById('welcomeScreen').classList.add('hidden');
+      // (welcome screen removed)
       document.querySelector('.input-bar').style.display = 'none';
 
       // Create an input card at the right-click position
