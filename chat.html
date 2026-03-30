@@ -1490,7 +1490,8 @@
       el.style.top = y + 'px';
       if (folder._dashed) { el.style.borderStyle = 'dashed'; el.style.opacity = '0.6'; }
 
-      const icon = folder._icon || '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>';
+      const defaultIcon = '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>';
+      const icon = folder._icon || folder.icon || defaultIcon;
       const countHtml = folder._count !== undefined ? `<div class="folder-card-count">${folder._count} conversation${folder._count !== 1 ? 's' : ''}</div>` : '';
 
       el.innerHTML = `
@@ -1506,11 +1507,37 @@
         el.addEventListener('contextmenu', (e) => {
           e.preventDefault();
           e.stopPropagation();
+          const colors = ['#7c9885','#4a90a4','#d17a5f','#8a7aa4','#5a8a5a','#e89b5f','#dc2626','#6366f1','#2d2d2d'];
+          const icons = [
+            { name: 'Folder', svg: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>' },
+            { name: 'Book', svg: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>' },
+            { name: 'Beaker', svg: '<path d="M9 3h6v4l4 8H5l4-8V3z"/><line x1="9" y1="3" x2="15" y2="3"/>' },
+            { name: 'Calculator', svg: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/>' },
+            { name: 'Globe', svg: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>' },
+            { name: 'Music', svg: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>' },
+            { name: 'Code', svg: '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>' },
+            { name: 'Star', svg: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>' },
+          ];
+
+          const colorDots = colors.map(c => `<div onclick="changeFolderColor('${folder.id}','${c}')" style="width:20px;height:20px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${c === folder.color ? 'var(--text-primary)' : 'transparent'};transition:border 0.15s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'"></div>`).join('');
+
+          const iconBtns = icons.map(ic => `<div onclick="changeFolderIcon('${folder.id}','${ic.svg.replace(/'/g, "\\'")}')" style="width:28px;height:28px;border-radius:6px;background:var(--hover-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='var(--accent-primary)';this.querySelector('svg').style.stroke='white'" onmouseout="this.style.background='var(--hover-bg)';this.querySelector('svg').style.stroke='var(--text-secondary)'"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text-secondary);fill:none;stroke-width:2;">${ic.svg}</svg></div>`).join('');
+
           ctxMenu.innerHTML = `
             <button class="ctx-item" onclick="renameFolder('${folder.id}')">
               <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               Rename
             </button>
+            <div class="ctx-divider"></div>
+            <div style="padding:6px 12px;">
+              <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;">Color</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">${colorDots}</div>
+            </div>
+            <div style="padding:6px 12px;">
+              <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px;">Icon</div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;">${iconBtns}</div>
+            </div>
+            <div class="ctx-divider"></div>
             <button class="ctx-item" onclick="deleteFolder('${folder.id}', '${folder.name.replace(/'/g, "\\'")}')">
               <svg viewBox="0 0 24 24" style="stroke:#dc2626;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               <span style="color:#dc2626;">Delete</span>
@@ -1852,6 +1879,32 @@
           navigateHome();
         }
       } catch (e) { console.error('Create folder error:', e); }
+    }
+
+    async function changeFolderColor(folderId, color) {
+      ctxMenu.classList.remove('active');
+      try {
+        await fetch(`${BACKEND_URL}/api/chat-folders/${folderId}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ color })
+        });
+        if (currentLevel === 'folder') navigateToFolder(currentFolderId, currentFolderName);
+        else navigateHome();
+      } catch (e) { console.error('Color change error:', e); }
+    }
+
+    async function changeFolderIcon(folderId, iconSvg) {
+      ctxMenu.classList.remove('active');
+      try {
+        await fetch(`${BACKEND_URL}/api/chat-folders/${folderId}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ icon: iconSvg })
+        });
+        if (currentLevel === 'folder') navigateToFolder(currentFolderId, currentFolderName);
+        else navigateHome();
+      } catch (e) { console.error('Icon change error:', e); }
     }
 
     async function deleteFolder(folderId, folderName) {
@@ -3261,6 +3314,12 @@
       // Build menu items based on current level
       let items = '';
 
+      const stickyItem = `
+        <button class="ctx-item" onclick="ctxAction('sticky')">
+          <svg viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M14 3v5a1 1 0 0 0 1 1h5"/></svg>
+          Sticky note
+        </button>`;
+
       if (currentLevel === 'home') {
         items = `
           <button class="ctx-item" onclick="ctxAction('newFolder')">
@@ -3271,6 +3330,7 @@
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             New chat
           </button>
+          ${stickyItem}
         `;
       } else if (currentLevel === 'folder') {
         items = `
@@ -3282,6 +3342,7 @@
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             New chat here
           </button>
+          ${stickyItem}
         `;
       } else if (currentLevel === 'conversation') {
         items = `
