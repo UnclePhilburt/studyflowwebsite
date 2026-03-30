@@ -296,7 +296,7 @@
       display: none;
     }
 
-    .folder-card.selected, .convo-preview.selected {
+    .folder-card.selected, .convo-preview.selected, .canvas-card.selected {
       outline: 2px solid var(--accent-primary);
       outline-offset: 2px;
     }
@@ -2949,7 +2949,7 @@
 
       // Highlight elements inside selection box
       const boxRect = { left: x, top: y, right: x + w, bottom: y + h };
-      const selectableEls = [...document.querySelectorAll('.folder-card, .convo-preview')];
+      const selectableEls = [...document.querySelectorAll('.folder-card, .convo-preview, .canvas-card')];
       selectableEls.forEach(el => {
         const rect = el.getBoundingClientRect();
         const overlaps = !(rect.right < boxRect.left || rect.left > boxRect.right ||
@@ -2965,21 +2965,25 @@
 
       // Collect selected items
       selectedItems = [];
+      const seenConvIds = new Set();
+
       document.querySelectorAll('.folder-card.selected').forEach(el => {
-        // Find folder id from the element's onclick/contextmenu handlers
         const nameEl = el.querySelector('.folder-card-name');
         const name = nameEl ? nameEl.textContent : '';
-        // Match to folders array
         const folder = folders.find(f => f.name === name);
         if (folder && folder.id) {
           selectedItems.push({ type: 'folder', id: folder.id, element: el, name: folder.name });
         }
       });
 
-      document.querySelectorAll('.convo-preview.selected').forEach(el => {
-        // Get conversation id from the element's stored data
-        if (el._convoId) {
-          selectedItems.push({ type: 'conversation', id: el._convoId, element: el });
+      // Collect conversations from selected canvas cards (dedupe by conversation)
+      document.querySelectorAll('.canvas-card.selected').forEach(el => {
+        const card = cards.find(c => c.element === el);
+        if (card && card._conversationId && !seenConvIds.has(card._conversationId)) {
+          seenConvIds.add(card._conversationId);
+          selectedItems.push({ type: 'conversation', id: card._conversationId, element: el });
+          // Highlight all cards in same conversation
+          cards.filter(c => c._conversationId === card._conversationId).forEach(c => c.element.classList.add('selected'));
         }
       });
 
@@ -3139,6 +3143,31 @@
     // ============ CONTEXT MENU ============
     const ctxMenu = document.getElementById('ctxMenu');
     let ctxWorldX = 0, ctxWorldY = 0; // Where the right-click happened in world coords
+
+    // Right-click on canvas cards (Q&A cards) -- show conversation actions
+    viewport.addEventListener('contextmenu', (e) => {
+      const cardEl = e.target.closest('.canvas-card');
+      if (!cardEl) return; // Let the next handler deal with non-card clicks
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Find which card and conversation this belongs to
+      const card = cards.find(c => c.element === cardEl);
+      const convId = card ? card._conversationId : null;
+
+      if (!convId) return;
+
+      ctxMenu.innerHTML = `
+        <button class="ctx-item" onclick="deleteConversation('${convId}')">
+          <svg viewBox="0 0 24 24" style="stroke:#dc2626;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span style="color:#dc2626;">Delete conversation</span>
+        </button>
+      `;
+      ctxMenu.style.left = e.clientX + 'px';
+      ctxMenu.style.top = e.clientY + 'px';
+      ctxMenu.classList.add('active');
+    }, true); // Use capture phase so it fires before the canvas handler
 
     viewport.addEventListener('contextmenu', (e) => {
       if (e.target.closest('.canvas-card') || e.target.closest('.followup-bubble') || e.target.closest('.followup-input-bubble') || e.target.closest('.sticky-note')) return;
