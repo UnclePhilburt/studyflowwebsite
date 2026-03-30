@@ -165,13 +165,17 @@
 
     .card-question {
       padding: 12px 16px;
+      padding-right: 36px;
       background: var(--accent-primary);
       color: white;
       font-size: 13px;
       font-weight: 500;
       border-radius: 16px 16px 0 0;
       line-height: 1.5;
+      cursor: grab;
     }
+
+    .card-question:active { cursor: grabbing; }
 
     .card-response {
       padding: 16px;
@@ -975,15 +979,18 @@
         }, 50);
       });
 
-      // Drag handler
+      // Drag handler -- only from the question header
       el.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.source-card') || e.target.closest('.vote-btn') || e.target.closest('a')) return;
+        if (!e.target.closest('.card-question')) return;
+        if (e.target.closest('.card-collapse-btn')) return;
         e.stopPropagation();
+        const cardObj = cards.find(c => c.id === id);
+        if (!cardObj) return;
         draggedCard = id;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
-        dragOffsetX = x;
-        dragOffsetY = y;
+        dragOffsetX = cardObj.x;
+        dragOffsetY = cardObj.y;
         isDragging = false;
         el.classList.add('dragging');
       });
