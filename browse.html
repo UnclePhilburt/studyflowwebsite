@@ -150,15 +150,23 @@
       position: relative;
     }
 
-    /* Search box fixed at top */
-    .search-stage {
+    /* Top bar - single flex row for filter, search, nav */
+    .top-bar {
       position: fixed;
       top: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 600px;
+      left: 32px;
+      right: 32px;
       z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Search box fills remaining space */
+    .search-stage {
+      flex: 1;
+      min-width: 0;
+      max-width: 600px;
     }
 
     .search-input {
@@ -409,12 +417,10 @@
 
     /* Top nav */
     .top-nav {
-      position: fixed;
-      top: 32px;
-      right: 32px;
-      z-index: 1000;
       display: flex;
       gap: 16px;
+      margin-left: auto;
+      flex-shrink: 0;
     }
 
     .nav-link {
@@ -458,10 +464,6 @@
 
     /* University filter */
     .filter-container {
-      position: fixed;
-      top: 32px;
-      left: 32px;
-      z-index: 1000;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -471,6 +473,7 @@
       border-radius: 12px;
       border: 2px solid var(--border-color);
       box-shadow: 0 4px 16px var(--shadow);
+      flex-shrink: 0;
     }
 
     .filter-label {
@@ -589,41 +592,44 @@
   </style>
 </head>
 <body>
-  <!-- Top Navigation -->
-  <div class="top-nav">
-    <a href="dashboard.html" class="nav-link">Dashboard</a>
-    <a href="notes.html" class="nav-link">My Notes</a>
-  </div>
-
-  <!-- University Filter -->
-  <div class="filter-container">
-    <span class="filter-label">Filter by University:</span>
-    <div class="filter-toggle" id="filterToggle">
-      <div class="filter-toggle-slider"></div>
+  <!-- Top Bar: Filter + Search + Navigation -->
+  <div class="top-bar">
+    <!-- University Filter -->
+    <div class="filter-container">
+      <span class="filter-label">Filter by University:</span>
+      <div class="filter-toggle" id="filterToggle">
+        <div class="filter-toggle-slider"></div>
+      </div>
+      <div class="university-select">
+        <input
+          type="text"
+          class="university-input"
+          id="universityFilter"
+          placeholder="Select university..."
+          autocomplete="off"
+          disabled
+          readonly
+        >
+        <div class="university-dropdown" id="universityDropdown"></div>
+      </div>
     </div>
-    <div class="university-select">
+
+    <!-- Search -->
+    <div class="search-stage">
       <input
         type="text"
-        class="university-input"
-        id="universityFilter"
-        placeholder="Select university..."
+        class="search-input"
+        id="searchInput"
+        placeholder="Search for notes..."
         autocomplete="off"
-        disabled
-        readonly
       >
-      <div class="university-dropdown" id="universityDropdown"></div>
     </div>
-  </div>
 
-  <!-- Search -->
-  <div class="search-stage">
-    <input
-      type="text"
-      class="search-input"
-      id="searchInput"
-      placeholder="Search for notes..."
-      autocomplete="off"
-    >
+    <!-- Navigation -->
+    <div class="top-nav">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="notes.html" class="nav-link">My Notes</a>
+    </div>
   </div>
 
   <!-- Card Table -->
