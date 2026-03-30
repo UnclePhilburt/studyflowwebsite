@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Announcements - StudyFlow Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="university-data.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f4f0;
+      color: #2d2d2d;
+      min-height: 100vh;
+    }
+
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(248, 247, 244, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .header a {
+      color: #7c9885;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .header h1 { font-size: 16px; font-weight: 600; }
+
+    .content {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 80px 24px 40px;
+    }
+
+    /* Compose card */
+    .compose-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+
+    .compose-title {
+      font-family: 'Lora', serif;
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      color: #2d2d2d;
+      background: white;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: #7c9885;
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-select {
+      cursor: pointer;
+    }
+
+    .audience-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .audience-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      background: white;
+      color: #666;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .audience-btn:hover { border-color: #7c9885; color: #2d2d2d; }
+    .audience-btn.active { background: #7c9885; color: white; border-color: #7c9885; }
+
+    .uni-select-row {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .uni-select-row.visible { display: block; }
+
+    .send-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .send-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(124, 152, 133, 0.3); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    /* History */
+    .history-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 16px;
+    }
+
+    .history-item {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .history-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .history-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+
+    .history-item-meta {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: right;
+    }
+
+    .history-item-message {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .history-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: rgba(124, 152, 133, 0.1);
+      color: #7c9885;
+      margin-top: 8px;
+    }
+
+    .empty-history {
+      text-align: center;
+      padding: 32px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    /* Flash */
+    .flash-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 400;
+      transition: transform 0.3s;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .flash-msg.show { transform: translateX(-50%) translateY(0); }
+    .flash-msg.success { background: #7c9885; color: white; }
+    .flash-msg.error { background: #dc2626; color: white; }
+
+    /* Confirm overlay */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .confirm-box {
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 16px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      max-width: 400px;
+      width: 100%;
+      padding: 24px;
+    }
+
+    .confirm-box h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .confirm-box p { font-size: 13px; color: #666; margin-bottom: 16px; line-height: 1.5; }
+
+    .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    .confirm-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+    }
+
+    .confirm-btn.cancel { background: rgba(0, 0, 0, 0.05); color: #666; }
+    .confirm-btn.send { background: #7c9885; color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="admin.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <h1>Announcements</h1>
+  </div>
+
+  <div class="content">
+    <!-- Compose -->
+    <div class="compose-card">
+      <div class="compose-title">New Announcement</div>
+
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input type="text" class="form-input" id="annTitle" placeholder="e.g. Scheduled Maintenance Tonight" maxlength="100">
+        <div class="char-count"><span id="titleCount">0</span>/100</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" id="annMessage" placeholder="Write your announcement..." maxlength="500"></textarea>
+        <div class="char-count"><span id="msgCount">0</span>/500</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Audience</label>
+        <div class="audience-row">
+          <button class="audience-btn active" data-audience="all" onclick="setAudience('all', this)">All Users</button>
+          <button class="audience-btn" data-audience="pro" onclick="setAudience('pro', this)">Pro Only</button>
+          <button class="audience-btn" data-audience="university" onclick="setAudience('university', this)">University</button>
+        </div>
+        <div class="uni-select-row" id="uniSelectRow">
+          <select class="form-select" id="uniSelect">
+            <option value="">Select university...</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="send-btn" id="sendBtn" onclick="confirmSend()">Send Announcement</button>
+    </div>
+
+    <!-- History -->
+    <div class="history-title">Past Announcements</div>
+    <div id="historyList">
+      <div class="empty-history">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <h3>Send Announcement?</h3>
+      <p id="confirmText"></p>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" onclick="closeConfirm()">Cancel</button>
+        <button class="confirm-btn send" onclick="doSend()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="flash-msg" id="flashMsg"></div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
+    if (!adminKey) window.location.href = 'admin.html';
+
+    let selectedAudience = 'all';
+
+    // Populate university dropdown
+    if (typeof UNIVERSITIES !== 'undefined') {
+      const select = document.getElementById('uniSelect');
+      UNIVERSITIES.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u;
+        opt.textContent = u;
+        select.appendChild(opt);
+      });
+    }
+
+    // Character counters
+    document.getElementById('annTitle').addEventListener('input', (e) => {
+      document.getElementById('titleCount').textContent = e.target.value.length;
+    });
+    document.getElementById('annMessage').addEventListener('input', (e) => {
+      document.getElementById('msgCount').textContent = e.target.value.length;
+    });
+
+    function setAudience(audience, btn) {
+      selectedAudience = audience;
+      document.querySelectorAll('.audience-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('uniSelectRow').classList.toggle('visible', audience === 'university');
+    }
+
+    function confirmSend() {
+      const title = document.getElementById('annTitle').value.trim();
+      const message = document.getElementById('annMessage').value.trim();
+
+      if (!title || !message) {
+        showFlash('Title and message are required', 'error');
+        return;
+      }
+
+      let audienceLabel = 'all users';
+      if (selectedAudience === 'pro') audienceLabel = 'pro subscribers only';
+      else if (selectedAudience === 'university') {
+        const uni = document.getElementById('uniSelect').value;
+        if (!uni) {
+          showFlash('Select a university', 'error');
+          return;
+        }
+        audienceLabel = uni + ' users';
+      }
+
+      document.getElementById('confirmText').textContent =
+        `This will send "${title}" to ${audienceLabel}. This cannot be undone.`;
+      document.getElementById('confirmOverlay').style.display = 'flex';
+    }
+
+    function closeConfirm() {
+      document.getElementById('confirmOverlay').style.display = 'none';
+    }
+
+    async function doSend() {
+      closeConfirm();
+
+      const title = document.getElementById('annTitle').value.trim();
+      const message = document.getElementById('annMessage').value.trim();
+      let audience = selectedAudience;
+
+      if (audience === 'university') {
+        audience = document.getElementById('uniSelect').value;
+      }
+
+      const btn = document.getElementById('sendBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/announcements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: adminKey, title, message, audience })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed');
+        }
+
+        showFlash(`Sent to ${data.sent_to} users`, 'success');
+
+        // Clear form
+        document.getElementById('annTitle').value = '';
+        document.getElementById('annMessage').value = '';
+        document.getElementById('titleCount').textContent = '0';
+        document.getElementById('msgCount').textContent = '0';
+
+        // Reload history
+        loadHistory();
+
+      } catch (e) {
+        showFlash('Failed: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Announcement';
+      }
+    }
+
+    async function loadHistory() {
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/announcements?key=' + encodeURIComponent(adminKey));
+        if (!res.ok) throw new Error('Failed');
+
+        const data = await res.json();
+        const list = document.getElementById('historyList');
+
+        if (!data.announcements || data.announcements.length === 0) {
+          list.innerHTML = '<div class="empty-history">No announcements sent yet</div>';
+          return;
+        }
+
+        list.innerHTML = data.announcements.map(a => {
+          const date = new Date(a.sent_at).toLocaleDateString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+          });
+          const audienceLabel = a.audience === 'all' ? 'All Users' :
+            a.audience === 'pro' ? 'Pro Only' : a.audience;
+
+          return `
+            <div class="history-item">
+              <div class="history-item-header">
+                <div class="history-item-title">${a.title}</div>
+                <div class="history-item-meta">${date}</div>
+              </div>
+              <div class="history-item-message">${a.message}</div>
+              <div class="history-badge">${audienceLabel}</div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (e) {
+        document.getElementById('historyList').innerHTML =
+          '<div class="empty-history">Failed to load history</div>';
+      }
+    }
+
+    function showFlash(msg, type) {
+      const el = document.getElementById('flashMsg');
+      el.textContent = msg;
+      el.className = 'flash-msg ' + type + ' show';
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // Escape closes confirm
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeConfirm();
+    });
+
+    // Init
+    loadHistory();
+  </script>
+</body>
+</html>
