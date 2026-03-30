@@ -2921,14 +2921,21 @@
         // Calculate new scale (limit between 0.25x and 3x)
         const newScale = Math.min(3, Math.max(0.25, touchStartScale * (currentDist / touchStartDist)));
 
-        // Zoom around the midpoint between fingers
+        // Get midpoint between fingers
         const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
         const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
 
-        // Adjust pan to zoom around touch point
-        canvasPan.x = midX - (midX - canvasPan.x) * (newScale / canvasScale);
-        canvasPan.y = midY - (midY - canvasPan.y) * (newScale / canvasScale);
+        // Calculate world position under touch point before zoom
+        const worldX = (midX - canvasPan.x) / canvasScale;
+        const worldY = (midY - canvasPan.y) / canvasScale;
+
+        // Update scale
+        const oldScale = canvasScale;
         canvasScale = newScale;
+
+        // Adjust pan so same world position stays under touch point
+        canvasPan.x = midX - worldX * canvasScale;
+        canvasPan.y = midY - worldY * canvasScale;
 
         updateCanvasTransform();
         e.preventDefault();
@@ -3000,16 +3007,22 @@
 
       const zoomSpeed = 0.001;
       const delta = -e.deltaY * zoomSpeed;
-      const oldScale = canvasScale;
       const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
 
-      // Zoom around mouse cursor position
+      // Get mouse position
       const mx = e.clientX;
       const my = e.clientY;
 
-      canvasPan.x = mx - (mx - canvasPan.x) * (newScale / oldScale);
-      canvasPan.y = my - (my - canvasPan.y) * (newScale / oldScale);
+      // Calculate world position under cursor before zoom
+      const worldX = (mx - canvasPan.x) / canvasScale;
+      const worldY = (my - canvasPan.y) / canvasScale;
+
+      // Update scale
       canvasScale = newScale;
+
+      // Adjust pan so same world position stays under cursor
+      canvasPan.x = mx - worldX * canvasScale;
+      canvasPan.y = my - worldY * canvasScale;
 
       updateCanvasTransform();
     }, { passive: false });
