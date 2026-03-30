@@ -542,11 +542,45 @@
 
         const { data: profile } = await supabaseClient
           .from('user_profiles')
-          .select('university')
+          .select('university, edu_email_verified')
           .eq('id', user.id)
           .single();
 
-        if (profile && profile.university) {
+        if (!profile) return;
+
+        // Check if .edu email is verified
+        if (!profile.edu_email_verified) {
+          // Show verification required message
+          document.getElementById('cardTable').innerHTML = `
+            <div class="loading-msg" style="padding: 60px 40px;">
+              <div style="font-size: 1.2rem; color: #7c9885; margin-bottom: 16px;">🎓 .edu Email Required</div>
+              <div style="font-size: 0.9rem; color: #5d5d5d; margin-bottom: 24px; line-height: 1.6;">
+                Browse requires a verified university .edu email address.<br>
+                Verify your .edu email to access the collective knowledge base.
+              </div>
+              <a href="account.html" style="
+                display: inline-block;
+                background: #7c9885;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 0.85rem;
+                transition: background 0.3s;
+              " onmouseover="this.style.background='#6a8473'" onmouseout="this.style.background='#7c9885'">
+                Verify .edu Email
+              </a>
+            </div>
+          `;
+
+          // Disable search input
+          document.getElementById('searchInput').disabled = true;
+          document.getElementById('searchInput').placeholder = 'Verify .edu email to search...';
+          return;
+        }
+
+        if (profile.university) {
           userUniversity = profile.university;
           selectedUniversity = profile.university;
           document.getElementById('universityFilter').value = profile.university;
@@ -742,6 +776,33 @@
         });
 
         if (!response.ok) {
+          // Check if it's a 403 (edu verification required)
+          if (response.status === 403) {
+            const errorData = await response.json();
+            document.getElementById('cardTable').innerHTML = `
+              <div class="loading-msg" style="padding: 60px 40px;">
+                <div style="font-size: 1.2rem; color: #7c9885; margin-bottom: 16px;">🎓 .edu Email Required</div>
+                <div style="font-size: 0.9rem; color: #5d5d5d; margin-bottom: 24px; line-height: 1.6;">
+                  Browse requires a verified university .edu email address.<br>
+                  Verify your .edu email to access the collective knowledge base.
+                </div>
+                <a href="account.html" style="
+                  display: inline-block;
+                  background: #7c9885;
+                  color: white;
+                  padding: 12px 24px;
+                  border-radius: 8px;
+                  text-decoration: none;
+                  font-weight: 500;
+                  font-size: 0.85rem;
+                  transition: background 0.3s;
+                " onmouseover="this.style.background='#6a8473'" onmouseout="this.style.background='#7c9885'">
+                  Verify .edu Email
+                </a>
+              </div>
+            `;
+            return;
+          }
           throw new Error('Search failed');
         }
 
