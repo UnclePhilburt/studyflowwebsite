@@ -92,6 +92,9 @@
       inset: 0;
       overflow: hidden;
       cursor: grab;
+      /* Dot grid background */
+      background-image: radial-gradient(circle, var(--border-color) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
 
     #canvasViewport.grabbing { cursor: grabbing; }
@@ -100,10 +103,9 @@
       position: absolute;
       top: 0; left: 0;
       transform-origin: 0 0;
-      /* transform set by JS: translate(px, py) scale(s) */
     }
 
-    /* SVG lines connecting cards */
+    /* SVG connection lines */
     #connectionsSvg {
       position: absolute;
       top: 0; left: 0;
@@ -113,10 +115,11 @@
       overflow: visible;
     }
 
-    #connectionsSvg line {
-      stroke: var(--border-color);
+    #connectionsSvg path {
+      stroke: var(--accent-primary);
       stroke-width: 1.5;
-      stroke-dasharray: 6 4;
+      fill: none;
+      opacity: 0.35;
     }
 
     /* ============ CARDS ============ */
@@ -127,21 +130,45 @@
       border-radius: 16px;
       box-shadow: 0 4px 24px var(--shadow);
       width: 380px;
-      max-height: 500px;
       overflow: hidden;
       cursor: grab;
-      transition: box-shadow 0.2s;
+      transition: box-shadow 0.2s, max-height 0.3s ease;
       z-index: 1;
     }
 
     .canvas-card:hover { box-shadow: 0 8px 32px var(--shadow); }
     .canvas-card.dragging { cursor: grabbing; box-shadow: 0 12px 40px var(--shadow); z-index: 100; }
     .canvas-card.expanding { animation: cardExpand 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .canvas-card.child-card { width: 350px; border-left: 3px solid var(--accent-primary); }
+    .canvas-card.collapsed .card-response { display: none; }
+    .canvas-card.collapsed { max-height: 52px; }
 
     @keyframes cardExpand {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
+      from { opacity: 0; transform: scale(0.85) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
+
+    /* Collapse toggle button */
+    .card-collapse-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(255,255,255,0.3);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 5;
+    }
+
+    .canvas-card:hover .card-collapse-btn { opacity: 1; }
 
     .card-question {
       padding: 12px 16px;
@@ -222,13 +249,27 @@
       text-overflow: ellipsis;
       transition: all 0.2s;
       z-index: 2;
-      box-shadow: 0 2px 12px var(--shadow);
+      box-shadow: 0 2px 12px var(--shadow), 0 0 0 0 rgba(124, 152, 133, 0);
+      animation: bubbleAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, bubblePulse 3s ease-in-out 1s infinite;
+      opacity: 0;
+    }
+
+    @keyframes bubbleAppear {
+      from { opacity: 0; transform: scale(0.5) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes bubblePulse {
+      0%, 100% { box-shadow: 0 2px 12px var(--shadow), 0 0 0 0 rgba(124, 152, 133, 0); }
+      50% { box-shadow: 0 2px 12px var(--shadow), 0 0 0 4px rgba(124, 152, 133, 0.1); }
     }
 
     .followup-bubble:hover {
       background: var(--accent-primary);
       color: white;
-      transform: scale(1.05);
+      transform: scale(1.08);
+      animation: none;
+      opacity: 1;
     }
 
     /* ============ WELCOME SCREEN ============ */
@@ -556,19 +597,64 @@
     .nav-drawer a.active { background: var(--hover-bg); color: var(--accent-primary); }
     .nav-drawer svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    /* ============ ZOOM INDICATOR ============ */
-    .zoom-indicator {
+    /* ============ CANVAS CONTROLS ============ */
+    .canvas-controls {
       position: fixed;
       bottom: 88px;
       right: 16px;
-      font-size: 11px;
-      color: var(--text-muted);
-      background: var(--bg-tertiary);
-      padding: 4px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       z-index: 200;
+    }
+
+    .canvas-ctrl-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.15s;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .canvas-ctrl-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+    .zoom-indicator {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
       user-select: none;
+      padding: 2px 0;
+    }
+
+    /* ============ MINIMAP ============ */
+    .minimap {
+      position: fixed;
+      bottom: 88px;
+      left: 16px;
+      width: 160px;
+      height: 100px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 200;
+      box-shadow: 0 2px 12px var(--shadow);
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .minimap:hover { opacity: 1; }
+
+    .minimap canvas {
+      width: 100%;
+      height: 100%;
     }
 
     /* ============ DISCLOSURE ============ */
@@ -622,8 +708,20 @@
     </button>
   </div>
 
-  <!-- Zoom indicator -->
-  <div class="zoom-indicator" id="zoomIndicator">100%</div>
+  <!-- Canvas controls -->
+  <div class="canvas-controls">
+    <button class="canvas-ctrl-btn" id="zoomInBtn" title="Zoom in">+</button>
+    <div class="zoom-indicator" id="zoomIndicator">100%</div>
+    <button class="canvas-ctrl-btn" id="zoomOutBtn" title="Zoom out">-</button>
+    <button class="canvas-ctrl-btn" id="fitAllBtn" title="Fit all cards" style="margin-top:4px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+    </button>
+  </div>
+
+  <!-- Minimap -->
+  <div class="minimap" id="minimap">
+    <canvas id="minimapCanvas" width="320" height="200"></canvas>
+  </div>
 
   <!-- Top buttons -->
   <button class="top-btn" id="menuBtn" title="Conversations">
@@ -707,7 +805,11 @@
 
     function updateTransform() {
       world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+      // Sync dot grid with pan
+      viewport.style.backgroundPosition = `${panX}px ${panY}px`;
+      viewport.style.backgroundSize = `${24 * scale}px ${24 * scale}px`;
       document.getElementById('zoomIndicator').textContent = Math.round(scale * 100) + '%';
+      renderMinimap();
     }
 
     // ============ PAN & ZOOM ============
@@ -771,11 +873,12 @@
     function createCard(question, x, y, parentId = null) {
       const id = nextCardId++;
       const el = document.createElement('div');
-      el.className = 'canvas-card expanding';
+      el.className = 'canvas-card expanding' + (parentId !== null ? ' child-card' : '');
       el.style.left = x + 'px';
       el.style.top = y + 'px';
 
       el.innerHTML = `
+        <button class="card-collapse-btn" title="Collapse/Expand">-</button>
         <div class="card-question">${escapeHtml(question)}</div>
         <div class="card-loading">
           <span class="typing-dot"></span>
@@ -783,6 +886,17 @@
           <span class="typing-dot"></span>
         </div>
       `;
+
+      // Collapse toggle
+      el.querySelector('.card-collapse-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        el.classList.toggle('collapsed');
+        e.currentTarget.textContent = el.classList.contains('collapsed') ? '+' : '-';
+        setTimeout(() => {
+          const card = cards.find(c => c.id === id);
+          if (card) { updateFollowupPositions(card); updateConnections(); }
+        }, 50);
+      });
 
       // Drag handler
       el.addEventListener('mousedown', (e) => {
@@ -863,9 +977,18 @@
       }
 
       card.element.innerHTML = `
+        <button class="card-collapse-btn" title="Collapse/Expand">-</button>
         <div class="card-question">${escapeHtml(card.question)}</div>
         <div class="card-response">${responseHtml}${sourcesHtml}</div>
       `;
+
+      // Re-attach collapse handler
+      card.element.querySelector('.card-collapse-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        card.element.classList.toggle('collapsed');
+        e.currentTarget.textContent = card.element.classList.contains('collapsed') ? '+' : '-';
+        setTimeout(() => { updateFollowupPositions(card); updateConnections(); }, 50);
+      });
 
       // KaTeX rendering
       const responseEl = card.element.querySelector('.card-response');
@@ -948,11 +1071,11 @@
       });
     }
 
-    // ============ CONNECTIONS ============
+    // ============ CONNECTIONS (BEZIER) ============
     function drawConnection(fromId, toId) {
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      svgLayer.appendChild(line);
-      connections.push({ fromId, toId, line });
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      svgLayer.appendChild(path);
+      connections.push({ fromId, toId, path });
       updateConnections();
     }
 
@@ -961,11 +1084,14 @@
         const from = cards.find(c => c.id === conn.fromId);
         const to = cards.find(c => c.id === conn.toId);
         if (!from || !to) return;
-        const fw = 380, fh = from.element.offsetHeight || 200;
-        conn.line.setAttribute('x1', from.x + fw / 2);
-        conn.line.setAttribute('y1', from.y + fh);
-        conn.line.setAttribute('x2', to.x + fw / 2);
-        conn.line.setAttribute('y2', to.y);
+        const fw = from.element.classList.contains('child-card') ? 350 : 380;
+        const tw = to.element.classList.contains('child-card') ? 350 : 380;
+        const fh = from.element.offsetHeight || 200;
+        const x1 = from.x + fw / 2, y1 = from.y + fh;
+        const x2 = to.x + tw / 2, y2 = to.y;
+        const cy1 = y1 + (y2 - y1) * 0.5;
+        const cy2 = y2 - (y2 - y1) * 0.5;
+        conn.path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${cy1}, ${x2} ${cy2}, ${x2} ${y2}`);
       });
     }
 
@@ -1125,17 +1251,22 @@
         conversationId = convId;
         document.getElementById('welcomeScreen').classList.add('hidden');
 
-        // Rebuild cards from messages
+        // Rebuild cards from messages in a natural tree layout
         let lastCardId = null;
         let pendingQuestion = null;
+        let layoutX = 0, layoutY = 0;
+        let direction = 1; // Alternate left/right slightly
 
         for (const msg of (data.messages || [])) {
           if (msg.role === 'user') {
             pendingQuestion = msg.content;
           } else if (msg.role === 'assistant' && pendingQuestion) {
-            const y = cards.length * 280;
-            const card = createCard(pendingQuestion, 0, y, lastCardId);
+            const offsetX = direction * (40 + Math.random() * 30);
+            direction *= -1;
+            const card = createCard(pendingQuestion, layoutX + offsetX, layoutY, lastCardId);
             populateCard(card, msg.content, msg.sources, []);
+            layoutY += (card.element.offsetHeight || 200) + 100;
+            layoutX += offsetX * 0.3;
             lastCardId = card.id;
             pendingQuestion = null;
           }
@@ -1289,6 +1420,121 @@
     });
 
     setInterval(fetchNotifications, 60000);
+
+    // ============ MINIMAP ============
+    const minimapCanvas = document.getElementById('minimapCanvas');
+    const minimapCtx = minimapCanvas.getContext('2d');
+
+    function renderMinimap() {
+      const ctx = minimapCtx;
+      const cw = minimapCanvas.width, ch = minimapCanvas.height;
+      ctx.clearRect(0, 0, cw, ch);
+
+      if (cards.length === 0) return;
+
+      // Find bounds of all cards
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      cards.forEach(c => {
+        const w = c.element.classList.contains('child-card') ? 350 : 380;
+        const h = c.element.offsetHeight || 200;
+        minX = Math.min(minX, c.x);
+        minY = Math.min(minY, c.y);
+        maxX = Math.max(maxX, c.x + w);
+        maxY = Math.max(maxY, c.y + h);
+      });
+
+      const padding = 100;
+      minX -= padding; minY -= padding; maxX += padding; maxY += padding;
+      const worldW = maxX - minX || 1;
+      const worldH = maxY - minY || 1;
+      const mapScale = Math.min(cw / worldW, ch / worldH);
+
+      // Draw cards as small rectangles
+      cards.forEach(c => {
+        const w = c.element.classList.contains('child-card') ? 350 : 380;
+        const h = c.element.offsetHeight || 200;
+        const rx = (c.x - minX) * mapScale;
+        const ry = (c.y - minY) * mapScale;
+        const rw = w * mapScale;
+        const rh = h * mapScale;
+
+        ctx.fillStyle = c.element.classList.contains('child-card') ? 'rgba(124,152,133,0.4)' : 'rgba(124,152,133,0.6)';
+        ctx.fillRect(rx, ry, Math.max(rw, 2), Math.max(rh, 2));
+      });
+
+      // Draw connections
+      ctx.strokeStyle = 'rgba(124,152,133,0.3)';
+      ctx.lineWidth = 1;
+      connections.forEach(conn => {
+        const from = cards.find(c => c.id === conn.fromId);
+        const to = cards.find(c => c.id === conn.toId);
+        if (!from || !to) return;
+        const fw = from.element.classList.contains('child-card') ? 350 : 380;
+        ctx.beginPath();
+        ctx.moveTo((from.x + fw / 2 - minX) * mapScale, (from.y + (from.element.offsetHeight || 200) - minY) * mapScale);
+        const tw = to.element.classList.contains('child-card') ? 350 : 380;
+        ctx.lineTo((to.x + tw / 2 - minX) * mapScale, (to.y - minY) * mapScale);
+        ctx.stroke();
+      });
+
+      // Draw viewport rectangle
+      const vx = (-panX / scale - minX) * mapScale;
+      const vy = (-panY / scale - minY) * mapScale;
+      const vw = (window.innerWidth / scale) * mapScale;
+      const vh = (window.innerHeight / scale) * mapScale;
+      ctx.strokeStyle = 'rgba(124,152,133,0.8)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(vx, vy, vw, vh);
+    }
+
+    // ============ FIT ALL & ZOOM BUTTONS ============
+    function fitAll() {
+      if (cards.length === 0) return;
+
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      cards.forEach(c => {
+        const w = c.element.classList.contains('child-card') ? 350 : 380;
+        const h = c.element.offsetHeight || 200;
+        minX = Math.min(minX, c.x);
+        minY = Math.min(minY, c.y);
+        maxX = Math.max(maxX, c.x + w);
+        maxY = Math.max(maxY, c.y + h);
+      });
+
+      const padding = 120;
+      const worldW = (maxX - minX) + padding * 2;
+      const worldH = (maxY - minY) + padding * 2;
+      const newScale = Math.min(window.innerWidth / worldW, window.innerHeight / worldH, 1.5);
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const targetPanX = window.innerWidth / 2 - cx * newScale;
+      const targetPanY = window.innerHeight / 2 - cy * newScale;
+
+      // Animate
+      const startX = panX, startY = panY, startScale = scale;
+      const duration = 500;
+      const start = performance.now();
+      function anim(t) {
+        const p = Math.min((t - start) / duration, 1);
+        const e = 1 - Math.pow(1 - p, 3);
+        panX = startX + (targetPanX - startX) * e;
+        panY = startY + (targetPanY - startY) * e;
+        scale = startScale + (newScale - startScale) * e;
+        updateTransform();
+        if (p < 1) requestAnimationFrame(anim);
+      }
+      requestAnimationFrame(anim);
+    }
+
+    document.getElementById('fitAllBtn').addEventListener('click', fitAll);
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+      scale = Math.min(2, scale * 1.2);
+      updateTransform();
+    });
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+      scale = Math.max(0.3, scale / 1.2);
+      updateTransform();
+    });
 
     // ============ UI HANDLERS ============
     const chatInput = document.getElementById('chatInput');
