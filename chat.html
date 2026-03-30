@@ -1180,23 +1180,44 @@
           const bx = parseFloat(originBubble.style.left) || 0;
           const by = parseFloat(originBubble.style.top) || 0;
           const bw = originBubble.offsetWidth || 120;
-          clickedBubbleInfo = { x: bx, y: by, w: bw };
+          const bh = originBubble.offsetHeight || 30;
+          clickedBubbleInfo = { x: bx, y: by, w: bw, h: bh, parentCard };
 
           // Position new card below the clicked bubble
           const cardW = 350; // child card width
           cx = bx + bw / 2 - cardW / 2;
-          cy = by + 50;
+          cy = by + bh + 40;
+
+          // Draw line from parent card bottom to clicked bubble top
+          const pcW = parentCard.element.classList.contains('child-card') ? 350 : 380;
+          const pcH = parentCard.element.offsetHeight || 200;
+          const pcAx = parentCard.x + pcW / 2 + SVG_OFFSET;
+          const pcAy = parentCard.y + pcH + SVG_OFFSET;
+          const bubTopX = bx + bw / 2 + SVG_OFFSET;
+          const bubTopY = by + SVG_OFFSET;
+          const mid1 = pcAy + (bubTopY - pcAy) * 0.5;
+
+          const cardToBubblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          cardToBubblePath.setAttribute('d', `M ${pcAx} ${pcAy} C ${pcAx} ${mid1}, ${bubTopX} ${mid1}, ${bubTopX} ${bubTopY}`);
+          cardToBubblePath.setAttribute('stroke', '#7c9885');
+          cardToBubblePath.setAttribute('stroke-width', '1.5');
+          cardToBubblePath.setAttribute('fill', 'none');
+          cardToBubblePath.setAttribute('opacity', '0.35');
+          svgLayer.appendChild(cardToBubblePath);
+
+          if (!parentCard._followupPaths) parentCard._followupPaths = [];
+          parentCard._followupPaths.push(cardToBubblePath);
         }
       }
 
       if (clickedBubbleInfo) _skipNextParentConnection = true;
       const card = createCard(text, cx, cy, parentId);
 
-      // Draw connection line from clicked bubble to new card
+      // Draw line from clicked bubble bottom to new card top
       if (clickedBubbleInfo) {
         const bubblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const bCx = clickedBubbleInfo.x + clickedBubbleInfo.w / 2 + SVG_OFFSET;
-        const bCy = clickedBubbleInfo.y + 30 + SVG_OFFSET;
+        const bCy = clickedBubbleInfo.y + clickedBubbleInfo.h + SVG_OFFSET;
         const cardCx = cx + 175 + SVG_OFFSET;
         const cardCy = cy + SVG_OFFSET;
         const midY = bCy + (cardCy - bCy) * 0.5;
