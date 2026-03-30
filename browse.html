@@ -548,7 +548,6 @@
     (async function init() {
       console.log('[Browse Init] Starting initialization...');
 
-      // Try to get and refresh the session
       const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
 
       if (sessionError) {
@@ -563,20 +562,8 @@
         return;
       }
 
-      console.log('[Browse Init] Session found, attempting to refresh...');
-
-      // Try to refresh the session to ensure tokens are valid
-      const { data: { session: refreshedSession }, error: refreshError } = await supabaseClient.auth.refreshSession();
-
-      if (refreshError || !refreshedSession) {
-        console.error('[Browse Init] Session refresh failed:', refreshError);
-        console.log('[Browse Init] Redirecting to login...');
-        window.location.href = 'index.html';
-        return;
-      }
-
-      console.log('[Browse Init] Session refreshed successfully, user:', refreshedSession.user.email);
-      authToken = refreshedSession.access_token;
+      console.log('[Browse Init] Valid session found, user:', session.user.email);
+      authToken = session.access_token;
 
       // Listen for auth state changes (only logout)
       supabaseClient.auth.onAuthStateChange((event, newSession) => {
@@ -595,14 +582,18 @@
         }
       });
 
-      // Get user's university using refreshed session user (don't let errors block page load)
-      try {
-        console.log('[Browse Init] Fetching user university...');
-        await fetchUserUniversity(refreshedSession.user);
-        console.log('[Browse Init] User university fetched');
-      } catch (error) {
-        console.error('[Browse Init] Error fetching university (non-blocking):', error);
-      }
+      // Skip fetching university for now to isolate auth issues
+      // The 401 errors on profile fetch don't matter for basic functionality
+      console.log('[Browse Init] Skipping university fetch (not required for search)');
+
+      // Get user's university using session user (don't let errors block page load)
+      // try {
+      //   console.log('[Browse Init] Fetching user university...');
+      //   await fetchUserUniversity(session.user);
+      //   console.log('[Browse Init] User university fetched');
+      // } catch (error) {
+      //   console.error('[Browse Init] Error fetching university (non-blocking):', error);
+      // }
 
       // Setup university filter
       console.log('[Browse Init] Setting up university filter...');
