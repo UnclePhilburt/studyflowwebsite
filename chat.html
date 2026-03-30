@@ -1909,7 +1909,10 @@
       // Find the clicked folder card to zoom into it
       const clickedEl = fromElement || folderElements.find(el => el.style && el.querySelector('.folder-card-name')?.textContent === folderName);
 
-      if (clickedEl) {
+      // Skip zoom animation on mobile (768px or less)
+      const isMobile = window.innerWidth <= 768;
+
+      if (clickedEl && !isMobile) {
         // Get the folder's world position
         const fx = parseFloat(clickedEl.style.left) || 0;
         const fy = parseFloat(clickedEl.style.top) || 0;
@@ -1939,6 +1942,9 @@
           }
           requestAnimationFrame(anim);
         });
+      } else if (clickedEl && isMobile) {
+        // On mobile, just fade out folders without zoom
+        folderElements.forEach(el => { el.style.opacity = 0; });
       }
 
       clearCanvas();
