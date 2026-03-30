@@ -1062,15 +1062,22 @@
       const anchorX = card.x + cardW / 2;
       const anchorY = card.y + cardH;
 
+      // Measure all bubble widths first
+      const bubbleWidths = card.followups.map(f => f.element.offsetWidth || 140);
+      const gap = 16;
+      const totalWidth = bubbleWidths.reduce((sum, w) => sum + w, 0) + gap * (count - 1);
+      let cursorX = anchorX - totalWidth / 2;
+
       card.followups.forEach((f, i) => {
-        const offsetX = (i - (count - 1) / 2) * (cardW / count + 20);
-        const fx = card.x + cardW / 2 + offsetX - 60;
-        const fy = startY + Math.abs(offsetX) * 0.15;
+        const bw = bubbleWidths[i];
+        const fx = cursorX;
+        const fy = startY;
+        cursorX += bw + gap;
+
         f.element.style.left = fx + 'px';
         f.element.style.top = fy + 'px';
 
         // Bubble center
-        const bw = f.element.offsetWidth || 120;
         const bcx = fx + bw / 2;
         const bcy = fy;
 
