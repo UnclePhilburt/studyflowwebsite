@@ -1230,33 +1230,42 @@
       document.querySelector('.input-bar').style.display = 'none';
       updateBreadcrumb();
 
-      panX = 0; panY = 0; scale = 1;
+      // Center canvas so (0,0) is middle of screen
+      panX = window.innerWidth / 2;
+      panY = window.innerHeight / 2 - 50;
+      scale = 1;
       updateTransform();
 
       // Fetch folders and unfiled count
+      let foldersData = { folders: [] };
+      let unfiledData = { conversations: [] };
       try {
         const [foldersRes, unfiledRes] = await Promise.all([
           fetch(`${BACKEND_URL}/api/folders`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
           fetch(`${BACKEND_URL}/api/conversations/unfiled`, { headers: { 'Authorization': `Bearer ${authToken}` } })
         ]);
+        if (foldersRes.ok) foldersData = await foldersRes.json();
+        if (unfiledRes.ok) unfiledData = await unfiledRes.json();
+      } catch (e) { console.error('Fetch error:', e); }
 
-        const foldersData = foldersRes.ok ? await foldersRes.json() : { folders: [] };
-        const unfiledData = unfiledRes.ok ? await unfiledRes.json() : { conversations: [] };
-        folders = foldersData.folders || [];
+      folders = foldersData.folders || [];
+      const totalItems = folders.length + 2; // +unfiled +new folder
 
-        // Render folders on canvas
-        const startX = -((folders.length + 1) * 210) / 2;
-        folders.forEach((f, i) => {
-          const el = createFolderCard(f, startX + i * 210, -40);
-          folderElements.push(el);
-        });
+      // Render folders centered on canvas
+      const startX = -(totalItems * 210) / 2;
+      const y = -70;
 
-        // Render "Unfiled" as a special folder
-        const unfiledCount = (unfiledData.conversations || []).length;
-        const unfiledEl = document.createElement('div');
-        unfiledEl.className = 'folder-card';
-        unfiledEl.style.left = (startX + folders.length * 210) + 'px';
-        unfiledEl.style.top = '-40px';
+      folders.forEach((f, i) => {
+        const el = createFolderCard(f, startX + i * 210, y);
+        folderElements.push(el);
+      });
+
+      // Render "Unfiled" as a special folder
+      const unfiledCount = (unfiledData.conversations || []).length;
+      const unfiledEl = document.createElement('div');
+      unfiledEl.className = 'folder-card';
+      unfiledEl.style.left = (startX + folders.length * 210) + 'px';
+      unfiledEl.style.top = y + 'px';
         unfiledEl.innerHTML = `
           <div class="folder-card-icon" style="background:linear-gradient(135deg,#9ca3af,#6b7280);">
             <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
@@ -1272,7 +1281,7 @@
         const newFolderEl = document.createElement('div');
         newFolderEl.className = 'folder-card';
         newFolderEl.style.left = (startX + (folders.length + 1) * 210) + 'px';
-        newFolderEl.style.top = '-40px';
+        newFolderEl.style.top = y + 'px';
         newFolderEl.style.borderStyle = 'dashed';
         newFolderEl.style.opacity = '0.6';
         newFolderEl.innerHTML = `
@@ -1315,7 +1324,9 @@
       document.querySelector('.input-bar').style.display = 'none';
       updateBreadcrumb();
 
-      panX = 0; panY = 0; scale = 1;
+      panX = window.innerWidth / 2;
+      panY = window.innerHeight / 2 - 50;
+      scale = 1;
       updateTransform();
 
       try {
