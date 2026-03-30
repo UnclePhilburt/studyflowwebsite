@@ -1575,13 +1575,17 @@
           panToCard(cards[0]);
         }
 
-        // Add follow-ups to the last card
+        // Add follow-ups to all leaf cards (cards that have no children)
         if (cards.length > 0) {
-          const last = cards[cards.length - 1];
-          createFollowupBubbles(last, [
-            'Tell me more about this',
-            'What else should I know?'
-          ]);
+          const parentIds = new Set(cards.map(c => c.parentId).filter(id => id !== null));
+          cards.forEach(c => {
+            if (!parentIds.has(c.id) && c.response) {
+              createFollowupBubbles(c, [
+                'Tell me more about this',
+                'What else should I know?'
+              ]);
+            }
+          });
         }
 
         // Update sidebar active state
