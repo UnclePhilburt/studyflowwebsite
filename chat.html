@@ -2172,6 +2172,95 @@
       renderMinimap();
     }
 
+    // ============ MOBILE CARD HELPERS ============
+
+    function zoomToCard(cardObj) {
+      // Animate canvas to center and zoom on the specified card
+      const cardWidth = cardObj.element.offsetWidth || 600;
+      const cardHeight = cardObj.element.offsetHeight || 400;
+
+      // Target scale - zoom in enough to see the card clearly
+      const targetScale = Math.min(1.5, Math.max(0.8, window.innerWidth / (cardWidth + 100)));
+
+      // Calculate target pan to center the card in viewport
+      const targetPanX = window.innerWidth / 2 - (cardObj.x + cardWidth / 2) * targetScale;
+      const targetPanY = window.innerHeight / 2 - (cardObj.y + cardHeight / 2) * targetScale;
+
+      // Animate from current position to target
+      const startPanX = panX, startPanY = panY, startScale = scale;
+      const duration = 400;
+      const start = performance.now();
+
+      function anim(t) {
+        const p = Math.min((t - start) / duration, 1);
+        const e = 1 - Math.pow(1 - p, 3); // ease out cubic
+
+        panX = startPanX + (targetPanX - startPanX) * e;
+        panY = startPanY + (targetPanY - startPanY) * e;
+        scale = startScale + (targetScale - startScale) * e;
+
+        updateTransform();
+        if (p < 1) requestAnimationFrame(anim);
+      }
+      requestAnimationFrame(anim);
+    }
+
+    function showCardContextMenu(cardObj, x, y) {
+      // Show mobile-friendly context menu for card actions
+      const ctxMenu = document.getElementById('ctxMenu');
+      const isCollapsed = cardObj.element.classList.contains('collapsed');
+
+      ctxMenu.innerHTML = `
+        <button class="ctx-item" onclick="document.getElementById('card-${cardObj.id}').querySelector('.card-collapse-btn').click(); ctxMenu.classList.remove('active');">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-secondary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;">
+            ${isCollapsed
+              ? '<polyline points="6 9 12 15 18 9"/>'
+              : '<polyline points="18 15 12 9 6 15"/>'}
+          </svg>
+          ${isCollapsed ? 'Expand Card' : 'Collapse Card'}
+        </button>
+        <button class="ctx-item" onclick="
+          const card = cards.find(c => c.id === ${cardObj.id});
+          if (card && card.response) {
+            navigator.clipboard.writeText(card.response).catch(() => {
+              console.error('Failed to copy to clipboard');
+            });
+          }
+          document.getElementById('ctxMenu').classList.remove('active');
+        ">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-secondary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copy Response
+        </button>
+        <button class="ctx-item" onclick="
+          const card = cards.find(c => c.id === ${cardObj.id});
+          if (card) zoomToCard(card);
+          ctxMenu.classList.remove('active');
+        ">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-secondary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><circle cx="11" cy="11" r="3"/>
+          </svg>
+          Center on Card
+        </button>
+      `;
+
+      // Position menu at touch location, but keep it on screen
+      const menuWidth = 200;
+      const menuHeight = 150;
+      let menuX = x;
+      let menuY = y;
+
+      if (menuX + menuWidth > window.innerWidth) menuX = window.innerWidth - menuWidth - 10;
+      if (menuY + menuHeight > window.innerHeight) menuY = window.innerHeight - menuHeight - 10;
+      if (menuX < 10) menuX = 10;
+      if (menuY < 10) menuY = 10;
+
+      ctxMenu.style.left = menuX + 'px';
+      ctxMenu.style.top = menuY + 'px';
+      ctxMenu.classList.add('active');
+    }
+
     // ============ PAN & ZOOM ============
     viewport.addEventListener('mousedown', (e) => {
       if (e.shiftKey) return; // Shift+drag is for selection, not panning
@@ -2304,6 +2393,7 @@
     function createCard(question, x, y, parentId = null) {
       const id = nextCardId++;
       const el = document.createElement('div');
+      el.id = 'card-' + id;
       el.className = 'canvas-card expanding' + (parentId !== null ? ' child-card' : '');
       el.style.left = x + 'px';
       el.style.top = y + 'px';
@@ -2349,6 +2439,61 @@
         });
       }
       attachDragHandler();
+
+      // ============ MOBILE TOUCH INTERACTIONS ============
+      let tapCount = 0;
+      let tapTimeout = null;
+      let longPressTimeout = null;
+      let touchStartTime = 0;
+      let touchMoved = false;
+
+      // Double-tap to zoom to card
+      el.addEventListener('touchstart', (e) => {
+        const cardObj = cards.find(c => c.id === id);
+        if (!cardObj) return;
+
+        // Don't trigger viewport panning when touching card
+        e.stopPropagation();
+
+        touchStartTime = Date.now();
+        touchMoved = false;
+
+        // Long press detection
+        longPressTimeout = setTimeout(() => {
+          if (!touchMoved) {
+            // Show context menu for this card
+            showCardContextMenu(cardObj, e.touches[0].clientX, e.touches[0].clientY);
+          }
+        }, 500); // 500ms long press
+
+        // Double-tap detection
+        tapCount++;
+        if (tapCount === 1) {
+          tapTimeout = setTimeout(() => {
+            tapCount = 0;
+          }, 300); // 300ms window for double-tap
+        } else if (tapCount === 2) {
+          clearTimeout(tapTimeout);
+          tapCount = 0;
+          // Double-tap detected - zoom to this card
+          zoomToCard(cardObj);
+          e.preventDefault();
+        }
+      });
+
+      el.addEventListener('touchmove', (e) => {
+        touchMoved = true;
+        clearTimeout(longPressTimeout);
+      });
+
+      el.addEventListener('touchend', (e) => {
+        clearTimeout(longPressTimeout);
+      });
+
+      el.addEventListener('touchcancel', (e) => {
+        clearTimeout(longPressTimeout);
+        touchMoved = false;
+      });
 
       world.appendChild(el);
 
