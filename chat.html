@@ -1301,6 +1301,52 @@
     let conversationId = null;
     let userProfile = null;
 
+    // Preloaded canvas data (everything loaded once on page init)
+    let _preloadedData = null; // { folders, conversations, sticky_notes }
+
+    async function preloadCanvas() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/canvas/preload`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          _preloadedData = await res.json();
+        }
+      } catch (e) { console.error('Preload error:', e); }
+    }
+
+    function invalidatePreload() {
+      _preloadedData = null;
+      fetch(`${BACKEND_URL}/api/canvas/invalidate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      }).catch(() => {});
+    }
+
+    // Get preloaded data helpers
+    function getPreloadedFolders() { return _preloadedData ? _preloadedData.folders : []; }
+    function getPreloadedConversations(folderId) {
+      if (!_preloadedData) return [];
+      return _preloadedData.conversations.filter(c =>
+        folderId ? c.folder_id === folderId : !c.folder_id
+      );
+    }
+    function getPreloadedMessages(convId) {
+      if (!_preloadedData) return [];
+      const conv = _preloadedData.conversations.find(c => c.id === convId);
+      return conv ? conv.messages || [] : [];
+    }
+    function getPreloadedConversation(convId) {
+      if (!_preloadedData) return null;
+      return _preloadedData.conversations.find(c => c.id === convId) || null;
+    }
+    function getPreloadedStickies(folderId) {
+      if (!_preloadedData) return [];
+      return _preloadedData.sticky_notes.filter(n =>
+        folderId ? n.folder_id === folderId : !n.folder_id
+      );
+    }
+
     // ============ NAVIGATION LEVELS ============
     const FOLDER_ICONS = [
       { name: 'Folder', svg: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>' },
@@ -1370,36 +1416,26 @@
       stickyNotes = [];
     }
 
-    async function navigateHome() {
+    async function navigateHome(forceRefresh = false) {
       clearCanvas();
       clearLevelElements();
       currentLevel = 'home';
       currentFolderId = null;
       conversationId = null;
-      // (welcome screen removed)
-      // (input bar removed)
       updateBreadcrumb();
 
-      // Center canvas so (0,0) is middle of screen
       panX = window.innerWidth / 2;
       panY = window.innerHeight / 2 - 50;
       scale = 1;
       updateTransform();
 
-      // Fetch folders and unfiled count
-      let foldersData = { folders: [] };
-      let unfiledData = { conversations: [] };
-      try {
-        const [foldersRes, unfiledRes] = await Promise.all([
-          fetch(`${BACKEND_URL}/api/chat-folders`, { headers: { 'Authorization': `Bearer ${authToken}` } }),
-          fetch(`${BACKEND_URL}/api/conversations/unfiled`, { headers: { 'Authorization': `Bearer ${authToken}` } })
-        ]);
-        if (foldersRes.ok) foldersData = await foldersRes.json();
-        if (unfiledRes.ok) unfiledData = await unfiledRes.json();
-      } catch (e) { console.error('Fetch error:', e); }
+      // Preload or refresh data
+      if (!_preloadedData || forceRefresh) {
+        invalidatePreload();
+        await preloadCanvas();
+      }
 
-      // Only show top-level folders (no parent) on home
-      folders = (foldersData.folders || []).filter(f => !f.parent_id);
+      folders = getPreloadedFolders().filter(f => !f.parent_id);
 
       // Render folder cards
       folders.forEach((f, i) => {
@@ -1410,18 +1446,12 @@
       });
 
       // Load unfiled conversations as card clusters directly on home canvas
-      const unfiledConvos = unfiledData.conversations || [];
+      const unfiledConvos = getPreloadedConversations(null);
       if (unfiledConvos.length > 0) {
-        const msgPromises = unfiledConvos.map(c =>
-          fetch(`${BACKEND_URL}/api/conversations/${c.id}/messages`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-          }).then(r => r.ok ? r.json() : { messages: [] }).catch(() => ({ messages: [] }))
-        );
-        const allMsgs = await Promise.all(msgPromises);
 
         let clusterX = 500; // Start to the right of folders
         unfiledConvos.forEach((conv, ci) => {
-          const messages = allMsgs[ci].messages || [];
+          const messages = conv.messages || [];
           const savedLayout = conv.canvas_layout;
           const clusterOffsetX = clusterX;
 
@@ -1490,8 +1520,10 @@
         });
       }
 
-      // Load sticky notes for home level
-      await loadStickyNotes(null);
+      // Load sticky notes for home level (from preloaded data)
+      getPreloadedStickies(null).forEach(n => {
+        renderStickyNote(n.id, n.position_x || 0, n.position_y || 0, n.content || '');
+      });
 
       // Show empty state hint if nothing on canvas
       if (folders.length === 0 && unfiledConvos.length === 0 && stickyNotes.length === 0) {
@@ -1731,26 +1763,15 @@
 
       try {
         // Load conversations list
-        const url = folderId
-          ? `${BACKEND_URL}/api/chat-folders/${folderId}/conversations`
-          : `${BACKEND_URL}/api/conversations/unfiled`;
-        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${authToken}` } });
-        const data = res.ok ? await res.json() : { conversations: [] };
-        const convos = data.conversations || [];
-
-        // Load all conversations' messages in parallel
-        const msgPromises = convos.map(c =>
-          fetch(`${BACKEND_URL}/api/conversations/${c.id}/messages`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-          }).then(r => r.ok ? r.json() : { messages: [] }).catch(() => ({ messages: [] }))
-        );
-        const allMessages = await Promise.all(msgPromises);
+        // Use preloaded data (instant)
+        if (!_preloadedData) await preloadCanvas();
+        const convos = getPreloadedConversations(folderId);
 
         // Render each conversation as a card cluster
         let clusterX = 0;
 
         convos.forEach((conv, ci) => {
-          const messages = allMessages[ci].messages || [];
+          const messages = conv.messages || [];
           const savedLayout = conv.canvas_layout;
 
           // Cluster offset -- space conversations apart
@@ -1841,24 +1862,23 @@
           clusterX = maxX + 200;
         });
 
-        // Render subfolders
-        try {
-          const subRes = await fetch(`${BACKEND_URL}/api/chat-folders`, { headers: { 'Authorization': `Bearer ${authToken}` } });
-          if (subRes.ok) {
-            const subData = await subRes.json();
-            const subFolders = (subData.folders || []).filter(f => f.parent_id === folderId);
-            subFolders.forEach(sf => {
-              const sfx = sf.position_x || clusterX;
-              const sfy = sf.position_y || (Math.random() - 0.5) * 300;
-              const el = createDraggableFolderCard(sf, sfx, sfy, (clickedEl) => navigateToFolder(sf.id, sf.name, clickedEl));
-              convoElements.push(el);
-              clusterX += 220;
-            });
+        // Render subfolders from preloaded data
+        {
+          const subFolders = getPreloadedFolders().filter(f => f.parent_id === folderId);
+          subFolders.forEach(sf => {
+            const sfx = sf.position_x || clusterX;
+            const sfy = sf.position_y || (Math.random() - 0.5) * 300;
+            const el = createDraggableFolderCard(sf, sfx, sfy, (clickedEl) => navigateToFolder(sf.id, sf.name, clickedEl));
+            convoElements.push(el);
+            clusterX += 220;
+          });
           }
         } catch (e) {}
 
-        // Load sticky notes for this folder
-        await loadStickyNotes(folderId);
+        // Load sticky notes for this folder (from preloaded data)
+        getPreloadedStickies(folderId).forEach(n => {
+          renderStickyNote(n.id, n.position_x || 0, n.position_y || 0, n.content || '');
+        });
 
         // Show empty hint if folder is empty
         if (convos.length === 0 && convoElements.length === 0 && stickyNotes.length === 0) {
@@ -2457,6 +2477,7 @@
         if (data.conversation_id) {
           conversationId = data.conversation_id;
           card._conversationId = data.conversation_id;
+          invalidatePreload();
 
           // If we're inside a folder, move the new conversation into it
           if (currentFolderId) {
@@ -3635,6 +3656,9 @@
       } catch (e) {}
 
       fetchNotifications();
+
+      // Preload ALL canvas data in one request
+      await preloadCanvas();
 
       // Navigate to home (folder view) or directly to a conversation via URL
       const urlParams = new URLSearchParams(window.location.search);
