@@ -1713,6 +1713,7 @@
 
     // ============ PAN & ZOOM ============
     viewport.addEventListener('mousedown', (e) => {
+      if (e.shiftKey) return; // Shift+drag is for selection, not panning
       if (e.target !== viewport && e.target !== world && e.target !== svgLayer) return;
       isPanning = true;
       panStartX = e.clientX - panX;
