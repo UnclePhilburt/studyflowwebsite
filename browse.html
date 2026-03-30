@@ -519,6 +519,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    console.log('=== BROWSE.HTML LOADED ===');
+    console.log('Current URL:', window.location.href);
+    console.log('Timestamp:', new Date().toISOString());
+
     const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0MTc1MzksImV4cCI6MjA0Nzk5MzUzOX0.wY3_JRor-5DfOBZVCZLLpVI6-O7PJTrqe2Ty9HXdxnU';
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
@@ -542,47 +546,67 @@
 
     // Initialize
     (async function init() {
+      console.log('[Browse Init] Starting initialization...');
+
       const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
 
-      if (sessionError || !session) {
-        console.log('No valid session, redirecting to login...');
+      if (sessionError) {
+        console.error('[Browse Init] Session error:', sessionError);
         window.location.href = 'index.html';
         return;
       }
 
+      if (!session) {
+        console.log('[Browse Init] No session found, redirecting to login...');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      console.log('[Browse Init] Valid session found');
       authToken = session.access_token;
 
       // Listen for auth state changes (only logout)
       supabaseClient.auth.onAuthStateChange((event, newSession) => {
-        console.log('Auth state changed:', event, 'Has session:', !!newSession);
+        console.log('[Browse Auth] Auth state changed:', event, 'Has session:', !!newSession);
 
         // Only redirect on explicit sign out
         if (event === 'SIGNED_OUT') {
-          console.log('User signed out, redirecting to login...');
+          console.log('[Browse Auth] User signed out, redirecting to login...');
           window.location.href = 'index.html';
         }
 
         // Update token if refreshed successfully
         if (event === 'TOKEN_REFRESHED' && newSession) {
-          console.log('Token refreshed successfully');
+          console.log('[Browse Auth] Token refreshed successfully');
           authToken = newSession.access_token;
         }
       });
 
-      // Get user's university
-      await fetchUserUniversity();
+      // Get user's university (don't let errors block page load)
+      try {
+        console.log('[Browse Init] Fetching user university...');
+        await fetchUserUniversity();
+        console.log('[Browse Init] User university fetched');
+      } catch (error) {
+        console.error('[Browse Init] Error fetching university (non-blocking):', error);
+      }
 
       // Setup university filter
+      console.log('[Browse Init] Setting up university filter...');
       setupUniversityFilter();
 
       // Setup search
+      console.log('[Browse Init] Setting up search...');
       document.getElementById('searchInput').addEventListener('input', handleSearchInput);
 
       // Setup load more button
       document.getElementById('loadMoreBtn').addEventListener('click', loadMoreNotes);
 
       // Restore previous state if exists
+      console.log('[Browse Init] Restoring state...');
       restoreState();
+
+      console.log('[Browse Init] Initialization complete!');
     })();
 
     // Load more notes (next batch)
@@ -596,21 +620,21 @@
     // Fetch user's university from profile
     async function fetchUserUniversity() {
       try {
+        console.log('[fetchUserUniversity] Getting user...');
         const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
 
-        // Check for auth errors (expired token, etc.)
         if (authError) {
-          console.error('Auth error:', authError);
-          // Redirect to login if auth fails
-          window.location.href = 'index.html';
+          console.error('[fetchUserUniversity] Auth error:', authError);
+          // Don't redirect - let main init handle auth
           return;
         }
 
         if (!user) {
-          window.location.href = 'index.html';
+          console.log('[fetchUserUniversity] No user found');
           return;
         }
 
+        console.log('[fetchUserUniversity] User found, fetching profile...');
         const { data: profile, error: profileError } = await supabaseClient
           .from('user_profiles')
           .select('university, edu_email_verified')
@@ -618,14 +642,24 @@
           .single();
 
         if (profileError) {
-          console.error('Profile fetch error:', profileError);
+          console.error('[fetchUserUniversity] Profile fetch error:', profileError);
           return;
         }
 
-        if (!profile) return;
+        if (!profile) {
+          console.log('[fetchUserUniversity] No profile found');
+          return;
+        }
+
+        console.log('[fetchUserUniversity] Profile found:', {
+          hasUniversity: !!profile.university,
+          eduVerified: profile.edu_email_verified
+        });
 
         // Check if .edu email is verified
         if (!profile.edu_email_verified) {
+          console.log('[fetchUserUniversity] User not .edu verified, showing message');
+
           // Show verification required message
           document.getElementById('cardTable').innerHTML = `
             <div class="loading-msg" style="padding: 60px 40px;">
@@ -653,16 +687,26 @@
           // Disable search input
           document.getElementById('searchInput').disabled = true;
           document.getElementById('searchInput').placeholder = 'Verify .edu email to search...';
+
+          // Don't return - let page continue loading
+          console.log('[fetchUserUniversity] Page loaded but search disabled');
           return;
         }
 
+        console.log('[fetchUserUniversity] User is .edu verified');
+
         if (profile.university) {
+          console.log('[fetchUserUniversity] Setting university:', profile.university);
           userUniversity = profile.university;
           selectedUniversity = profile.university;
           document.getElementById('universityFilter').value = profile.university;
+        } else {
+          console.log('[fetchUserUniversity] No university set in profile');
         }
+
       } catch (error) {
-        console.error('Error fetching user university:', error);
+        console.error('[fetchUserUniversity] Caught error:', error);
+        // Don't rethrow - let page continue loading
       }
     }
 
