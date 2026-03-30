@@ -1144,16 +1144,7 @@
     </div>
   </div>
 
-  <!-- Input Bar (hidden by default, shown only inside conversations) -->
-  <div class="input-bar" style="display:none;">
-    <textarea id="chatInput" placeholder="What would you like to explore?" rows="1"></textarea>
-    <button id="sendBtn" disabled>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="22" y1="2" x2="11" y2="13"></line>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-      </svg>
-    </button>
-  </div>
+  <!-- Input bar removed -- all input via right-click inline bubbles -->
 
   <!-- Breadcrumb -->
   <div class="breadcrumb" id="breadcrumb">
@@ -1296,7 +1287,7 @@
       currentFolderId = null;
       conversationId = null;
       // (welcome screen removed)
-      document.querySelector('.input-bar').style.display = 'none';
+      // (input bar removed)
       updateBreadcrumb();
 
       // Center canvas so (0,0) is middle of screen
@@ -1614,7 +1605,7 @@
       currentFolderId = folderId;
       currentFolderName = folderName;
       conversationId = null;
-      document.querySelector('.input-bar').style.display = 'none';
+      // (input bar removed)
       updateBreadcrumb();
 
       panX = window.innerWidth / 2;
@@ -2246,7 +2237,7 @@
       if (!text.trim()) return;
 
       // (welcome screen removed)
-      document.querySelector('.input-bar').style.display = 'none';
+      // (input bar removed)
 
       // SB 1455: Disclosure at initiation of first card
       if (cards.length === 0) {
@@ -2472,7 +2463,7 @@
         clearCanvas();
         conversationId = convId;
         // (welcome screen removed)
-        document.querySelector('.input-bar').style.display = 'none';
+        // (input bar removed)
 
         // Build a lookup from saved layout by question text
         const savedPositions = {};
@@ -2583,8 +2574,7 @@
       currentLevel = 'conversation';
       updateBreadcrumb();
       // (welcome screen removed)
-      document.querySelector('.input-bar').style.display = 'flex';
-      document.getElementById('chatInput').focus();
+      // (input bar removed)
     }
 
     function clearCanvas() {
@@ -3241,17 +3231,11 @@
         createNewFolder(null);
       } else if (action === 'newSubfolder') {
         createNewFolder(currentFolderId);
-      } else if (action === 'newChat') {
-        // Start a new conversation (in current folder context)
-        currentLevel = 'conversation';
-        updateBreadcrumb();
-        clearLevelElements();
-        conversationId = null;
-        clearCanvas();
-        document.querySelector('.input-bar').style.display = 'flex';
-        document.getElementById('chatInput').focus();
-      } else if (action === 'newCard') {
-        document.querySelector('.input-bar').style.display = 'none';
+      } else if (action === 'newChat' || action === 'newCard') {
+        // Reset conversation for newChat so a fresh one starts
+        if (action === 'newChat') conversationId = null;
+
+        // Spawn inline input bubble at right-click position
         const inputEl = document.createElement('div');
         inputEl.className = 'followup-input-bubble';
         inputEl.style.position = 'absolute';
@@ -3260,7 +3244,7 @@
         inputEl.style.opacity = '1';
         inputEl.style.width = '280px';
         inputEl.innerHTML = `
-          <input type="text" placeholder="Type your question..." style="width:240px;" />
+          <input type="text" placeholder="${action === 'newChat' ? 'Start a new conversation...' : 'Type your question...'}" style="width:240px;" />
           <button>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -3339,35 +3323,9 @@
     // Context menu actions handled by ctxAction() function
 
     // ============ UI HANDLERS ============
-    const chatInput = document.getElementById('chatInput');
-    const sendBtnEl = document.getElementById('sendBtn');
+    // Input bar removed -- all input via right-click inline bubbles
 
-    chatInput.addEventListener('input', () => {
-      sendBtnEl.disabled = !chatInput.value.trim();
-      chatInput.style.height = 'auto';
-      chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
-    });
-
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (chatInput.value.trim()) {
-          sendMessage(chatInput.value.trim());
-          chatInput.value = '';
-          chatInput.style.height = 'auto';
-          sendBtnEl.disabled = true;
-        }
-      }
-    });
-
-    sendBtnEl.addEventListener('click', () => {
-      if (chatInput.value.trim()) {
-        sendMessage(chatInput.value.trim());
-        chatInput.value = '';
-        chatInput.style.height = 'auto';
-        sendBtnEl.disabled = true;
-      }
-    });
+    // Input handled by inline bubbles on canvas
 
     // Navigation handled by breadcrumb and home button
 
