@@ -761,10 +761,10 @@
       console.log('[Browse Init] Restoring state...');
       const hasRestoredState = restoreState();
 
-      // If no restored state, show hint text (don't load initial notes to avoid RLS errors)
+      // If no restored state, load initial popular notes
       if (!hasRestoredState) {
-        console.log('[Browse Init] No restored state, showing search hint...');
-        document.getElementById('hintText').style.display = 'block';
+        console.log('[Browse Init] No restored state, loading initial notes...');
+        loadInitialNotes();
       }
 
       console.log('[Browse Init] Initialization complete!');
@@ -794,121 +794,69 @@
       }
     }
 
-    // Load initial notes on page load -- queries Supabase directly (no Render round trip)
+    // Load initial notes on page load using backend API
     async function loadInitialNotes() {
       try {
         showLoading();
 
-        // Get user's university from profile
-        let university = null;
-        try {
-          const { data: { session } } = await supabaseClient.auth.getSession();
-          if (session) {
-            const { data: profile } = await supabaseClient
-              .from('user_profiles')
-              .select('university, edu_email_verified')
-              .eq('id', session.user.id)
-              .single();
-
-            if (profile && !profile.edu_email_verified) {
-              return; // edu gate will show
-            }
-            if (profile && profile.university) {
-              university = profile.university;
-              userUniversity = profile.university;
-            }
-          }
-        } catch (e) {
-          console.log('[Initial Load] Could not fetch university, loading general notes');
-        }
-
-        // Query notes directly from Supabase (fast, no Render cold start)
-        let notes = [];
-
-        // Try user's university first
-        if (university) {
-          const { data } = await supabaseClient
-            .from('notes')
-            .select('id, original_filename, university, course_code, user_id, topic_tags, uploaded_at')
-            .eq('is_public', true)
-            .not('user_id', 'is', null)
-            .eq('university', university)
-            .order('uploaded_at', { ascending: false })
-            .limit(10);
-          if (data) notes = data;
-        }
-
-        // Supplement with general notes if needed
-        if (notes.length < 10) {
-          const existingIds = new Set(notes.map(n => n.id));
-          const { data } = await supabaseClient
-            .from('notes')
-            .select('id, original_filename, university, course_code, user_id, topic_tags, uploaded_at')
-            .eq('is_public', true)
-            .not('user_id', 'is', null)
-            .order('uploaded_at', { ascending: false })
-            .limit(10);
-          if (data) {
-            for (const note of data) {
-              if (!existingIds.has(note.id) && notes.length < 10) {
-                notes.push(note);
-              }
-            }
-          }
-        }
-
-        if (notes.length === 0) {
-          document.getElementById('cardTable').innerHTML = '';
-          document.getElementById('hintText').style.display = 'block';
-          return;
-        }
-
-        // Batch fetch usernames for all note authors
-        const userIds = [...new Set(notes.map(n => n.user_id))];
-        const { data: profiles } = await supabaseClient
-          .from('user_profiles')
-          .select('id, username, is_public')
-          .in('id', userIds);
-
-        const profileMap = {};
-        if (profiles) {
-          profiles.forEach(p => { profileMap[p.id] = p; });
-        }
-
-        // Filter out notes from users with Nexus disabled, map to display format
-        const mappedNotes = notes
-          .filter(note => {
-            const profile = profileMap[note.user_id];
-            return profile && profile.is_public !== false;
+        // Use backend API with a generic query to get popular/recent notes
+        const response = await fetch(`${BACKEND_URL}/api/notes/semantic-browse`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            question: 'study notes materials',  // Generic query to get diverse results
+            offset: 0
           })
-          .map(note => {
-            const profile = profileMap[note.user_id];
-            return {
-              note_id: note.id,
-              filename: note.original_filename || 'Untitled',
-              content: note.topic_tags && note.topic_tags.length > 0
-                ? note.topic_tags.join(', ')
-                : (note.course_code || 'Study notes and materials'),
-              username: (profile && profile.username) || 'Anonymous',
-              university: note.university || 'Unknown',
-              created_at: note.uploaded_at || new Date().toISOString(),
-              upvotes: 0
-            };
-          });
+        });
 
-        if (mappedNotes.length === 0) {
+        if (!response.ok) {
+          // Handle errors gracefully
+          if (response.status === 401) {
+            console.log('Session expired, redirecting to login...');
+            window.location.href = 'index.html';
+            return;
+          }
+          if (response.status === 403) {
+            // .edu verification required - show gate
+            document.getElementById('cardTable').innerHTML = `
+              <div class="loading-msg" style="padding: 60px 40px;">
+                <div style="font-size: 1.2rem; color: var(--accent-primary); margin-bottom: 16px;">University .edu Email Required</div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;">
+                  Browse requires a verified university .edu email address.<br>
+                  Verify your .edu email to access the collective knowledge base.
+                </div>
+                <a href="account.html" class="load-more-btn">
+                  Verify .edu Email
+                </a>
+              </div>
+            `;
+            return;
+          }
+          throw new Error('Failed to load initial notes');
+        }
+
+        const data = await response.json();
+        const results = data.notes || data;
+
+        if (results.length === 0) {
           document.getElementById('cardTable').innerHTML = '';
+          setHintText(false);
           document.getElementById('hintText').style.display = 'block';
           return;
         }
 
-        document.getElementById('hintText').style.display = 'none';
-        displayCards(mappedNotes, '');
-        console.log(`[Initial Load] Displayed ${mappedNotes.length} notes directly from Supabase`);
+        displayCards(results, '');
+        setHintText(true);
+        document.getElementById('hintText').style.display = 'block';
+        console.log(`[Initial Load] Displayed ${results.length} initial notes`);
 
       } catch (error) {
         console.error('[Initial Load] Error:', error);
         document.getElementById('cardTable').innerHTML = '';
+        setHintText(false);
         document.getElementById('hintText').style.display = 'block';
       }
     }
@@ -1169,10 +1117,11 @@
       if (!query) {
         document.getElementById('cardTable').innerHTML = '';
         document.getElementById('loadMoreContainer').style.display = 'none';
-        document.getElementById('hintText').style.display = 'block';
         sessionStorage.removeItem('browseState'); // Clear saved state
         currentOffset = 0;
         currentQuery = '';
+        // Reload initial notes when search is cleared
+        loadInitialNotes();
         return;
       }
 
