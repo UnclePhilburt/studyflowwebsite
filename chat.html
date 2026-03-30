@@ -938,12 +938,22 @@
     });
 
     viewport.addEventListener('wheel', (e) => {
+      // If scrolling inside a card response, let it scroll naturally
+      const responseEl = e.target.closest('.card-response');
+      if (responseEl) {
+        const atTop = responseEl.scrollTop === 0;
+        const atBottom = responseEl.scrollTop + responseEl.clientHeight >= responseEl.scrollHeight - 1;
+        // Only zoom if at scroll boundary and scrolling further
+        if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+          return; // Let card scroll
+        }
+      }
+
       e.preventDefault();
       const zoomSpeed = 0.001;
       const delta = -e.deltaY * zoomSpeed;
       const newScale = Math.min(2, Math.max(0.3, scale + delta * scale));
 
-      // Zoom toward mouse position
       const mx = e.clientX, my = e.clientY;
       panX = mx - (mx - panX) * (newScale / scale);
       panY = my - (my - panY) * (newScale / scale);
@@ -1159,22 +1169,38 @@
       const anchorX = card.x + cardW / 2;
       const anchorY = card.y + cardH;
 
-      // Measure all bubble widths first
-      const bubbleWidths = card.followups.map(f => f.element.offsetWidth || 140);
+      // Separate input bubble from suggestion bubbles
+      const inputItems = card.followups.filter(f => f.isInput);
+      const suggestionItems = card.followups.filter(f => !f.isInput);
+
+      // Row 1: Input bubble centered
+      const row1Y = startY;
+      inputItems.forEach(f => {
+        const bw = f.element.offsetWidth || 210;
+        f.element.style.left = (anchorX - bw / 2) + 'px';
+        f.element.style.top = row1Y + 'px';
+      });
+
+      // Row 2: Suggestion bubbles centered below
+      const row2Y = startY + (inputItems.length > 0 ? 50 : 0);
+      const suggWidths = suggestionItems.map(f => f.element.offsetWidth || 140);
       const gap = 16;
-      const totalWidth = bubbleWidths.reduce((sum, w) => sum + w, 0) + gap * (count - 1);
-      let cursorX = anchorX - totalWidth / 2;
+      const totalSuggW = suggWidths.reduce((sum, w) => sum + w, 0) + gap * Math.max(suggestionItems.length - 1, 0);
+      let cursorX = anchorX - totalSuggW / 2;
 
-      card.followups.forEach((f, i) => {
-        const bw = bubbleWidths[i];
-        const fx = cursorX;
-        const fy = startY;
+      suggestionItems.forEach((f, i) => {
+        const bw = suggWidths[i];
+        f.element.style.left = cursorX + 'px';
+        f.element.style.top = row2Y + 'px';
         cursorX += bw + gap;
+      });
 
-        f.element.style.left = fx + 'px';
-        f.element.style.top = fy + 'px';
-
-        // Bubble center
+      // Draw lines from card to all items
+      const allItems = [...inputItems, ...suggestionItems];
+      allItems.forEach(f => {
+        const fx = parseFloat(f.element.style.left) || 0;
+        const fy = parseFloat(f.element.style.top) || 0;
+        const bw = f.element.offsetWidth || 140;
         const bcx = fx + bw / 2;
         const bcy = fy;
 
