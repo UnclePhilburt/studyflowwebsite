@@ -784,12 +784,12 @@
       document.getElementById('hintText').style.display = 'none';
     }
 
-    // Load initial notes on page load so the page isn't empty
+    // Load initial notes on page load -- queries Supabase directly (no Render round trip)
     async function loadInitialNotes() {
       try {
         showLoading();
 
-        // First, try to get the user's university from their profile
+        // Get user's university from profile
         let university = null;
         try {
           const { data: { session } } = await supabaseClient.auth.getSession();
@@ -801,8 +801,7 @@
               .single();
 
             if (profile && !profile.edu_email_verified) {
-              // Not .edu verified - don't load anything, the edu gate will show
-              return;
+              return; // edu gate will show
             }
             if (profile && profile.university) {
               university = profile.university;
@@ -813,30 +812,34 @@
           console.log('[Initial Load] Could not fetch university, loading general notes');
         }
 
-        // Try loading popular notes from user's university first
+        // Query notes directly from Supabase (fast, no Render cold start)
         let notes = [];
+
+        // Try user's university first
         if (university) {
-          const uniUrl = `${BACKEND_URL}/api/notes/browse?sort=popular&limit=10&university=${encodeURIComponent(university)}`;
-          const uniResponse = await fetch(uniUrl, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-          });
-          if (uniResponse.ok) {
-            const uniData = await uniResponse.json();
-            notes = uniData.notes || [];
-          }
+          const { data } = await supabaseClient
+            .from('notes')
+            .select('id, original_filename, university, course_code, user_id, topic_tags, uploaded_at')
+            .eq('is_public', true)
+            .not('user_id', 'is', null)
+            .eq('university', university)
+            .order('uploaded_at', { ascending: false })
+            .limit(10);
+          if (data) notes = data;
         }
 
-        // If not enough from university, supplement with general popular notes
+        // Supplement with general notes if needed
         if (notes.length < 10) {
-          const generalUrl = `${BACKEND_URL}/api/notes/browse?sort=popular&limit=${10 - notes.length}`;
-          const generalResponse = await fetch(generalUrl, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-          });
-          if (generalResponse.ok) {
-            const generalData = await generalResponse.json();
-            const generalNotes = generalData.notes || [];
-            const existingIds = new Set(notes.map(n => n.id));
-            for (const note of generalNotes) {
+          const existingIds = new Set(notes.map(n => n.id));
+          const { data } = await supabaseClient
+            .from('notes')
+            .select('id, original_filename, university, course_code, user_id, topic_tags, uploaded_at')
+            .eq('is_public', true)
+            .not('user_id', 'is', null)
+            .order('uploaded_at', { ascending: false })
+            .limit(10);
+          if (data) {
+            for (const note of data) {
               if (!existingIds.has(note.id) && notes.length < 10) {
                 notes.push(note);
               }
@@ -844,29 +847,59 @@
           }
         }
 
-        if (notes.length === 0) return;
+        if (notes.length === 0) {
+          document.getElementById('cardTable').innerHTML = '';
+          document.getElementById('hintText').style.display = 'block';
+          return;
+        }
 
-        // Map browse API response to the format displayCards expects
-        const mappedNotes = notes.map(note => ({
-          note_id: note.id,
-          filename: note.filename || 'Untitled',
-          content: note.topic_tags && note.topic_tags.length > 0
-            ? note.topic_tags.join(', ')
-            : (note.course_code || 'Study notes and materials'),
-          username: note.username || 'Anonymous',
-          university: note.university || 'Unknown',
-          created_at: note.uploaded_at || new Date().toISOString(),
-          upvotes: 0
-        }));
+        // Batch fetch usernames for all note authors
+        const userIds = [...new Set(notes.map(n => n.user_id))];
+        const { data: profiles } = await supabaseClient
+          .from('user_profiles')
+          .select('id, username, is_public')
+          .in('id', userIds);
 
-        // Hide hint text and show cards
+        const profileMap = {};
+        if (profiles) {
+          profiles.forEach(p => { profileMap[p.id] = p; });
+        }
+
+        // Filter out notes from users with Nexus disabled, map to display format
+        const mappedNotes = notes
+          .filter(note => {
+            const profile = profileMap[note.user_id];
+            return profile && profile.is_public !== false;
+          })
+          .map(note => {
+            const profile = profileMap[note.user_id];
+            return {
+              note_id: note.id,
+              filename: note.original_filename || 'Untitled',
+              content: note.topic_tags && note.topic_tags.length > 0
+                ? note.topic_tags.join(', ')
+                : (note.course_code || 'Study notes and materials'),
+              username: (profile && profile.username) || 'Anonymous',
+              university: note.university || 'Unknown',
+              created_at: note.uploaded_at || new Date().toISOString(),
+              upvotes: 0
+            };
+          });
+
+        if (mappedNotes.length === 0) {
+          document.getElementById('cardTable').innerHTML = '';
+          document.getElementById('hintText').style.display = 'block';
+          return;
+        }
+
         document.getElementById('hintText').style.display = 'none';
         displayCards(mappedNotes, '');
-        console.log(`[Initial Load] Displayed ${mappedNotes.length} initial notes`);
+        console.log(`[Initial Load] Displayed ${mappedNotes.length} notes directly from Supabase`);
 
       } catch (error) {
-        console.error('[Initial Load] Error loading initial notes:', error);
-        // Silently fail - user can still search manually
+        console.error('[Initial Load] Error:', error);
+        document.getElementById('cardTable').innerHTML = '';
+        document.getElementById('hintText').style.display = 'block';
       }
     }
 
