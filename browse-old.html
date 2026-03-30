@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The Nexus - Browse and discover shared study notes from the StudyFlow Suite community.">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Nexus - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #e8e3d8;
+      min-height: 100vh;
+      color: #2d2d2d;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(124, 152, 133, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(232, 155, 95, 0.05) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: multiply;
+      opacity: 0.8;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* Header */
+    .browse-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .browse-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 2.5rem;
+      font-weight: 400;
+      background: linear-gradient(135deg, #7c9885 0%, #e89b5f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .browse-subtitle {
+      font-size: 1.0625rem;
+      color: #6b8575;
+      font-weight: 400;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .nav-link {
+      color: #5d5d5d;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .nav-link:hover {
+      color: #7c9885;
+      background: rgba(124, 152, 133, 0.08);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c9885 0%, #6b8575 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3);
+    }
+
+    .user-avatar-wrapper {
+      position: relative;
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: 12px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 8px 24px rgba(124, 152, 133, 0.15);
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10000;
+    }
+
+    .user-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .user-menu-header {
+      padding: 16px;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .user-menu-email {
+      font-size: 13px;
+      color: #5d5d5d;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .user-menu-item {
+      padding: 12px 16px;
+      color: #2d2d2d;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .user-menu-item:hover {
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
+
+    .user-menu-item.logout {
+      color: #e89b5f;
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+    }
+
+    .user-menu-item.logout:hover {
+      background: rgba(232, 155, 95, 0.08);
+      color: #d4783d;
+    }
+
+    /* Verification Gate */
+    .verification-gate {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 20px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      box-shadow: 0 2px 16px rgba(124, 152, 133, 0.08);
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .gate-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+    }
+
+    .gate-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: #2d2d2d;
+      margin-bottom: 1.25rem;
+    }
+
+    .gate-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #5a5a5a;
+      margin-bottom: 2rem;
+    }
+
+    .verify-btn {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(232, 155, 95, 0.95) 100%);
+      color: white;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.2);
+    }
+
+    .verify-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.25);
+    }
+
+    /* Search Bar */
+    .search-container {
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      margin-bottom: 48px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 2px 16px rgba(124, 152, 133, 0.06);
+    }
+
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 16px 20px;
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 14px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: rgba(124, 152, 133, 0.4);
+      box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.08);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Subject-based accent colors for search bar */
+    .search-input.accent-biology {
+      border-color: rgba(76, 175, 80, 0.4);
+      box-shadow: 0 0 0 1px rgba(76, 175, 80, 0.1);
+    }
+
+    .search-input.accent-chemistry {
+      border-color: rgba(156, 39, 176, 0.4);
+      box-shadow: 0 0 0 1px rgba(156, 39, 176, 0.1);
+    }
+
+    .search-input.accent-physics {
+      border-color: rgba(33, 150, 243, 0.4);
+      box-shadow: 0 0 0 1px rgba(33, 150, 243, 0.1);
+    }
+
+    .search-input.accent-math {
+      border-color: rgba(255, 152, 0, 0.4);
+      box-shadow: 0 0 0 1px rgba(255, 152, 0, 0.1);
+    }
+
+    .search-input.accent-history {
+      border-color: rgba(121, 85, 72, 0.4);
+      box-shadow: 0 0 0 1px rgba(121, 85, 72, 0.1);
+    }
+
+    .search-input.accent-literature {
+      border-color: rgba(233, 30, 99, 0.4);
+      box-shadow: 0 0 0 1px rgba(233, 30, 99, 0.1);
+    }
+
+    .search-input.accent-computer {
+      border-color: rgba(0, 188, 212, 0.4);
+      box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.1);
+    }
+
+    .search-input.accent-engineering {
+      border-color: rgba(255, 87, 34, 0.4);
+      box-shadow: 0 0 0 1px rgba(255, 87, 34, 0.1);
+    }
+
+    .search-input.accent-business {
+      border-color: rgba(103, 58, 183, 0.4);
+      box-shadow: 0 0 0 1px rgba(103, 58, 183, 0.1);
+    }
+
+    .search-input.accent-psychology {
+      border-color: rgba(244, 67, 54, 0.4);
+      box-shadow: 0 0 0 1px rgba(244, 67, 54, 0.1);
+    }
+
+    .search-input.accent-law {
+      border-color: rgba(96, 125, 139, 0.4);
+      box-shadow: 0 0 0 1px rgba(96, 125, 139, 0.1);
+    }
+
+    .search-input.accent-medicine {
+      border-color: rgba(205, 220, 57, 0.4);
+      box-shadow: 0 0 0 1px rgba(205, 220, 57, 0.1);
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(232, 155, 95, 0.95) 100%);
+      color: white;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 12px rgba(124, 152, 133, 0.2);
+    }
+
+    .search-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(124, 152, 133, 0.25);
+    }
+
+    /* Filters */
+    .filters-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #6b8575;
+      margin-bottom: 8px;
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+      color: #2d2d2d;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: rgba(124, 152, 133, 0.4);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Searchable Filter */
+    .filter-search-wrapper {
+      position: relative;
+    }
+
+    .filter-search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255, 255, 255, 0.7);
+      transition: all 0.3s ease;
+      color: #2d2d2d;
+    }
+
+    .filter-search-input:focus {
+      outline: none;
+      border-color: rgba(124, 152, 133, 0.4);
+      box-shadow: 0 0 0 3px rgba(124, 152, 133, 0.08);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .filter-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-dropdown.active {
+      display: block;
+    }
+
+    .filter-dropdown-item {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      color: #2d2d2d;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .filter-dropdown-item:hover {
+      background: rgba(124, 152, 133, 0.1);
+      color: #6b8575;
+    }
+
+    .filter-dropdown-item.selected {
+      background: rgba(124, 152, 133, 0.15);
+      font-weight: 600;
+      color: #6b8575;
+    }
+
+    .filter-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      line-height: 1;
+      display: none;
+    }
+
+    .filter-clear.active {
+      display: block;
+    }
+
+    .filter-clear:hover {
+      color: #5d5d5d;
+    }
+
+    /* Topic Tags */
+    .topic-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .topic-tag {
+      padding: 9px 18px;
+      background: rgba(124, 152, 133, 0.1);
+      border: 1px solid rgba(124, 152, 133, 0.2);
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #6b8575;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .topic-tag:hover {
+      background: rgba(124, 152, 133, 0.15);
+      border-color: rgba(124, 152, 133, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .topic-tag.active {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.95) 0%, rgba(232, 155, 95, 0.95) 100%);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 2px 8px rgba(124, 152, 133, 0.2);
+    }
+
+    /* Zen Grid - Multi-column horizontal */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px 32px;
+      margin-top: 48px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Mobile Bottom Tab Bar */
+    .bottom-tab-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(124, 152, 133, 0.15);
+      justify-content: space-around;
+      align-items: center;
+      z-index: 9999;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      text-decoration: none;
+      color: #8a8a8a;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 6px 0;
+      min-width: 48px;
+      transition: color 0.2s;
+    }
+
+    .tab-item svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tab-item.active {
+      color: #7c9885;
+    }
+
+    @media (max-width: 1200px) {
+      .notes-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px 24px;
+        max-width: 900px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .notes-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px 16px;
+        max-width: calc(100% - 32px);
+        margin-left: 16px;
+        margin-right: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .notes-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        max-width: calc(100% - 16px);
+        margin-left: 8px;
+        margin-right: 8px;
+      }
+    }
+
+    .note-card {
+      background: transparent;
+      border: none;
+      padding: 24px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      border-radius: 12px;
+      opacity: 0;
+      transform: scale(0.95);
+      animation: fadeInScale 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .note-card:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.02);
+    }
+
+    .note-card-content {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0;
+      gap: 8px;
+    }
+
+    .note-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: #5a6b5f;
+      margin-bottom: 0;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .note-university {
+      display: inline;
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      color: #8a8a8a;
+      text-transform: none;
+      letter-spacing: 0.01em;
+    }
+
+    .note-university::after {
+      content: " • ";
+      margin: 0 4px;
+      opacity: 0.5;
+    }
+
+    .note-course {
+      display: inline;
+      font-size: 0.8125rem;
+      color: #6b8575;
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .note-description {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      color: #5d5d5d;
+      margin-top: 8px;
+      margin-bottom: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .note-preview {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      color: #5d5d5d;
+      margin-top: 12px;
+      margin-bottom: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.4);
+      border-left: 3px solid rgba(124, 152, 133, 0.3);
+      border-radius: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-style: italic;
+    }
+
+    .note-preview mark {
+      background: rgba(232, 155, 95, 0.25);
+      color: inherit;
+      font-weight: 500;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    .note-attribution {
+      font-size: 0.6875rem;
+      color: #9a9a9a;
+      opacity: 0.5;
+      margin-top: 8px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      transition: opacity 0.3s;
+    }
+
+    .note-card:hover .note-attribution {
+      opacity: 0.7;
+    }
+
+    .note-attribution-username {
+      color: #7c9885;
+      font-weight: 500;
+    }
+
+    .note-meta {
+      font-size: 0.75rem;
+      color: #9a9a9a;
+      margin-bottom: 0;
+      display: inline;
+    }
+
+    .note-contributor {
+      color: #7c9885;
+      font-weight: 500;
+    }
+
+    .note-tags {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .note-tag {
+      padding: 0;
+      background: transparent;
+      border-radius: 0;
+      font-size: 0.7rem;
+      color: #d4783d;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .note-tag::before {
+      content: "#";
+      opacity: 0.5;
+    }
+
+    .note-stats {
+      display: inline-flex;
+      gap: 12px;
+      padding-top: 0;
+      border-top: none;
+      font-size: 0.7rem;
+      color: #9a9a9a;
+    }
+
+    .note-stats::before {
+      content: " • ";
+      margin: 0 4px;
+      opacity: 0.5;
+    }
+
+    .note-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 400;
+    }
+
+    .note-stat svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    .note-meta::before {
+      content: " • ";
+      margin: 0 4px;
+      opacity: 0.5;
+    }
+
+    .note-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      font-size: 0.7rem;
+      gap: 0;
+    }
+
+    .note-badge {
+      position: static;
+      display: inline;
+      padding: 0 6px 0 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      font-size: 0.65rem;
+      color: #d4783d;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.7;
+    }
+
+    /* Context menu for right-click */
+    .browse-context-menu {
+      position: fixed;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 243, 0.98) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.2);
+      border-radius: 12px;
+      padding: 8px;
+      box-shadow: 0 12px 32px rgba(45, 45, 45, 0.2);
+      z-index: 10000;
+      display: none;
+      min-width: 180px;
+    }
+    .browse-context-menu.active { display: block; }
+    .browse-context-menu-item {
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      color: #2d2d2d;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .browse-context-menu-item:hover {
+      background: rgba(124, 152, 133, 0.15);
+    }
+    .browse-context-menu-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9ca3af;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(124, 152, 133, 0.2);
+      border-top-color: #7c9885;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .scroll-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+      color: #8a8a8a;
+      font-size: 14px;
+    }
+
+    .scroll-loading .loading-spinner {
+      width: 24px;
+      height: 24px;
+      border-width: 3px;
+      margin: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+    }
+
+    .empty-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 12px;
+    }
+
+    .empty-text {
+      color: #9ca3af;
+      font-size: 1rem;
+    }
+
+    /* --- Responsive Layout: Tablet --- */
+
+    /* Hide navigation - use dashboard instead */
+    .top-nav,
+    .bottom-tab-bar {
+      display: none !important;
+    }
+
+    /* Back to Dashboard Button */
+    .back-to-dashboard {
+      position: fixed;
+      top: 28px;
+      left: 28px;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.1) 0%, rgba(232, 155, 95, 0.1) 100%);
+      border: 2px solid rgba(124, 152, 133, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 99;
+      color: #7c9885;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(124, 152, 133, 0.1);
+    }
+
+    .back-to-dashboard:hover {
+      background: linear-gradient(135deg, rgba(124, 152, 133, 0.2) 0%, rgba(232, 155, 95, 0.2) 100%);
+      box-shadow: 0 6px 30px rgba(124, 152, 133, 0.2);
+      transform: translateY(-2px);
+      border-color: rgba(124, 152, 133, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .back-to-dashboard {
+        top: 16px;
+        left: 16px;
+        width: 44px;
+        height: 44px;
+      }
+      .container {
+        padding: 60px 16px 24px;
+      }
+
+      .top-nav {
+        display: none !important;
+      }
+
+      .bottom-tab-bar {
+        display: none !important;
+      }
+
+      body {
+        padding-bottom: 56px;
+      }
+
+      .browse-header {
+        margin-bottom: 32px;
+      }
+
+      .browse-title {
+        font-size: 2rem;
+      }
+
+      .search-container {
+        padding: 1.25rem;
+        margin-bottom: 32px;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .search-btn {
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .filter-group {
+        min-width: 0;
+        flex-basis: 100%;
+      }
+
+      .topic-tags {
+        gap: 8px;
+      }
+
+      .topic-tag {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
+
+      .verification-gate {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    /* --- Responsive Layout: Phone --- */
+    @media (max-width: 480px) {
+      .container {
+        padding: 52px 12px 16px;
+      }
+
+      .browse-title {
+        font-size: 1.5rem;
+      }
+
+      .browse-subtitle {
+        font-size: 0.9rem;
+      }
+
+      .browse-header {
+        margin-bottom: 20px;
+      }
+
+      .search-container {
+        padding: 1rem;
+        margin-bottom: 20px;
+        border-radius: 12px;
+      }
+
+      .search-input {
+        padding: 12px 16px;
+        font-size: 16px;
+      }
+
+      .filter-select, .filter-search-input {
+        padding: 10px 12px;
+        font-size: 16px;
+      }
+
+      .nav-link {
+        padding: 6px 6px;
+        font-size: 12px;
+      }
+
+      .gate-title {
+        font-size: 1.5rem;
+      }
+
+      .verify-btn {
+        width: 100%;
+        min-height: 44px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Back to Dashboard Button -->
+  <a href="dashboard.html" class="back-to-dashboard" title="Back to Dashboard">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </a>
+
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="chat.html" class="nav-link">Chat</a>
+    <a href="upload.html" class="nav-link">Upload</a>
+    <a href="notes.html" class="nav-link">Notes</a>
+    <a href="office.html" class="nav-link">Office</a>
+    <a href="browse.html" class="nav-link active">Nexus</a>
+    <a href="calendar.html" class="nav-link">Calendar</a>
+    <div class="user-avatar-wrapper">
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-menu" id="userMenu">
+        <div class="user-menu-header">
+          <div class="user-menu-email" id="menuUserEmail">Loading...</div>
+        </div>
+        <a href="account.html" class="user-menu-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Account
+        </a>
+        <button class="user-menu-item logout" onclick="logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="browse-header">
+      <h1 class="browse-title">Browse the Nexus</h1>
+      <p class="browse-subtitle">Discover study notes shared by students across universities</p>
+    </div>
+
+    <!-- Verification Gate (shown only if .edu not verified) -->
+    <div class="verification-gate" id="verificationGate" style="display: none;">
+      <div class="gate-icon">🎓</div>
+      <h2 class="gate-title">.edu Email Required</h2>
+      <p class="gate-text">
+        To browse and download notes from other students, you need to verify a university email address (.edu). This creates a trusted educational sandbox and protects student contributors.
+      </p>
+      <p class="gate-text" style="margin-top: 16px; font-size: 14px; color: #7c9885;">
+        Verify your .edu email in Account Settings to access the Nexus note library.
+      </p>
+      <button class="verify-btn" onclick="window.location.href='account.html'">Go to Account Settings</button>
+    </div>
+
+    <!-- Main Browse Interface (hidden until verified) -->
+    <div id="browseInterface" style="display: none;">
+      <!-- Search Bar -->
+      <div class="search-container">
+        <div class="search-box">
+          <input type="text" class="search-input" id="searchInput" placeholder="Search notes by keyword, topic, or course...">
+          <button class="search-btn" onclick="search()">Search</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-row">
+          <div class="filter-group">
+            <label class="filter-label">University</label>
+            <div class="filter-search-wrapper">
+              <input type="text" class="filter-search-input" id="universityFilter" placeholder="All Universities" autocomplete="off">
+              <button class="filter-clear" id="universityClear" onclick="clearFilter('university')">&times;</button>
+              <div class="filter-dropdown" id="universityDropdown"></div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Course</label>
+            <div class="filter-search-wrapper">
+              <input type="text" class="filter-search-input" id="courseFilter" placeholder="All Courses" autocomplete="off">
+              <button class="filter-clear" id="courseClear" onclick="clearFilter('course')">&times;</button>
+              <div class="filter-dropdown" id="courseDropdown"></div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select class="filter-select" id="sortFilter" onchange="filterNotes()">
+              <option value="recent">Most Recent</option>
+              <option value="popular">Most Popular</option>
+              <option value="views">Most Viewed</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Topic Tags -->
+        <div class="topic-tags" id="topicTags"></div>
+      </div>
+
+      <!-- Notes Grid -->
+      <div id="notesContainer">
+        <div class="loading" id="loadingState">
+          <div class="loading-spinner"></div>
+          <div>Loading notes...</div>
+        </div>
+
+        <div class="notes-grid" id="notesGrid" style="display: none;"></div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-icon">📚</div>
+          <h3 class="empty-title">No notes found</h3>
+          <p class="empty-text">Try adjusting your search or filters</p>
+        </div>
+
+        <div class="scroll-loading" id="scrollLoading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <span>Loading more notes...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right-click context menu -->
+  <div class="browse-context-menu" id="browseContextMenu">
+    <div class="browse-context-menu-item" id="browseCtxFavorite">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <span>Favorite</span>
+    </div>
+    <div class="browse-context-menu-item" id="browseCtxView">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+      </svg>
+      <span>View Note</span>
+    </div>
+    <div class="browse-context-menu-item" id="browseCtxReport" style="color:#dc2626;">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+      </svg>
+      <span>Report / DMCA</span>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="reportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:24px;">
+    <div style="background:rgba(255,255,255,0.97);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.15);max-width:440px;width:100%;padding:28px;position:relative;">
+      <button onclick="closeReportModal()" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:rgba(0,0,0,0.04);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9ca3af;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div style="font-size:16px;font-weight:600;color:#2d2d2d;margin-bottom:4px;">Report Content</div>
+      <div style="font-size:12px;color:#9ca3af;margin-bottom:16px;" id="reportNoteInfo"></div>
+      <input type="hidden" id="reportNoteId">
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:13px;font-weight:500;color:#2d2d2d;margin-bottom:4px;">Your Email</label>
+        <input type="email" id="reportEmail" placeholder="your@email.com" style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:13px;font-weight:500;color:#2d2d2d;margin-bottom:4px;">Your Name (optional)</label>
+        <input type="text" id="reportName" placeholder="Dr. Jane Doe" style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:13px;font-weight:500;color:#2d2d2d;margin-bottom:4px;">Reason for Report</label>
+        <textarea id="reportReason" rows="3" placeholder="This contains my copyrighted lecture slides..." style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;resize:vertical;"></textarea>
+      </div>
+      <button id="reportSubmitBtn" onclick="submitReport()" style="width:100%;padding:10px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:white;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Submit Report</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="university-data.js"></script>
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let authToken = null;
+    let currentUser = null;
+    let allNotes = [];
+    let filteredNotes = [];
+    let selectedTags = [];
+
+    // Infinite scroll pagination
+    let currentOffset = 0;
+    const NOTES_PER_PAGE = 12; // 4 rows x 3 columns
+    let isLoadingMore = false;
+    let hasMoreNotes = true;
+
+    // Check authentication and .edu verification
+    async function checkAuth() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      authToken = session.access_token;
+      currentUser = session.user;
+
+      // Set user avatar
+      const userEmail = currentUser.email || '';
+      const firstLetter = userEmail.charAt(0).toUpperCase();
+      document.getElementById('userAvatar').textContent = firstLetter;
+      document.getElementById('menuUserEmail').textContent = currentUser.email;
+
+      // Check if user has verified .edu email from user_profiles table
+      try {
+        const { data: profile, error } = await supabaseClient
+          .from('user_profiles')
+          .select('edu_email_verified')
+          .eq('id', currentUser.id)
+          .single();
+
+        const isEduVerified = profile?.edu_email_verified === true;
+
+        if (!isEduVerified) {
+          // Show verification gate for non-verified users
+          document.getElementById('verificationGate').style.display = 'block';
+          document.getElementById('browseInterface').style.display = 'none';
+        } else {
+          // Show browse interface for verified .edu users
+          document.getElementById('verificationGate').style.display = 'none';
+          document.getElementById('browseInterface').style.display = 'block';
+          await loadNotes();
+          await loadTopicTags();
+
+          // Setup infinite scroll
+          setupInfiniteScroll();
+
+          // Setup search input Enter key listener
+          document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              search();
+            }
+          });
+
+          // Setup scroll-to-top gesture for power users
+          setupScrollGestures();
+        }
+      } catch (error) {
+        console.error('Error checking .edu verification:', error);
+        // Default to showing verification gate on error
+        document.getElementById('verificationGate').style.display = 'block';
+        document.getElementById('browseInterface').style.display = 'none';
+      }
+    }
+
+    // Load notes from backend
+    async function loadNotes(append = false) {
+      if (isLoadingMore) return; // Prevent duplicate requests
+      isLoadingMore = true;
+
+      if (append) {
+        document.getElementById('scrollLoading').style.display = 'flex';
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/browse?limit=${NOTES_PER_PAGE}&offset=${currentOffset}`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const newNotes = data.notes || [];
+
+          if (append) {
+            // Append new notes to existing
+            allNotes = [...allNotes, ...newNotes];
+            filteredNotes = [...allNotes];
+            displayNotes(newNotes, true); // Append mode
+          } else {
+            // Initial load - replace all
+            allNotes = newNotes;
+            filteredNotes = [...allNotes];
+
+            // Populate filters only on initial load
+            populateFilters();
+
+            // Display notes
+            displayNotes();
+
+            document.getElementById('loadingState').style.display = 'none';
+          }
+
+          // Update pagination state
+          currentOffset += newNotes.length;
+          hasMoreNotes = newNotes.length === NOTES_PER_PAGE;
+
+          console.log(`[Infinite Scroll] Loaded ${newNotes.length} notes, offset now ${currentOffset}, hasMore: ${hasMoreNotes}`);
+        } else {
+          throw new Error('Failed to load notes');
+        }
+      } catch (error) {
+        console.error('Error loading notes:', error);
+        if (!append) {
+          document.getElementById('loadingState').innerHTML = '<div>Error loading notes. Please try again.</div>';
+        }
+      } finally {
+        isLoadingMore = false;
+        document.getElementById('scrollLoading').style.display = 'none';
+      }
+    }
+
+    // Setup infinite scroll listener
+    function setupInfiniteScroll() {
+      window.addEventListener('scroll', () => {
+        // Check if user scrolled near bottom (within 500px of bottom)
+        const scrollPosition = window.scrollY + window.innerHeight;
+        const pageHeight = document.documentElement.scrollHeight;
+        const threshold = 500; // Load more when 500px from bottom
+
+        if (scrollPosition >= pageHeight - threshold && !isLoadingMore && hasMoreNotes) {
+          console.log('[Infinite Scroll] Loading more notes...');
+          loadNotes(true); // Append mode
+        }
+      });
+    }
+
+    // Setup scroll gestures for power users
+    function setupScrollGestures() {
+      let lastScrollY = window.scrollY;
+      let scrollVelocity = 0;
+      let scrollTimeout;
+
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        scrollVelocity = lastScrollY - currentScrollY; // Positive = scrolling up
+        lastScrollY = currentScrollY;
+
+        // Detect rapid upward scroll gesture (scroll to top)
+        if (scrollVelocity > 30 && currentScrollY > 200) {
+          clearTimeout(scrollTimeout);
+          scrollTimeout = setTimeout(() => {
+            // Smooth scroll to top
+            window.scrollTo({
+              top: 0,
+              behavior: 'smooth'
+            });
+          }, 100); // Debounce to avoid accidental triggers
+        }
+      }, { passive: true });
+
+      // ESC key to scroll to top
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && window.scrollY > 100) {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        }
+      });
+    }
+
+    // Load topic tags
+    async function loadTopicTags() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes/topic-tags`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const tags = data.tags || [];
+
+          const tagsContainer = document.getElementById('topicTags');
+          tagsContainer.innerHTML = tags.map(tag =>
+            `<div class="topic-tag" onclick="toggleTag('${tag}')">${tag}</div>`
+          ).join('');
+        }
+      } catch (error) {
+        console.error('Error loading topic tags:', error);
+      }
+    }
+
+    // Toggle topic tag
+    function toggleTag(tag) {
+      const tagElement = event.target;
+      tagElement.classList.toggle('active');
+
+      if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter(t => t !== tag);
+      } else {
+        selectedTags.push(tag);
+      }
+
+      filterNotes();
+    }
+
+    // Selected filter values
+    let selectedUniversity = '';
+    let selectedCourse = '';
+
+    // Populate filter dropdowns - merge data from notes + university-data.js
+    function populateFilters() {
+      // Merge universities from actual notes with the master list
+      const noteUniversities = [...new Set(allNotes.map(n => n.university).filter(Boolean))];
+      const allUniversities = [...new Set([...noteUniversities, ...UNIVERSITIES])].sort();
+
+      // Merge courses from actual notes with generated course codes
+      const noteCourses = [...new Set(allNotes.map(n => n.course_code).filter(Boolean))];
+      // Get department prefixes as summary items
+      const deptPrefixes = Object.entries(COURSE_DEPARTMENTS).map(([dept, codes]) => `${codes[0]} - ${dept}`);
+      // Combine: actual courses from notes first, then department prefixes
+      window._allUniversities = allUniversities;
+      window._noteCourses = noteCourses;
+
+      setupFilterSearch('universityFilter', 'universityDropdown', 'universityClear', allUniversities, 'university');
+      setupFilterSearch('courseFilter', 'courseDropdown', 'courseClear', noteCourses, 'course');
+    }
+
+    function setupFilterSearch(inputId, dropdownId, clearId, allItems, type) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      const clearBtn = document.getElementById(clearId);
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim().toLowerCase();
+        let items;
+
+        if (type === 'university') {
+          items = query
+            ? window._allUniversities.filter(u => u.toLowerCase().includes(query))
+            : window._allUniversities;
+        } else {
+          // For courses, search both actual notes' courses and generated codes
+          if (query) {
+            const fromNotes = window._noteCourses.filter(c => c.toLowerCase().includes(query));
+            const generated = searchCourseCodes(query);
+            items = [...new Set([...fromNotes, ...generated])];
+          } else {
+            items = window._noteCourses;
+          }
+        }
+
+        items = items.slice(0, 25);
+
+        if (items.length === 0) {
+          dropdown.classList.remove('active');
+          return;
+        }
+
+        dropdown.innerHTML = `<div class="filter-dropdown-item" data-value="" style="color: #9ca3af; font-style: italic;">All ${type === 'university' ? 'Universities' : 'Courses'}</div>` +
+          items.map(item =>
+            `<div class="filter-dropdown-item${(type === 'university' ? selectedUniversity : selectedCourse) === item ? ' selected' : ''}" data-value="${item}">${item}</div>`
+          ).join('');
+        dropdown.classList.add('active');
+
+        dropdown.querySelectorAll('.filter-dropdown-item').forEach(el => {
+          el.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const val = el.dataset.value;
+            input.value = val;
+            if (type === 'university') selectedUniversity = val;
+            else selectedCourse = val;
+            dropdown.classList.remove('active');
+            clearBtn.classList.toggle('active', !!val);
+            filterNotes();
+          });
+        });
+      });
+
+      input.addEventListener('focus', () => {
+        input.dispatchEvent(new Event('input'));
+      });
+
+      input.addEventListener('blur', () => {
+        setTimeout(() => dropdown.classList.remove('active'), 150);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const highlighted = dropdown.querySelector('.filter-dropdown-item:hover') ||
+            dropdown.querySelector('.filter-dropdown-item:not([style])');
+          if (input.value.trim()) {
+            if (type === 'university') selectedUniversity = input.value.trim();
+            else selectedCourse = input.value.trim();
+            clearBtn.classList.add('active');
+          }
+          dropdown.classList.remove('active');
+          filterNotes();
+        } else if (e.key === 'Escape') {
+          dropdown.classList.remove('active');
+        }
+      });
+    }
+
+    function clearFilter(type) {
+      if (type === 'university') {
+        document.getElementById('universityFilter').value = '';
+        document.getElementById('universityClear').classList.remove('active');
+        selectedUniversity = '';
+      } else {
+        document.getElementById('courseFilter').value = '';
+        document.getElementById('courseClear').classList.remove('active');
+        selectedCourse = '';
+      }
+      filterNotes();
+    }
+
+    // Search notes
+    async function search() {
+      const query = document.getElementById('searchInput').value.trim();
+
+      if (!query) {
+        // No query: show all notes
+        filteredNotes = [...allNotes];
+        filterNotes();
+        return;
+      }
+
+      // Use semantic search for better results
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+
+        const response = await fetch('https://studyflowsuite.onrender.com/api/search/notes', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: query,
+            match_count: 20
+          })
+        });
+
+        if (response.ok) {
+          const results = await response.json();
+
+          // Map semantic results to note cards with preview text
+          const noteIdsWithPreviews = new Map();
+          results.forEach(result => {
+            if (!noteIdsWithPreviews.has(result.note_id)) {
+              noteIdsWithPreviews.set(result.note_id, {
+                preview: result.content,
+                similarity: result.similarity
+              });
+            }
+          });
+
+          // Filter allNotes to only include search results
+          filteredNotes = allNotes
+            .filter(note => noteIdsWithPreviews.has(note.id))
+            .map(note => ({
+              ...note,
+              preview: noteIdsWithPreviews.get(note.id).preview,
+              similarity: noteIdsWithPreviews.get(note.id).similarity
+            }))
+            .sort((a, b) => b.similarity - a.similarity);
+
+        } else {
+          // Fallback to simple keyword search
+          filteredNotes = allNotes.filter(note =>
+            note.filename.toLowerCase().includes(query.toLowerCase()) ||
+            (note.topic_tags && note.topic_tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))) ||
+            (note.course_code && note.course_code.toLowerCase().includes(query.toLowerCase()))
+          );
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        // Fallback to simple keyword search
+        filteredNotes = allNotes.filter(note =>
+          note.filename.toLowerCase().includes(query.toLowerCase()) ||
+          (note.topic_tags && note.topic_tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))) ||
+          (note.course_code && note.course_code.toLowerCase().includes(query.toLowerCase()))
+        );
+      }
+
+      filterNotes();
+      updateSearchBarAccent();
+    }
+
+    // Update search bar accent color based on top result's subject
+    function updateSearchBarAccent() {
+      const searchInput = document.getElementById('searchInput');
+
+      // Remove all accent classes
+      searchInput.className = searchInput.className.replace(/accent-\w+/g, '').trim() + ' search-input';
+
+      // If no filtered notes, reset to default
+      if (!filteredNotes || filteredNotes.length === 0) {
+        return;
+      }
+
+      // Get the top result
+      const topNote = filteredNotes[0];
+      if (!topNote) return;
+
+      // Detect subject from course code, filename, or tags
+      const courseCode = (topNote.course_code || '').toLowerCase();
+      const filename = (topNote.filename || '').toLowerCase();
+      const tags = (topNote.topic_tags || []).map(t => t.toLowerCase()).join(' ');
+      const combinedText = `${courseCode} ${filename} ${tags}`;
+
+      // Subject detection patterns
+      const subjectPatterns = {
+        'biology': /bio|anatomy|physiology|genetics|ecology|microbio|botany|zoology/,
+        'chemistry': /chem|organic|inorganic|biochem/,
+        'physics': /phys|mechanics|thermodynamics|quantum|relativity/,
+        'math': /math|calc|algebra|geometry|statistics|trig|differential/,
+        'history': /hist|historical|civilization|world war|ancient|medieval/,
+        'literature': /lit|english|writing|poetry|novel|shakespeare/,
+        'computer': /cs|comp|programming|software|algorithm|data struct|coding|javascript|python/,
+        'engineering': /eng|mechanical|electrical|civil|chemical eng|thermofluids/,
+        'business': /bus|econ|finance|accounting|marketing|management|mba/,
+        'psychology': /psych|cognitive|behavioral|development|personality/,
+        'law': /law|legal|constitutional|criminal|civil law|tort/,
+        'medicine': /med|nursing|pharmacology|pathology|clinical|health/
+      };
+
+      // Find matching subject
+      for (const [subject, pattern] of Object.entries(subjectPatterns)) {
+        if (pattern.test(combinedText)) {
+          searchInput.classList.add(`accent-${subject}`);
+          console.log(`Applied accent: ${subject}`);
+          return;
+        }
+      }
+
+      // Default: no accent (keeps zen green)
+    }
+
+    // Filter notes
+    function filterNotes() {
+      const university = selectedUniversity;
+      const course = selectedCourse;
+      const sortBy = document.getElementById('sortFilter').value;
+
+      let notes = [...filteredNotes];
+
+      // Apply university filter
+      if (university) {
+        notes = notes.filter(n => n.university === university);
+      }
+
+      // Apply course filter
+      if (course) {
+        notes = notes.filter(n => n.course_code === course);
+      }
+
+      // Apply topic tag filter
+      if (selectedTags.length > 0) {
+        notes = notes.filter(n =>
+          n.topic_tags && selectedTags.some(tag => n.topic_tags.includes(tag))
+        );
+      }
+
+      // Sort notes
+      if (sortBy === 'popular') {
+        notes.sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0));
+      } else if (sortBy === 'views') {
+        notes.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
+      } else {
+        notes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
+      displayNotes(notes);
+    }
+
+    // Get time ago string
+    function getTimeAgo(dateString) {
+      if (!dateString) return 'Recently';
+
+      const now = new Date();
+      const date = new Date(dateString);
+
+      // Check if date is valid
+      if (isNaN(date.getTime())) return 'Recently';
+
+      const seconds = Math.floor((now - date) / 1000);
+
+      // Handle negative values (future dates)
+      if (seconds < 0) return 'Recently';
+
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+      if (seconds < 2592000) return `${Math.floor(seconds / 604800)}w ago`;
+      return `${Math.floor(seconds / 2592000)}mo ago`;
+    }
+
+    // Assign bento box size based on position and popularity
+    function getBentoSize(index, note, sortBy) {
+      // Top results in sorted lists get featured sizes
+      const isTopResult = index < 3;
+      const isPopular = (note.view_count || 0) > 100;
+      const isHighUsage = (note.usage_count || 0) > 50;
+
+      // When sorting, feature top results with larger cards
+      if (sortBy === 'popular' || sortBy === 'views') {
+        if (index === 0) return 'size-2x2';  // First result always hero
+        if (index === 1) return 'size-2x1';  // Second result wide
+        if (index === 2) return 'size-1x2';  // Third result tall
+      }
+
+      // Create a repeating pattern for visual balance
+      const pattern = [
+        'size-2x2',  // 0: Large featured
+        'size-1x1',  // 1: Small
+        'size-2x1',  // 2: Wide
+        'size-1x1',  // 3: Small
+        'size-1x1',  // 4: Small
+        'size-1x2',  // 5: Tall
+        'size-1x1',  // 6: Small
+        'size-2x1',  // 7: Wide
+        'size-1x1',  // 8: Small
+        'size-1x1',  // 9: Small
+        'size-1x1',  // 10: Small
+        'size-2x1',  // 11: Wide
+      ];
+
+      let size = pattern[index % pattern.length];
+
+      // Upgrade popular notes that would be small
+      if ((isPopular || isHighUsage) && size === 'size-1x1' && index < 20) {
+        size = index % 3 === 0 ? 'size-2x1' : 'size-1x2';
+      }
+
+      return size;
+    }
+
+    // Display notes
+    function displayNotes(notes = filteredNotes, append = false) {
+      const grid = document.getElementById('notesGrid');
+      const emptyState = document.getElementById('emptyState');
+
+      if (notes.length === 0 && !append) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      emptyState.style.display = 'none';
+
+      const sortBy = document.getElementById('sortFilter').value;
+
+      const notesHTML = notes.map((note, index) => {
+        const timeAgo = getTimeAgo(note.created_at);
+        const queryText = document.getElementById('searchInput').value.trim();
+
+        // Highlight search terms in preview
+        let previewHTML = '';
+        if (note.preview) {
+          let highlightedPreview = note.preview;
+          if (queryText) {
+            const regex = new RegExp(`(${queryText})`, 'gi');
+            highlightedPreview = highlightedPreview.replace(regex, '<mark>$1</mark>');
+          }
+          previewHTML = `<div class="note-preview">${highlightedPreview}</div>`;
+        } else if (note.description) {
+          previewHTML = `<div class="note-description">${note.description}</div>`;
+        }
+
+        // Get username for ghosted attribution
+        const username = note.username || 'Anonymous';
+        const year = note.created_at ? new Date(note.created_at).getFullYear() : new Date().getFullYear();
+
+        return `
+        <div class="note-card" data-id="${note.id}" onclick="viewNote('${note.id}')" oncontextmenu="showBrowseContextMenu(event, '${note.id}')" style="animation-delay: ${index * 0.05}s">
+          <div class="note-card-content">
+            <div class="note-header">
+              <div class="note-title">${note.filename}</div>
+              ${note.view_count > 100 ? '<span class="note-badge">Popular</span>' : ''}
+            </div>
+            <div>
+              <span class="note-university">${note.university || 'Unknown University'}</span><span class="note-course">${note.course_code || 'General Studies'}</span>
+            </div>
+            ${previewHTML}
+            <div class="note-footer">
+              ${(note.topic_tags && note.topic_tags.length > 0) ? `
+                <span class="note-tags">
+                  ${(note.topic_tags || []).slice(0, 3).map(tag =>
+                    `<span class="note-tag">${tag}</span>`
+                  ).join(' ')}
+                </span>
+              ` : ''}
+              <span class="note-stats">
+                <span class="note-stat">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                  ${note.view_count || 0}
+                </span>
+                <span class="note-stat">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  ${note.usage_count || 0}
+                </span>
+              </span>
+              <span class="note-meta">${timeAgo}</span>
+            </div>
+            <div class="note-attribution">
+              <span class="note-attribution-username">@${username}</span> · ${note.university || 'Unknown'} · ${year}
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+
+      if (append) {
+        // Append new notes to existing grid
+        grid.innerHTML += notesHTML;
+      } else {
+        // Replace entire grid
+        grid.innerHTML = notesHTML;
+      }
+    }
+
+    // View note
+    function viewNote(noteId) {
+      window.location.href = `note-viewer.html?id=${noteId}`;
+    }
+
+    function toggleUserMenu() {
+      const menu = document.getElementById('userMenu');
+      menu.classList.toggle('show');
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('userMenu');
+      const avatar = document.getElementById('userAvatar');
+      if (menu && !menu.contains(event.target) && !avatar.contains(event.target)) {
+        menu.classList.remove('show');
+      }
+    });
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    // ============ FAVORITES & CONTEXT MENU ============
+    let userFavorites = new Set();
+    let browseCtxNoteId = null;
+
+    async function loadFavorites() {
+      if (!authToken) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/notes/favorites`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          userFavorites = new Set((json.favorites || []).map(f => f.note_id));
+        }
+      } catch (e) { console.error('Failed to load favorites:', e); }
+    }
+
+    function showBrowseContextMenu(event, noteId) {
+      event.preventDefault();
+      event.stopPropagation();
+      browseCtxNoteId = noteId;
+
+      const menu = document.getElementById('browseContextMenu');
+      const favBtn = document.getElementById('browseCtxFavorite');
+      const isFav = userFavorites.has(noteId);
+      favBtn.querySelector('span').textContent = isFav ? 'Unfavorite' : 'Favorite';
+
+      menu.classList.add('active');
+      menu.style.left = event.pageX + 'px';
+      menu.style.top = event.pageY + 'px';
+    }
+
+    function closeBrowseContextMenu() {
+      document.getElementById('browseContextMenu').classList.remove('active');
+      browseCtxNoteId = null;
+    }
+
+    document.getElementById('browseCtxFavorite').addEventListener('click', async () => {
+      if (!browseCtxNoteId || !authToken) return;
+      const noteId = browseCtxNoteId;
+      const isFav = userFavorites.has(noteId);
+      closeBrowseContextMenu();
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/notes/favorite`, {
+          method: isFav ? 'DELETE' : 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ note_id: noteId })
+        });
+        if (res.ok) {
+          if (isFav) {
+            userFavorites.delete(noteId);
+          } else {
+            userFavorites.add(noteId);
+          }
+        }
+      } catch (e) { console.error('Favorite toggle failed:', e); }
+    });
+
+    document.getElementById('browseCtxView').addEventListener('click', () => {
+      if (browseCtxNoteId) {
+        viewNote(browseCtxNoteId);
+      }
+      closeBrowseContextMenu();
+    });
+
+    document.getElementById('browseCtxReport').addEventListener('click', () => {
+      if (browseCtxNoteId) {
+        openReportModal(browseCtxNoteId);
+      }
+      closeBrowseContextMenu();
+    });
+
+    function openReportModal(noteId) {
+      document.getElementById('reportNoteId').value = noteId;
+      document.getElementById('reportNoteInfo').textContent = 'Note ID: ' + noteId;
+      document.getElementById('reportEmail').value = currentUser ? currentUser.email : '';
+      document.getElementById('reportReason').value = '';
+      document.getElementById('reportName').value = '';
+      document.getElementById('reportModal').style.display = 'flex';
+    }
+
+    function closeReportModal() {
+      document.getElementById('reportModal').style.display = 'none';
+    }
+
+    async function submitReport() {
+      const noteId = document.getElementById('reportNoteId').value;
+      const email = document.getElementById('reportEmail').value.trim();
+      const name = document.getElementById('reportName').value.trim();
+      const reason = document.getElementById('reportReason').value.trim();
+
+      if (!email || !reason) {
+        alert('Email and reason are required.');
+        return;
+      }
+
+      const btn = document.getElementById('reportSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(BACKEND_URL + '/api/dmca/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            note_id: noteId,
+            reporter_email: email,
+            reporter_name: name || undefined,
+            reason: reason
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Report submitted. The note will be reviewed within 24 hours.');
+          closeReportModal();
+        } else {
+          alert(data.error || 'Failed to submit report.');
+        }
+      } catch (e) {
+        alert('Failed to submit report.');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Submit Report';
+    }
+
+    document.getElementById('reportModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('reportModal')) closeReportModal();
+    });
+
+    // Close context menu on click outside
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('browseContextMenu');
+      if (!menu.contains(e.target)) {
+        closeBrowseContextMenu();
+      }
+    });
+
+    // Load favorites after auth
+    const origCheckAuth = checkAuth;
+    checkAuth = async function() {
+      await origCheckAuth();
+      await loadFavorites();
+    };
+
+    // Initialize
+    checkAuth();
+  </script>
+
+  <nav class="bottom-tab-bar">
+    <a href="chat.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span></a>
+    <a href="upload.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span></a>
+    <a href="notes.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Notes</span></a>
+    <a href="office.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg><span>Office</span></a>
+    <a href="browse.html" class="tab-item active"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><span>Nexus</span></a>
+    <a href="calendar.html" class="tab-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></a>
+    <a href="account.html" class="tab-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Account</span></a>
+  </nav>
+</body>
+</html>
