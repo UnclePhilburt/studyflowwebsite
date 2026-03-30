@@ -964,7 +964,6 @@
     }, { passive: false });
 
     // ============ CARD CREATION ============
-    let _skipNextParentConnection = false;
 
     function createCard(question, x, y, parentId = null) {
       const id = nextCardId++;
@@ -1020,11 +1019,10 @@
       const card = { id, element: el, x, y, parentId, question, response: null, sources: null, followups: [] };
       cards.push(card);
 
-      // Draw connection to parent (skip if bubble connection handles it)
-      if (parentId !== null && !_skipNextParentConnection) {
+      // Draw connection to parent
+      if (parentId !== null) {
         drawConnection(parentId, id);
       }
-      _skipNextParentConnection = false;
 
       return card;
     }
@@ -1341,91 +1339,29 @@
         cy = (window.innerHeight / 2 - panY) / scale - 100 + cards.length * 30;
       }
 
-      // Keep clicked bubble, remove the others
-      let clickedBubbleInfo = null;
+      // Remove all followup bubbles and paths from parent
       if (originBubble) {
         const parentCard = cards.find(c => c.id === parentId);
         if (parentCard) {
-          // Remove all followup paths
           if (parentCard._followupPaths) {
             parentCard._followupPaths.forEach(p => p.remove());
             parentCard._followupPaths = [];
           }
+          // Remove all bubbles
+          parentCard.followups.forEach(f => f.element.remove());
+          parentCard.followups = [];
 
-          // Remove other bubbles, keep the clicked one
-          parentCard.followups = parentCard.followups.filter(f => {
-            if (f.element !== originBubble) {
-              f.element.remove();
-              return false;
-            }
-            return true;
-          });
-
-          // Style the clicked bubble as a permanent label
-          originBubble.style.animation = 'none';
-          originBubble.style.opacity = '0.7';
-          originBubble.style.cursor = 'default';
-          originBubble.style.pointerEvents = 'none';
-          originBubble.style.borderStyle = 'dashed';
-
-          // Get bubble position for card placement
-          const bx = parseFloat(originBubble.style.left) || 0;
-          const by = parseFloat(originBubble.style.top) || 0;
-          const bw = originBubble.offsetWidth || 120;
-          const bh = originBubble.offsetHeight || 30;
-          clickedBubbleInfo = { x: bx, y: by, w: bw, h: bh, parentCard };
-
-          // Position new card below the clicked bubble
-          const cardW = 520; // child card width
-          cx = bx + bw / 2 - cardW / 2;
-          cy = by + bh + 40;
-
-          // Draw line from parent card bottom to clicked bubble top
+          // Position new card below parent
           const pcW = parentCard.element.classList.contains('child-card') ? 520 : 550;
           const pcH = parentCard.element.offsetHeight || 200;
-          const pcAx = parentCard.x + pcW / 2 + SVG_OFFSET;
-          const pcAy = parentCard.y + pcH + SVG_OFFSET;
-          const bubTopX = bx + bw / 2 + SVG_OFFSET;
-          const bubTopY = by + SVG_OFFSET;
-          const mid1 = pcAy + (bubTopY - pcAy) * 0.5;
-
-          const cardToBubblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-          cardToBubblePath.setAttribute('d', `M ${pcAx} ${pcAy} C ${pcAx} ${mid1}, ${bubTopX} ${mid1}, ${bubTopX} ${bubTopY}`);
-          cardToBubblePath.setAttribute('stroke', '#7c9885');
-          cardToBubblePath.setAttribute('stroke-width', '1.5');
-          cardToBubblePath.setAttribute('fill', 'none');
-          cardToBubblePath.setAttribute('opacity', '0.35');
-          svgLayer.appendChild(cardToBubblePath);
-
-          if (!parentCard._followupPaths) parentCard._followupPaths = [];
-          parentCard._followupPaths.push(cardToBubblePath);
+          const cardW = 520;
+          cx = parentCard.x + pcW / 2 - cardW / 2;
+          cy = parentCard.y + pcH + 100;
         }
       }
 
-      if (clickedBubbleInfo) _skipNextParentConnection = true;
       const card = createCard(text, cx, cy, parentId);
-
-      // Draw line from clicked bubble bottom to new card top
-      if (clickedBubbleInfo) {
-        const bubblePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        const bCx = clickedBubbleInfo.x + clickedBubbleInfo.w / 2 + SVG_OFFSET;
-        const bCy = clickedBubbleInfo.y + clickedBubbleInfo.h + SVG_OFFSET;
-        const cardCx = cx + 260 + SVG_OFFSET;
-        const cardCy = cy + SVG_OFFSET;
-        const midY = bCy + (cardCy - bCy) * 0.5;
-        bubblePath.setAttribute('d', `M ${bCx} ${bCy} C ${bCx} ${midY}, ${cardCx} ${midY}, ${cardCx} ${cardCy}`);
-        bubblePath.setAttribute('stroke', '#7c9885');
-        bubblePath.setAttribute('stroke-width', '1.5');
-        bubblePath.setAttribute('fill', 'none');
-        bubblePath.setAttribute('opacity', '0.35');
-        svgLayer.appendChild(bubblePath);
-        // Store so it can be cleaned up
-        const parentCard = cards.find(c => c.id === parentId);
-        if (parentCard) {
-          if (!parentCard._followupPaths) parentCard._followupPaths = [];
-          parentCard._followupPaths.push(bubblePath);
-        }
-      }
+      // drawConnection in createCard handles the line (and it updates on drag)
 
       // Pan to show the new card
       panToCard(card);
