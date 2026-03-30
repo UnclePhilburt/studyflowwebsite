@@ -343,15 +343,16 @@
       transform: scale(0.8);
     }
 
-    .branch-btn.visible {
-      opacity: 1;
+    .branch-btn {
+      opacity: 0.4;
       transform: scale(1);
     }
 
     .branch-btn:hover {
+      opacity: 1;
       background: var(--accent-primary);
       color: white;
-      transform: scale(1.15);
+      transform: scale(1.2);
     }
 
     /* ============ WELCOME SCREEN ============ */
@@ -1251,29 +1252,15 @@
       path.setAttribute('opacity', '0.35');
       svgLayer.appendChild(path);
 
-      // Create branch button on the line
+      // Create branch button on the line midpoint
       const branchBtn = document.createElement('div');
       branchBtn.className = 'branch-btn';
       branchBtn.textContent = '+';
       branchBtn.title = 'Branch from here';
       world.appendChild(branchBtn);
 
-      // Show on hover near the line area
-      let hoverZone = document.createElement('div');
-      hoverZone.style.cssText = 'position:absolute;width:40px;pointer-events:all;z-index:2;cursor:pointer;';
-      world.appendChild(hoverZone);
-
-      hoverZone.addEventListener('mouseenter', () => branchBtn.classList.add('visible'));
-      hoverZone.addEventListener('mouseleave', () => {
-        setTimeout(() => {
-          if (!branchBtn.matches(':hover')) branchBtn.classList.remove('visible');
-        }, 100);
-      });
-      branchBtn.addEventListener('mouseleave', () => branchBtn.classList.remove('visible'));
-
       branchBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        branchBtn.classList.remove('visible');
         const parentCard = cards.find(c => c.id === fromId);
         if (parentCard && parentCard.response) {
           createFollowupBubbles(parentCard, [
@@ -1283,7 +1270,7 @@
         }
       });
 
-      connections.push({ fromId, toId, path, branchBtn, hoverZone });
+      connections.push({ fromId, toId, path, branchBtn });
       updateConnections();
     }
 
@@ -1307,15 +1294,6 @@
         if (conn.branchBtn) {
           conn.branchBtn.style.left = midX + 'px';
           conn.branchBtn.style.top = midY + 'px';
-        }
-        // Position hover zone along the line
-        if (conn.hoverZone) {
-          const hx = Math.min(from.x + fw / 2, to.x + tw / 2) - 20;
-          const hy = from.y + fh;
-          const hh = Math.max(to.y - (from.y + fh), 40);
-          conn.hoverZone.style.left = hx + 'px';
-          conn.hoverZone.style.top = hy + 'px';
-          conn.hoverZone.style.height = hh + 'px';
         }
       });
     }
@@ -1606,7 +1584,6 @@
       connections.forEach(c => {
         c.path.remove();
         if (c.branchBtn) c.branchBtn.remove();
-        if (c.hoverZone) c.hoverZone.remove();
       });
       cards = [];
       connections = [];
