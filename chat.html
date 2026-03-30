@@ -2309,6 +2309,15 @@
         if (data.conversation_id) {
           conversationId = data.conversation_id;
           card._conversationId = data.conversation_id;
+
+          // If we're inside a folder, move the new conversation into it
+          if (currentFolderId) {
+            fetch(`${BACKEND_URL}/api/conversations/${data.conversation_id}/move`, {
+              method: 'PUT',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ folder_id: currentFolderId })
+            }).catch(() => {});
+          }
         }
 
         populateCard(card, data.response || 'Sorry, something went wrong.', data.sources, []);
