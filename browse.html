@@ -386,7 +386,7 @@
     // Perform semantic search
     async function performSearch(query) {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/search/notes`, {
+        const response = await fetch(`${BACKEND_URL}/api/notes/search`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
