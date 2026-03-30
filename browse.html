@@ -848,7 +848,7 @@
           username: note.username || 'Anonymous',
           university: note.university || 'Unknown',
           created_at: note.uploaded_at || new Date().toISOString(),
-          upvotes: note.view_count || 0
+          upvotes: 0
         }));
 
         // Hide hint text and show cards
