@@ -1862,6 +1862,7 @@
     async function createNewFolder(parentId) {
       const name = prompt('Folder name:');
       if (!name || !name.trim()) return;
+      document.querySelectorAll('.empty-hint').forEach(h => h.remove());
       try {
         const body = {
           name: name.trim(),
@@ -2374,8 +2375,8 @@
     async function sendMessage(text, parentId = null, originBubble = null) {
       if (!text.trim()) return;
 
-      // (welcome screen removed)
-      // (input bar removed)
+      // Remove empty hints
+      document.querySelectorAll('.empty-hint').forEach(h => h.remove());
 
       // SB 1455: Disclosure at initiation of first card
       if (cards.length === 0) {
