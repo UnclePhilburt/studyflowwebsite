@@ -84,6 +84,9 @@
       overflow: hidden;
       height: 100vh;
       width: 100vw;
+      /* Better mobile touch behavior */
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
     }
 
     /* ============ CANVAS ============ */
@@ -1183,11 +1186,184 @@
 
     /* ============ RESPONSIVE ============ */
     @media (max-width: 768px) {
-      .canvas-card { width: 90vw; max-width: 550px; }
-      .canvas-card.child-card { width: 85vw; max-width: 520px; }
-      .input-bar { width: 95%; bottom: 12px; }
-      .sidebar { width: 260px; }
-      .followup-bubble { max-width: 160px; font-size: 11px; }
+      /* Cards - wider on mobile */
+      .canvas-card {
+        width: 92vw;
+        max-width: 600px;
+        padding: 20px;
+      }
+      .canvas-card.child-card {
+        width: 88vw;
+        max-width: 580px;
+        padding: 18px;
+      }
+
+      /* Sidebar - full width on mobile */
+      .sidebar {
+        width: 100%;
+        max-width: 320px;
+      }
+
+      /* Top buttons - better spacing */
+      .top-btn {
+        width: 44px;
+        height: 44px;
+      }
+      #menuBtn { top: 12px; left: 12px; }
+      #navBtn { top: 12px; left: 64px; }
+      #homeBtn { top: 12px; left: 116px; }
+      #notifBtn { top: 12px; right: 64px; }
+      #settingsBtn { top: 12px; right: 12px; }
+
+      /* Breadcrumb - adjust for mobile */
+      .breadcrumb {
+        top: 12px;
+        max-width: calc(100vw - 200px);
+        font-size: 13px;
+      }
+      .breadcrumb-item {
+        padding: 6px 10px;
+      }
+
+      /* Canvas controls - larger touch targets */
+      .canvas-controls {
+        bottom: 80px;
+        right: 12px;
+      }
+      .canvas-ctrl-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+      .zoom-indicator {
+        height: 36px;
+        line-height: 36px;
+        font-size: 13px;
+      }
+
+      /* Minimap - hide on small screens, not useful */
+      .minimap {
+        display: none;
+      }
+
+      /* Input bar (if visible) */
+      .input-bar {
+        width: calc(100% - 24px);
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+      }
+
+      /* Follow-up bubbles */
+      .followup-bubble {
+        max-width: 170px;
+        font-size: 12px;
+        padding: 8px 14px;
+      }
+
+      /* Navigation drawer */
+      .nav-drawer {
+        width: 100%;
+        max-width: 320px;
+      }
+
+      /* Card content adjustments */
+      .card-title {
+        font-size: 15px;
+      }
+      .card-body {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      /* Modals */
+      .folder-modal,
+      .rename-modal {
+        padding: 20px;
+        max-width: calc(100vw - 40px);
+      }
+
+      /* Notification dropdown */
+      .notif-dropdown {
+        width: calc(100vw - 32px);
+        max-width: 340px;
+        right: 16px;
+        top: 64px;
+      }
+
+      /* Selection toolbar */
+      .selection-toolbar {
+        bottom: 16px;
+        padding: 10px 14px;
+        width: calc(100vw - 32px);
+        max-width: 500px;
+      }
+      .selection-toolbar button {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+
+      /* Context menu */
+      .ctx-menu {
+        min-width: 200px;
+        max-width: calc(100vw - 40px);
+      }
+      .ctx-item {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+
+      /* Folder cards */
+      .folder-card {
+        width: 160px;
+        height: 130px;
+      }
+      .folder-card-icon {
+        width: 44px;
+        height: 44px;
+      }
+      .folder-card-icon svg {
+        width: 26px;
+        height: 26px;
+      }
+
+      /* Conversation preview cards */
+      .convo-preview {
+        width: 240px;
+      }
+    }
+
+    /* Very small screens */
+    @media (max-width: 480px) {
+      .canvas-card {
+        width: 94vw;
+        padding: 16px;
+      }
+      .canvas-card.child-card {
+        width: 90vw;
+        padding: 14px;
+      }
+
+      /* Stack top buttons vertically on tiny screens */
+      .breadcrumb {
+        max-width: calc(100vw - 150px);
+        font-size: 12px;
+      }
+
+      /* Card text smaller */
+      .card-title {
+        font-size: 14px;
+      }
+      .card-body {
+        font-size: 13px;
+      }
+
+      /* Follow-up bubbles */
+      .followup-bubble {
+        max-width: 140px;
+        font-size: 11px;
+        padding: 6px 12px;
+      }
     }
   </style>
 </head>
