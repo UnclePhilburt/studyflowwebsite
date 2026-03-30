@@ -415,13 +415,8 @@
   <div class="flash keep" id="flashKeep">KEPT</div>
   <div class="flash remove" id="flashRemove">REMOVED</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI0MTc1MzksImV4cCI6MjA0Nzk5MzUzOX0.wY3_JRor-5DfOBZVCZLLpVI6-O7PJTrqe2Ty9HXdxnU';
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
-
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
     let queue = [];
@@ -436,87 +431,38 @@
 
     async function loadFlaggedNotes() {
       try {
-        // Fetch all ratings from Supabase directly (fast, no Render round trip)
-        const { data: ratings, error } = await supabaseClient
-          .from('ai_response_ratings')
-          .select('vote, cited_note_ids');
-
-        if (error) throw error;
-        if (!ratings || ratings.length === 0) {
-          showEmpty();
-          return;
-        }
-
-        // Aggregate votes per note
-        const voteMap = {}; // note_id -> { up, down }
-        for (const rating of ratings) {
-          const noteIds = rating.cited_note_ids || [];
-          for (const noteId of noteIds) {
-            if (!voteMap[noteId]) voteMap[noteId] = { up: 0, down: 0 };
-            if (rating.vote === 1) voteMap[noteId].up++;
-            else if (rating.vote === -1) voteMap[noteId].down++;
+        const res = await fetch(BACKEND_URL + '/admin/flagged-notes?key=' + encodeURIComponent(adminKey));
+        if (!res.ok) {
+          if (res.status === 403) {
+            sessionStorage.removeItem('studyflow_admin_key');
+            window.location.href = 'admin.html';
+            return;
           }
+          throw new Error('Failed to load');
         }
 
-        // Find notes with net -5 or worse
-        const flaggedIds = [];
-        const flaggedVotes = {};
-        for (const [noteId, votes] of Object.entries(voteMap)) {
-          const net = votes.up - votes.down;
-          if (net <= -5) {
-            flaggedIds.push(noteId);
-            flaggedVotes[noteId] = votes;
-          }
-        }
-
-        if (flaggedIds.length === 0) {
-          showEmpty();
-          return;
-        }
-
-        // Fetch note metadata for flagged notes
-        const { data: notes } = await supabaseClient
-          .from('notes')
-          .select('id, original_filename, university, course_code, user_id, file_size, uploaded_at')
-          .in('id', flaggedIds);
-
-        if (!notes || notes.length === 0) {
-          showEmpty();
-          return;
-        }
-
-        // Batch fetch uploader usernames
-        const userIds = [...new Set(notes.map(n => n.user_id))];
-        const { data: profiles } = await supabaseClient
-          .from('user_profiles')
-          .select('id, username')
-          .in('id', userIds);
-
-        const profileMap = {};
-        if (profiles) {
-          profiles.forEach(p => { profileMap[p.id] = p.username || 'Unknown'; });
-        }
-
-        // Build queue sorted by worst net score first
-        queue = notes.map(n => {
-          const votes = flaggedVotes[n.id];
-          return {
-            id: n.id,
-            filename: n.original_filename || 'Untitled',
-            university: n.university || 'Not set',
-            course_code: n.course_code || 'Not set',
-            uploader: profileMap[n.user_id] || 'Unknown',
-            file_size: n.file_size,
-            uploaded_at: n.uploaded_at,
-            upvotes: votes.up,
-            downvotes: votes.down,
-            net: votes.up - votes.down
-          };
-        }).sort((a, b) => a.net - b.net); // Worst first
+        const data = await res.json();
+        queue = (data.notes || []).map(n => ({
+          id: n.id,
+          filename: n.filename || 'Untitled',
+          university: n.university || 'Not set',
+          course_code: n.course_code || 'Not set',
+          uploader: n.uploader || 'Unknown',
+          file_size: n.file_size,
+          uploaded_at: n.uploaded_at,
+          upvotes: n.upvotes,
+          downvotes: n.downvotes,
+          net: n.net
+        }));
 
         document.getElementById('loadingState').style.display = 'none';
-        currentIndex = 0;
-        showCard();
+
+        if (queue.length === 0) {
+          showEmpty();
+        } else {
+          currentIndex = 0;
+          showCard();
+        }
         updateCounter();
 
       } catch (e) {
