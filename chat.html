@@ -910,7 +910,7 @@
         panY = e.clientY - panStartY;
         updateTransform();
       }
-      if (draggedCard) {
+      if (draggedCard !== null) {
         const dx = (e.clientX - dragStartX) / scale;
         const dy = (e.clientY - dragStartY) / scale;
         if (Math.abs(dx) > 3 || Math.abs(dy) > 3) isDragging = true;
@@ -929,7 +929,7 @@
     window.addEventListener('mouseup', () => {
       isPanning = false;
       viewport.classList.remove('grabbing');
-      if (draggedCard) {
+      if (draggedCard !== null) {
         const card = cards.find(c => c.id === draggedCard);
         if (card) card.element.classList.remove('dragging');
         draggedCard = null;
