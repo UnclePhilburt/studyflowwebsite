@@ -552,11 +552,20 @@
 
       authToken = session.access_token;
 
-      // Listen for auth state changes (logout, session expiry)
-      supabaseClient.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !session) {
-          console.log('Auth state changed:', event);
+      // Listen for auth state changes (only logout)
+      supabaseClient.auth.onAuthStateChange((event, newSession) => {
+        console.log('Auth state changed:', event, 'Has session:', !!newSession);
+
+        // Only redirect on explicit sign out
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out, redirecting to login...');
           window.location.href = 'index.html';
+        }
+
+        // Update token if refreshed successfully
+        if (event === 'TOKEN_REFRESHED' && newSession) {
+          console.log('Token refreshed successfully');
+          authToken = newSession.access_token;
         }
       });
 
