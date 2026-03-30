@@ -1952,9 +1952,23 @@
         if (pRes.ok) userProfile = await pRes.json();
       } catch (e) {}
 
-      loadConversations();
+      await loadConversations();
       fetchNotifications();
-      chatInput.focus();
+
+      // Auto-load conversation from URL param, or most recent
+      const urlParams = new URLSearchParams(window.location.search);
+      const convParam = urlParams.get('c');
+      if (convParam) {
+        loadConversation(convParam);
+      } else {
+        // Check if there's a most recent conversation to resume
+        const firstConv = document.querySelector('.conversation-item');
+        if (firstConv) {
+          loadConversation(firstConv.dataset.id);
+        } else {
+          chatInput.focus();
+        }
+      }
     }
 
     init();
