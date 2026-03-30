@@ -272,6 +272,66 @@
       opacity: 1;
     }
 
+    /* ============ SELECTION BOX ============ */
+    .selection-box {
+      position: fixed;
+      border: 1.5px solid var(--accent-primary);
+      background: rgba(124, 152, 133, 0.08);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 400;
+      display: none;
+    }
+
+    .folder-card.selected, .convo-preview.selected {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    /* Selection toolbar */
+    .selection-toolbar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 8px 12px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 300;
+      box-shadow: 0 8px 32px var(--shadow);
+    }
+
+    .selection-toolbar.visible { display: flex; }
+
+    .selection-toolbar .sel-count {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 0 8px;
+    }
+
+    .selection-toolbar button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .selection-toolbar button:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+    .selection-toolbar button.danger { color: #dc2626; border-color: #dc262644; }
+    .selection-toolbar button.danger:hover { background: #dc2626; color: white; border-color: #dc2626; }
+
     /* ============ INPUT BUBBLE ============ */
     .followup-input-bubble {
       position: absolute;
@@ -1147,6 +1207,17 @@
   <!-- Disclosure Banner -->
   <div class="disclosure-banner" id="disclosureBanner"></div>
 
+  <!-- Selection Box -->
+  <div class="selection-box" id="selectionBox"></div>
+
+  <!-- Selection Toolbar -->
+  <div class="selection-toolbar" id="selectionToolbar">
+    <span class="sel-count" id="selCount">0 selected</span>
+    <button onclick="moveSelected()">Move to...</button>
+    <button class="danger" onclick="deleteSelected()">Delete</button>
+    <button onclick="clearSelection()">Cancel</button>
+  </div>
+
   <!-- Context Menu -->
   <div class="ctx-menu" id="ctxMenu"></div>
 
@@ -1522,6 +1593,7 @@
             clearLevelElements();
             loadConversation(c.id);
           }, { type: 'conversation', id: c.id });
+          el._convoId = c.id;
           convoElements.push(el);
         });
 
@@ -2674,6 +2746,174 @@
     function injectInitiationDisclosure() {
       showDisclosureBanner("You are chatting with StudyFlow AI, an artificial intelligence assistant powered by Gemini 3 Flash Lite. I am not a human. My responses are machine-generated and may contain inaccuracies. Please verify important information independently.");
     }
+
+    // ============ MULTI-SELECT (SHIFT+DRAG) ============
+    let selectedItems = []; // { type: 'conversation'|'folder', id: string, element: HTMLElement }
+    let isSelecting = false;
+    let selStartX = 0, selStartY = 0;
+    const selBox = document.getElementById('selectionBox');
+    const selToolbar = document.getElementById('selectionToolbar');
+
+    viewport.addEventListener('mousedown', (e) => {
+      if (!e.shiftKey) return;
+      if (currentLevel === 'conversation') return; // Only on home/folder levels
+      if (e.target.closest('.folder-card') || e.target.closest('.convo-preview')) return;
+
+      e.preventDefault();
+      isSelecting = true;
+      selStartX = e.clientX;
+      selStartY = e.clientY;
+      selBox.style.left = e.clientX + 'px';
+      selBox.style.top = e.clientY + 'px';
+      selBox.style.width = '0px';
+      selBox.style.height = '0px';
+      selBox.style.display = 'block';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isSelecting) return;
+      const x = Math.min(e.clientX, selStartX);
+      const y = Math.min(e.clientY, selStartY);
+      const w = Math.abs(e.clientX - selStartX);
+      const h = Math.abs(e.clientY - selStartY);
+      selBox.style.left = x + 'px';
+      selBox.style.top = y + 'px';
+      selBox.style.width = w + 'px';
+      selBox.style.height = h + 'px';
+
+      // Highlight elements inside selection box
+      const boxRect = { left: x, top: y, right: x + w, bottom: y + h };
+      const selectableEls = [...document.querySelectorAll('.folder-card, .convo-preview')];
+      selectableEls.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const overlaps = !(rect.right < boxRect.left || rect.left > boxRect.right ||
+                          rect.bottom < boxRect.top || rect.top > boxRect.bottom);
+        el.classList.toggle('selected', overlaps);
+      });
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isSelecting) return;
+      isSelecting = false;
+      selBox.style.display = 'none';
+
+      // Collect selected items
+      selectedItems = [];
+      document.querySelectorAll('.folder-card.selected').forEach(el => {
+        // Find folder id from the element's onclick/contextmenu handlers
+        const nameEl = el.querySelector('.folder-card-name');
+        const name = nameEl ? nameEl.textContent : '';
+        // Match to folders array
+        const folder = folders.find(f => f.name === name);
+        if (folder && folder.id) {
+          selectedItems.push({ type: 'folder', id: folder.id, element: el, name: folder.name });
+        }
+      });
+
+      document.querySelectorAll('.convo-preview.selected').forEach(el => {
+        // Get conversation id from the element's stored data
+        if (el._convoId) {
+          selectedItems.push({ type: 'conversation', id: el._convoId, element: el });
+        }
+      });
+
+      // Show toolbar if items selected
+      if (selectedItems.length > 0) {
+        document.getElementById('selCount').textContent = selectedItems.length + ' selected';
+        selToolbar.classList.add('visible');
+      } else {
+        selToolbar.classList.remove('visible');
+      }
+    });
+
+    function clearSelection() {
+      selectedItems = [];
+      document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+      selToolbar.classList.remove('visible');
+    }
+
+    async function deleteSelected() {
+      const count = selectedItems.length;
+      if (!confirm(`Delete ${count} item${count > 1 ? 's' : ''}? Conversations in deleted folders will become unfiled.`)) return;
+
+      for (const item of selectedItems) {
+        try {
+          if (item.type === 'folder') {
+            await fetch(`${BACKEND_URL}/api/chat-folders/${item.id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+          } else if (item.type === 'conversation') {
+            await fetch(`${BACKEND_URL}/api/conversations/${item.id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+          }
+        } catch (e) { console.error('Delete error:', e); }
+      }
+
+      clearSelection();
+      if (currentLevel === 'folder') {
+        navigateToFolder(currentFolderId, currentFolderName);
+      } else {
+        navigateHome();
+      }
+    }
+
+    async function moveSelected() {
+      // Build list of available folders
+      let targetFolders = [];
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/chat-folders`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          targetFolders = data.folders || [];
+        }
+      } catch (e) {}
+
+      // Build a simple prompt with folder options
+      let options = 'Move to:\n0: Unfiled (no folder)\n';
+      targetFolders.forEach((f, i) => {
+        options += `${i + 1}: ${f.name}\n`;
+      });
+      const choice = prompt(options);
+      if (choice === null) return;
+
+      const idx = parseInt(choice);
+      const targetId = idx === 0 ? null : (targetFolders[idx - 1] ? targetFolders[idx - 1].id : null);
+
+      for (const item of selectedItems) {
+        try {
+          if (item.type === 'conversation') {
+            await fetch(`${BACKEND_URL}/api/conversations/${item.id}/move`, {
+              method: 'PUT',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ folder_id: targetId })
+            });
+          } else if (item.type === 'folder') {
+            await fetch(`${BACKEND_URL}/api/chat-folders/${item.id}`, {
+              method: 'PUT',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ parent_id: targetId })
+            });
+          }
+        } catch (e) { console.error('Move error:', e); }
+      }
+
+      clearSelection();
+      if (currentLevel === 'folder') {
+        navigateToFolder(currentFolderId, currentFolderName);
+      } else {
+        navigateHome();
+      }
+    }
+
+    // Escape clears selection
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && selectedItems.length > 0) {
+        clearSelection();
+      }
+    });
 
     // ============ DRAG TO BREADCRUMB ============
     let activeDragItem = null; // { type: 'conversation'|'folder', id: string, element: HTMLElement }
