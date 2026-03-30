@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Search Analytics - StudyFlow Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f4f0;
+      color: #2d2d2d;
+      min-height: 100vh;
+    }
+
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(248, 247, 244, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .header a {
+      color: #7c9885;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .header h1 { font-size: 16px; font-weight: 600; }
+
+    .content {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px 40px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d2d2d;
+      line-height: 1;
+    }
+
+    .summary-sub {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .card.full-width { grid-column: 1 / -1; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 16px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      font-weight: 400;
+      margin-left: 8px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 220px;
+    }
+
+    /* Query list */
+    .query-list { list-style: none; }
+
+    .query-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      font-size: 13px;
+    }
+
+    .query-item:last-child { border-bottom: none; }
+
+    .query-rank {
+      width: 28px;
+      font-weight: 700;
+      color: #9ca3af;
+      flex-shrink: 0;
+    }
+
+    .query-text {
+      flex: 1;
+      font-weight: 500;
+      color: #2d2d2d;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-right: 12px;
+    }
+
+    .query-count {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .query-count.normal {
+      background: rgba(124, 152, 133, 0.08);
+      color: #7c9885;
+    }
+
+    .query-count.gap {
+      background: rgba(220, 38, 38, 0.08);
+      color: #dc2626;
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 32px;
+      color: #9ca3af;
+      font-size: 13px;
+    }
+
+    .gap-label {
+      display: inline-block;
+      padding: 3px 8px;
+      background: rgba(220, 38, 38, 0.06);
+      border: 1px solid rgba(220, 38, 38, 0.12);
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #dc2626;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 80px 24px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="admin.html">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <h1>Search Analytics</h1>
+  </div>
+
+  <div class="content">
+    <div class="loading" id="loadingState">Loading search data...</div>
+    <div id="dashboard" style="display:none;">
+
+      <div class="summary-grid" id="summaryGrid"></div>
+
+      <div class="grid-2">
+        <div class="card full-width">
+          <div class="card-title">Search Volume (Last 30 Days)</div>
+          <div class="chart-container">
+            <canvas id="volumeChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Top Searches <span class="card-subtitle">All time</span></div>
+          <ul class="query-list" id="topSearches"></ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Content Gaps <span class="card-subtitle">Zero results</span></div>
+          <div class="gap-label">Users searched for these but found nothing</div>
+          <ul class="query-list" id="zeroResults"></ul>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Today's Top Searches</div>
+          <ul class="query-list" id="todayTop"></ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Today's Content Gaps</div>
+          <ul class="query-list" id="todayZero"></ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
+    if (!adminKey) window.location.href = 'admin.html';
+
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = '#9ca3af';
+
+    async function loadData() {
+      try {
+        const res = await fetch(BACKEND_URL + '/admin/search-analytics?key=' + encodeURIComponent(adminKey));
+        if (!res.ok) {
+          if (res.status === 403) {
+            sessionStorage.removeItem('studyflow_admin_key');
+            window.location.href = 'admin.html';
+            return;
+          }
+          throw new Error('Failed');
+        }
+
+        const data = await res.json();
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        renderSummary(data.summary);
+        renderVolumeChart(data.dates, data.daily_volume);
+        renderQueryList('topSearches', data.top_searches, 'normal');
+        renderQueryList('zeroResults', data.zero_results, 'gap');
+        renderQueryList('todayTop', data.today_top, 'normal');
+        renderQueryList('todayZero', data.today_zero, 'gap');
+
+      } catch (e) {
+        document.getElementById('loadingState').textContent = 'Failed to load: ' + e.message;
+      }
+    }
+
+    function renderSummary(s) {
+      document.getElementById('summaryGrid').innerHTML = `
+        <div class="summary-card">
+          <div class="summary-label">Today</div>
+          <div class="summary-value">${s.total_today}</div>
+          <div class="summary-sub">searches</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Last 7 Days</div>
+          <div class="summary-value">${s.total_7d}</div>
+          <div class="summary-sub">searches</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Last 30 Days</div>
+          <div class="summary-value">${s.total_30d}</div>
+          <div class="summary-sub">searches</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Daily Average</div>
+          <div class="summary-value">${s.avg_daily}</div>
+          <div class="summary-sub">searches/day</div>
+        </div>
+      `;
+    }
+
+    function renderVolumeChart(dates, volume) {
+      const labels = dates.map(d => {
+        const dt = new Date(d + 'T00:00:00');
+        return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      });
+
+      new Chart(document.getElementById('volumeChart'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: volume,
+            backgroundColor: 'rgba(124, 152, 133, 0.15)',
+            borderColor: 'rgba(124, 152, 133, 1)',
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 8 } },
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { precision: 0 } }
+          }
+        }
+      });
+    }
+
+    function renderQueryList(elementId, queries, type) {
+      const el = document.getElementById(elementId);
+
+      if (!queries || queries.length === 0) {
+        el.innerHTML = '<div class="empty-msg">No data yet</div>';
+        return;
+      }
+
+      el.innerHTML = queries.map((q, i) => `
+        <li class="query-item">
+          <span class="query-rank">${i + 1}</span>
+          <span class="query-text" title="${q.query}">${q.query}</span>
+          <span class="query-count ${type}">${q.count}x</span>
+        </li>
+      `).join('');
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
