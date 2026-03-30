@@ -1253,7 +1253,7 @@
       folders.forEach((f, i) => {
         const fx = f.position_x || (Math.random() - 0.5) * 500;
         const fy = f.position_y || (Math.random() - 0.5) * 300;
-        const el = createDraggableFolderCard(f, fx, fy, () => navigateToFolder(f.id, f.name));
+        const el = createDraggableFolderCard(f, fx, fy, (clickedEl) => navigateToFolder(f.id, f.name, clickedEl));
         folderElements.push(el);
       });
 
@@ -1264,7 +1264,7 @@
         color: '#9ca3af',
         _count: unfiledCount,
         _icon: '<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>'
-      }, 300, -20, () => navigateToFolder(null, 'Unfiled'));
+      }, 300, -20, (clickedEl) => navigateToFolder(null, 'Unfiled', clickedEl));
       folderElements.push(unfiledEl);
 
       // "+ New Folder" card
@@ -1321,7 +1321,6 @@
 
       const upHandler = () => {
         if (dragState && didDrag && folder.id) {
-          // Save position to backend
           fetch(`${BACKEND_URL}/api/chat-folders/${folder.id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
@@ -1329,7 +1328,7 @@
           }).catch(() => {});
         }
         if (dragState && !didDrag) {
-          onClick();
+          onClick(el);
         }
         dragState = null;
       };
@@ -1378,7 +1377,7 @@
       };
 
       const upHandler = () => {
-        if (dragState && !didDrag && onClick) onClick();
+        if (dragState && !didDrag && onClick) onClick(el);
         dragState = null;
       };
 
@@ -1393,14 +1392,48 @@
       return el;
     }
 
-    async function navigateToFolder(folderId, folderName) {
+    async function navigateToFolder(folderId, folderName, fromElement) {
+      // Find the clicked folder card to zoom into it
+      const clickedEl = fromElement || folderElements.find(el => el.style && el.querySelector('.folder-card-name')?.textContent === folderName);
+
+      if (clickedEl) {
+        // Get the folder's world position
+        const fx = parseFloat(clickedEl.style.left) || 0;
+        const fy = parseFloat(clickedEl.style.top) || 0;
+
+        // Animate zoom into the folder
+        const targetScale = 3;
+        const targetPanX = window.innerWidth / 2 - fx * targetScale - 90 * targetScale;
+        const targetPanY = window.innerHeight / 2 - fy * targetScale - 70 * targetScale;
+        const startPanX = panX, startPanY = panY, startScale = scale;
+        const duration = 500;
+        const start = performance.now();
+
+        await new Promise(resolve => {
+          function anim(t) {
+            const p = Math.min((t - start) / duration, 1);
+            const e = 1 - Math.pow(1 - p, 3); // ease out cubic
+            panX = startPanX + (targetPanX - startPanX) * e;
+            panY = startPanY + (targetPanY - startPanY) * e;
+            scale = startScale + (targetScale - startScale) * e;
+
+            // Fade out folder elements
+            folderElements.forEach(el => { el.style.opacity = 1 - p; });
+
+            updateTransform();
+            if (p < 1) requestAnimationFrame(anim);
+            else resolve();
+          }
+          requestAnimationFrame(anim);
+        });
+      }
+
       clearCanvas();
       clearLevelElements();
       currentLevel = 'folder';
       currentFolderId = folderId;
       currentFolderName = folderName;
       conversationId = null;
-      // (welcome screen removed)
       document.querySelector('.input-bar').style.display = 'none';
       updateBreadcrumb();
 
@@ -1436,7 +1469,30 @@
               </div>
               <span class="convo-preview-label">${cardCount || '?'} cards</span>
             </div>
-          `, () => {
+          `, async (clickedEl) => {
+            // Zoom into the conversation card
+            if (clickedEl) {
+              const cx = parseFloat(clickedEl.style.left) || 0;
+              const cy = parseFloat(clickedEl.style.top) || 0;
+              const targetScale = 3;
+              const targetPanX = window.innerWidth / 2 - cx * targetScale - 130 * targetScale;
+              const targetPanY = window.innerHeight / 2 - cy * targetScale - 50 * targetScale;
+              const sPX = panX, sPY = panY, sS = scale;
+              const dur = 400, st = performance.now();
+              await new Promise(resolve => {
+                function a(t) {
+                  const p = Math.min((t - st) / dur, 1);
+                  const e = 1 - Math.pow(1 - p, 3);
+                  panX = sPX + (targetPanX - sPX) * e;
+                  panY = sPY + (targetPanY - sPY) * e;
+                  scale = sS + (targetScale - sS) * e;
+                  convoElements.forEach(el => { el.style.opacity = 1 - p; });
+                  updateTransform();
+                  if (p < 1) requestAnimationFrame(a); else resolve();
+                }
+                requestAnimationFrame(a);
+              });
+            }
             currentLevel = 'conversation';
             updateBreadcrumb();
             clearLevelElements();
