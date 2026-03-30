@@ -1208,9 +1208,9 @@
     }
 
     function clearLevelElements() {
-      folderElements.forEach(el => el.remove());
+      folderElements.forEach(el => { if (el._cleanup) el._cleanup(); el.remove(); });
       folderElements = [];
-      convoElements.forEach(el => el.remove());
+      convoElements.forEach(el => { if (el._cleanup) el._cleanup(); el.remove(); });
       convoElements = [];
     }
 
@@ -1249,58 +1249,146 @@
       const startX = -(totalItems * 210) / 2;
       const y = -70;
 
+      // Use saved positions or scatter randomly
       folders.forEach((f, i) => {
-        const el = createFolderCard(f, startX + i * 210, y);
+        const fx = f.position_x || (Math.random() - 0.5) * 500;
+        const fy = f.position_y || (Math.random() - 0.5) * 300;
+        const el = createDraggableFolderCard(f, fx, fy, () => navigateToFolder(f.id, f.name));
         folderElements.push(el);
       });
 
-      // Render "Unfiled" as a special folder
+      // "Unfiled" folder
       const unfiledCount = (unfiledData.conversations || []).length;
-      const unfiledEl = document.createElement('div');
-      unfiledEl.className = 'folder-card';
-      unfiledEl.style.left = (startX + folders.length * 210) + 'px';
-      unfiledEl.style.top = y + 'px';
-        unfiledEl.innerHTML = `
-          <div class="folder-card-icon" style="background:linear-gradient(135deg,#9ca3af,#6b7280);">
-            <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-          </div>
-          <div class="folder-card-name">Unfiled</div>
-          <div class="folder-card-count">${unfiledCount} conversation${unfiledCount !== 1 ? 's' : ''}</div>
-        `;
-        unfiledEl.addEventListener('click', () => navigateToFolder(null, 'Unfiled'));
-        world.appendChild(unfiledEl);
-        folderElements.push(unfiledEl);
+      const unfiledEl = createDraggableFolderCard({
+        name: 'Unfiled',
+        color: '#9ca3af',
+        _count: unfiledCount,
+        _icon: '<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>'
+      }, 300, -20, () => navigateToFolder(null, 'Unfiled'));
+      folderElements.push(unfiledEl);
 
-        // Add "New Folder" button card
-        const newFolderEl = document.createElement('div');
-        newFolderEl.className = 'folder-card';
-        newFolderEl.style.left = (startX + (folders.length + 1) * 210) + 'px';
-        newFolderEl.style.top = y + 'px';
-        newFolderEl.style.borderStyle = 'dashed';
-        newFolderEl.style.opacity = '0.6';
-        newFolderEl.innerHTML = `
-          <div class="folder-card-icon" style="background:linear-gradient(135deg,var(--text-muted),var(--text-muted));">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </div>
-          <div class="folder-card-name">New Folder</div>
-        `;
-        newFolderEl.addEventListener('click', createNewFolder);
-        world.appendChild(newFolderEl);
-        folderElements.push(newFolderEl);
+      // "+ New Folder" card
+      const newEl = createDraggableFolderCard({
+        name: '+ New Folder',
+        color: 'var(--text-muted)',
+        _dashed: true,
+        _icon: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'
+      }, -300, 150, createNewFolder);
+      folderElements.push(newEl);
     }
 
-    function createFolderCard(folder, x, y) {
+    function createDraggableFolderCard(folder, x, y, onClick) {
       const el = document.createElement('div');
       el.className = 'folder-card';
       el.style.left = x + 'px';
       el.style.top = y + 'px';
+      if (folder._dashed) { el.style.borderStyle = 'dashed'; el.style.opacity = '0.6'; }
+
+      const icon = folder._icon || '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>';
+      const countHtml = folder._count !== undefined ? `<div class="folder-card-count">${folder._count} conversation${folder._count !== 1 ? 's' : ''}</div>` : '';
+
       el.innerHTML = `
         <div class="folder-card-icon" style="background:linear-gradient(135deg,${folder.color},${folder.color}dd);">
-          <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <svg viewBox="0 0 24 24">${icon}</svg>
         </div>
         <div class="folder-card-name">${folder.name}</div>
+        ${countHtml}
       `;
-      el.addEventListener('click', () => navigateToFolder(folder.id, folder.name));
+
+      // Drag + click detection
+      let dragState = null;
+      let didDrag = false;
+
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragState = { startX: e.clientX, startY: e.clientY, origX: x, origY: y };
+        didDrag = false;
+      });
+
+      const moveHandler = (e) => {
+        if (!dragState) return;
+        const dx = (e.clientX - dragState.startX) / scale;
+        const dy = (e.clientY - dragState.startY) / scale;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didDrag = true;
+        if (didDrag) {
+          x = dragState.origX + dx;
+          y = dragState.origY + dy;
+          el.style.left = x + 'px';
+          el.style.top = y + 'px';
+        }
+      };
+
+      const upHandler = () => {
+        if (dragState && didDrag && folder.id) {
+          // Save position to backend
+          fetch(`${BACKEND_URL}/api/chat-folders/${folder.id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ position_x: x, position_y: y })
+          }).catch(() => {});
+        }
+        if (dragState && !didDrag) {
+          onClick();
+        }
+        dragState = null;
+      };
+
+      window.addEventListener('mousemove', moveHandler);
+      window.addEventListener('mouseup', upHandler);
+
+      // Store cleanup refs
+      el._cleanup = () => {
+        window.removeEventListener('mousemove', moveHandler);
+        window.removeEventListener('mouseup', upHandler);
+      };
+
+      world.appendChild(el);
+      return el;
+    }
+
+    function createDraggableElement(className, x, y, innerHTML, onClick) {
+      const el = document.createElement('div');
+      el.className = className;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.innerHTML = innerHTML;
+
+      let dragState = null;
+      let didDrag = false;
+
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragState = { startX: e.clientX, startY: e.clientY, origX: x, origY: y };
+        didDrag = false;
+      });
+
+      const moveHandler = (e) => {
+        if (!dragState) return;
+        const dx = (e.clientX - dragState.startX) / scale;
+        const dy = (e.clientY - dragState.startY) / scale;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) didDrag = true;
+        if (didDrag) {
+          x = dragState.origX + dx;
+          y = dragState.origY + dy;
+          el.style.left = x + 'px';
+          el.style.top = y + 'px';
+        }
+      };
+
+      const upHandler = () => {
+        if (dragState && !didDrag && onClick) onClick();
+        dragState = null;
+      };
+
+      window.addEventListener('mousemove', moveHandler);
+      window.addEventListener('mouseup', upHandler);
+      el._cleanup = () => {
+        window.removeEventListener('mousemove', moveHandler);
+        window.removeEventListener('mouseup', upHandler);
+      };
+
       world.appendChild(el);
       return el;
     }
@@ -1329,23 +1417,15 @@
         const data = res.ok ? await res.json() : { conversations: [] };
         const convos = data.conversations || [];
 
-        // Layout conversation previews in a grid
-        const cols = 3;
+        // Scatter conversation previews randomly
         convos.forEach((c, i) => {
-          const col = i % cols;
-          const row = Math.floor(i / cols);
-          const x = col * 290 - (Math.min(convos.length, cols) * 290) / 2;
-          const y = row * 140 - 40;
-
-          const el = document.createElement('div');
-          el.className = 'convo-preview';
-          el.style.left = x + 'px';
-          el.style.top = y + 'px';
+          const cx = (Math.random() - 0.5) * 600;
+          const cy = (Math.random() - 0.5) * 400;
 
           const date = c.updated_at ? new Date(c.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
           const cardCount = c.canvas_layout && c.canvas_layout.cards ? c.canvas_layout.cards.length : 0;
 
-          el.innerHTML = `
+          const el = createDraggableElement('convo-preview', cx, cy, `
             <div class="convo-preview-header">
               <div class="convo-preview-title">${c.title || 'New Chat'}</div>
               <div class="convo-preview-date">${date}</div>
@@ -1356,47 +1436,34 @@
               </div>
               <span class="convo-preview-label">${cardCount || '?'} cards</span>
             </div>
-          `;
-
-          el.addEventListener('click', () => {
+          `, () => {
             currentLevel = 'conversation';
             updateBreadcrumb();
             clearLevelElements();
             loadConversation(c.id);
           });
-
-          world.appendChild(el);
           convoElements.push(el);
         });
 
-        // "New conversation" card
-        const newX = (convos.length % cols) * 290 - (Math.min(convos.length + 1, cols) * 290) / 2;
-        const newY = Math.floor(convos.length / cols) * 140 - 40;
-        const newEl = document.createElement('div');
-        newEl.className = 'convo-preview';
-        newEl.style.left = newX + 'px';
-        newEl.style.top = newY + 'px';
-        newEl.style.borderStyle = 'dashed';
-        newEl.style.opacity = '0.6';
-        newEl.innerHTML = `
+        // "+ New Conversation" card
+        const newEl = createDraggableElement('convo-preview', 350, 0, `
           <div class="convo-preview-header">
             <div class="convo-preview-title" style="color:var(--text-muted);">+ New Conversation</div>
           </div>
           <div class="convo-preview-body">
             <span class="convo-preview-label">Start chatting</span>
           </div>
-        `;
-        newEl.addEventListener('click', () => {
+        `, () => {
           currentLevel = 'conversation';
           updateBreadcrumb();
           clearLevelElements();
           conversationId = null;
           clearCanvas();
           document.querySelector('.input-bar').style.display = 'flex';
-          // (welcome screen removed)
           document.getElementById('chatInput').focus();
         });
-        world.appendChild(newEl);
+        newEl.style.borderStyle = 'dashed';
+        newEl.style.opacity = '0.6';
         convoElements.push(newEl);
 
       } catch (e) { console.error('Folder load error:', e); }
