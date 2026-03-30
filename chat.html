@@ -272,6 +272,19 @@
       opacity: 1;
     }
 
+    /* ============ CLUSTER TITLE ============ */
+    .cluster-title {
+      position: absolute;
+      font-family: 'Lora', serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+      z-index: 1;
+      user-select: none;
+      pointer-events: none;
+    }
+
     /* ============ SELECTION BOX ============ */
     .selection-box {
       position: fixed;
@@ -1539,6 +1552,7 @@
       updateTransform();
 
       try {
+        // Load conversations list
         const url = folderId
           ? `${BACKEND_URL}/api/chat-folders/${folderId}/conversations`
           : `${BACKEND_URL}/api/conversations/unfiled`;
@@ -1546,88 +1560,127 @@
         const data = res.ok ? await res.json() : { conversations: [] };
         const convos = data.conversations || [];
 
-        // Scatter conversation previews randomly
-        convos.forEach((c, i) => {
-          const cx = (Math.random() - 0.5) * 600;
-          const cy = (Math.random() - 0.5) * 400;
+        // Load all conversations' messages in parallel
+        const msgPromises = convos.map(c =>
+          fetch(`${BACKEND_URL}/api/conversations/${c.id}/messages`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          }).then(r => r.ok ? r.json() : { messages: [] }).catch(() => ({ messages: [] }))
+        );
+        const allMessages = await Promise.all(msgPromises);
 
-          const date = c.updated_at ? new Date(c.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
-          const cardCount = c.canvas_layout && c.canvas_layout.cards ? c.canvas_layout.cards.length : 0;
+        // Render each conversation as a card cluster
+        let clusterX = 0;
 
-          const el = createDraggableElement('convo-preview', cx, cy, `
-            <div class="convo-preview-header">
-              <div class="convo-preview-title">${c.title || 'New Chat'}</div>
-              <div class="convo-preview-date">${date}</div>
-            </div>
-            <div class="convo-preview-body">
-              <div class="convo-preview-dots">
-                ${Array(Math.min(cardCount || 1, 5)).fill('<div class="convo-preview-dot"></div>').join('')}
-              </div>
-              <span class="convo-preview-label">${cardCount || '?'} cards</span>
-            </div>
-          `, async (clickedEl) => {
-            // Zoom into the conversation card
-            if (clickedEl) {
-              const cx = parseFloat(clickedEl.style.left) || 0;
-              const cy = parseFloat(clickedEl.style.top) || 0;
-              const targetScale = 3;
-              const targetPanX = window.innerWidth / 2 - cx * targetScale - 130 * targetScale;
-              const targetPanY = window.innerHeight / 2 - cy * targetScale - 50 * targetScale;
-              const sPX = panX, sPY = panY, sS = scale;
-              const dur = 400, st = performance.now();
-              await new Promise(resolve => {
-                function a(t) {
-                  const p = Math.min((t - st) / dur, 1);
-                  const e = 1 - Math.pow(1 - p, 3);
-                  panX = sPX + (targetPanX - sPX) * e;
-                  panY = sPY + (targetPanY - sPY) * e;
-                  scale = sS + (targetScale - sS) * e;
-                  convoElements.forEach(el => { el.style.opacity = 1 - p; });
-                  updateTransform();
-                  if (p < 1) requestAnimationFrame(a); else resolve();
-                }
-                requestAnimationFrame(a);
-              });
+        convos.forEach((conv, ci) => {
+          const messages = allMessages[ci].messages || [];
+          const savedLayout = conv.canvas_layout;
+
+          // Cluster offset -- space conversations apart
+          const clusterOffsetX = clusterX;
+          const clusterOffsetY = 0;
+
+          // Title label
+          const titleLabel = document.createElement('div');
+          titleLabel.className = 'cluster-title';
+          titleLabel.textContent = conv.title || 'New Chat';
+          titleLabel.style.left = clusterOffsetX + 'px';
+          titleLabel.style.top = (clusterOffsetY - 40) + 'px';
+          world.appendChild(titleLabel);
+          convoElements.push(titleLabel);
+
+          // Build saved position lookup
+          const savedPositions = {};
+          if (savedLayout && savedLayout.cards) {
+            savedLayout.cards.forEach(sc => {
+              savedPositions[sc.question] = sc;
+            });
+          }
+
+          // Create cards from messages
+          let lastCardId = null;
+          let pendingQuestion = null;
+          let fallbackY = clusterOffsetY;
+          let maxX = clusterOffsetX;
+          let maxY = clusterOffsetY;
+
+          // Track this conversation's first card for setting conversationId on click
+          let firstCardInCluster = null;
+
+          for (const msg of messages) {
+            if (msg.role === 'user') {
+              pendingQuestion = msg.content;
+            } else if (msg.role === 'assistant' && pendingQuestion) {
+              const saved = savedPositions[pendingQuestion];
+              let cx, cy, parentId;
+
+              if (saved) {
+                cx = saved.x + clusterOffsetX;
+                cy = saved.y + clusterOffsetY;
+                parentId = saved.parentId !== null && saved.parentId !== undefined
+                  ? (saved.parentId < cards.length ? saved.parentId : lastCardId)
+                  : lastCardId;
+              } else {
+                cx = clusterOffsetX;
+                cy = fallbackY;
+                parentId = lastCardId;
+              }
+
+              const card = createCard(pendingQuestion, cx, cy, parentId);
+              card._conversationId = conv.id;
+              populateCard(card, msg.content, msg.sources, []);
+
+              // Restore collapse state
+              if (saved && saved.collapsed) {
+                card.element.classList.add('collapsed');
+                const collapseBtn = card.element.querySelector('.card-collapse-btn');
+                if (collapseBtn) collapseBtn.textContent = '+';
+              }
+
+              if (!firstCardInCluster) firstCardInCluster = card;
+
+              maxX = Math.max(maxX, cx + 550);
+              maxY = Math.max(maxY, cy + (card.element.offsetHeight || 200));
+
+              if (!saved) {
+                fallbackY += (card.element.offsetHeight || 200) + 100;
+              }
+
+              lastCardId = card.id;
+              pendingQuestion = null;
             }
-            currentLevel = 'conversation';
-            updateBreadcrumb();
-            clearLevelElements();
-            loadConversation(c.id);
-          }, { type: 'conversation', id: c.id });
-          el._convoId = c.id;
+          }
 
-          // Right-click menu on conversation previews
-          el.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            ctxMenu.innerHTML = `
-              <button class="ctx-item" onclick="deleteConversation('${c.id}')">
-                <svg viewBox="0 0 24 24" style="stroke:#dc2626;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                <span style="color:#dc2626;">Delete conversation</span>
-              </button>
-            `;
-            ctxMenu.style.left = e.clientX + 'px';
-            ctxMenu.style.top = e.clientY + 'px';
-            ctxMenu.classList.add('active');
+          // Add follow-up bubbles to leaf cards of this cluster
+          const clusterCards = cards.filter(c => c._conversationId === conv.id);
+          const parentIds = new Set(clusterCards.map(c => c.parentId).filter(id => id !== null));
+          clusterCards.forEach(c => {
+            if (!parentIds.has(c.id) && c.response) {
+              createFollowupBubbles(c, ['Tell me more about this', 'What else should I know?']);
+            }
           });
 
-          convoElements.push(el);
+          // Space next cluster to the right
+          clusterX = maxX + 200;
         });
 
-        // Also render subfolders inside this folder
+        // Render subfolders
         try {
           const subRes = await fetch(`${BACKEND_URL}/api/chat-folders`, { headers: { 'Authorization': `Bearer ${authToken}` } });
           if (subRes.ok) {
             const subData = await subRes.json();
             const subFolders = (subData.folders || []).filter(f => f.parent_id === folderId);
             subFolders.forEach(sf => {
-              const sfx = sf.position_x || (Math.random() - 0.5) * 400;
+              const sfx = sf.position_x || clusterX;
               const sfy = sf.position_y || (Math.random() - 0.5) * 300;
               const el = createDraggableFolderCard(sf, sfx, sfy, (clickedEl) => navigateToFolder(sf.id, sf.name, clickedEl));
               convoElements.push(el);
+              clusterX += 220;
             });
           }
         } catch (e) {}
+
+        // Set conversationId when interacting with a card's followups
+        // (override sendMessage to use the card's conversation)
 
       } catch (e) { console.error('Folder load error:', e); }
     }
@@ -2143,6 +2196,14 @@
         cy = (window.innerHeight / 2 - panY) / scale - 100 + cards.length * 30;
       }
 
+      // Set conversationId from parent card if in folder view
+      if (parentId !== null) {
+        const parentCardForConv = cards.find(c => c.id === parentId);
+        if (parentCardForConv && parentCardForConv._conversationId) {
+          conversationId = parentCardForConv._conversationId;
+        }
+      }
+
       // Remove all followup bubbles and paths from parent
       if (originBubble) {
         const parentCard = cards.find(c => c.id === parentId);
@@ -2183,7 +2244,10 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
-        if (data.conversation_id) conversationId = data.conversation_id;
+        if (data.conversation_id) {
+          conversationId = data.conversation_id;
+          card._conversationId = data.conversation_id;
+        }
 
         populateCard(card, data.response || 'Sorry, something went wrong.', data.sources, []);
 
@@ -2474,23 +2538,33 @@
     let _saveTimeout = null;
 
     function saveLayout() {
-      if (!conversationId || cards.length === 0) return;
-      // Debounce -- save 1 second after last change
+      if (cards.length === 0) return;
       clearTimeout(_saveTimeout);
       _saveTimeout = setTimeout(async () => {
-        const layout = cards.map(c => ({
-          question: c.question,
-          x: c.x,
-          y: c.y,
-          parentId: c.parentId
-        }));
-        try {
-          await fetch(`${BACKEND_URL}/api/conversations/${conversationId}/layout`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cards: layout, panX, panY, scale })
+        // Group cards by conversation and save each
+        const convGroups = {};
+        cards.forEach(c => {
+          const cid = c._conversationId || conversationId;
+          if (!cid) return;
+          if (!convGroups[cid]) convGroups[cid] = [];
+          convGroups[cid].push({
+            question: c.question,
+            x: c.x,
+            y: c.y,
+            parentId: c.parentId,
+            collapsed: c.element.classList.contains('collapsed')
           });
-        } catch (e) {}
+        });
+
+        for (const [cid, layout] of Object.entries(convGroups)) {
+          try {
+            await fetch(`${BACKEND_URL}/api/conversations/${cid}/layout`, {
+              method: 'PUT',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cards: layout, panX, panY, scale })
+            });
+          } catch (e) {}
+        }
       }, 1000);
     }
 
