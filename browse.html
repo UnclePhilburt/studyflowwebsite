@@ -651,7 +651,7 @@
 
   <!-- Hint -->
   <div class="hint-text" id="hintText">
-    Click cards to open · Drag to rearrange
+    Search for topics, courses, or keywords to browse community notes
   </div>
 
   <!-- University Data -->
@@ -761,10 +761,10 @@
       console.log('[Browse Init] Restoring state...');
       const hasRestoredState = restoreState();
 
-      // If no restored state, load initial popular notes so the page isn't empty
+      // If no restored state, show hint text (don't load initial notes to avoid RLS errors)
       if (!hasRestoredState) {
-        console.log('[Browse Init] No restored state, loading initial notes...');
-        loadInitialNotes();
+        console.log('[Browse Init] No restored state, showing search hint...');
+        document.getElementById('hintText').style.display = 'block';
       }
 
       console.log('[Browse Init] Initialization complete!');
@@ -782,6 +782,16 @@
     function showLoading() {
       document.getElementById('cardTable').innerHTML = '<div class="loading-msg">Loading notes...</div>';
       document.getElementById('hintText').style.display = 'none';
+    }
+
+    // Update hint text based on context
+    function setHintText(hasCards) {
+      const hintText = document.getElementById('hintText');
+      if (hasCards) {
+        hintText.textContent = 'Click cards to open · Drag to rearrange';
+      } else {
+        hintText.textContent = 'Search for topics, courses, or keywords to browse community notes';
+      }
     }
 
     // Load initial notes on page load -- queries Supabase directly (no Render round trip)
@@ -1159,11 +1169,10 @@
       if (!query) {
         document.getElementById('cardTable').innerHTML = '';
         document.getElementById('loadMoreContainer').style.display = 'none';
+        document.getElementById('hintText').style.display = 'block';
         sessionStorage.removeItem('browseState'); // Clear saved state
         currentOffset = 0;
         currentQuery = '';
-        // Reload initial notes instead of showing empty page
-        loadInitialNotes();
         return;
       }
 
@@ -1244,6 +1253,7 @@
         } else {
           loadMoreContainer.style.display = 'none';
           if (results.length > 0) {
+            setHintText(true);
             hintText.style.display = 'block';
           }
         }
@@ -1263,11 +1273,15 @@
 
       if (results.length === 0) {
         cardTable.innerHTML = '<div class="loading-msg">No notes found</div>';
+        setHintText(false);
         return;
       }
 
       // Clear existing cards
       cardTable.innerHTML = '';
+
+      // Update hint text for card interaction
+      setHintText(true);
 
       // Create cards with random scatter positions
       results.forEach((result, index) => {
