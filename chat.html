@@ -160,9 +160,10 @@
       opacity: 0;
       transition: opacity 0.2s;
       z-index: 5;
+      pointer-events: none;
     }
 
-    .canvas-card:hover .card-collapse-btn { opacity: 1; }
+    .canvas-card:hover .card-collapse-btn { opacity: 1; pointer-events: auto; }
 
     .card-question {
       padding: 12px 16px;
@@ -993,25 +994,26 @@
         }, 50);
       });
 
-      // Drag handler -- anywhere except response body, buttons, links
-      el.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.card-response')) return;
-        if (e.target.closest('.card-collapse-btn')) return;
-        if (e.target.closest('.vote-btn')) return;
-        if (e.target.closest('a')) return;
-        if (e.target.closest('button')) return;
-        e.stopPropagation();
-        const cardObj = cards.find(c => c.id === id);
-        if (!cardObj) return;
-        draggedCard = id;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        dragOffsetX = cardObj.x;
-        dragOffsetY = cardObj.y;
-        isDragging = false;
-        el.classList.add('dragging');
-        viewport.classList.add('dragging-card');
-      });
+      // Drag handler on the question header specifically
+      function attachDragHandler() {
+        const qHeader = el.querySelector('.card-question');
+        if (!qHeader) return;
+        qHeader.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const cardObj = cards.find(c => c.id === id);
+          if (!cardObj) return;
+          draggedCard = id;
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          dragOffsetX = cardObj.x;
+          dragOffsetY = cardObj.y;
+          isDragging = false;
+          el.classList.add('dragging');
+          viewport.classList.add('dragging-card');
+        });
+      }
+      attachDragHandler();
 
       world.appendChild(el);
 
@@ -1092,6 +1094,23 @@
         e.currentTarget.textContent = card.element.classList.contains('collapsed') ? '+' : '-';
         setTimeout(() => { updateFollowupPositions(card); updateConnections(); }, 50);
       });
+
+      // Re-attach drag handler on new question header
+      const qHeader = card.element.querySelector('.card-question');
+      if (qHeader) {
+        qHeader.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          draggedCard = card.id;
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          dragOffsetX = card.x;
+          dragOffsetY = card.y;
+          isDragging = false;
+          card.element.classList.add('dragging');
+          viewport.classList.add('dragging-card');
+        });
+      }
 
       // KaTeX rendering
       const responseEl = card.element.querySelector('.card-response');
