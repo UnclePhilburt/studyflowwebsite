@@ -886,6 +886,15 @@
     .breadcrumb-item:hover { color: var(--accent-primary); }
     .breadcrumb-item.current { color: var(--text-primary); cursor: default; }
 
+    .breadcrumb-item.drop-target {
+      background: var(--accent-primary);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transform: scale(1.15);
+      transition: all 0.15s;
+    }
+
     .breadcrumb-sep {
       color: var(--text-muted);
       font-size: 11px;
@@ -1170,19 +1179,19 @@
     function updateBreadcrumb() {
       const bc = document.getElementById('breadcrumb');
       if (currentLevel === 'home') {
-        bc.innerHTML = '<button class="breadcrumb-item current">Home</button>';
+        bc.innerHTML = '<button class="breadcrumb-item current" data-folder-id="home">Home</button>';
       } else if (currentLevel === 'folder') {
         bc.innerHTML = `
-          <button class="breadcrumb-item" onclick="navigateHome()">Home</button>
+          <button class="breadcrumb-item" data-folder-id="home" onclick="navigateHome()">Home</button>
           <span class="breadcrumb-sep">/</span>
-          <button class="breadcrumb-item current">${currentFolderName}</button>
+          <button class="breadcrumb-item current" data-folder-id="${currentFolderId || 'unfiled'}">${currentFolderName}</button>
         `;
       } else if (currentLevel === 'conversation') {
         const convTitle = conversationId ? (cards.length > 0 ? cards[0].question.substring(0, 30) + '...' : 'Chat') : 'New Chat';
         bc.innerHTML = `
-          <button class="breadcrumb-item" onclick="navigateHome()">Home</button>
+          <button class="breadcrumb-item" data-folder-id="home" onclick="navigateHome()">Home</button>
           <span class="breadcrumb-sep">/</span>
-          <button class="breadcrumb-item" onclick="navigateToFolder('${currentFolderId}', '${currentFolderName}')">${currentFolderName || 'Unfiled'}</button>
+          <button class="breadcrumb-item" data-folder-id="${currentFolderId || 'unfiled'}" onclick="navigateToFolder('${currentFolderId}', '${currentFolderName}')">${currentFolderName || 'Unfiled'}</button>
           <span class="breadcrumb-sep">/</span>
           <button class="breadcrumb-item current">${escapeHtml(convTitle)}</button>
         `;
@@ -1290,11 +1299,22 @@
           y = dragState.origY + dy;
           el.style.left = x + 'px';
           el.style.top = y + 'px';
+          // Check breadcrumb hover for drag-to-move
+          if (folder.id) checkBreadcrumbHover(e.clientX, e.clientY);
         }
       };
 
-      const upHandler = () => {
+      const upHandler = (e) => {
         if (dragState && didDrag && folder.id) {
+          // Check if dropped on breadcrumb
+          const bcTarget = checkBreadcrumbHover(e.clientX, e.clientY);
+          clearBreadcrumbHover();
+          if (bcTarget) {
+            dropOnBreadcrumb(bcTarget, { type: 'folder', id: folder.id });
+            dragState = null;
+            return;
+          }
+          // Otherwise just save position
           fetch(`${BACKEND_URL}/api/chat-folders/${folder.id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
@@ -1304,6 +1324,7 @@
         if (dragState && !didDrag) {
           onClick(el);
         }
+        clearBreadcrumbHover();
         dragState = null;
       };
 
@@ -1320,7 +1341,7 @@
       return el;
     }
 
-    function createDraggableElement(className, x, y, innerHTML, onClick) {
+    function createDraggableElement(className, x, y, innerHTML, onClick, dragMeta) {
       const el = document.createElement('div');
       el.className = className;
       el.style.left = x + 'px';
@@ -1347,11 +1368,23 @@
           y = dragState.origY + dy;
           el.style.left = x + 'px';
           el.style.top = y + 'px';
+          // Check breadcrumb hover
+          if (dragMeta) checkBreadcrumbHover(e.clientX, e.clientY);
         }
       };
 
-      const upHandler = () => {
+      const upHandler = (e) => {
+        if (dragState && didDrag && dragMeta) {
+          const bcTarget = checkBreadcrumbHover(e.clientX, e.clientY);
+          clearBreadcrumbHover();
+          if (bcTarget) {
+            dropOnBreadcrumb(bcTarget, dragMeta);
+            dragState = null;
+            return;
+          }
+        }
         if (dragState && !didDrag && onClick) onClick(el);
+        clearBreadcrumbHover();
         dragState = null;
       };
 
@@ -1471,7 +1504,7 @@
             updateBreadcrumb();
             clearLevelElements();
             loadConversation(c.id);
-          });
+          }, { type: 'conversation', id: c.id });
           convoElements.push(el);
         });
 
@@ -2589,6 +2622,61 @@
 
     function injectInitiationDisclosure() {
       showDisclosureBanner("You are chatting with StudyFlow AI, an artificial intelligence assistant powered by Gemini 3 Flash Lite. I am not a human. My responses are machine-generated and may contain inaccuracies. Please verify important information independently.");
+    }
+
+    // ============ DRAG TO BREADCRUMB ============
+    let activeDragItem = null; // { type: 'conversation'|'folder', id: string, element: HTMLElement }
+
+    function checkBreadcrumbHover(screenX, screenY) {
+      const bcItems = document.querySelectorAll('.breadcrumb-item:not(.current)');
+      let hoveredItem = null;
+
+      bcItems.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        // Expand hit area a bit
+        const padding = 10;
+        if (screenX >= rect.left - padding && screenX <= rect.right + padding &&
+            screenY >= rect.top - padding && screenY <= rect.bottom + padding) {
+          hoveredItem = item;
+          item.classList.add('drop-target');
+        } else {
+          item.classList.remove('drop-target');
+        }
+      });
+
+      return hoveredItem;
+    }
+
+    function clearBreadcrumbHover() {
+      document.querySelectorAll('.breadcrumb-item').forEach(i => i.classList.remove('drop-target'));
+    }
+
+    async function dropOnBreadcrumb(bcItem, dragItem) {
+      const targetFolderId = bcItem.dataset.folderId;
+      const moveTo = targetFolderId === 'home' ? null : (targetFolderId === 'unfiled' ? null : targetFolderId);
+
+      try {
+        if (dragItem.type === 'conversation') {
+          await fetch(`${BACKEND_URL}/api/conversations/${dragItem.id}/move`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folder_id: moveTo })
+          });
+        } else if (dragItem.type === 'folder') {
+          await fetch(`${BACKEND_URL}/api/chat-folders/${dragItem.id}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parent_id: moveTo })
+          });
+        }
+
+        // Refresh current view
+        if (currentLevel === 'folder') {
+          navigateToFolder(currentFolderId, currentFolderName);
+        } else {
+          navigateHome();
+        }
+      } catch (e) { console.error('Move error:', e); }
     }
 
     // ============ CONTEXT MENU ============
