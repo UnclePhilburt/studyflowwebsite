@@ -993,10 +993,13 @@
         }, 50);
       });
 
-      // Drag handler -- only from the question header
+      // Drag handler -- anywhere except response body, buttons, links
       el.addEventListener('mousedown', (e) => {
-        if (!e.target.closest('.card-question')) return;
+        if (e.target.closest('.card-response')) return;
         if (e.target.closest('.card-collapse-btn')) return;
+        if (e.target.closest('.vote-btn')) return;
+        if (e.target.closest('a')) return;
+        if (e.target.closest('button')) return;
         e.stopPropagation();
         const cardObj = cards.find(c => c.id === id);
         if (!cardObj) return;
