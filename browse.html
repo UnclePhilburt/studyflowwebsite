@@ -753,7 +753,13 @@
 
       // Restore previous state if exists
       console.log('[Browse Init] Restoring state...');
-      restoreState();
+      const hasRestoredState = restoreState();
+
+      // If no restored state, load initial popular notes so the page isn't empty
+      if (!hasRestoredState) {
+        console.log('[Browse Init] No restored state, loading initial notes...');
+        loadInitialNotes();
+      }
 
       console.log('[Browse Init] Initialization complete!');
     })();
@@ -763,6 +769,90 @@
       if (currentQuery && hasMore) {
         const nextOffset = currentOffset + 10;
         performSearch(currentQuery, nextOffset);
+      }
+    }
+
+    // Load initial notes on page load so the page isn't empty
+    async function loadInitialNotes() {
+      try {
+        // First, try to get the user's university from their profile
+        let university = null;
+        try {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          if (session) {
+            const { data: profile } = await supabaseClient
+              .from('user_profiles')
+              .select('university, edu_email_verified')
+              .eq('id', session.user.id)
+              .single();
+
+            if (profile && !profile.edu_email_verified) {
+              // Not .edu verified - don't load anything, the edu gate will show
+              return;
+            }
+            if (profile && profile.university) {
+              university = profile.university;
+              userUniversity = profile.university;
+            }
+          }
+        } catch (e) {
+          console.log('[Initial Load] Could not fetch university, loading general notes');
+        }
+
+        // Try loading popular notes from user's university first
+        let notes = [];
+        if (university) {
+          const uniUrl = `${BACKEND_URL}/api/notes/browse?sort=popular&limit=10&university=${encodeURIComponent(university)}`;
+          const uniResponse = await fetch(uniUrl, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (uniResponse.ok) {
+            const uniData = await uniResponse.json();
+            notes = uniData.notes || [];
+          }
+        }
+
+        // If not enough from university, supplement with general popular notes
+        if (notes.length < 10) {
+          const generalUrl = `${BACKEND_URL}/api/notes/browse?sort=popular&limit=${10 - notes.length}`;
+          const generalResponse = await fetch(generalUrl, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (generalResponse.ok) {
+            const generalData = await generalResponse.json();
+            const generalNotes = generalData.notes || [];
+            const existingIds = new Set(notes.map(n => n.id));
+            for (const note of generalNotes) {
+              if (!existingIds.has(note.id) && notes.length < 10) {
+                notes.push(note);
+              }
+            }
+          }
+        }
+
+        if (notes.length === 0) return;
+
+        // Map browse API response to the format displayCards expects
+        const mappedNotes = notes.map(note => ({
+          note_id: note.id,
+          filename: note.filename || 'Untitled',
+          content: note.topic_tags && note.topic_tags.length > 0
+            ? note.topic_tags.join(', ')
+            : (note.course_code || 'Study notes and materials'),
+          username: note.username || 'Anonymous',
+          university: note.university || 'Unknown',
+          created_at: note.uploaded_at || new Date().toISOString(),
+          upvotes: note.view_count || 0
+        }));
+
+        // Hide hint text and show cards
+        document.getElementById('hintText').style.display = 'none';
+        displayCards(mappedNotes, '');
+        console.log(`[Initial Load] Displayed ${mappedNotes.length} initial notes`);
+
+      } catch (error) {
+        console.error('[Initial Load] Error loading initial notes:', error);
+        // Silently fail - user can still search manually
       }
     }
 
@@ -948,10 +1038,10 @@
       }));
     }
 
-    // Restore state from sessionStorage
+    // Restore state from sessionStorage (returns true if state was restored)
     function restoreState() {
       const savedState = sessionStorage.getItem('browseState');
-      if (!savedState) return;
+      if (!savedState) return false;
 
       try {
         const state = JSON.parse(savedState);
@@ -1005,9 +1095,11 @@
             hintText.style.display = 'block';
           }
         }
+        return true;
       } catch (e) {
         console.error('Error restoring state:', e);
         sessionStorage.removeItem('browseState');
+        return false;
       }
     }
 
@@ -1020,10 +1112,11 @@
       if (!query) {
         document.getElementById('cardTable').innerHTML = '';
         document.getElementById('loadMoreContainer').style.display = 'none';
-        document.getElementById('hintText').style.display = 'block';
         sessionStorage.removeItem('browseState'); // Clear saved state
         currentOffset = 0;
         currentQuery = '';
+        // Reload initial notes instead of showing empty page
+        loadInitialNotes();
         return;
       }
 
