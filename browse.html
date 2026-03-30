@@ -203,6 +203,32 @@
       font-weight: 500;
     }
 
+    /* Upvote badge */
+    .upvote-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(124, 152, 133, 0.9);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+
+    .upvote-badge.negative {
+      background: rgba(200, 100, 100, 0.9);
+    }
+
+    .upvote-badge.zero {
+      background: rgba(150, 150, 150, 0.7);
+    }
+
     /* Back side content */
     .card-back-header {
       font-size: 0.85rem;
@@ -470,6 +496,7 @@
         const username = result.username || 'Anonymous';
         const university = result.university || 'Unknown';
         const year = result.created_at ? new Date(result.created_at).getFullYear() : new Date().getFullYear();
+        const upvotes = result.upvotes || 0;
 
         // Highlight search terms
         let highlightedPreview = preview;
@@ -506,10 +533,25 @@
           card.style.animation = `cardThrow ${0.5 + index * 0.05}s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`;
         }
 
+        // Determine upvote badge class
+        let upvoteBadgeClass = '';
+        if (upvotes > 0) {
+          upvoteBadgeClass = '';
+        } else if (upvotes < 0) {
+          upvoteBadgeClass = 'negative';
+        } else {
+          upvoteBadgeClass = 'zero';
+        }
+
+        const upvoteSymbol = upvotes > 0 ? '▲' : (upvotes < 0 ? '▼' : '−');
+
         card.innerHTML = `
           <div class="card-inner">
             <!-- Front of card -->
             <div class="card-front">
+              <div class="upvote-badge ${upvoteBadgeClass}">
+                ${upvoteSymbol} ${Math.abs(upvotes)}
+              </div>
               <div class="card-title">${filename}</div>
               <div class="card-preview">${highlightedPreview.substring(0, 150)}...</div>
               <div class="card-meta">
@@ -519,6 +561,9 @@
 
             <!-- Back of card -->
             <div class="card-back">
+              <div class="upvote-badge ${upvoteBadgeClass}">
+                ${upvoteSymbol} ${Math.abs(upvotes)}
+              </div>
               <div class="card-back-header">${filename}</div>
               <div class="card-back-content">${highlightedPreview}</div>
               <div class="card-back-footer">
