@@ -2103,11 +2103,12 @@
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
-        // Refresh current view
+        // Refresh current view (force refresh to bypass stale preload cache)
+        _preloadedData = null;
         if (currentLevel === 'folder') {
           navigateToFolder(currentFolderId, currentFolderName);
         } else {
-          navigateHome();
+          navigateHome(true);
         }
       } catch (e) { console.error('Create folder error:', e); }
     }
@@ -2120,8 +2121,9 @@
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ color })
         });
+        _preloadedData = null;
         if (currentLevel === 'folder') navigateToFolder(currentFolderId, currentFolderName);
-        else navigateHome();
+        else navigateHome(true);
       } catch (e) { console.error('Color change error:', e); }
     }
 
@@ -2133,8 +2135,9 @@
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ icon: iconSvg })
         });
+        _preloadedData = null;
         if (currentLevel === 'folder') navigateToFolder(currentFolderId, currentFolderName);
-        else navigateHome();
+        else navigateHome(true);
       } catch (e) { console.error('Icon change error:', e); }
     }
 
@@ -2146,10 +2149,11 @@
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
+        _preloadedData = null;
         if (currentLevel === 'folder') {
           navigateToFolder(currentFolderId, currentFolderName);
         } else {
-          navigateHome();
+          navigateHome(true);
         }
       } catch (e) { console.error('Delete folder error:', e); }
     }
@@ -2164,10 +2168,11 @@
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name.trim() })
         });
+        _preloadedData = null;
         if (currentLevel === 'folder') {
           navigateToFolder(currentFolderId, currentFolderName);
         } else {
-          navigateHome();
+          navigateHome(true);
         }
       } catch (e) { console.error('Rename folder error:', e); }
     }
