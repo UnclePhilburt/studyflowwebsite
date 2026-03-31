@@ -425,12 +425,9 @@
     /* Main infinite canvas */
     .canvas {
       position: absolute;
-      width: 50000px;
-      height: 50000px;
-      left: -20000px;
-      top: -20000px;
+      top: 0;
+      left: 0;
       z-index: 1;
-      transform-origin: 0 0;
       transform-origin: 0 0;
       background-color: var(--canvas-bg);
       background-image:
@@ -2537,7 +2534,7 @@
 
     let activeWidgets = []; // Array of {id, x, y}
     let isDragging = false;
-    let canvasPan = { x: 0, y: 0 }; // Canvas pan offset
+    let canvasPan = { x: -20000, y: -20000 }; // Canvas pan offset (widgets positioned around 20000,20000)
     let canvasScale = 1; // Canvas zoom scale
     let isPanningCanvas = false;
     let isPinching = false; // Flag to prevent pan during pinch
@@ -2702,7 +2699,7 @@
 
     // Reset canvas view to center
     function resetCanvasView() {
-      canvasPan = { x: 0, y: 0 };
+      canvasPan = { x: -20000, y: -20000 };
       canvasScale = 1;
       updateCanvasTransform();
       stopMomentum();
