@@ -3348,9 +3348,8 @@
       const container = document.getElementById(`widget-${widgetData.id}`);
 
       try {
-        const authToken = localStorage.getItem('auth_token');
         const response = await fetch('https://studyflowsuite.onrender.com/api/leaderboard', {
-          headers: { 'Authorization': `Bearer ${authToken}` }
+          headers: { 'Authorization': 'Bearer ' + authToken }
         });
 
         if (!response.ok) {
