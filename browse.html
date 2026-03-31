@@ -605,10 +605,9 @@
           type="text"
           class="university-input"
           id="universityFilter"
-          placeholder="Select university..."
+          placeholder="Search universities..."
           autocomplete="off"
           disabled
-          readonly
         >
         <div class="university-dropdown" id="universityDropdown"></div>
       </div>
@@ -967,9 +966,18 @@
         }
       });
 
-      // Handle input for search
+      // Handle input for search -- show dropdown and filter as you type
       input.addEventListener('input', () => {
         if (!input.disabled) {
+          dropdown.classList.add('visible');
+          filterUniversityDropdown(input.value);
+        }
+      });
+
+      // Also show dropdown on focus
+      input.addEventListener('focus', () => {
+        if (!input.disabled) {
+          dropdown.classList.add('visible');
           filterUniversityDropdown(input.value);
         }
       });
