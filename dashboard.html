@@ -1463,14 +1463,16 @@
     /* Upgrade banner */
     .upgrade-banner {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 44px;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 40px;
       background: var(--bg-tertiary);
-      border-top: 1px solid var(--border-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       z-index: 200;
       backdrop-filter: blur(20px);
+      box-shadow: 0 4px 16px var(--shadow);
     }
 
     .upgrade-banner-content {
