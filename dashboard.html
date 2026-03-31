@@ -2513,6 +2513,7 @@
     let canvasPan = { x: 0, y: 0 }; // Canvas pan offset
     let canvasScale = 1; // Canvas zoom scale
     let isPanningCanvas = false;
+    let isPinching = false; // Flag to prevent pan during pinch
     let panStart = { x: 0, y: 0 };
     let draggedWidget = null;
     let touchStartDist = 0; // For pinch-to-zoom
@@ -2903,6 +2904,7 @@
         // Two fingers - start pinch-to-zoom
         else if (e.touches.length === 2) {
           isPanningCanvas = false;
+          isPinching = true;
           canvasContainer.classList.remove('panning');
           const dx = e.touches[0].clientX - e.touches[1].clientX;
           const dy = e.touches[0].clientY - e.touches[1].clientY;
@@ -2937,8 +2939,8 @@
 
         updateCanvasTransform();
       }
-      // Pan canvas (one finger)
-      else if (isPanningCanvas && e.touches.length === 1) {
+      // Pan canvas (one finger) - but NOT during pinch
+      else if (isPanningCanvas && e.touches.length === 1 && !isPinching) {
         const touch = e.touches[0];
         const newX = touch.clientX - panStart.x;
         const newY = touch.clientY - panStart.y;
@@ -2998,6 +3000,7 @@
 
         // Reset pinch-to-zoom state
         touchStartDist = 0;
+        isPinching = false;
       }
     });
 
