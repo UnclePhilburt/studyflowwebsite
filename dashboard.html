@@ -3014,33 +3014,51 @@
       }
     });
 
-    // Mouse wheel zoom (desktop + trackpad)
+    // Mouse wheel zoom + trackpad pan/pinch
     canvasContainer.addEventListener('wheel', (e) => {
       e.preventDefault();
 
-      // Detect if this is a pinch-to-zoom (ctrlKey on trackpad) or regular scroll
-      if (e.ctrlKey) {
-        // Pinch zoom -- use deltaY directly but clamp it
+      // ctrlKey = pinch-to-zoom on trackpad (Chrome), or Ctrl+scroll on mouse
+      if (e.ctrlKey || e.metaKey) {
         const clampedDelta = Math.max(-10, Math.min(10, -e.deltaY));
         const zoomFactor = 1 + clampedDelta * 0.02;
         const newScale = Math.min(3, Math.max(0.25, canvasScale * zoomFactor));
 
-        const mx = e.clientX;
-        const my = e.clientY;
+        const mx = e.clientX, my = e.clientY;
         const worldX = (mx - canvasPan.x) / canvasScale;
         const worldY = (my - canvasPan.y) / canvasScale;
-
         canvasScale = newScale;
         canvasPan.x = mx - worldX * canvasScale;
         canvasPan.y = my - worldY * canvasScale;
       } else {
-        // Regular scroll/trackpad swipe -- pan the canvas
+        // Two-finger scroll = pan
         canvasPan.x -= e.deltaX;
         canvasPan.y -= e.deltaY;
       }
 
       updateCanvasTransform();
     }, { passive: false });
+
+    // Safari gesture events for pinch-to-zoom
+    let gestureStartScale = 1;
+    canvasContainer.addEventListener('gesturestart', (e) => {
+      e.preventDefault();
+      gestureStartScale = canvasScale;
+    });
+    canvasContainer.addEventListener('gesturechange', (e) => {
+      e.preventDefault();
+      const newScale = Math.min(3, Math.max(0.25, gestureStartScale * e.scale));
+
+      const mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      const worldX = (mx - canvasPan.x) / canvasScale;
+      const worldY = (my - canvasPan.y) / canvasScale;
+      canvasScale = newScale;
+      canvasPan.x = mx - worldX * canvasScale;
+      canvasPan.y = my - worldY * canvasScale;
+
+      updateCanvasTransform();
+    });
+    canvasContainer.addEventListener('gestureend', (e) => { e.preventDefault(); });
 
     // Reset canvas view button
     document.getElementById('canvasReset').addEventListener('click', () => {
