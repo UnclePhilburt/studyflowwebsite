@@ -1595,7 +1595,7 @@
     /* Mac-style dock */
     .dock {
       position: fixed;
-      bottom: 64px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       background: var(--widget-bg);
@@ -5425,7 +5425,10 @@
     async function checkUpgradeBanner() {
       // Check if dismissed in last 24 hours
       const dismissed = localStorage.getItem('upgrade_banner_dismissed');
-      if (dismissed && Date.now() - parseInt(dismissed) < 86400000) return;
+      if (dismissed && Date.now() - parseInt(dismissed) < 86400000) {
+        document.querySelector('.dock').style.bottom = '20px';
+        return;
+      }
 
       try {
         const res = await fetch(BACKEND_URL + '/api/current-user', {
@@ -5436,13 +5439,19 @@
           const tier = user.subscription_tier || user.tier || 'free';
           if (tier === 'free') {
             document.getElementById('upgradeBanner').style.display = 'block';
+            document.querySelector('.dock').style.bottom = '64px';
+          } else {
+            document.querySelector('.dock').style.bottom = '20px';
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        document.querySelector('.dock').style.bottom = '20px';
+      }
     }
 
     function dismissBanner() {
       document.getElementById('upgradeBanner').style.display = 'none';
+      document.querySelector('.dock').style.bottom = '20px';
       localStorage.setItem('upgrade_banner_dismissed', Date.now().toString());
     }
 
