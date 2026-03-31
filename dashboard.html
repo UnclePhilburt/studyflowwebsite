@@ -1542,6 +1542,133 @@
       .upgrade-banner-price { display: none; }
     }
 
+    /* Onboarding tutorial */
+    .onboarding-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      display: none;
+      transition: opacity 0.3s;
+    }
+
+    .onboarding-overlay.active { display: block; }
+
+    .onboarding-spotlight {
+      position: fixed;
+      border-radius: 16px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+      z-index: 10000;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .onboarding-tooltip {
+      position: fixed;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 340px;
+      z-index: 10001;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+      animation: tooltipPop 0.3s ease forwards;
+    }
+
+    @keyframes tooltipPop {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .onboarding-tooltip h3 {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .onboarding-tooltip p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .onboarding-tooltip-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .onboarding-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .onboarding-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border-color);
+    }
+
+    .onboarding-dot.active { background: var(--accent-primary); }
+
+    .onboarding-btn {
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .onboarding-btn.next {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .onboarding-btn.next:hover { box-shadow: 0 4px 12px var(--shadow); }
+
+    .onboarding-btn.skip {
+      background: none;
+      color: var(--text-muted);
+    }
+
+    .onboarding-btn.skip:hover { color: var(--text-primary); }
+
+    .onboarding-welcome {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10001;
+      animation: tooltipPop 0.4s ease forwards;
+    }
+
+    .onboarding-welcome h2 {
+      font-family: 'Lora', serif;
+      font-size: 32px;
+      font-weight: 500;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .onboarding-welcome p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 28px;
+    }
+
+    .onboarding-welcome .onboarding-btn.next {
+      padding: 12px 32px;
+      font-size: 15px;
+    }
+
     /* Canvas reset button */
     .canvas-reset {
       position: fixed;
@@ -2120,6 +2247,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Onboarding -->
+  <div class="onboarding-overlay" id="onboardingOverlay"></div>
+  <div class="onboarding-spotlight" id="onboardingSpotlight" style="display:none;"></div>
+  <div id="onboardingTooltip" style="display:none;"></div>
 
   <!-- Add widget button -->
   <button class="add-widget-btn" id="addWidgetBtn" title="Add widget">+</button>
@@ -5420,6 +5552,11 @@
 
       // Show upgrade banner for free users
       checkUpgradeBanner();
+
+      // Check if first visit -- show onboarding
+      if (!localStorage.getItem('studyflow_onboarded')) {
+        setTimeout(startOnboarding, 800);
+      }
     }
 
     async function checkUpgradeBanner() {
@@ -5452,6 +5589,154 @@
       document.getElementById('upgradeBanner').style.display = 'none';
       document.querySelector('.dock').style.bottom = '20px';
       sessionStorage.setItem('upgrade_banner_dismissed', '1');
+    }
+
+    // ============ ONBOARDING ============
+    var onboardingStep = 0;
+    var onboardingSteps = [
+      {
+        type: 'welcome',
+        title: 'Welcome to StudyFlow',
+        text: 'Your AI-powered study workspace. Let us show you around.'
+      },
+      {
+        target: '.dock',
+        title: 'Your Navigation Dock',
+        text: 'Everything you need is right here -- Chat, Notes, Office, Nexus, Study Groups, Flashcards, and more.',
+        position: 'top'
+      },
+      {
+        target: 'a[href="notes.html"].dock-item',
+        title: 'Notes & Uploads',
+        text: 'Upload your study notes here. PDFs, documents, images -- the AI will use them to help you study.',
+        position: 'top'
+      },
+      {
+        target: 'a[href="chat.html"].dock-item',
+        title: 'AI Chat',
+        text: 'Ask questions about any topic. The AI searches your notes and the Nexus to give you grounded answers.',
+        position: 'top'
+      },
+      {
+        target: 'a[href="browse.html"].dock-item',
+        title: 'The Nexus',
+        text: 'Browse and download notes shared by students across universities. A growing knowledge network.',
+        position: 'top'
+      },
+      {
+        target: '#addWidgetBtn',
+        title: 'Customize Your Dashboard',
+        text: 'Click here to add widgets -- sticky notes, to-do lists, clocks, study group chat, and more. Drag them anywhere.',
+        position: 'bottom'
+      }
+    ];
+
+    function startOnboarding() {
+      onboardingStep = 0;
+      showOnboardingStep();
+    }
+
+    function showOnboardingStep() {
+      var step = onboardingSteps[onboardingStep];
+      var overlay = document.getElementById('onboardingOverlay');
+      var spotlight = document.getElementById('onboardingSpotlight');
+      var tooltip = document.getElementById('onboardingTooltip');
+
+      if (!step) {
+        // Onboarding complete
+        overlay.classList.remove('active');
+        spotlight.style.display = 'none';
+        tooltip.style.display = 'none';
+        localStorage.setItem('studyflow_onboarded', '1');
+        return;
+      }
+
+      overlay.classList.add('active');
+
+      if (step.type === 'welcome') {
+        spotlight.style.display = 'none';
+        tooltip.style.display = 'none';
+        tooltip.outerHTML = '<div id="onboardingTooltip"></div>';
+        tooltip = document.getElementById('onboardingTooltip');
+
+        var welcome = document.createElement('div');
+        welcome.className = 'onboarding-welcome';
+        welcome.innerHTML = '<h2>' + step.title + '</h2><p>' + step.text + '</p>' +
+          '<button class="onboarding-btn next" onclick="nextOnboardingStep()">Show me around</button>' +
+          '<br><button class="onboarding-btn skip" style="margin-top:12px;" onclick="skipOnboarding()">Skip tour</button>';
+        welcome.id = 'onboardingWelcome';
+
+        var old = document.getElementById('onboardingWelcome');
+        if (old) old.remove();
+        document.body.appendChild(welcome);
+        return;
+      }
+
+      // Remove welcome if exists
+      var oldWelcome = document.getElementById('onboardingWelcome');
+      if (oldWelcome) oldWelcome.remove();
+
+      // Find target element
+      var el = document.querySelector(step.target);
+      if (!el) { onboardingStep++; showOnboardingStep(); return; }
+
+      var rect = el.getBoundingClientRect();
+      var pad = 8;
+
+      // Position spotlight
+      spotlight.style.display = 'block';
+      spotlight.style.left = (rect.left - pad) + 'px';
+      spotlight.style.top = (rect.top - pad) + 'px';
+      spotlight.style.width = (rect.width + pad * 2) + 'px';
+      spotlight.style.height = (rect.height + pad * 2) + 'px';
+
+      // Build dots
+      var totalSteps = onboardingSteps.length;
+      var dots = '';
+      for (var i = 0; i < totalSteps; i++) {
+        dots += '<div class="onboarding-dot' + (i === onboardingStep ? ' active' : '') + '"></div>';
+      }
+
+      // Build tooltip
+      var isLast = onboardingStep === onboardingSteps.length - 1;
+      tooltip.className = 'onboarding-tooltip';
+      tooltip.style.display = 'block';
+      tooltip.innerHTML =
+        '<h3>' + step.title + '</h3>' +
+        '<p>' + step.text + '</p>' +
+        '<div class="onboarding-tooltip-actions">' +
+          '<div class="onboarding-dots">' + dots + '</div>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="onboarding-btn skip" onclick="skipOnboarding()">Skip</button>' +
+            '<button class="onboarding-btn next" onclick="nextOnboardingStep()">' + (isLast ? 'Got it!' : 'Next') + '</button>' +
+          '</div>' +
+        '</div>';
+
+      // Position tooltip
+      if (step.position === 'top') {
+        tooltip.style.left = Math.max(16, rect.left + rect.width / 2 - 170) + 'px';
+        tooltip.style.top = (rect.top - 180) + 'px';
+      } else {
+        tooltip.style.left = Math.max(16, rect.left + rect.width / 2 - 170) + 'px';
+        tooltip.style.top = (rect.bottom + 16) + 'px';
+      }
+    }
+
+    function nextOnboardingStep() {
+      onboardingStep++;
+      showOnboardingStep();
+    }
+
+    function skipOnboarding() {
+      var overlay = document.getElementById('onboardingOverlay');
+      var spotlight = document.getElementById('onboardingSpotlight');
+      var tooltip = document.getElementById('onboardingTooltip');
+      var welcome = document.getElementById('onboardingWelcome');
+      overlay.classList.remove('active');
+      spotlight.style.display = 'none';
+      tooltip.style.display = 'none';
+      if (welcome) welcome.remove();
+      localStorage.setItem('studyflow_onboarded', '1');
     }
 
     // Start loading widgets
