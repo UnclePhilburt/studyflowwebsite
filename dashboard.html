@@ -3033,42 +3033,24 @@
       updateCanvasTransform();
     }
 
-    // Wheel: always pan. Ctrl/Meta+wheel or pinch: zoom.
+    // Wheel zoom -- same approach as chat page (works on all trackpads)
     canvasContainer.addEventListener('wheel', (e) => {
       e.preventDefault();
+      const zoomSpeed = 0.001;
+      const delta = -e.deltaY * zoomSpeed;
+      const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
 
-      if (e.ctrlKey || e.metaKey) {
-        // Pinch-to-zoom (Chrome sends ctrlKey for trackpad pinch)
-        const factor = e.deltaY > 0 ? 0.95 : 1.05;
-        zoomCanvas(factor, e.clientX, e.clientY);
-      } else {
-        // Two-finger scroll = pan
-        canvasPan.x -= e.deltaX;
-        canvasPan.y -= e.deltaY;
-        updateCanvasTransform();
-      }
-    }, { passive: false });
-
-    // Safari gesture events for pinch-to-zoom
-    let gestureStartScale = 1;
-    canvasContainer.addEventListener('gesturestart', (e) => {
-      e.preventDefault();
-      gestureStartScale = canvasScale;
-    });
-    canvasContainer.addEventListener('gesturechange', (e) => {
-      e.preventDefault();
-      const newScale = Math.min(3, Math.max(0.25, gestureStartScale * e.scale));
-
-      const mx = window.innerWidth / 2, my = window.innerHeight / 2;
+      const mx = e.clientX;
+      const my = e.clientY;
       const worldX = (mx - canvasPan.x) / canvasScale;
       const worldY = (my - canvasPan.y) / canvasScale;
+
       canvasScale = newScale;
       canvasPan.x = mx - worldX * canvasScale;
       canvasPan.y = my - worldY * canvasScale;
 
       updateCanvasTransform();
-    });
-    canvasContainer.addEventListener('gestureend', (e) => { e.preventDefault(); });
+    }, { passive: false });
 
     // Reset canvas view button
     document.getElementById('canvasReset').addEventListener('click', () => {
