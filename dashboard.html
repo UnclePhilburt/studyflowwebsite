@@ -3034,21 +3034,29 @@
       updateCanvasTransform();
     }
 
-    // Wheel zoom -- same approach as chat page (works on all trackpads)
+    // Wheel: two-finger scroll = pan, pinch/ctrl+scroll = zoom
     canvasContainer.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const zoomSpeed = 0.001;
-      const delta = -e.deltaY * zoomSpeed;
-      const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
 
-      const mx = e.clientX;
-      const my = e.clientY;
-      const worldX = (mx - canvasPan.x) / canvasScale;
-      const worldY = (my - canvasPan.y) / canvasScale;
+      if (e.ctrlKey || e.metaKey) {
+        // Pinch-to-zoom or Ctrl+scroll
+        const zoomSpeed = 0.005;
+        const delta = -e.deltaY * zoomSpeed;
+        const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
 
-      canvasScale = newScale;
-      canvasPan.x = mx - worldX * canvasScale;
-      canvasPan.y = my - worldY * canvasScale;
+        const mx = e.clientX;
+        const my = e.clientY;
+        const worldX = (mx - canvasPan.x) / canvasScale;
+        const worldY = (my - canvasPan.y) / canvasScale;
+
+        canvasScale = newScale;
+        canvasPan.x = mx - worldX * canvasScale;
+        canvasPan.y = my - worldY * canvasScale;
+      } else {
+        // Two-finger scroll = pan
+        canvasPan.x -= e.deltaX;
+        canvasPan.y -= e.deltaY;
+      }
 
       updateCanvasTransform();
     }, { passive: false });
