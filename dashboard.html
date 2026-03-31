@@ -4786,38 +4786,43 @@
       widgetElement.style.maxHeight = '500px';
 
       if (!selectedGroupId) {
-        // Show group selection screen
         container.innerHTML = `
           <div style="padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
-            <div style="font-size:32px;margin-bottom:12px;">💬</div>
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
             <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">Select a study group to display chat</div>
-            <button onclick="selectGroupForChat('${widgetData.id}')" style="padding:8px 16px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;">Choose Group</button>
+            <button onclick="selectGroupForChat('${widgetData.id}')" style="padding:8px 16px;background:var(--accent-primary);color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:600;">Choose Group</button>
           </div>
         `;
       } else {
-        // Show messages
         const groupName = widgetData.data.groupName || 'Study Group';
         container.innerHTML = `
           <div style="display:flex;flex-direction:column;height:100%;">
             <div class="group-chat-header" onclick="selectGroupForChat('${widgetData.id}')">
-              <div style="font-weight:600;font-size:13px;color:var(--text-primary);">${groupName}</div>
-              <div style="font-size:11px;color:#8B9D83;cursor:pointer;">Change</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));display:flex;align-items:center;justify-content:center;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                </div>
+                <div style="font-weight:600;font-size:13px;color:var(--text-primary);">${groupName}</div>
+              </div>
+              <div style="font-size:11px;color:var(--accent-primary);cursor:pointer;font-weight:500;">Change</div>
             </div>
             <div class="group-chat-messages" id="chat-messages-${widgetData.id}" style="flex:1;overflow-y:auto;min-height:0;">
-              ${messages.length === 0 ? '<div style="text-align:center;padding:40px 20px;color:#9B8B7E;font-size:13px;">No messages yet</div>' : ''}
+              ${messages.length === 0 ? '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;">No messages yet</div>' : ''}
             </div>
-            <div style="padding:8px;border-top:1px solid #E8DFD3;display:flex;gap:6px;background:rgba(255,255,255,0.5);">
+            <div style="padding:8px;border-top:1px solid var(--border-color);display:flex;gap:6px;background:var(--bg-secondary);">
               <input
                 type="text"
                 id="chat-input-${widgetData.id}"
                 placeholder="Type a message..."
-                style="flex:1;padding:6px 10px;border:1px solid #E8DFD3;border-radius:6px;font-size:12px;font-family:inherit;outline:none;"
+                style="flex:1;padding:8px 12px;border:1px solid var(--border-color);border-radius:20px;font-size:12px;font-family:inherit;outline:none;background:var(--bg-tertiary);color:var(--text-primary);"
                 onkeypress="if(event.key==='Enter') sendGroupMessage('${widgetData.id}')"
               />
               <button
                 onclick="sendGroupMessage('${widgetData.id}')"
-                style="padding:6px 12px;background:#8B9D83;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;"
-              >Send</button>
+                style="width:32px;height:32px;background:var(--accent-primary);color:white;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
+              ><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
             </div>
           </div>
         `;
@@ -4838,18 +4843,31 @@
 
       container.innerHTML = messages.slice(-20).map(msg => {
         const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const initial = (msg.username || msg.sender_username || '?')[0].toUpperCase();
+        const username = msg.username || msg.sender_username || 'User';
+        const isAI = msg.role === 'assistant' || msg.is_ai;
+
+        // Reactions
+        const reactions = msg.reactions || {};
+        const reactHtml = Object.entries(reactions).map(([emoji, users]) =>
+          `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:10px;background:var(--hover-bg);border:1px solid var(--border-color);font-size:11px;margin-right:3px;">${emoji}<span style="font-size:9px;color:var(--text-muted);">${(users||[]).length}</span></span>`
+        ).join('');
+
         return `
-          <div class="chat-message">
-            <div class="chat-message-header">
-              <span class="chat-message-user">${msg.username || 'User'}</span>
-              <span class="chat-message-time">${time}</span>
+          <div class="chat-message" style="display:flex;gap:8px;margin-bottom:4px;">
+            <div style="width:26px;height:26px;border-radius:50%;background:${isAI ? 'var(--accent-tertiary)' : 'var(--accent-primary)'};color:white;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${isAI ? 'AI' : initial}</div>
+            <div style="flex:1;min-width:0;">
+              <div class="chat-message-header">
+                <span class="chat-message-user">${isAI ? 'StudyFlow AI' : username}</span>
+                <span class="chat-message-time">${time}</span>
+              </div>
+              <div class="chat-message-text">${msg.content || ''}</div>
+              ${reactHtml ? '<div style="margin-top:3px;">' + reactHtml + '</div>' : ''}
             </div>
-            <div class="chat-message-text">${msg.content || ''}</div>
           </div>
         `;
       }).join('');
 
-      // Auto-scroll to bottom
       container.scrollTop = container.scrollHeight;
     }
 
