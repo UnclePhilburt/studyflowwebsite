@@ -3056,32 +3056,21 @@
       updateCanvasTransform();
     }
 
-    // Wheel: trackpad two-finger = pan, mouse wheel / pinch = zoom
+    // Wheel zoom -- same as chat page
     canvasContainer.addEventListener('wheel', (e) => {
       e.preventDefault();
+      const zoomSpeed = 0.001;
+      const delta = -e.deltaY * zoomSpeed;
+      const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
 
-      // Trackpad pan: deltaX is non-zero (trackpad sends both axes), and no ctrl/meta
-      const isTrackpadPan = Math.abs(e.deltaX) > 0 && !e.ctrlKey && !e.metaKey;
+      const mx = e.clientX;
+      const my = e.clientY;
+      const worldX = (mx - canvasPan.x) / canvasScale;
+      const worldY = (my - canvasPan.y) / canvasScale;
 
-      if (isTrackpadPan) {
-        // Two-finger trackpad scroll = pan
-        canvasPan.x -= e.deltaX;
-        canvasPan.y -= e.deltaY;
-      } else {
-        // Mouse wheel or pinch = zoom
-        const zoomSpeed = 0.001;
-        const delta = -e.deltaY * zoomSpeed;
-        const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
-
-        const mx = e.clientX;
-        const my = e.clientY;
-        const worldX = (mx - canvasPan.x) / canvasScale;
-        const worldY = (my - canvasPan.y) / canvasScale;
-
-        canvasScale = newScale;
-        canvasPan.x = mx - worldX * canvasScale;
-        canvasPan.y = my - worldY * canvasScale;
-      }
+      canvasScale = newScale;
+      canvasPan.x = mx - worldX * canvasScale;
+      canvasPan.y = my - worldY * canvasScale;
 
       updateCanvasTransform();
     }, { passive: false });
