@@ -416,6 +416,8 @@
       cursor: grab;
       z-index: 1;
       background-color: var(--canvas-bg);
+      background-image: radial-gradient(circle, var(--canvas-grid) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
 
     .canvas-container.panning {
@@ -427,12 +429,10 @@
       position: absolute;
       top: 0;
       left: 0;
+      width: 50000px;
+      height: 50000px;
       z-index: 1;
       transform-origin: 0 0;
-      background-color: var(--canvas-bg);
-      background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 99px, var(--canvas-grid) 99px, var(--canvas-grid) 100px),
-        repeating-linear-gradient(90deg, transparent, transparent 99px, var(--canvas-grid) 99px, var(--canvas-grid) 100px);
     }
 
     /* Widget cards */
@@ -2578,9 +2578,12 @@
           let layout = data.layout || DEFAULT_WIDGETS;
 
           // Load canvas pan position if saved
-          if (data.canvasPan) {
+          if (data.canvasPan && (data.canvasPan.x !== 0 || data.canvasPan.y !== 0)) {
             canvasPan = data.canvasPan;
-            console.log('Loaded canvasPan:', canvasPan);
+          }
+          // If saved pan is 0,0 (old format when CSS had -20000 offset), use the JS offset
+          if (canvasPan.x === 0 && canvasPan.y === 0) {
+            canvasPan = { x: -20000, y: -20000 };
           }
 
           // Migration: Convert old array format ['id1', 'id2'] to new format [{id, type, x, y, data}]
