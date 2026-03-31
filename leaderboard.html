@@ -432,13 +432,19 @@
       const maxPages = Math.max(...data.map(d => d.pages_contributed || 1), 1);
       const cx = width / 2, cy = height / 2;
 
+      // Assign each university a starting angle so clusters begin separated
+      const unis = [...new Set(data.map(d => d.university || 'Unknown'))];
+      const uniAngle = {};
+      unis.forEach((u, i) => { uniAngle[u] = (i / unis.length) * Math.PI * 2; });
+
       nodes = data.map((d, i) => {
         const size = 8 + (d.pages_contributed / maxPages) * 40;
-        const angle = (i / data.length) * Math.PI * 2;
-        const dist = 100 + Math.random() * 250;
+        const baseAngle = uniAngle[d.university || 'Unknown'];
+        const spread = (Math.random() - 0.5) * 0.8;
+        const dist = 200 + Math.random() * 150;
         return {
-          x: cx + Math.cos(angle) * dist,
-          y: cy + Math.sin(angle) * dist,
+          x: cx + Math.cos(baseAngle + spread) * dist,
+          y: cy + Math.sin(baseAngle + spread) * dist,
           vx: 0, vy: 0,
           size,
           username: d.username || 'Anonymous',
@@ -475,15 +481,15 @@
           n.vx += (center.x - n.x) * pull;
           n.vy += (center.y - n.y) * pull;
 
-          // Suns repel each other
+          // Suns strongly repel each other to keep clusters apart
           for (const otherUni in uniSuns) {
             if (otherUni === n.university) continue;
             const m = uniSuns[otherUni];
             const dx = n.x - m.x;
             const dy = n.y - m.y;
             const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            if (dist < 300) {
-              const repel = (300 - dist) * 0.003;
+            if (dist < 500) {
+              const repel = (500 - dist) * 0.008;
               n.vx += (dx / dist) * repel;
               n.vy += (dy / dist) * repel;
             }
