@@ -946,52 +946,6 @@
     .nav-drawer a.active { background: var(--hover-bg); color: var(--accent-primary); }
     .nav-drawer svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    /* ============ FLOATING ACTION BUTTONS (Mobile only) ============ */
-    .mobile-fab-container {
-      display: none; /* Hidden on desktop */
-    }
-
-    @media (max-width: 768px) {
-      .mobile-fab-container {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        position: fixed;
-        bottom: 80px;
-        left: 12px;
-        z-index: 200;
-      }
-
-      .mobile-fab {
-        width: 56px;
-        height: 56px;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        background: var(--accent-primary);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        box-shadow: 0 4px 16px var(--shadow);
-        transition: all 0.2s;
-      }
-
-      .mobile-fab:active {
-        transform: scale(0.95);
-      }
-
-      .mobile-fab svg {
-        width: 24px;
-        height: 24px;
-        stroke: white;
-        fill: none;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-    }
-
     /* ============ CANVAS CONTROLS ============ */
     .canvas-controls {
       position: fixed;
@@ -1457,26 +1411,6 @@
     <button class="canvas-ctrl-btn" id="fitAllBtn" title="Fit all cards" style="margin-top:4px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
     </button>
-  </div>
-
-  <!-- Mobile floating action buttons -->
-  <div class="mobile-fab-container">
-    <a href="notes.html" class="mobile-fab" title="Upload Notes">
-      <svg viewBox="0 0 24 24">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-        <line x1="12" y1="18" x2="12" y2="12"/>
-        <line x1="9" y1="15" x2="15" y2="15"/>
-      </svg>
-    </a>
-    <a href="flashcards.html" class="mobile-fab" title="Flashcards">
-      <svg viewBox="0 0 24 24">
-        <rect x="2" y="2" width="20" height="20" rx="2"/>
-        <path d="M8 6h8"/>
-        <path d="M8 10h8"/>
-        <path d="M8 14h4"/>
-      </svg>
-    </a>
   </div>
 
   <!-- Minimap -->
