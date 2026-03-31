@@ -453,7 +453,8 @@
           rank: i + 1,
           isUser: d.username === currentUser?.email?.split('@')[0],
           color: getUniColor(d.university),
-          alpha: 1
+          alpha: 1,
+          trail: []
         };
       });
     }
@@ -536,6 +537,14 @@
         n.vy *= 0.92;
         n.x += n.vx;
         n.y += n.vy;
+
+        // Record trail (every 3rd frame to save memory)
+        if (!n._frame) n._frame = 0;
+        n._frame++;
+        if (n._frame % 3 === 0) {
+          n.trail.push({ x: n.x, y: n.y });
+          if (n.trail.length > 20) n.trail.shift();
+        }
       }
     }
 
@@ -593,9 +602,9 @@
       });
 
       Object.values(uniCenters).forEach(c => {
-        if (c.count < 2) return;
         c.x /= c.count;
         c.y /= c.count;
+        if (c.count < 2) return;
         const radius = 80 + c.count * 25;
         const grad = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, radius);
         grad.addColorStop(0, c.color + '18');
@@ -606,6 +615,40 @@
         ctx.arc(c.x, c.y, radius, 0, Math.PI * 2);
         ctx.fillStyle = grad;
         ctx.fill();
+      });
+
+      // University labels floating near cluster centers
+      Object.entries(uniCenters).forEach(([uni, c]) => {
+        if (c.count < 1) return;
+        ctx.globalAlpha = 0.5;
+        ctx.font = '600 13px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = c.color;
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 6;
+        ctx.fillText(uni, c.x, c.y - 60 - c.count * 3);
+        ctx.shadowBlur = 0;
+
+        // Small member count below
+        ctx.globalAlpha = 0.3;
+        ctx.font = '400 10px Inter';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(c.count + ' contributor' + (c.count !== 1 ? 's' : ''), c.x, c.y - 60 - c.count * 3 + 15);
+      });
+
+      // Draw orbit trails
+      nodes.forEach(n => {
+        if (n.trail.length < 3 || n.alpha < 0.1) return;
+        ctx.beginPath();
+        ctx.moveTo(n.trail[0].x, n.trail[0].y);
+        for (let i = 1; i < n.trail.length; i++) {
+          ctx.lineTo(n.trail[i].x, n.trail[i].y);
+        }
+        ctx.strokeStyle = n.color;
+        ctx.lineWidth = n.size * 0.3;
+        ctx.globalAlpha = 0.08 * n.alpha;
+        ctx.lineCap = 'round';
+        ctx.stroke();
       });
 
       // Draw connections between same-university nodes
