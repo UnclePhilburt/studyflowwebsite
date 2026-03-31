@@ -436,6 +436,17 @@
     }
 
     /* Widget cards */
+    @keyframes widgetEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
     .widget {
       position: absolute;
       background: var(--widget-bg);
@@ -452,6 +463,8 @@
       flex-direction: column;
       user-select: none;
       z-index: 10;
+      opacity: 0;
+      animation: widgetEntrance 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .widget:hover {
@@ -2988,6 +3001,7 @@
       }
     }
 
+    let _initialRender = true;
     function renderWidgets() {
       const canvas = document.getElementById('canvas');
       canvas.innerHTML = '';
@@ -2997,9 +3011,11 @@
         return;
       }
 
+      const animate = _initialRender;
+      _initialRender = false;
       const isMobile = window.innerWidth <= 768;
 
-      activeWidgets.forEach((widgetData) => {
+      activeWidgets.forEach((widgetData, index) => {
         const widgetDef = WIDGET_TYPES[widgetData.type];
         if (!widgetDef) return;
 
@@ -3009,6 +3025,12 @@
         widget.dataset.widgetType = widgetData.type;
         widget.style.left = widgetData.x + 'px';
         widget.style.top = widgetData.y + 'px';
+        if (animate) {
+          widget.style.animationDelay = (index * 0.08) + 's';
+        } else {
+          widget.style.animation = 'none';
+          widget.style.opacity = '1';
+        }
 
         // Different layout for accessory widgets (no header for some)
         if (widgetDef.category === 'accessory') {
