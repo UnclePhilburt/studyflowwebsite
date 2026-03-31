@@ -977,32 +977,54 @@
     /* Study Groups widget */
     .group-item {
       padding: 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       margin-bottom: 8px;
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid rgba(139, 126, 115, 0.08);
+      background: var(--hover-bg);
+      border: 1px solid var(--border-color);
       transition: all 0.2s;
       cursor: pointer;
       text-decoration: none;
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       color: inherit;
     }
 
     .group-item:hover {
-      background: rgba(139, 157, 131, 0.08);
-      border-color: rgba(139, 157, 131, 0.15);
+      background: var(--widget-bg);
+      border-color: var(--accent-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--shadow);
     }
+
+    .group-item-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .group-item-icon svg {
+      width: 16px; height: 16px;
+      stroke: white; fill: none; stroke-width: 2;
+    }
+
+    .group-item-info { flex: 1; min-width: 0; }
 
     .group-name {
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .group-activity {
-      font-size: 12px;
-      color: #9B8B7E;
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
     /* Quick Launch widget */
@@ -1714,7 +1736,7 @@
 
       .conv-item,
       .event-item,
-      .group-item {
+      .group-item { display: flex;
         padding: 10px;
         margin-bottom: 6px;
       }
@@ -3316,8 +3338,13 @@
           const lastActivity = group.last_message_at || group.created_at;
           return `
             <a href="study-groups.html?id=${group.id}" class="group-item">
-              <div class="group-name">${group.name}</div>
-              <div class="group-activity">${group.member_count || 0} members • ${timeAgo(lastActivity)}</div>
+              <div class="group-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="group-item-info">
+                <div class="group-name">${group.name}</div>
+                <div class="group-activity">${group.member_count || 0} members -- ${timeAgo(lastActivity)}</div>
+              </div>
             </a>
           `;
         }).join('');
