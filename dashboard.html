@@ -5423,9 +5423,8 @@
     }
 
     async function checkUpgradeBanner() {
-      // Check if dismissed in last 24 hours
-      const dismissed = localStorage.getItem('upgrade_banner_dismissed');
-      if (dismissed && Date.now() - parseInt(dismissed) < 86400000) {
+      // Check if dismissed this session
+      if (sessionStorage.getItem('upgrade_banner_dismissed')) {
         document.querySelector('.dock').style.bottom = '20px';
         return;
       }
@@ -5452,7 +5451,7 @@
     function dismissBanner() {
       document.getElementById('upgradeBanner').style.display = 'none';
       document.querySelector('.dock').style.bottom = '20px';
-      localStorage.setItem('upgrade_banner_dismissed', Date.now().toString());
+      sessionStorage.setItem('upgrade_banner_dismissed', '1');
     }
 
     // Start loading widgets
