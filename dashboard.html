@@ -2577,14 +2577,8 @@
           console.log('Loaded data:', data);
           let layout = data.layout || DEFAULT_WIDGETS;
 
-          // Load canvas pan position if saved
-          if (data.canvasPan && (data.canvasPan.x !== 0 || data.canvasPan.y !== 0)) {
-            canvasPan = data.canvasPan;
-          }
-          // If saved pan is 0,0 (old format when CSS had -20000 offset), use the JS offset
-          if (canvasPan.x === 0 && canvasPan.y === 0) {
-            canvasPan = { x: -20000, y: -20000 };
-          }
+          // Center view on widgets after loading
+          // (ignore saved canvasPan -- always auto-center for reliability)
 
           // Migration: Convert old array format ['id1', 'id2'] to new format [{id, type, x, y, data}]
           if (layout.length > 0 && typeof layout[0] === 'string') {
@@ -2651,6 +2645,22 @@
         }
       }
       renderWidgets();
+
+      // Auto-center view on widgets
+      if (activeWidgets.length > 0) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        activeWidgets.forEach(w => {
+          minX = Math.min(minX, w.x);
+          minY = Math.min(minY, w.y);
+          maxX = Math.max(maxX, w.x + 400);
+          maxY = Math.max(maxY, w.y + 300);
+        });
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        canvasPan.x = window.innerWidth / 2 - cx * canvasScale;
+        canvasPan.y = window.innerHeight / 2 - cy * canvasScale;
+        updateCanvasTransform();
+      }
     }
 
     async function saveWidgets(widgetsToSave) {
