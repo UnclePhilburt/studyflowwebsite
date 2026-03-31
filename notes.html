@@ -2519,6 +2519,9 @@
             uploadedCount++;
             const progress = (uploadedCount / selectedFiles.length) * 100;
             document.getElementById('uploadProgressBar').style.width = `${progress}%`;
+            // Update status text
+            const statusEl = document.getElementById('uploadProgress').querySelector('div');
+            if (statusEl) statusEl.textContent = `Uploaded ${uploadedCount} of ${selectedFiles.length} files...`;
           } else {
             const error = await response.json();
             alert(`Upload failed for ${file.name}: ${error.error || 'Unknown error'}`);
@@ -2526,11 +2529,17 @@
           }
         }
 
-        // All uploads successful
+        // All uploads successful -- show success then close
+        const statusEl = document.getElementById('uploadProgress').querySelector('div');
+        if (statusEl) {
+          statusEl.textContent = `${uploadedCount} file${uploadedCount > 1 ? 's' : ''} uploaded successfully!`;
+          statusEl.style.color = 'var(--accent-primary)';
+        }
+
         setTimeout(() => {
           closeUploadModal();
-          loadNotes(); // Refresh the notes list
-        }, 500);
+          loadNotes();
+        }, 1200);
 
       } catch (error) {
         console.error('Upload error:', error);
