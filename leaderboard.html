@@ -480,16 +480,27 @@
           }
         }
 
-        // Attraction to same university nodes
+        // Attraction to same university nodes (strong)
+        // Repulsion from different university nodes (mild)
         for (let j = 0; j < nodes.length; j++) {
           if (i === j) continue;
-          if (nodes[j].university === n.university) {
-            const dx = nodes[j].x - n.x;
-            const dy = nodes[j].y - n.y;
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            if (dist > 80) {
-              n.vx += dx * 0.001;
-              n.vy += dy * 0.001;
+          const m = nodes[j];
+          const dx = m.x - n.x;
+          const dy = m.y - n.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+          if (m.university === n.university) {
+            // Pull toward same university (strong)
+            if (dist > 60) {
+              n.vx += dx * 0.003;
+              n.vy += dy * 0.003;
+            }
+          } else {
+            // Push away from different university (mild)
+            if (dist < 150) {
+              const repel = (150 - dist) * 0.002;
+              n.vx -= (dx / dist) * repel;
+              n.vy -= (dy / dist) * repel;
             }
           }
         }
