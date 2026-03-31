@@ -2932,9 +2932,19 @@
 
         // Calculate new scale (limit between 0.25x and 3x)
         const newScale = Math.min(3, Math.max(0.25, touchStartScale * (currentDist / touchStartDist)));
-        const scaleDelta = newScale - canvasScale;
 
-        // Simple center zoom - just scale without moving
+        console.log('Pinch zoom:', {
+          oldScale: canvasScale,
+          newScale: newScale,
+          panX: canvasPan.x,
+          panY: canvasPan.y,
+          touchStartPanX: touchStartPan.x,
+          touchStartPanY: touchStartPan.y
+        });
+
+        // Keep pan locked to start position during pinch
+        canvasPan.x = touchStartPan.x;
+        canvasPan.y = touchStartPan.y;
         canvasScale = newScale;
 
         updateCanvasTransform();
