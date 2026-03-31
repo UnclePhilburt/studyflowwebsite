@@ -1157,31 +1157,38 @@
 
     async function toggleReaction(msgId, emoji) {
       document.querySelectorAll('.reaction-picker').forEach(p => p.remove());
-      // Note: reactions would need a backend endpoint to persist
-      // For now, update UI optimistically
+
+      // Optimistic UI update
       const msgEl = document.querySelector(`[data-msg-id="${msgId}"]`);
-      if (!msgEl) return;
+      if (msgEl) {
+        let reactionsDiv = msgEl.querySelector('.chat-reactions');
+        if (!reactionsDiv) {
+          reactionsDiv = document.createElement('div');
+          reactionsDiv.className = 'chat-reactions';
+          const timeEl = msgEl.querySelector('.chat-msg-time');
+          timeEl.parentNode.insertBefore(reactionsDiv, timeEl);
+        }
 
-      let reactionsDiv = msgEl.querySelector('.chat-reactions');
-      if (!reactionsDiv) {
-        reactionsDiv = document.createElement('div');
-        reactionsDiv.className = 'chat-reactions';
-        const timeEl = msgEl.querySelector('.chat-msg-time');
-        timeEl.parentNode.insertBefore(reactionsDiv, timeEl);
+        const existing = reactionsDiv.querySelector(`[data-emoji="${emoji}"]`);
+        if (existing) {
+          existing.remove();
+          if (reactionsDiv.children.length === 0) reactionsDiv.remove();
+        } else {
+          const span = document.createElement('span');
+          span.className = 'chat-reaction mine';
+          span.dataset.emoji = emoji;
+          span.innerHTML = `${emoji}<span class="chat-reaction-count">1</span>`;
+          reactionsDiv.appendChild(span);
+        }
       }
 
-      // Check if this emoji already exists
-      const existing = reactionsDiv.querySelector(`[data-emoji="${emoji}"]`);
-      if (existing) {
-        existing.remove();
-        if (reactionsDiv.children.length === 0) reactionsDiv.remove();
-      } else {
-        const span = document.createElement('span');
-        span.className = 'chat-reaction mine';
-        span.dataset.emoji = emoji;
-        span.innerHTML = `${emoji}<span class="chat-reaction-count">1</span>`;
-        reactionsDiv.appendChild(span);
-      }
+      // Persist to backend
+      try {
+        await apiFetch(`/api/groups/${currentGroup}/messages/${msgId}/react`, {
+          method: 'POST',
+          body: JSON.stringify({ emoji })
+        });
+      } catch (e) { console.error('Reaction error:', e); }
     }
 
     function scrollChatBottom() {
