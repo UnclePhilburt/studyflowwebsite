@@ -684,7 +684,7 @@
 
   <!-- Top Nav -->
   <div class="top-nav">
-    <a href="dashboard.html">
+    <a href="dashboard.html" id="dashBackBtn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
     <h1>Study Groups</h1>
@@ -953,14 +953,16 @@
       currentGroup = groupId;
       document.getElementById('canvasViewport').style.display = 'none';
       document.getElementById('groupDetail').classList.add('active');
-      document.querySelector('.top-nav h1').innerHTML = `<a href="#" onclick="closeGroup();return false;" style="color:var(--text-muted);margin-right:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></a> Loading...`;
+      document.getElementById('dashBackBtn').style.display = 'none';
+      document.getElementById('dashBackBtn').insertAdjacentHTML('afterend', '<a href="#" id="groupBackLink" onclick="closeGroup();return false;" style="color:var(--accent-primary);display:flex;align-items:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></a>');
+      document.querySelector('.top-nav h1').textContent = 'Loading...';
       document.getElementById('createBtn').style.display = 'none';
 
       const data = await apiFetch('/api/groups/' + groupId);
       if (!data) { closeGroup(); return; }
       currentGroupDetail = data.group || data;
 
-      document.querySelector('.top-nav h1').innerHTML = `<a href="#" onclick="closeGroup();return false;" style="color:var(--text-muted);margin-right:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></a> ${currentGroupDetail.name || 'Group'}`;
+      document.querySelector('.top-nav h1').textContent = currentGroupDetail.name || 'Group';
 
       renderSidePanel();
       loadChatHistory();
@@ -974,6 +976,9 @@
       document.getElementById('groupDetail').classList.remove('active');
       document.getElementById('canvasViewport').style.display = 'block';
       document.querySelector('.top-nav h1').textContent = 'Study Groups';
+      document.getElementById('dashBackBtn').style.display = '';
+      const groupBackLink = document.getElementById('groupBackLink');
+      if (groupBackLink) groupBackLink.remove();
       document.getElementById('createBtn').style.display = '';
       loadGroups();
     }
