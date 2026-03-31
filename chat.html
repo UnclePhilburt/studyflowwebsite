@@ -3220,6 +3220,10 @@
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
+        // Force fresh data
+        _preloadedData = null;
+        invalidatePreload();
+        await preloadCanvas();
         // Refresh current view
         if (currentLevel === 'folder') {
           navigateToFolder(currentFolderId, currentFolderName);
@@ -3678,6 +3682,9 @@
       }
 
       clearSelection();
+      _preloadedData = null;
+      invalidatePreload();
+      await preloadCanvas();
       if (currentLevel === 'folder') {
         navigateToFolder(currentFolderId, currentFolderName);
       } else {
