@@ -4164,6 +4164,53 @@
       } else {
         navigateHome();
       }
+
+      // First visit tutorial
+      if (!localStorage.getItem('chat_onboarded')) {
+        setTimeout(showChatTutorial, 1000);
+      }
+    }
+
+    function showChatTutorial() {
+      const tip = document.createElement('div');
+      tip.id = 'chatTutorial';
+      tip.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:16px;padding:24px 28px;z-index:500;box-shadow:0 12px 40px var(--shadow);max-width:400px;text-align:center;animation:tooltipFade 0.4s ease;';
+      tip.innerHTML = `
+        <style>@keyframes tooltipFade { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }</style>
+        <div style="font-family:'Lora',serif;font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:8px;">This is your study canvas</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
+          <strong style="color:var(--text-primary);">Right-click</strong> anywhere to create a new chat, folder, or sticky note.<br>
+          <strong style="color:var(--text-primary);">Click</strong> a folder to open it. <strong style="color:var(--text-primary);">Drag</strong> anything to rearrange.
+        </div>
+        <div style="display:flex;gap:16px;justify-content:center;margin-bottom:12px;">
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--hover-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);">Chat</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--hover-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);">Folder</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--hover-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-tertiary)" stroke-width="2"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M14 3v5a1 1 0 0 0 1 1h5"/></svg>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);">Sticky Note</div>
+          </div>
+        </div>
+        <button onclick="dismissChatTutorial()" style="padding:8px 24px;border-radius:8px;background:var(--accent-primary);color:white;border:none;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">Got it</button>
+      `;
+      document.body.appendChild(tip);
+    }
+
+    function dismissChatTutorial() {
+      const tip = document.getElementById('chatTutorial');
+      if (tip) tip.remove();
+      localStorage.setItem('chat_onboarded', '1');
     }
 
     init();
