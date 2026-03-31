@@ -1546,10 +1546,10 @@
     .onboarding-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: transparent;
       z-index: 9999;
       display: none;
-      transition: opacity 0.3s;
+      pointer-events: none;
     }
 
     .onboarding-overlay.active { display: block; }
