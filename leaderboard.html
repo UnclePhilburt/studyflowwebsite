@@ -454,25 +454,70 @@
 
     function simulate() {
       const center = { x: width / 2, y: height / 2 };
+      const t = Date.now() / 1000;
+
+      // Find the biggest node per university (the "sun" of each cluster)
+      const uniSuns = {};
+      nodes.forEach(n => {
+        if (!uniSuns[n.university] || n.size > uniSuns[n.university].size) {
+          uniSuns[n.university] = n;
+        }
+      });
 
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
+        const sun = uniSuns[n.university];
+        const isSun = (n === sun);
 
-        // Gravity toward center (stronger for higher rank)
-        const pull = 0.01 + (1 - n.rank / nodes.length) * 0.02;
-        n.vx += (center.x - n.x) * pull;
-        n.vy += (center.y - n.y) * pull;
+        if (isSun) {
+          // Suns drift toward center (stronger for higher rank)
+          const pull = 0.005 + (1 - n.rank / nodes.length) * 0.01;
+          n.vx += (center.x - n.x) * pull;
+          n.vy += (center.y - n.y) * pull;
 
-        // Repulsion from other nodes
+          // Suns repel each other
+          for (const otherUni in uniSuns) {
+            if (otherUni === n.university) continue;
+            const m = uniSuns[otherUni];
+            const dx = n.x - m.x;
+            const dy = n.y - m.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            if (dist < 300) {
+              const repel = (300 - dist) * 0.003;
+              n.vx += (dx / dist) * repel;
+              n.vy += (dy / dist) * repel;
+            }
+          }
+        } else {
+          // Smaller nodes orbit their university's sun
+          const dx = sun.x - n.x;
+          const dy = sun.y - n.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+          // Desired orbit radius based on rank within university
+          const orbitRadius = sun.size + 30 + (n.rank % 20) * 8;
+
+          // Pull toward orbit radius (spring force)
+          const radiusDiff = dist - orbitRadius;
+          n.vx += (dx / dist) * radiusDiff * 0.01;
+          n.vy += (dy / dist) * radiusDiff * 0.01;
+
+          // Tangential velocity (creates orbiting motion)
+          const orbitSpeed = 0.3 + (1 / (n.size + 1)) * 2;
+          n.vx += (-dy / dist) * orbitSpeed;
+          n.vy += (dx / dist) * orbitSpeed;
+        }
+
+        // Repulsion from close nodes (prevents overlap)
         for (let j = i + 1; j < nodes.length; j++) {
           const m = nodes[j];
           const dx = n.x - m.x;
           const dy = n.y - m.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const minDist = n.size + m.size + 10;
+          const minDist = n.size + m.size + 6;
 
           if (dist < minDist) {
-            const force = (minDist - dist) * 0.05;
+            const force = (minDist - dist) * 0.08;
             const fx = (dx / dist) * force;
             const fy = (dy / dist) * force;
             n.vx += fx; n.vy += fy;
@@ -480,34 +525,9 @@
           }
         }
 
-        // Attraction to same university nodes (strong)
-        // Repulsion from different university nodes (mild)
-        for (let j = 0; j < nodes.length; j++) {
-          if (i === j) continue;
-          const m = nodes[j];
-          const dx = m.x - n.x;
-          const dy = m.y - n.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-
-          if (m.university === n.university) {
-            // Pull toward same university (strong)
-            if (dist > 60) {
-              n.vx += dx * 0.003;
-              n.vy += dy * 0.003;
-            }
-          } else {
-            // Push away from different university (mild)
-            if (dist < 150) {
-              const repel = (150 - dist) * 0.002;
-              n.vx -= (dx / dist) * repel;
-              n.vy -= (dy / dist) * repel;
-            }
-          }
-        }
-
         // Damping
-        n.vx *= 0.85;
-        n.vy *= 0.85;
+        n.vx *= 0.92;
+        n.vy *= 0.92;
         n.x += n.vx;
         n.y += n.vy;
       }
