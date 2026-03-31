@@ -936,12 +936,10 @@
     showScreen('loadingScreen');
     document.getElementById('loadingSubtext').textContent = 'Searching Nexus notes for "' + topic + '"';
 
-    var prompt = 'Generate exactly 15 quiz questions about "' + topic + '" based on the study notes available. ' +
-      'Each question should have exactly two answer choices where only one is correct. ' +
-      'Mix multiple choice and true/false questions. ' +
-      'Return ONLY a valid JSON array with no other text, in this exact format: ' +
-      '[{"question":"What is...?","left":"Answer A","right":"Answer B","correct":"left"}] ' +
-      'where "correct" is either "left" or "right". Make questions educational and clear.';
+    var prompt = 'IMPORTANT: Return ONLY a JSON array, no other text before or after it. ' +
+      'Generate 15 quiz questions about "' + topic + '". ' +
+      'Each has two answer choices. Format: [{"question":"...","left":"...","right":"...","correct":"left"}] ' +
+      'correct must be "left" or "right". No markdown, no explanation, just the JSON array.';
 
     try {
       var resp = await fetch(BACKEND_URL + '/api/notes/chat', {
@@ -958,11 +956,18 @@
       var data = await resp.json();
       var text = data.response || '';
 
-      // Extract JSON array from response
-      var jsonMatch = text.match(/\[[\s\S]*\]/);
+      // Extract JSON array from response (handle markdown code blocks)
+      var cleaned = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+      var jsonMatch = cleaned.match(/\[[\s\S]*\]/);
       if (!jsonMatch) throw new Error('No valid questions generated');
 
-      questions = JSON.parse(jsonMatch[0]);
+      try {
+        questions = JSON.parse(jsonMatch[0]);
+      } catch (parseErr) {
+        // Try fixing common JSON issues
+        var fixedJson = jsonMatch[0].replace(/,\s*\]/g, ']').replace(/'/g, '"');
+        questions = JSON.parse(fixedJson);
+      }
       if (!Array.isArray(questions) || questions.length === 0) throw new Error('Empty questions');
 
       // Validate structure
@@ -1232,9 +1237,13 @@
         body: JSON.stringify({ message: prompt, source: 'flashcard' })
       });
       var data = await resp.json();
-      var jsonMatch = (data.response || '').match(/\[[\s\S]*\]/);
+      var cleaned = (data.response || '').replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+      var jsonMatch = cleaned.match(/\[[\s\S]*\]/);
       if (!jsonMatch) throw new Error('No questions');
-      raceQuestions = JSON.parse(jsonMatch[0]).filter(function(q) {
+      var parsed;
+      try { parsed = JSON.parse(jsonMatch[0]); }
+      catch (e) { parsed = JSON.parse(jsonMatch[0].replace(/,\s*\]/g, ']').replace(/'/g, '"')); }
+      raceQuestions = parsed.filter(function(q) {
         return q.question && q.left && q.right && (q.correct === 'left' || q.correct === 'right');
       });
       if (raceQuestions.length === 0) throw new Error('Empty');
