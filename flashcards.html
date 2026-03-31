@@ -944,51 +944,28 @@
       'The "correct" field must be either "left" or "right". Return exactly 15 items.';
 
     try {
-      var resp = await fetch(BACKEND_URL + '/api/notes/chat', {
+      var resp = await fetch(BACKEND_URL + '/api/flashcards/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + authToken
         },
-        body: JSON.stringify({ message: prompt, source: 'flashcard' })
+        body: JSON.stringify({ topic: topic, count: 15 })
       });
 
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
 
       var data = await resp.json();
-      var text = data.response || '';
-      console.log('AI raw response:', text.substring(0, 500));
+      var text = data.questions || '';
 
-      // Strip everything that's not JSON: markdown, attribution, sources
-      var cleaned = text
-        .replace(/```json\s*/gi, '')
-        .replace(/```\s*/g, '')
-        .replace(/---[\s\S]*$/m, '') // Remove attribution footer
-        .trim();
-
-      console.log('Cleaned:', cleaned.substring(0, 500));
-
-      var jsonMatch = cleaned.match(/\[[\s\S]*?\](?=\s*$|\s*[^,\[\{])/);
-      if (!jsonMatch) {
-        // Try broader match
-        jsonMatch = cleaned.match(/\[[\s\S]*\]/);
-      }
-      if (!jsonMatch) {
-        console.error('No JSON found in response');
-        throw new Error('No valid questions generated');
-      }
-
-      console.log('JSON match:', jsonMatch[0].substring(0, 300));
+      // Parse JSON
+      var jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) throw new Error('No valid questions generated');
 
       try {
         questions = JSON.parse(jsonMatch[0]);
       } catch (parseErr) {
-        console.error('Parse error:', parseErr, 'Trying cleanup...');
-        var fixedJson = jsonMatch[0]
-          .replace(/,\s*\]/g, ']')
-          .replace(/,\s*\}/g, '}')
-          .replace(/'/g, '"')
-          .replace(/\n/g, ' ');
+        var fixedJson = jsonMatch[0].replace(/,\s*\]/g, ']').replace(/,\s*\}/g, '}');
         questions = JSON.parse(fixedJson);
       }
       if (!Array.isArray(questions) || questions.length === 0) throw new Error('Empty questions');
@@ -1254,18 +1231,18 @@
       'Return ONLY a valid JSON array: [{"question":"...","left":"...","right":"...","correct":"left"}]';
 
     try {
-      var resp = await fetch(BACKEND_URL + '/api/notes/chat', {
+      var resp = await fetch(BACKEND_URL + '/api/flashcards/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
-        body: JSON.stringify({ message: prompt, source: 'flashcard' })
+        body: JSON.stringify({ topic: topic, count: 15 })
       });
       var data = await resp.json();
-      var cleaned = (data.response || '').replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-      var jsonMatch = cleaned.match(/\[[\s\S]*\]/);
+      var text = data.questions || '';
+      var jsonMatch = text.match(/\[[\s\S]*\]/);
       if (!jsonMatch) throw new Error('No questions');
       var parsed;
       try { parsed = JSON.parse(jsonMatch[0]); }
-      catch (e) { parsed = JSON.parse(jsonMatch[0].replace(/,\s*\]/g, ']').replace(/'/g, '"')); }
+      catch (e) { parsed = JSON.parse(jsonMatch[0].replace(/,\s*\]/g, ']').replace(/,\s*\}/g, '}')); }
       raceQuestions = parsed.filter(function(q) {
         return q.question && q.left && q.right && (q.correct === 'left' || q.correct === 'right');
       });
