@@ -621,6 +621,14 @@
 
         if (error) throw error;
 
+        // Pre-warm caches
+        try {
+          fetch('https://studyflowsuite.onrender.com/api/warmup', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + data.session.access_token }
+          });
+        } catch (e) {}
+
         showSuccess('Account created! Redirecting to your dashboard...');
         setTimeout(() => {
           window.location.href = 'dashboard.html';

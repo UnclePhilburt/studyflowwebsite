@@ -1297,6 +1297,14 @@
 
         if (error) throw error;
 
+        // Pre-warm all caches in the background while showing success message
+        try {
+          fetch('https://studyflowsuite.onrender.com/api/warmup', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + data.session.access_token }
+          });
+        } catch (e) {}
+
         showSuccess('Login successful! Redirecting...');
         setTimeout(() => {
           window.location.href = 'dashboard.html';
