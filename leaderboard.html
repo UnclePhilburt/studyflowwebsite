@@ -548,7 +548,7 @@
       }
     }
 
-    // Background stars (generated once)
+    // Background stars
     let bgStars = [];
     function generateStars() {
       bgStars = [];
@@ -563,6 +563,59 @@
       }
     }
     generateStars();
+
+    // Ambient dust particles
+    let dustParticles = [];
+    for (let i = 0; i < 80; i++) {
+      dustParticles.push({
+        x: Math.random() * 4000 - 1000,
+        y: Math.random() * 4000 - 1000,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.15 + 0.03
+      });
+    }
+
+    // Shooting stars
+    let shootingStars = [];
+    function maybeSpawnShootingStar() {
+      if (Math.random() < 0.003 && shootingStars.length < 2) { // ~every 5 sec at 60fps
+        const angle = Math.random() * Math.PI * 0.5 + Math.PI * 0.1;
+        shootingStars.push({
+          x: Math.random() * 3000 - 500,
+          y: Math.random() * 1000 - 500,
+          vx: Math.cos(angle) * 8,
+          vy: Math.sin(angle) * 8,
+          life: 1.0,
+          length: 40 + Math.random() * 60
+        });
+      }
+    }
+
+    // Spark particles (emitted between close nodes)
+    let sparks = [];
+    function emitSparks() {
+      if (sparks.length > 50) return;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          if (nodes[i].university !== nodes[j].university) continue;
+          const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+          if (dist < 80 && Math.random() < 0.02) {
+            const t = Math.random();
+            sparks.push({
+              x: nodes[i].x + (nodes[j].x - nodes[i].x) * t,
+              y: nodes[i].y + (nodes[j].y - nodes[i].y) * t,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: (Math.random() - 0.5) * 0.5,
+              life: 1.0,
+              color: nodes[i].color,
+              size: Math.random() * 2 + 0.5
+            });
+          }
+        }
+      }
+    }
 
     function draw() {
       // Dark space background
@@ -589,6 +642,43 @@
         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
+      });
+
+      // Ambient dust particles
+      dustParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        // Wrap around
+        if (p.x < -1000) p.x = 3000;
+        if (p.x > 3000) p.x = -1000;
+        if (p.y < -1000) p.y = 3000;
+        if (p.y > 3000) p.y = -1000;
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = '#8899aa';
+        ctx.fill();
+      });
+
+      // Shooting stars
+      maybeSpawnShootingStar();
+      shootingStars = shootingStars.filter(s => {
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life -= 0.02;
+        if (s.life <= 0) return false;
+
+        ctx.globalAlpha = s.life * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x - s.vx * s.length / 8, s.y - s.vy * s.length / 8);
+        const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx * s.length / 8, s.y - s.vy * s.length / 8);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(1, 'transparent');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        return true;
       });
 
       // Draw nebula glows around university clusters
@@ -726,6 +816,21 @@
           ctx.fillText('@' + n.username, n.x, n.y + n.size + 16);
           ctx.shadowBlur = 0;
         }
+      });
+
+      // Spark particles between close nodes
+      emitSparks();
+      sparks = sparks.filter(s => {
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life -= 0.015;
+        if (s.life <= 0) return false;
+        ctx.globalAlpha = s.life * 0.6;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.fill();
+        return true;
       });
 
       ctx.restore();
