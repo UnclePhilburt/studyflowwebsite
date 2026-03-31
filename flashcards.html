@@ -1254,16 +1254,22 @@
     }
 
     // Create realtime channel and wait for opponent
-    raceChannel = supabaseClient.channel('race-' + raceCode);
+    raceChannel = supabaseClient.channel('race-' + raceCode, {
+      config: { broadcast: { self: false } }
+    });
     raceChannel.on('broadcast', { event: 'join' }, function(payload) {
-      // Opponent joined! Send them the questions
-      raceChannel.send({ type: 'broadcast', event: 'questions', payload: { questions: raceQuestions, topic: currentTopic } });
-      startRaceCountdown();
+      // Opponent joined! Send them the questions after a brief delay
+      setTimeout(function() {
+        raceChannel.send({ type: 'broadcast', event: 'questions', payload: { questions: raceQuestions, topic: currentTopic } });
+        startRaceCountdown();
+      }, 300);
     });
     raceChannel.on('broadcast', { event: 'progress' }, function(payload) {
       updateOpponent(payload.payload);
     });
-    raceChannel.subscribe();
+    raceChannel.subscribe(function(status) {
+      console.log('Host channel status:', status);
+    });
   }
 
   async function joinChallenge() {
@@ -1277,7 +1283,9 @@
     showScreen('loadingScreen');
     document.getElementById('loadingSubtext').textContent = 'Joining challenge...';
 
-    raceChannel = supabaseClient.channel('race-' + raceCode);
+    raceChannel = supabaseClient.channel('race-' + raceCode, {
+      config: { broadcast: { self: false } }
+    });
     raceChannel.on('broadcast', { event: 'questions' }, function(payload) {
       raceQuestions = payload.payload.questions;
       currentTopic = payload.payload.topic;
@@ -1286,12 +1294,13 @@
     raceChannel.on('broadcast', { event: 'progress' }, function(payload) {
       updateOpponent(payload.payload);
     });
-    await raceChannel.subscribe();
-
-    // Tell host we joined
-    setTimeout(function() {
-      raceChannel.send({ type: 'broadcast', event: 'join', payload: {} });
-    }, 500);
+    raceChannel.subscribe(function(status) {
+      console.log('Joiner channel status:', status);
+      if (status === 'SUBSCRIBED') {
+        // Fully subscribed, now safe to send
+        raceChannel.send({ type: 'broadcast', event: 'join', payload: {} });
+      }
+    });
   }
 
   function startRaceCountdown() {
