@@ -1460,6 +1460,88 @@
       pointer-events: none;
     }
 
+    /* Upgrade banner */
+    .upgrade-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: var(--bg-tertiary);
+      border-top: 1px solid var(--border-color);
+      z-index: 200;
+      backdrop-filter: blur(20px);
+    }
+
+    .upgrade-banner-content {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .upgrade-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upgrade-banner-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .upgrade-banner-text strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .upgrade-banner-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upgrade-banner-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-tertiary);
+    }
+
+    .upgrade-banner-btn {
+      padding: 6px 16px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-tertiary), #d4864a);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .upgrade-banner-btn:hover {
+      box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .upgrade-banner-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .upgrade-banner-close:hover { color: var(--text-primary); }
+
+    @media (max-width: 768px) {
+      .upgrade-banner-text { font-size: 11px; }
+      .upgrade-banner-price { display: none; }
+    }
+
     /* Canvas reset button */
     .canvas-reset {
       position: fixed;
@@ -2041,6 +2123,21 @@
 
   <!-- Add widget button -->
   <button class="add-widget-btn" id="addWidgetBtn" title="Add widget">+</button>
+
+  <!-- Upgrade Banner (free users only) -->
+  <div class="upgrade-banner" id="upgradeBanner" style="display:none;">
+    <div class="upgrade-banner-content">
+      <div class="upgrade-banner-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-tertiary);flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="upgrade-banner-text"><strong>Scholar Plan</strong> -- Unlimited AI chat, priority responses, no limits</span>
+      </div>
+      <div class="upgrade-banner-right">
+        <span class="upgrade-banner-price">$4.99/mo</span>
+        <a href="account.html" class="upgrade-banner-btn">Upgrade</a>
+        <button class="upgrade-banner-close" onclick="dismissBanner()" title="Dismiss">&times;</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Reset canvas view button -->
   <button class="canvas-reset" id="canvasReset" title="Reset view">Reset View</button>
@@ -5320,6 +5417,33 @@
       await loadWidgets();
       updateCanvasTransform();
       renderWidgets();
+
+      // Show upgrade banner for free users
+      checkUpgradeBanner();
+    }
+
+    async function checkUpgradeBanner() {
+      // Check if dismissed in last 24 hours
+      const dismissed = localStorage.getItem('upgrade_banner_dismissed');
+      if (dismissed && Date.now() - parseInt(dismissed) < 86400000) return;
+
+      try {
+        const res = await fetch(BACKEND_URL + '/api/current-user', {
+          headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+        if (res.ok) {
+          const user = await res.json();
+          const tier = user.subscription_tier || user.tier || 'free';
+          if (tier === 'free') {
+            document.getElementById('upgradeBanner').style.display = 'block';
+          }
+        }
+      } catch (e) {}
+    }
+
+    function dismissBanner() {
+      document.getElementById('upgradeBanner').style.display = 'none';
+      localStorage.setItem('upgrade_banner_dismissed', Date.now().toString());
     }
 
     // Start loading widgets
