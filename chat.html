@@ -1724,6 +1724,8 @@
         showEmptyHint('Your workspace is empty', 'Right-click anywhere to create a folder or start a chat');
       }
 
+      // Fit camera to show all content
+      setTimeout(() => fitAllContent(), 50);
     }
 
     function createDraggableFolderCard(folder, x, y, onClick) {
@@ -2083,6 +2085,9 @@
         if (convos.length === 0 && convoElements.length === 0 && stickyNotes.length === 0) {
           showEmptyHint('This folder is empty', 'Right-click to add a chat or subfolder');
         }
+
+        // Fit camera to show all content after a brief render settle
+        setTimeout(() => fitAllContent(), 50);
 
       } catch (e) { console.error('Folder load error:', e); }
     }
@@ -3457,31 +3462,61 @@
     }
 
     // ============ FIT ALL & ZOOM BUTTONS ============
-    function fitAll() {
-      if (cards.length === 0) return;
-
+    function fitAllContent() {
+      // Gather bounding box from all visible elements: cards, folder elements, sticky notes
       let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      let hasContent = false;
+
       cards.forEach(c => {
         const w = c.element.classList.contains('child-card') ? 520 : 550;
         const h = c.element.offsetHeight || 200;
-        minX = Math.min(minX, c.x);
-        minY = Math.min(minY, c.y);
-        maxX = Math.max(maxX, c.x + w);
-        maxY = Math.max(maxY, c.y + h);
+        minX = Math.min(minX, c.x); minY = Math.min(minY, c.y);
+        maxX = Math.max(maxX, c.x + w); maxY = Math.max(maxY, c.y + h);
+        hasContent = true;
       });
+
+      folderElements.forEach(el => {
+        const x = parseFloat(el.style.left) || 0;
+        const y = parseFloat(el.style.top) || 0;
+        minX = Math.min(minX, x); minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x + 180); maxY = Math.max(maxY, y + 140);
+        hasContent = true;
+      });
+
+      convoElements.forEach(el => {
+        const x = parseFloat(el.style.left) || 0;
+        const y = parseFloat(el.style.top) || 0;
+        const w = el.offsetWidth || 180;
+        const h = el.offsetHeight || 140;
+        minX = Math.min(minX, x); minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x + w); maxY = Math.max(maxY, y + h);
+        hasContent = true;
+      });
+
+      stickyNotes.forEach(s => {
+        const el = s.element || document.querySelector(`[data-sticky-id="${s.id}"]`);
+        if (!el) return;
+        const x = parseFloat(el.style.left) || 0;
+        const y = parseFloat(el.style.top) || 0;
+        minX = Math.min(minX, x); minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x + 200); maxY = Math.max(maxY, y + 200);
+        hasContent = true;
+      });
+
+      if (!hasContent) return;
 
       const padding = 120;
       const worldW = (maxX - minX) + padding * 2;
       const worldH = (maxY - minY) + padding * 2;
-      const newScale = Math.min(window.innerWidth / worldW, window.innerHeight / worldH, 1.5);
+      const newScale = Math.min(window.innerWidth / worldW, (window.innerHeight - 60) / worldH, 1.2);
       const cx = (minX + maxX) / 2;
       const cy = (minY + maxY) / 2;
       const targetPanX = window.innerWidth / 2 - cx * newScale;
       const targetPanY = window.innerHeight / 2 - cy * newScale;
 
-      // Animate
+      // Animate smoothly
       const startX = panX, startY = panY, startScale = scale;
-      const duration = 500;
+      const duration = 400;
       const start = performance.now();
       function anim(t) {
         const p = Math.min((t - start) / duration, 1);
@@ -3493,6 +3528,10 @@
         if (p < 1) requestAnimationFrame(anim);
       }
       requestAnimationFrame(anim);
+    }
+
+    function fitAll() {
+      fitAllContent();
     }
 
     document.getElementById('fitAllBtn').addEventListener('click', fitAll);
