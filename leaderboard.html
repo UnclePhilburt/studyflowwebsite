@@ -509,7 +509,7 @@
           n.vy += (dy / dist) * radiusDiff * 0.01;
 
           // Tangential velocity (creates orbiting motion)
-          const orbitSpeed = 0.3 + (1 / (n.size + 1)) * 2;
+          const orbitSpeed = 0.04 + (1 / (n.size + 1)) * 0.15;
           n.vx += (-dy / dist) * orbitSpeed;
           n.vy += (dx / dist) * orbitSpeed;
         }
