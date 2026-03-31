@@ -936,10 +936,12 @@
     showScreen('loadingScreen');
     document.getElementById('loadingSubtext').textContent = 'Searching Nexus notes for "' + topic + '"';
 
-    var prompt = 'IMPORTANT: Return ONLY a JSON array, no other text before or after it. ' +
-      'Generate 15 quiz questions about "' + topic + '". ' +
-      'Each has two answer choices. Format: [{"question":"...","left":"...","right":"...","correct":"left"}] ' +
-      'correct must be "left" or "right". No markdown, no explanation, just the JSON array.';
+    var prompt = 'You are a quiz generator. Generate exactly 15 quiz questions about "' + topic + '". ' +
+      'Use your general knowledge -- do NOT say you lack context or need notes. Just create the questions. ' +
+      'Each question has two answer choices where one is correct. ' +
+      'You MUST respond with ONLY a JSON array, nothing else. No apologies, no explanations, no markdown. ' +
+      'Format: [{"question":"What is...?","left":"Answer A","right":"Answer B","correct":"left"}] ' +
+      'The "correct" field must be either "left" or "right". Return exactly 15 items.';
 
     try {
       var resp = await fetch(BACKEND_URL + '/api/notes/chat', {
