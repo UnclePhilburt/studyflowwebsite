@@ -84,9 +84,352 @@
       overflow: hidden;
       height: 100vh;
       width: 100vw;
-      /* Better mobile touch behavior */
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
+    }
+
+    /* ============ MOBILE CHAT ============ */
+    .mobile-chat { display: none; }
+
+    @media (max-width: 768px) {
+      .mobile-chat {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        background: var(--chat-bg);
+        position: fixed;
+        inset: 0;
+        z-index: 9000;
+      }
+
+      /* Hide desktop canvas stuff */
+      #canvasViewport, .breadcrumb, .canvas-controls, .minimap,
+      .top-btn, #navDrawer, .nav-overlay, .notif-dropdown,
+      #contextMenu, #folderContextMenu { display: none !important; }
+
+      .mc-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: var(--bg-tertiary);
+        border-bottom: 1px solid var(--border-color);
+        min-height: 56px;
+        flex-shrink: 0;
+      }
+
+      .mc-back {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .mc-header-title {
+        font-size: 16px;
+        font-weight: 600;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mc-header-action {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        border: none;
+        background: var(--hover-bg);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .mc-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 16px;
+      }
+
+      /* Folder list view */
+      .mc-folder-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .mc-folder-item:active { transform: scale(0.98); }
+
+      .mc-folder-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .mc-folder-icon svg {
+        width: 20px; height: 20px;
+        fill: #fff;
+        stroke: none;
+      }
+
+      .mc-folder-info { flex: 1; min-width: 0; }
+
+      .mc-folder-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mc-folder-count {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .mc-chevron {
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+
+      /* Conversation list item */
+      .mc-convo-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        margin-bottom: 8px;
+        cursor: pointer;
+      }
+
+      .mc-convo-item:active { transform: scale(0.98); }
+
+      .mc-convo-icon {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        background: var(--hover-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .mc-convo-icon svg {
+        width: 16px; height: 16px;
+        stroke: var(--accent-primary);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .mc-convo-info { flex: 1; min-width: 0; }
+
+      .mc-convo-title {
+        font-size: 14px;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mc-convo-time {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      /* Message view */
+      .mc-messages {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 8px;
+      }
+
+      .mc-msg {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.55;
+        word-break: break-word;
+      }
+
+      .mc-msg.user {
+        align-self: flex-end;
+        background: var(--accent-primary);
+        color: #fff;
+        border-bottom-right-radius: 6px;
+      }
+
+      .mc-msg.assistant {
+        align-self: flex-start;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-bottom-left-radius: 6px;
+        color: var(--text-primary);
+      }
+
+      .mc-msg.assistant .mc-sources {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border-color);
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .mc-msg.assistant .mc-source-tag {
+        display: inline-block;
+        background: var(--hover-bg);
+        border-radius: 6px;
+        padding: 2px 8px;
+        margin: 2px 4px 2px 0;
+        font-size: 10px;
+        color: var(--accent-primary);
+      }
+
+      .mc-typing {
+        align-self: flex-start;
+        padding: 12px 20px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        border-bottom-left-radius: 6px;
+        font-size: 13px;
+        color: var(--text-muted);
+        animation: mcPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes mcPulse {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+
+      /* Input bar */
+      .mc-input-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: var(--bg-tertiary);
+        border-top: 1px solid var(--border-color);
+        flex-shrink: 0;
+      }
+
+      .mc-input-bar input {
+        flex: 1;
+        padding: 12px 16px;
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        background: var(--chat-bg);
+        color: var(--text-primary);
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+      }
+
+      .mc-input-bar input:focus {
+        border-color: var(--accent-primary);
+      }
+
+      .mc-input-bar input::placeholder {
+        color: var(--text-muted);
+      }
+
+      .mc-send-btn {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        border: none;
+        background: var(--accent-primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .mc-send-btn:active { transform: scale(0.92); }
+
+      .mc-send-btn:disabled {
+        opacity: 0.4;
+      }
+
+      .mc-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+      }
+
+      .mc-empty-icon {
+        width: 48px; height: 48px;
+        margin: 0 auto 12px;
+        opacity: 0.3;
+      }
+
+      .mc-empty-text {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .mc-empty-sub {
+        font-size: 12px;
+      }
+
+      .mc-section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        padding: 8px 4px 6px;
+      }
+
+      .mc-new-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px;
+        background: var(--hover-bg);
+        border: 1px dashed var(--border-color);
+        border-radius: 14px;
+        color: var(--accent-primary);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 12px;
+        font-family: inherit;
+      }
+
+      .mc-new-btn:active { transform: scale(0.98); }
     }
 
     /* ============ CANVAS ============ */
@@ -1388,6 +1731,26 @@
 <body>
   <!-- Apply saved theme -->
   <script>(function(){ document.body.setAttribute('data-theme', localStorage.getItem('dashboard-theme') || 'default'); })();</script>
+
+  <!-- Mobile Chat -->
+  <div class="mobile-chat" id="mobileChat">
+    <div class="mc-header" id="mcHeader">
+      <button class="mc-back" id="mcBack" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="mc-header-title" id="mcTitle">Chats</div>
+      <a href="dashboard.html" class="mc-header-action" title="Dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </a>
+    </div>
+    <div class="mc-body" id="mcBody"></div>
+    <div class="mc-input-bar" id="mcInputBar" style="display:none;">
+      <input type="text" id="mcInput" placeholder="Ask anything..." autocomplete="off" />
+      <button class="mc-send-btn" id="mcSendBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
 
   <!-- Canvas -->
   <div id="canvasViewport">
@@ -4195,6 +4558,12 @@
 
       fetchNotifications();
 
+      // Mobile: use simple linear chat instead of canvas
+      if (window.innerWidth <= 768) {
+        initMobileChat();
+        return;
+      }
+
       // Preload ALL canvas data in one request
       await preloadCanvas();
 
@@ -4255,6 +4624,402 @@
       const tip = document.getElementById('chatTutorial');
       if (tip) tip.remove();
       localStorage.setItem('chat_onboarded', '1');
+    }
+
+    // ============ MOBILE CHAT ============
+    let mcView = 'home'; // 'home', 'folder', 'conversation'
+    let mcFolderId = null;
+    let mcFolderName = '';
+    let mcConvoId = null;
+    let mcSending = false;
+    let mcPreloaded = null;
+
+    async function initMobileChat() {
+      // Load all data
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/canvas/preload`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) mcPreloaded = await res.json();
+      } catch(e) {}
+
+      mcPreloaded = mcPreloaded || { folders: [], conversations: [], sticky_notes: [] };
+
+      // Wire up input
+      document.getElementById('mcSendBtn').addEventListener('click', mcSend);
+      document.getElementById('mcInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); mcSend(); }
+      });
+
+      document.getElementById('mcBack').addEventListener('click', mcGoBack);
+
+      // Check URL param
+      const urlConv = new URLSearchParams(window.location.search).get('c');
+      if (urlConv) {
+        mcOpenConversation(urlConv, 'Chat');
+      } else {
+        mcShowHome();
+      }
+    }
+
+    function mcShowHome() {
+      mcView = 'home';
+      mcFolderId = null;
+      mcConvoId = null;
+      document.getElementById('mcBack').style.display = 'none';
+      document.getElementById('mcTitle').textContent = 'Chats';
+      document.getElementById('mcInputBar').style.display = 'none';
+
+      const body = document.getElementById('mcBody');
+      let html = '';
+
+      // New chat button
+      html += `<button class="mc-new-btn" onclick="mcStartNewChat()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </button>`;
+
+      // Folders
+      const folders = (mcPreloaded.folders || []).filter(f => !f.parent_id);
+      if (folders.length > 0) {
+        html += '<div class="mc-section-label">Folders</div>';
+        folders.forEach(f => {
+          const count = (mcPreloaded.conversations || []).filter(c => c.folder_id === f.id).length;
+          const color = f.color || '#7c9885';
+          html += `<div class="mc-folder-item" onclick="mcOpenFolder('${f.id}', '${(f.name||'Folder').replace(/'/g,"\\'")}')">
+            <div class="mc-folder-icon" style="background:${color};">
+              <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="mc-folder-info">
+              <div class="mc-folder-name">${f.name || 'Folder'}</div>
+              <div class="mc-folder-count">${count} chat${count !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="mc-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </div>`;
+        });
+      }
+
+      // Unfiled conversations
+      const unfiled = (mcPreloaded.conversations || []).filter(c => !c.folder_id);
+      if (unfiled.length > 0) {
+        html += '<div class="mc-section-label">Recent</div>';
+        unfiled.forEach(c => {
+          const time = c.updated_at ? mcTimeAgo(c.updated_at) : '';
+          html += mcConvoItemHtml(c, time);
+        });
+      }
+
+      if (folders.length === 0 && unfiled.length === 0) {
+        html += `<div class="mc-empty">
+          <div class="mc-empty-text">No chats yet</div>
+          <div class="mc-empty-sub">Tap "New Chat" to get started</div>
+        </div>`;
+      }
+
+      body.innerHTML = html;
+    }
+
+    function mcOpenFolder(folderId, folderName) {
+      mcView = 'folder';
+      mcFolderId = folderId;
+      mcFolderName = folderName;
+      mcConvoId = null;
+      document.getElementById('mcBack').style.display = 'flex';
+      document.getElementById('mcTitle').textContent = folderName;
+      document.getElementById('mcInputBar').style.display = 'none';
+
+      const body = document.getElementById('mcBody');
+      let html = '';
+
+      // New chat in folder
+      html += `<button class="mc-new-btn" onclick="mcStartNewChat()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </button>`;
+
+      // Subfolders
+      const subs = (mcPreloaded.folders || []).filter(f => f.parent_id === folderId);
+      subs.forEach(f => {
+        const count = (mcPreloaded.conversations || []).filter(c => c.folder_id === f.id).length;
+        const color = f.color || '#7c9885';
+        html += `<div class="mc-folder-item" onclick="mcOpenFolder('${f.id}', '${(f.name||'Folder').replace(/'/g,"\\'")}')">
+          <div class="mc-folder-icon" style="background:${color};">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="mc-folder-info">
+            <div class="mc-folder-name">${f.name || 'Folder'}</div>
+            <div class="mc-folder-count">${count} chat${count !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="mc-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>`;
+      });
+
+      // Conversations in folder
+      const convos = (mcPreloaded.conversations || []).filter(c => c.folder_id === folderId);
+      convos.forEach(c => {
+        const time = c.updated_at ? mcTimeAgo(c.updated_at) : '';
+        html += mcConvoItemHtml(c, time);
+      });
+
+      if (subs.length === 0 && convos.length === 0) {
+        html += `<div class="mc-empty">
+          <div class="mc-empty-text">Empty folder</div>
+          <div class="mc-empty-sub">Tap "New Chat" to start</div>
+        </div>`;
+      }
+
+      body.innerHTML = html;
+    }
+
+    function mcConvoItemHtml(c, time) {
+      const title = c.title || 'New Chat';
+      const safeTitle = title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<div class="mc-convo-item" onclick="mcOpenConversation('${c.id}', '${title.replace(/'/g,"\\'")}')">
+        <div class="mc-convo-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="mc-convo-info">
+          <div class="mc-convo-title">${safeTitle}</div>
+          <div class="mc-convo-time">${time}</div>
+        </div>
+        <div class="mc-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>`;
+    }
+
+    async function mcOpenConversation(convId, title) {
+      mcView = 'conversation';
+      mcConvoId = convId;
+      document.getElementById('mcBack').style.display = 'flex';
+      document.getElementById('mcTitle').textContent = title || 'Chat';
+      document.getElementById('mcInputBar').style.display = 'flex';
+
+      const body = document.getElementById('mcBody');
+      body.innerHTML = '<div class="mc-empty"><div class="mc-empty-text">Loading...</div></div>';
+
+      // Get messages from preloaded data or fetch
+      let messages = [];
+      const preConv = mcPreloaded?.conversations?.find(c => c.id === convId);
+      if (preConv && preConv.messages) {
+        messages = preConv.messages;
+      } else {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/conversations/${convId}/messages`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            messages = data.messages || [];
+          }
+        } catch(e) {}
+      }
+
+      mcRenderMessages(messages);
+      // Scroll to bottom
+      setTimeout(() => { body.scrollTop = body.scrollHeight; }, 50);
+
+      // Focus input
+      document.getElementById('mcInput').focus();
+    }
+
+    function mcRenderMessages(messages) {
+      const body = document.getElementById('mcBody');
+      if (messages.length === 0) {
+        body.innerHTML = `<div class="mc-messages"><div class="mc-empty">
+          <div class="mc-empty-text">Start the conversation</div>
+          <div class="mc-empty-sub">Ask anything about your notes</div>
+        </div></div>`;
+        return;
+      }
+
+      let html = '<div class="mc-messages">';
+      messages.forEach(msg => {
+        const role = msg.role || 'user';
+        let content = msg.content || '';
+        // Basic markdown: bold, italic, code
+        content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        content = content.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:4px;font-size:13px;">$1</code>');
+        content = content.replace(/\n/g, '<br>');
+
+        html += `<div class="mc-msg ${role}">${content}`;
+
+        // Sources
+        if (role === 'assistant' && msg.sources && msg.sources.length > 0) {
+          html += '<div class="mc-sources">Sources: ';
+          msg.sources.forEach(s => {
+            const name = s.filename || s.original_filename || 'Note';
+            html += `<span class="mc-source-tag">${name}</span>`;
+          });
+          html += '</div>';
+        }
+
+        html += '</div>';
+      });
+      html += '</div>';
+      body.innerHTML = html;
+    }
+
+    async function mcSend() {
+      if (mcSending) return;
+      const input = document.getElementById('mcInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      mcSending = true;
+      document.getElementById('mcSendBtn').disabled = true;
+
+      const body = document.getElementById('mcBody');
+      let msgsContainer = body.querySelector('.mc-messages');
+      if (!msgsContainer) {
+        body.innerHTML = '<div class="mc-messages"></div>';
+        msgsContainer = body.querySelector('.mc-messages');
+      }
+
+      // Remove empty state
+      const empty = msgsContainer.querySelector('.mc-empty');
+      if (empty) empty.remove();
+
+      // Add user message
+      const userBubble = document.createElement('div');
+      userBubble.className = 'mc-msg user';
+      userBubble.textContent = text;
+      msgsContainer.appendChild(userBubble);
+
+      // Add typing indicator
+      const typing = document.createElement('div');
+      typing.className = 'mc-typing';
+      typing.textContent = 'Thinking...';
+      msgsContainer.appendChild(typing);
+      body.scrollTop = body.scrollHeight;
+
+      try {
+        const reqBody = { message: text };
+        if (mcConvoId) reqBody.conversation_id = mcConvoId;
+
+        const res = await fetch(`${BACKEND_URL}/api/notes/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify(reqBody)
+        });
+
+        typing.remove();
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (data.conversation_id) {
+          mcConvoId = data.conversation_id;
+
+          // If in folder, move convo into it
+          if (mcFolderId) {
+            fetch(`${BACKEND_URL}/api/conversations/${data.conversation_id}/move`, {
+              method: 'PUT',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ folder_id: mcFolderId })
+            }).catch(() => {});
+          }
+
+          // Update title in header if this is a new conversation
+          if (data.title) {
+            document.getElementById('mcTitle').textContent = data.title;
+          }
+        }
+
+        // Add assistant bubble
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'mc-msg assistant';
+        let responseText = (data.response || 'Sorry, something went wrong.').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        responseText = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        responseText = responseText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        responseText = responseText.replace(/`([^`]+)`/g, '<code style="background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:4px;font-size:13px;">$1</code>');
+        responseText = responseText.replace(/\n/g, '<br>');
+        let bubbleHtml = responseText;
+
+        if (data.sources && data.sources.length > 0) {
+          bubbleHtml += '<div class="mc-sources">Sources: ';
+          data.sources.forEach(s => {
+            const name = s.filename || s.original_filename || 'Note';
+            bubbleHtml += `<span class="mc-source-tag">${name}</span>`;
+          });
+          bubbleHtml += '</div>';
+        }
+
+        aiBubble.innerHTML = bubbleHtml;
+        msgsContainer.appendChild(aiBubble);
+
+        body.scrollTop = body.scrollHeight;
+
+        // Invalidate preload so new convo shows in lists
+        mcPreloaded = null;
+
+      } catch (err) {
+        typing.remove();
+        const errBubble = document.createElement('div');
+        errBubble.className = 'mc-msg assistant';
+        errBubble.textContent = 'Sorry, something went wrong. Please try again.';
+        msgsContainer.appendChild(errBubble);
+      }
+
+      mcSending = false;
+      document.getElementById('mcSendBtn').disabled = false;
+      input.focus();
+    }
+
+    async function mcStartNewChat() {
+      mcConvoId = null;
+      mcView = 'conversation';
+      document.getElementById('mcBack').style.display = 'flex';
+      document.getElementById('mcTitle').textContent = 'New Chat';
+      document.getElementById('mcInputBar').style.display = 'flex';
+
+      const body = document.getElementById('mcBody');
+      body.innerHTML = `<div class="mc-messages"><div class="mc-empty">
+        <div class="mc-empty-text">Start a conversation</div>
+        <div class="mc-empty-sub">Ask anything about your notes</div>
+      </div></div>`;
+
+      document.getElementById('mcInput').focus();
+    }
+
+    async function mcGoBack() {
+      if (mcView === 'conversation') {
+        // Re-fetch data if it was invalidated
+        if (!mcPreloaded) {
+          try {
+            const res = await fetch(`${BACKEND_URL}/api/canvas/preload`, {
+              headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+            if (res.ok) mcPreloaded = await res.json();
+          } catch(e) {}
+          mcPreloaded = mcPreloaded || { folders: [], conversations: [], sticky_notes: [] };
+        }
+
+        if (mcFolderId) {
+          mcOpenFolder(mcFolderId, mcFolderName);
+        } else {
+          mcShowHome();
+        }
+      } else if (mcView === 'folder') {
+        // Check if this folder has a parent
+        const folder = (mcPreloaded?.folders || []).find(f => f.id === mcFolderId);
+        if (folder && folder.parent_id) {
+          const parent = (mcPreloaded?.folders || []).find(f => f.id === folder.parent_id);
+          mcOpenFolder(folder.parent_id, parent?.name || 'Folder');
+        } else {
+          mcShowHome();
+        }
+      }
+    }
+
+    function mcTimeAgo(dateStr) {
+      const now = new Date();
+      const d = new Date(dateStr);
+      const diff = Math.floor((now - d) / 1000);
+      if (diff < 60) return 'now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
 
     init();
