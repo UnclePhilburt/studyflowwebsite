@@ -1872,18 +1872,16 @@
         <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Note Details</div>
 
         <!-- Privacy Toggle -->
-        <div style="margin-bottom:16px;">
-          <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:12px;" onclick="toggleNexusSwitch(event)">
-            <div style="min-width:0;flex:1;">
-              <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Share with Nexus</div>
-              <div style="font-size:12px;color:var(--text-secondary);">Make this note public and contribute to the knowledge base</div>
-            </div>
-            <div class="toggle-switch" id="nexusToggle" style="position:relative;width:50px;min-width:50px;height:28px;flex-shrink:0;">
-              <input type="checkbox" id="shareWithNexus" checked style="position:absolute;opacity:0;width:0;height:0;">
-              <span style="position:absolute;top:0;left:0;right:0;bottom:0;background:var(--accent-primary);border-radius:28px;transition:background 0.3s;"></span>
-              <span class="toggle-knob" style="position:absolute;height:22px;width:22px;left:24px;top:3px;background:white;border-radius:50%;transition:left 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
-            </div>
-          </label>
+        <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;" onclick="toggleNexusSwitch(event)">
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Share with Nexus</div>
+            <div style="font-size:12px;color:var(--text-secondary);">Make this note public and contribute to the knowledge base</div>
+          </div>
+          <input type="checkbox" id="shareWithNexus" checked style="display:none;">
+          <div id="nexusToggle" style="position:relative;width:50px;min-width:50px;height:28px;flex-shrink:0;cursor:pointer;">
+            <div id="nexusTrack" style="position:absolute;top:0;left:0;right:0;bottom:0;background:var(--accent-primary);border-radius:28px;transition:background 0.3s;"></div>
+            <div id="nexusKnob" style="position:absolute;height:22px;width:22px;left:24px;top:3px;background:white;border-radius:50%;transition:left 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+          </div>
         </div>
 
         <!-- University Field -->
@@ -2588,20 +2586,11 @@
 
     function toggleNexusSwitch(event) {
       event.preventDefault();
+      event.stopPropagation();
       const checkbox = document.getElementById('shareWithNexus');
       checkbox.checked = !checkbox.checked;
-
-      const toggleEl = document.getElementById('nexusToggle');
-      const track = toggleEl.querySelector('span:first-of-type');
-      const knob = toggleEl.querySelector('.toggle-knob');
-
-      if (checkbox.checked) {
-        track.style.background = 'var(--accent-primary)';
-        knob.style.left = '24px';
-      } else {
-        track.style.background = 'var(--text-muted)';
-        knob.style.left = '4px';
-      }
+      document.getElementById('nexusTrack').style.background = checkbox.checked ? 'var(--accent-primary)' : 'var(--text-muted)';
+      document.getElementById('nexusKnob').style.left = checkbox.checked ? '24px' : '4px';
     }
 
     async function startUpload() {
