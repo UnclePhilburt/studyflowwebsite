@@ -2030,6 +2030,7 @@
           let lastCardId = null;
           let pendingQuestion = null;
           let fallbackY = 0;
+          let firstCard = null;
 
           for (const msg of messages) {
             if (msg.role === 'user') {
@@ -2058,11 +2059,20 @@
                 if (btn) btn.textContent = '+';
               }
 
+              if (!firstCard) firstCard = card;
+
               if (!saved) fallbackY += (card.element.offsetHeight || 200) + 100;
               clusterX = Math.max(clusterX, cx + 600);
               lastCardId = card.id;
               pendingQuestion = null;
             }
+          }
+
+          // Link title to first card
+          if (firstCard) {
+            firstCard._titleLabel = titleLabel;
+            titleLabel.style.left = firstCard.x + 'px';
+            titleLabel.style.top = (firstCard.y - 36) + 'px';
           }
 
           // Follow-up bubbles on leaf cards
@@ -2344,12 +2354,13 @@
           const clusterOffsetX = clusterX;
           const clusterOffsetY = 0;
 
-          // Title label
+          // Title label (will be positioned relative to first card)
           const titleLabel = document.createElement('div');
           titleLabel.className = 'cluster-title';
           titleLabel.textContent = conv.title || 'New Chat';
           titleLabel.style.left = clusterOffsetX + 'px';
           titleLabel.style.top = (clusterOffsetY - 40) + 'px';
+          titleLabel.style.position = 'absolute';
           world.appendChild(titleLabel);
           convoElements.push(titleLabel);
 
@@ -2413,6 +2424,13 @@
               lastCardId = card.id;
               pendingQuestion = null;
             }
+          }
+
+          // Link title label to first card so it follows during drag
+          if (firstCardInCluster) {
+            firstCardInCluster._titleLabel = titleLabel;
+            titleLabel.style.left = firstCardInCluster.x + 'px';
+            titleLabel.style.top = (firstCardInCluster.y - 36) + 'px';
           }
 
           // Add follow-up bubbles to leaf cards of this cluster
@@ -2682,6 +2700,10 @@
           card.y = dragOffsetY + dy;
           card.element.style.left = card.x + 'px';
           card.element.style.top = card.y + 'px';
+          if (card._titleLabel) {
+            card._titleLabel.style.left = card.x + 'px';
+            card._titleLabel.style.top = (card.y - 36) + 'px';
+          }
           updateFollowupPositions(card);
           updateConnections();
         }
@@ -2936,6 +2958,10 @@
             cardObj.y = dragOffsetY + moveY;
             cardObj.element.style.left = cardObj.x + 'px';
             cardObj.element.style.top = cardObj.y + 'px';
+            if (cardObj._titleLabel) {
+              cardObj._titleLabel.style.left = cardObj.x + 'px';
+              cardObj._titleLabel.style.top = (cardObj.y - 36) + 'px';
+            }
             updateFollowupPositions(cardObj);
             updateConnections();
           }
