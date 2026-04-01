@@ -2378,6 +2378,7 @@
                data-type="folder"
                draggable="${isGridMode}"
                ondblclick="openFolder('${folder.id}')"
+               onclick="if(window.innerWidth<=768)openFolder('${folder.id}')"
                oncontextmenu="showContextMenu(event, '${folder.id}', 'folder')"
                ${isGridMode ? 'ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)"' : ''}
                ${style}>
