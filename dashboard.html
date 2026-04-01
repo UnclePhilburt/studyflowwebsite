@@ -2215,76 +2215,222 @@
     }
 
     /* ============ MOBILE HUB ============ */
-    .mobile-hub {
-      display: none;
-    }
+    .mobile-hub { display: none; }
 
     @media (max-width: 768px) {
       .mobile-hub {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        min-height: 100dvh;
         background: var(--bg-primary);
-        padding: 0 16px 100px;
+        padding: 0 0 40px;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
 
-      /* Hide desktop-only elements on mobile */
-      .canvas-container,
-      .canvas-reset,
-      #zoomControls,
-      .add-widget-btn,
-      .dock,
-      .upgrade-banner {
-        display: none !important;
-      }
+      .canvas-container, .canvas-reset, #zoomControls, .add-widget-btn,
+      .dock, .upgrade-banner { display: none !important; }
 
       .top-nav {
-        position: sticky;
-        top: 0;
-        right: auto;
-        left: auto;
-        padding: 14px 0;
+        position: sticky; top: 0; right: auto; left: auto;
+        padding: 12px 16px;
         justify-content: flex-end;
         z-index: 100;
         background: var(--bg-primary);
       }
 
-      .mobile-hub-header {
-        padding: 8px 0 24px;
+      /* Hero header with avatar */
+      .mh-hero {
+        padding: 4px 20px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
       }
 
-      .mobile-hub-greeting {
+      .mh-avatar {
+        width: 52px; height: 52px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+        color: #fff;
+        font-size: 20px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(124,152,133,0.25);
+      }
+
+      .mh-greeting {
         font-family: 'Lora', serif;
-        font-size: 28px;
+        font-size: 22px;
         font-weight: 600;
         color: var(--text-primary);
-        margin-bottom: 4px;
+        line-height: 1.2;
       }
 
-      .mobile-hub-sub {
-        font-size: 14px;
+      .mh-sub {
+        font-size: 13px;
         color: var(--text-secondary);
+        margin-top: 2px;
       }
 
-      .mobile-hub-section {
+      /* Quick actions: horizontal scroll row */
+      .mh-quick-actions {
+        display: flex;
+        gap: 10px;
+        padding: 0 20px 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .mh-quick-actions::-webkit-scrollbar { display: none; }
+
+      .mh-quick-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        color: #fff;
+        border-radius: 24px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        flex-shrink: 0;
+        box-shadow: 0 3px 12px rgba(124,152,133,0.2);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .mh-quick-btn:active { transform: scale(0.96); }
+
+      .mh-quick-btn svg {
+        width: 16px; height: 16px;
+        stroke: #fff; fill: none;
+        stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      }
+
+      .mh-quick-btn.secondary {
+        background: var(--widget-bg);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        box-shadow: none;
+      }
+
+      .mh-quick-btn.secondary svg { stroke: var(--accent-primary); }
+
+      /* Continue section */
+      .mh-continue {
+        padding: 0 16px 16px;
+      }
+
+      .mh-continue-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        text-decoration: none;
+        color: var(--text-primary);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .mh-continue-card:active { transform: scale(0.98); }
+
+      .mh-continue-icon {
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        background: var(--widget-bg);
+        border: 1px solid var(--border-color);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .mh-continue-icon svg {
+        width: 18px; height: 18px;
+        stroke: var(--accent-primary); fill: none;
+        stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+      }
+
+      .mh-continue-info { flex: 1; min-width: 0; }
+
+      .mh-continue-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 3px;
+      }
+
+      .mh-continue-title {
+        font-size: 14px;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mh-continue-chevron {
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+
+      /* Stats row */
+      .mobile-stats-row {
+        display: flex;
+        gap: 8px;
+        padding: 0 16px;
         margin-bottom: 20px;
       }
 
-      .mobile-hub-section-title {
-        font-size: 12px;
-        font-weight: 600;
+      .mobile-stat {
+        flex: 1;
+        background: var(--widget-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 14px 10px;
+        text-align: center;
+      }
+
+      .mobile-stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--accent-primary);
+        line-height: 1;
+      }
+
+      .mobile-stat-label {
+        font-size: 9px;
+        color: var(--text-muted);
+        margin-top: 4px;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
+        letter-spacing: 0.6px;
+        font-weight: 500;
+      }
+
+      /* Section titles */
+      .mobile-hub-section {
+        margin-bottom: 20px;
+        padding: 0 16px;
+      }
+
+      .mobile-hub-section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         color: var(--text-muted);
         margin-bottom: 10px;
       }
 
+      /* Nav grid */
       .mobile-nav-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
       }
 
       .mobile-nav-card {
@@ -2292,63 +2438,49 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        padding: 20px 12px;
+        gap: 8px;
+        padding: 16px 8px;
         background: var(--widget-bg);
         border: 1px solid var(--border-color);
-        border-radius: 16px;
+        border-radius: 14px;
         text-decoration: none;
         color: var(--text-primary);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
         -webkit-tap-highlight-color: transparent;
+        transition: transform 0.12s ease;
       }
 
-      .mobile-nav-card:active {
-        transform: scale(0.97);
-        box-shadow: 0 2px 8px var(--shadow);
-      }
+      .mobile-nav-card:active { transform: scale(0.95); }
 
       .mobile-nav-card svg {
-        width: 28px;
-        height: 28px;
+        width: 24px; height: 24px;
         stroke: var(--accent-primary);
-        fill: none;
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+        fill: none; stroke-width: 1.5;
+        stroke-linecap: round; stroke-linejoin: round;
       }
 
       .mobile-nav-card-label {
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 11px;
+        font-weight: 600;
       }
 
-      .mobile-nav-card-desc {
-        font-size: 11px;
-        color: var(--text-muted);
-        text-align: center;
-        line-height: 1.3;
-      }
+      .mobile-nav-card-desc { display: none; }
 
       .mobile-nav-card.full-width {
-        grid-column: 1 / -1;
-        flex-direction: row;
-        justify-content: flex-start;
-        padding: 16px 20px;
-        gap: 14px;
+        grid-column: auto;
+        flex-direction: column;
+        padding: 16px 8px;
+        gap: 8px;
       }
 
-      .mobile-nav-card.full-width .mobile-nav-card-text {
-        text-align: left;
-      }
+      .mobile-nav-card.full-width .mobile-nav-card-text { text-align: center; }
 
-      /* Mobile upgrade banner */
+      /* Upgrade banner */
       .mobile-upgrade-banner {
         display: none;
         background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-        border-radius: 16px;
-        padding: 16px 20px;
-        margin-bottom: 20px;
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin: 0 16px 16px;
         color: #fff;
       }
 
@@ -2358,59 +2490,21 @@
         justify-content: space-between;
       }
 
-      .mobile-upgrade-text {
-        font-size: 13px;
-        font-weight: 500;
-      }
+      .mobile-upgrade-text { font-size: 13px; font-weight: 500; }
 
       .mobile-upgrade-btn {
         background: rgba(255,255,255,0.25);
-        border: none;
-        border-radius: 10px;
+        border: none; border-radius: 10px;
         padding: 8px 16px;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        flex-shrink: 0;
+        color: #fff; font-size: 12px; font-weight: 600;
+        cursor: pointer; text-decoration: none; flex-shrink: 0;
       }
 
-      /* Quick stats row */
-      .mobile-stats-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
-
-      .mobile-stat {
-        flex: 1;
-        background: var(--widget-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 14px 12px;
-        text-align: center;
-      }
-
-      .mobile-stat-value {
-        font-size: 22px;
-        font-weight: 600;
-        color: var(--accent-primary);
-      }
-
-      .mobile-stat-label {
-        font-size: 10px;
-        color: var(--text-muted);
-        margin-top: 2px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      /* Recent activity section */
+      /* Recent list */
       .mobile-recent-list {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
       }
 
       .mobile-recent-item {
@@ -2423,39 +2517,64 @@
         border-radius: 12px;
         text-decoration: none;
         color: var(--text-primary);
+        -webkit-tap-highlight-color: transparent;
       }
 
+      .mobile-recent-item:active { background: var(--hover-bg); }
+
       .mobile-recent-item svg {
-        width: 18px;
-        height: 18px;
-        stroke: var(--text-muted);
-        fill: none;
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+        width: 18px; height: 18px;
+        stroke: var(--text-muted); fill: none;
+        stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
         flex-shrink: 0;
       }
 
       .mobile-recent-title {
-        font-size: 13px;
-        font-weight: 500;
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        font-size: 13px; font-weight: 500;
+        flex: 1; overflow: hidden;
+        text-overflow: ellipsis; white-space: nowrap;
       }
 
       .mobile-recent-time {
-        font-size: 11px;
-        color: var(--text-muted);
-        flex-shrink: 0;
+        font-size: 11px; color: var(--text-muted); flex-shrink: 0;
       }
 
       .mobile-empty {
-        text-align: center;
-        padding: 20px;
-        color: var(--text-muted);
+        text-align: center; padding: 20px;
+        color: var(--text-muted); font-size: 13px;
+      }
+
+      /* Settings row at bottom */
+      .mh-settings-row {
+        display: flex;
+        gap: 8px;
+        padding: 0 16px;
+        margin-top: 8px;
+      }
+
+      .mh-settings-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: var(--widget-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--text-secondary);
         font-size: 13px;
+        font-weight: 500;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .mh-settings-btn:active { background: var(--hover-bg); }
+
+      .mh-settings-btn svg {
+        width: 16px; height: 16px;
+        stroke: var(--text-muted); fill: none;
+        stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
       }
     }
   </style>
@@ -2508,16 +2627,52 @@
 
   <!-- Mobile Hub -->
   <div class="mobile-hub" id="mobileHub">
-    <div class="mobile-hub-header">
-      <div class="mobile-hub-greeting" id="mobileGreeting">Welcome back</div>
-      <div class="mobile-hub-sub" id="mobileSub">Your study hub</div>
+    <!-- Hero: avatar + greeting -->
+    <div class="mh-hero">
+      <div class="mh-avatar" id="mhAvatar">S</div>
+      <div>
+        <div class="mh-greeting" id="mobileGreeting">Welcome back</div>
+        <div class="mh-sub" id="mobileSub">Your study hub</div>
+      </div>
     </div>
 
+    <!-- Quick action pills -->
+    <div class="mh-quick-actions">
+      <a href="chat.html" class="mh-quick-btn">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </a>
+      <a href="browse.html" class="mh-quick-btn secondary">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Browse Nexus
+      </a>
+      <a href="flashcards.html" class="mh-quick-btn secondary">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/></svg>
+        Flashcards
+      </a>
+    </div>
+
+    <!-- Continue where you left off -->
+    <div class="mh-continue" id="mhContinue" style="display:none;">
+      <a href="#" class="mh-continue-card" id="mhContinueCard">
+        <div class="mh-continue-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="mh-continue-info">
+          <div class="mh-continue-label">Continue</div>
+          <div class="mh-continue-title" id="mhContinueTitle">...</div>
+        </div>
+        <div class="mh-continue-chevron"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </a>
+    </div>
+
+    <!-- Upgrade banner -->
     <div class="mobile-upgrade-banner" id="mobileUpgradeBanner">
       <span class="mobile-upgrade-text">Upgrade to Scholar Plan</span>
       <a href="account.html" class="mobile-upgrade-btn">$4.99/mo</a>
     </div>
 
+    <!-- Stats -->
     <div class="mobile-stats-row" id="mobileStats">
       <div class="mobile-stat">
         <div class="mobile-stat-value" id="mobileStatNotes">--</div>
@@ -2533,68 +2688,7 @@
       </div>
     </div>
 
-    <div class="mobile-hub-section">
-      <div class="mobile-hub-section-title">Navigate</div>
-      <div class="mobile-nav-grid">
-        <a href="chat.html" class="mobile-nav-card">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Chat</div>
-            <div class="mobile-nav-card-desc">AI study assistant</div>
-          </div>
-        </a>
-        <a href="notes.html" class="mobile-nav-card">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Notes</div>
-            <div class="mobile-nav-card-desc">Your uploads</div>
-          </div>
-        </a>
-        <a href="browse.html" class="mobile-nav-card">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Nexus</div>
-            <div class="mobile-nav-card-desc">Browse notes</div>
-          </div>
-        </a>
-        <a href="office.html" class="mobile-nav-card">
-          <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Office</div>
-            <div class="mobile-nav-card-desc">Documents</div>
-          </div>
-        </a>
-        <a href="study-groups.html" class="mobile-nav-card">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Groups</div>
-            <div class="mobile-nav-card-desc">Study together</div>
-          </div>
-        </a>
-        <a href="flashcards.html" class="mobile-nav-card">
-          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Flashcards</div>
-            <div class="mobile-nav-card-desc">Quiz yourself</div>
-          </div>
-        </a>
-        <a href="leaderboard.html" class="mobile-nav-card full-width">
-          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Leaderboard</div>
-            <div class="mobile-nav-card-desc">See top contributors</div>
-          </div>
-        </a>
-        <a href="calendar.html" class="mobile-nav-card full-width">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <div class="mobile-nav-card-text">
-            <div class="mobile-nav-card-label">Calendar</div>
-            <div class="mobile-nav-card-desc">Upcoming events</div>
-          </div>
-        </a>
-      </div>
-    </div>
-
+    <!-- Recent chats -->
     <div class="mobile-hub-section">
       <div class="mobile-hub-section-title">Recent Chats</div>
       <div class="mobile-recent-list" id="mobileRecentChats">
@@ -2602,15 +2696,55 @@
       </div>
     </div>
 
+    <!-- Navigate -->
     <div class="mobile-hub-section">
-      <div class="mobile-hub-section-title">Account</div>
-      <div class="mobile-recent-list">
-        <a href="account.html" class="mobile-recent-item">
-          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span class="mobile-recent-title">Account Settings</span>
-          <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--text-muted);"><polyline points="9 18 15 12 9 6"/></svg>
+      <div class="mobile-hub-section-title">Navigate</div>
+      <div class="mobile-nav-grid">
+        <a href="chat.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Chat</div></div>
+        </a>
+        <a href="notes.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Notes</div></div>
+        </a>
+        <a href="browse.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Nexus</div></div>
+        </a>
+        <a href="office.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Office</div></div>
+        </a>
+        <a href="study-groups.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Groups</div></div>
+        </a>
+        <a href="flashcards.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Flashcards</div></div>
+        </a>
+        <a href="leaderboard.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Leaders</div></div>
+        </a>
+        <a href="calendar.html" class="mobile-nav-card">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <div class="mobile-nav-card-text"><div class="mobile-nav-card-label">Calendar</div></div>
         </a>
       </div>
+    </div>
+
+    <!-- Bottom row: Account + Settings -->
+    <div class="mh-settings-row">
+      <a href="account.html" class="mh-settings-btn">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Account
+      </a>
+      <button class="mh-settings-btn" onclick="logout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
     </div>
   </div>
 
@@ -5942,12 +6076,13 @@
     }
 
     async function initMobileHub() {
-      // Greeting with time of day
       const hour = new Date().getHours();
       const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
       const email = currentUser?.email || '';
-      const name = email.split('@')[0] || '';
-      document.getElementById('mobileGreeting').textContent = timeGreeting + (name ? ', ' + name : '');
+      const initial = (email.charAt(0) || 'S').toUpperCase();
+      document.getElementById('mhAvatar').textContent = initial;
+      document.getElementById('mobileGreeting').textContent = timeGreeting;
+      document.getElementById('mobileSub').textContent = 'Ready to study?';
 
       // Load stats, recent chats, and upgrade status in parallel
       const [statsData, chatsData, userData] = await Promise.allSettled([
@@ -5956,7 +6091,6 @@
         fetch(BACKEND_URL + '/api/current-user', { headers: { 'Authorization': 'Bearer ' + authToken } }).then(r => r.ok ? r.json() : null)
       ]);
 
-      // Stats
       const notes = statsData.status === 'fulfilled' ? (Array.isArray(statsData.value) ? statsData.value : []) : [];
       const convos = chatsData.status === 'fulfilled' ? (chatsData.value.conversations || []) : [];
       document.getElementById('mobileStatNotes').textContent = notes.length;
@@ -5971,15 +6105,23 @@
         }
       } catch(e) { document.getElementById('mobileStatGroups').textContent = '0'; }
 
+      // Continue where you left off
+      if (convos.length > 0) {
+        const lastConvo = convos[0];
+        document.getElementById('mhContinue').style.display = 'block';
+        document.getElementById('mhContinueTitle').textContent = lastConvo.title || 'New Chat';
+        document.getElementById('mhContinueCard').href = 'chat.html?c=' + lastConvo.id;
+      }
+
       // Recent chats
       const recentContainer = document.getElementById('mobileRecentChats');
       if (convos.length === 0) {
-        recentContainer.innerHTML = '<div class="mobile-empty">No recent chats</div>';
+        recentContainer.innerHTML = '<div class="mobile-empty">No recent chats yet</div>';
       } else {
         recentContainer.innerHTML = convos.slice(0, 5).map(c => {
           const time = c.updated_at ? timeAgo(c.updated_at) : '';
           const title = c.title || 'New Chat';
-          return `<a href="chat.html" class="mobile-recent-item">
+          return `<a href="chat.html?c=${c.id}" class="mobile-recent-item">
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             <span class="mobile-recent-title">${title}</span>
             <span class="mobile-recent-time">${time}</span>
@@ -5987,16 +6129,16 @@
         }).join('');
       }
 
-      // Upgrade banner for free users
+      // User profile & upgrade banner
       const user = userData.status === 'fulfilled' ? userData.value : null;
       if (user) {
         const tier = user.subscription_tier || user.tier || 'free';
         if (tier === 'free') {
           document.getElementById('mobileUpgradeBanner').classList.add('visible');
         }
-        // Use username if available
         if (user.username && user.username !== 'Anonymous') {
           document.getElementById('mobileGreeting').textContent = timeGreeting + ', ' + user.username;
+          document.getElementById('mhAvatar').textContent = user.username.charAt(0).toUpperCase();
         }
       }
     }
