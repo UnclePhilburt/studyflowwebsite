@@ -1388,12 +1388,13 @@
 
     try {
       if (window.Asc && window.Asc.plugin && window.Asc.plugin.callCommand) {
-        window.Asc.scope.oj = outlineJson;
+        window.Asc.scope.ojStr = outlineJson ? JSON.stringify(outlineJson) : '';
         window.Asc.scope.fmt = outlineFormat;
         window.Asc.scope.rawText = outlineText;
 
         window.Asc.plugin.callCommand(function() {
-          var oj = Asc.scope.oj;
+          var oj = null;
+          try { if (Asc.scope.ojStr) oj = JSON.parse(Asc.scope.ojStr); } catch(e) {}
           var fmt = Asc.scope.fmt;
           var doc = Api.GetDocument();
 
