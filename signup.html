@@ -323,63 +323,120 @@
 
     /* Mobile: stack columns */
     @media (max-width: 768px) {
+      body {
+        padding: 16px 12px;
+        align-items: flex-start;
+      }
+
+      body::before, body::after {
+        opacity: 0.3;
+      }
+
       .signup-container {
-        padding: 32px 24px 28px;
+        padding: 28px 20px 24px;
+        border-radius: 16px;
       }
 
-      .form-columns {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-
-      .form-right {
-        border-left: none;
-        padding-left: 0;
-        border-top: 1px solid rgba(124, 152, 133, 0.15);
-        padding-top: 20px;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .form-bottom {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .btn-primary {
-        width: 100%;
-      }
-
-      .auth-footer {
-        text-align: center;
-      }
-    }
-
-    /* --- Responsive: Phone --- */
-    @media (max-width: 480px) {
-      .signup-container {
-        padding: 24px 16px 20px;
+      .logo-section {
+        margin-bottom: 20px;
       }
 
       .logo-section h1 {
         font-size: 24px;
       }
 
+      .logo-section p {
+        font-size: 12px;
+      }
+
+      .form-columns {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .form-left {
+        gap: 10px;
+      }
+
+      .form-right {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid rgba(124, 152, 133, 0.15);
+        padding-top: 16px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
       .form-group input,
       .form-group select {
-        font-size: 16px;
-        min-height: 44px;
+        font-size: 16px; /* prevents iOS auto-zoom */
+        padding: 12px 14px;
+        min-height: 46px;
+      }
+
+      .form-group label {
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      .age-notice {
+        font-size: 12px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+      }
+
+      .terms-checkbox {
+        font-size: 12px;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .terms-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-top: 0;
+      }
+
+      .legal-section-title {
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+
+      .form-bottom {
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
       }
 
       .btn-primary {
+        width: 100%;
         min-height: 48px;
-        font-size: 16px;
+        font-size: 15px;
+        border-radius: 12px;
       }
 
-      .legal-text {
-        font-size: 11px;
+      .auth-footer {
+        text-align: center;
+        font-size: 13px;
+      }
+
+      .error-message, .success-message {
+        font-size: 12px;
+        padding: 10px 14px;
+      }
+    }
+
+    /* Extra small */
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+
+      .signup-container {
+        padding: 24px 16px 20px;
       }
     }
   </style>
