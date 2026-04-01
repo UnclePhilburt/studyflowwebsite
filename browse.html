@@ -589,9 +589,230 @@
       background: var(--accent-secondary);
       transform: translateY(-2px);
     }
+
+    /* Back to dashboard */
+    .browse-back {
+      position: fixed;
+      top: 32px;
+      left: 32px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      text-decoration: none;
+      color: var(--text-primary);
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+
+    /* ============ MOBILE ============ */
+    @media (max-width: 768px) {
+      body {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .browse-back {
+        display: flex;
+        top: 14px;
+        left: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+
+      .top-bar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 8px;
+        padding: 58px 12px 12px;
+        background: var(--bg-primary);
+        z-index: 1000;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .top-nav {
+        display: none;
+      }
+
+      .search-stage {
+        max-width: none;
+        order: -1;
+      }
+
+      .search-input {
+        padding: 12px 16px;
+        font-size: 14px;
+        border-radius: 12px;
+      }
+
+      .filter-container {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 10px;
+      }
+
+      .filter-label {
+        font-size: 12px;
+      }
+
+      .university-select {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .university-input {
+        font-size: 13px;
+        padding: 8px 10px;
+      }
+
+      /* Cards: stacked list instead of absolute positioned */
+      .card-table {
+        position: relative;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: auto;
+        overflow: visible;
+      }
+
+      .note-card {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        cursor: pointer;
+        perspective: 1000px;
+        animation: none !important;
+      }
+
+      .note-card.flipped {
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      .card-inner {
+        position: relative;
+        min-height: 140px;
+      }
+
+      .note-card.flipped .card-inner {
+        min-height: 200px;
+      }
+
+      .card-front {
+        padding: 16px;
+      }
+
+      .card-title {
+        font-size: 14px;
+      }
+
+      .card-preview {
+        font-size: 12px;
+        -webkit-line-clamp: 3;
+      }
+
+      .card-meta {
+        font-size: 11px;
+      }
+
+      .card-back {
+        padding: 16px;
+      }
+
+      .card-back-header {
+        font-size: 14px;
+      }
+
+      .card-back-content {
+        font-size: 12px;
+      }
+
+      .upvote-badge {
+        top: 8px;
+        right: 8px;
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+
+      /* Loading and hints */
+      .loading-msg {
+        position: relative;
+        transform: none;
+        top: auto;
+        left: auto;
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      .hint-text {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        padding: 20px;
+        text-align: center;
+      }
+
+      /* Load more */
+      #loadMoreContainer {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        transform: none !important;
+        display: flex !important;
+        justify-content: center;
+        padding: 16px 0 24px;
+      }
+
+      .load-more-btn {
+        width: 100%;
+        max-width: 300px;
+        padding: 14px 24px;
+        font-size: 14px;
+        min-height: 48px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .top-bar {
+        padding: 54px 8px 10px;
+      }
+
+      .card-table {
+        padding: 8px;
+        gap: 10px;
+      }
+
+      .card-front, .card-back {
+        padding: 14px;
+      }
+
+      .filter-container {
+        padding: 8px 10px;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Back to Dashboard (mobile) -->
+  <a href="dashboard.html" class="browse-back" title="Dashboard">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </a>
+
   <!-- Top Bar: Filter + Search + Navigation -->
   <div class="top-bar">
     <!-- University Filter -->
@@ -1332,8 +1553,10 @@
           }, 600); // Match the CSS transition time
         });
 
-        // Drag functionality
-        card.addEventListener('mousedown', startDrag);
+        // Drag functionality (desktop only)
+        if (window.innerWidth > 768) {
+          card.addEventListener('mousedown', startDrag);
+        }
 
         cardTable.appendChild(card);
       });
