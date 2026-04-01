@@ -590,6 +590,195 @@
       transform: translateY(-2px);
     }
 
+    /* ============ ADVANCED FILTERS ============ */
+    .adv-filters {
+      position: fixed;
+      top: 80px;
+      left: 32px;
+      right: 32px;
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--bg-tertiary);
+      backdrop-filter: blur(20px);
+      border: 2px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px 18px;
+      box-shadow: 0 8px 32px var(--shadow);
+      animation: filterSlide 0.2s ease;
+    }
+
+    .adv-filters.visible { display: flex; }
+
+    @keyframes filterSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .adv-filters-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .adv-filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .adv-filter-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .adv-filter-input {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--widget-bg);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .adv-filter-input:focus { border-color: var(--accent-primary); }
+    .adv-filter-input::placeholder { color: var(--text-muted); }
+
+    .adv-filter-select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--widget-bg);
+      color: var(--text-primary);
+      outline: none;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239B8B7E' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 30px;
+    }
+
+    .adv-filter-select:focus { border-color: var(--accent-primary); }
+
+    /* Active filter pills */
+    .active-filters {
+      position: fixed;
+      top: 78px;
+      left: 32px;
+      right: 32px;
+      z-index: 998;
+      display: none;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 0;
+    }
+
+    .active-filters.has-filters { display: flex; }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px 4px 12px;
+      background: var(--accent-primary);
+      color: white;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      animation: filterSlide 0.2s ease;
+    }
+
+    .filter-pill-remove {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    .filter-pill-remove:hover { color: white; }
+
+    .adv-toggle-btn {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border-color);
+      background: var(--widget-bg);
+      backdrop-filter: blur(20px);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .adv-toggle-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+    .adv-toggle-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+
+    .adv-toggle-btn svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .adv-filter-actions {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .adv-apply-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent-primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .adv-apply-btn:hover { background: var(--accent-secondary); }
+
+    .adv-clear-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .adv-clear-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
+
     /* Back to dashboard */
     .browse-back {
       position: fixed;
@@ -641,6 +830,10 @@
 
       .top-nav {
         display: none;
+      }
+
+      .adv-toggle-btn, .adv-filters, .active-filters {
+        display: none !important;
       }
 
       .search-stage {
@@ -845,12 +1038,62 @@
       >
     </div>
 
+    <!-- Advanced filter toggle -->
+    <button class="adv-toggle-btn" id="advToggle" onclick="toggleAdvFilters()">
+      <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="18" r="2"/></svg>
+      Filters
+    </button>
+
     <!-- Navigation -->
     <div class="top-nav">
       <a href="dashboard.html" class="nav-link">Dashboard</a>
       <a href="notes.html" class="nav-link">My Notes</a>
     </div>
   </div>
+
+  <!-- Advanced Filters Panel (desktop only) -->
+  <div class="adv-filters" id="advFilters">
+    <div class="adv-filters-row">
+      <div class="adv-filter-field">
+        <div class="adv-filter-label">Course Code</div>
+        <input type="text" class="adv-filter-input" id="filterCourse" placeholder="e.g. BIO 101" autocomplete="off">
+      </div>
+      <div class="adv-filter-field">
+        <div class="adv-filter-label">Professor</div>
+        <input type="text" class="adv-filter-input" id="filterProfessor" placeholder="e.g. Dr. Smith" autocomplete="off">
+      </div>
+      <div class="adv-filter-field">
+        <div class="adv-filter-label">Uploader</div>
+        <input type="text" class="adv-filter-input" id="filterUsername" placeholder="@username" autocomplete="off">
+      </div>
+      <div class="adv-filter-field">
+        <div class="adv-filter-label">File Type</div>
+        <select class="adv-filter-select" id="filterFileType">
+          <option value="">Any</option>
+          <option value="pdf">PDF</option>
+          <option value="docx">Word</option>
+          <option value="txt">Text</option>
+          <option value="png">Image</option>
+        </select>
+      </div>
+      <div class="adv-filter-field">
+        <div class="adv-filter-label">Sort By</div>
+        <select class="adv-filter-select" id="filterSort">
+          <option value="relevance">Most Relevant</option>
+          <option value="newest">Newest</option>
+          <option value="most_upvoted">Most Upvoted</option>
+          <option value="most_downloaded">Most Downloaded</option>
+        </select>
+      </div>
+      <div class="adv-filter-actions">
+        <button class="adv-apply-btn" onclick="applyAdvFilters()">Apply</button>
+        <button class="adv-clear-btn" onclick="clearAdvFilters()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active filter pills -->
+  <div class="active-filters" id="activeFilters"></div>
 
   <!-- Card Table -->
   <div class="card-table" id="cardTable"></div>
@@ -914,6 +1157,91 @@
     let currentOffset = 0;
     let currentQuery = '';
     let hasMore = false;
+
+    // Advanced filter state
+    let advFiltersOpen = false;
+    let activeAdvFilters = {};
+
+    function toggleAdvFilters() {
+      advFiltersOpen = !advFiltersOpen;
+      document.getElementById('advFilters').classList.toggle('visible', advFiltersOpen);
+      document.getElementById('advToggle').classList.toggle('active', advFiltersOpen);
+    }
+
+    function applyAdvFilters() {
+      activeAdvFilters = {};
+      const course = document.getElementById('filterCourse').value.trim();
+      const professor = document.getElementById('filterProfessor').value.trim();
+      const username = document.getElementById('filterUsername').value.trim().replace('@', '');
+      const fileType = document.getElementById('filterFileType').value;
+      const sortBy = document.getElementById('filterSort').value;
+
+      if (course) activeAdvFilters.course_code = course;
+      if (professor) activeAdvFilters.professor = professor;
+      if (username) activeAdvFilters.username = username;
+      if (fileType) activeAdvFilters.file_type = fileType;
+      if (sortBy !== 'relevance') activeAdvFilters.sort_by = sortBy;
+
+      renderFilterPills();
+
+      // Close panel
+      advFiltersOpen = false;
+      document.getElementById('advFilters').classList.remove('visible');
+      document.getElementById('advToggle').classList.toggle('active', Object.keys(activeAdvFilters).length > 0);
+
+      // Re-run search with filters
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) {
+        performSearch(query, 0);
+      } else {
+        loadInitialNotes();
+      }
+    }
+
+    function clearAdvFilters() {
+      document.getElementById('filterCourse').value = '';
+      document.getElementById('filterProfessor').value = '';
+      document.getElementById('filterUsername').value = '';
+      document.getElementById('filterFileType').value = '';
+      document.getElementById('filterSort').value = 'relevance';
+      activeAdvFilters = {};
+      renderFilterPills();
+      document.getElementById('advToggle').classList.remove('active');
+
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) performSearch(query, 0);
+    }
+
+    function removeFilter(key) {
+      delete activeAdvFilters[key];
+      // Clear the corresponding input
+      if (key === 'course_code') document.getElementById('filterCourse').value = '';
+      if (key === 'professor') document.getElementById('filterProfessor').value = '';
+      if (key === 'username') document.getElementById('filterUsername').value = '';
+      if (key === 'file_type') document.getElementById('filterFileType').value = '';
+      if (key === 'sort_by') document.getElementById('filterSort').value = 'relevance';
+      renderFilterPills();
+      document.getElementById('advToggle').classList.toggle('active', Object.keys(activeAdvFilters).length > 0);
+
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) performSearch(query, 0);
+    }
+
+    function renderFilterPills() {
+      const container = document.getElementById('activeFilters');
+      const labels = { course_code: 'Course', professor: 'Prof', username: 'User', file_type: 'Type', sort_by: 'Sort' };
+      const keys = Object.keys(activeAdvFilters);
+      if (keys.length === 0) {
+        container.classList.remove('has-filters');
+        container.innerHTML = '';
+        return;
+      }
+      container.classList.add('has-filters');
+      container.innerHTML = keys.map(k => {
+        const val = activeAdvFilters[k];
+        return `<div class="filter-pill">${labels[k] || k}: ${val}<button class="filter-pill-remove" onclick="removeFilter('${k}')">&times;</button></div>`;
+      }).join('');
+    }
 
     // Initialize
     (async function init() {
@@ -1371,6 +1699,13 @@
         if (filterEnabled && selectedUniversity) {
           requestBody.university = selectedUniversity;
         }
+
+        // Add advanced filters
+        if (activeAdvFilters.course_code) requestBody.course_code = activeAdvFilters.course_code;
+        if (activeAdvFilters.professor) requestBody.professor = activeAdvFilters.professor;
+        if (activeAdvFilters.username) requestBody.username = activeAdvFilters.username;
+        if (activeAdvFilters.file_type) requestBody.file_type = activeAdvFilters.file_type;
+        if (activeAdvFilters.sort_by) requestBody.sort_by = activeAdvFilters.sort_by;
 
         const response = await fetch(`${BACKEND_URL}/api/notes/semantic-browse`, {
           method: 'POST',
