@@ -1229,41 +1229,205 @@
 
     @media (max-width: 768px) {
       .back-to-dashboard {
-        top: 16px;
-        left: 16px;
-        width: 44px;
-        height: 44px;
+        top: 14px;
+        left: 12px;
+        width: 40px;
+        height: 40px;
       }
       .top-nav { display: none; }
-      .bottom-tab-bar { display: flex; }
-      body { padding-bottom: 64px; }
-      .container { padding: 60px 20px 100px; }
-      .doc-grid { gap: 24px; }
-      .doc-card { width: 240px; }
-      .gallery-section { margin-top: 0; }
-      .section-title { font-size: 1.8rem; }
-      .fab-container { bottom: 88px; right: 24px; }
-      .fab { width: 48px; height: 48px; }
-      .fab svg { width: 20px; height: 20px; }
-      .fab-dropdown { min-width: 170px; }
-      .radial-item.docx { bottom: 120px; right: 4px; }
-      .radial-item.xlsx { bottom: 85px; right: 85px; }
-      .radial-item.pptx { bottom: 25px; right: 120px; }
-      .empty-state { padding: 100px 24px; }
-      .verification-gate {
-        padding: 2rem 1.5rem;
+      body { padding-bottom: 0; overflow: auto; }
+
+      /* Hide desktop office UI */
+      .container,
+      .fab-container,
+      .bottom-tab-bar {
+        display: none !important;
       }
-      .gate-title {
-        font-size: 1.5rem;
+
+      /* Mobile landing page */
+      .mobile-office {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 60px 16px 40px;
+        background: var(--bg-primary);
       }
-      .verify-btn {
-        width: 100%;
-        min-height: 44px;
+
+      .mo-header {
+        text-align: center;
+        padding: 20px 0 24px;
       }
+
+      .mo-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--hover-bg), var(--gradient-end));
+        border: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+      }
+
+      .mo-icon svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--accent-primary);
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .mo-title {
+        font-family: 'Lora', serif;
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+      }
+
+      .mo-subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .mo-desktop-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 16px;
+        padding: 8px 16px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .mo-desktop-badge svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--text-muted);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .mo-section-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        padding: 16px 0 8px;
+      }
+
+      .mo-doc-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .mo-doc-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+      }
+
+      .mo-doc-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .mo-doc-icon.docx { background: linear-gradient(135deg, #4285f4, #3b78e7); }
+      .mo-doc-icon.xlsx { background: linear-gradient(135deg, #34a853, #2d9248); }
+      .mo-doc-icon.pptx { background: linear-gradient(135deg, #ea4335, #d63c2f); }
+
+      .mo-doc-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .mo-doc-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .mo-doc-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .mo-empty {
+        text-align: center;
+        padding: 24px;
+        color: var(--text-muted);
+        font-size: 13px;
+      }
+
+      .mo-back-link {
+        display: block;
+        text-align: center;
+        margin-top: 24px;
+        padding: 14px;
+        background: var(--hover-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .mo-back-link:active { transform: scale(0.98); }
     }
   </style>
 </head>
 <body>
+  <script>(function(){ document.body.setAttribute('data-theme', localStorage.getItem('dashboard-theme') || 'default'); })();</script>
+
+  <!-- Mobile Office Landing -->
+  <div class="mobile-office" id="mobileOffice" style="display:none;">
+    <div class="mo-header">
+      <div class="mo-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+      </div>
+      <div class="mo-title">Office Suite</div>
+      <div class="mo-subtitle">Create and edit documents, spreadsheets, and presentations.</div>
+      <div class="mo-desktop-badge">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Best on desktop
+      </div>
+    </div>
+
+    <div class="mo-section-title">Your Documents</div>
+    <div class="mo-doc-list" id="moDocList">
+      <div class="mo-empty">Loading...</div>
+    </div>
+
+    <a href="dashboard.html" class="mo-back-link">Back to Dashboard</a>
+  </div>
 
   <!-- Back to Dashboard Button -->
   <a href="dashboard.html" class="back-to-dashboard" title="Back to Dashboard">
@@ -1496,6 +1660,13 @@
       return;
     }
     authToken = session.access_token;
+
+    // Mobile: show landing page instead of full office
+    if (window.innerWidth <= 768) {
+      document.getElementById('mobileOffice').style.display = 'flex';
+      loadMobileDocs(session.user.id);
+      return;
+    }
 
     // Set user avatar and email
     const userEmail = session.user.email;
@@ -1966,6 +2137,42 @@
   }
 
   // Init
+  async function loadMobileDocs(userId) {
+    const list = document.getElementById('moDocList');
+    try {
+      const { data: docs, error } = await supabaseClient
+        .from('office_documents')
+        .select('id, title, type, updated_at')
+        .eq('owner_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      if (!docs || docs.length === 0) {
+        list.innerHTML = '<div class="mo-empty">No documents yet. Create one on desktop.</div>';
+        return;
+      }
+
+      list.innerHTML = docs.map(doc => {
+        const typeLabel = (doc.type || 'docx').toUpperCase();
+        const typeCls = doc.type || 'docx';
+        const date = doc.updated_at ? new Date(doc.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '';
+        const title = (doc.title || 'Untitled').replace(/</g, '&lt;');
+        return `<div class="mo-doc-item">
+          <div class="mo-doc-icon ${typeCls}">${typeLabel}</div>
+          <div class="mo-doc-info">
+            <div class="mo-doc-title">${title}</div>
+            <div class="mo-doc-meta">${date}</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      console.error('Mobile docs error:', e);
+      list.innerHTML = '<div class="mo-empty">Could not load documents.</div>';
+    }
+  }
+
   checkAuth();
 </script>
 </body>
