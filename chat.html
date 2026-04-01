@@ -2857,6 +2857,14 @@
       }
       attachDragHandler();
 
+      // Double-click to zoom into card
+      el.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const cardObj = cards.find(c => c.id === id);
+        if (cardObj) zoomToCard(cardObj);
+      });
+
       // ============ MOBILE TOUCH INTERACTIONS ============
       let tapCount = 0;
       let tapTimeout = null;
