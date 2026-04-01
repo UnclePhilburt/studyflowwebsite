@@ -308,10 +308,17 @@
         display: inline-block;
         background: var(--hover-bg);
         border-radius: 6px;
-        padding: 2px 8px;
+        padding: 4px 10px;
         margin: 2px 4px 2px 0;
-        font-size: 10px;
+        font-size: 11px;
         color: var(--accent-primary);
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .mc-msg.assistant a.mc-source-tag:active {
+        transform: scale(0.95);
+        opacity: 0.8;
       }
 
       .mc-typing {
@@ -4846,8 +4853,13 @@
         if (role === 'assistant' && msg.sources && msg.sources.length > 0) {
           html += '<div class="mc-sources">Sources: ';
           msg.sources.forEach(s => {
-            const name = s.filename || s.original_filename || 'Note';
-            html += `<span class="mc-source-tag">${name}</span>`;
+            const name = (s.filename || s.original_filename || 'Note').replace(/\s*\([^)]*\)$/, '').replace(/\.(txt|pdf|docx?)$/i, '');
+            const noteId = s.note_id || s.id || '';
+            if (noteId) {
+              html += `<a href="note-viewer.html?id=${noteId}" class="mc-source-tag">${name}</a>`;
+            } else {
+              html += `<span class="mc-source-tag">${name}</span>`;
+            }
           });
           html += '</div>';
         }
@@ -4938,8 +4950,13 @@
         if (data.sources && data.sources.length > 0) {
           bubbleHtml += '<div class="mc-sources">Sources: ';
           data.sources.forEach(s => {
-            const name = s.filename || s.original_filename || 'Note';
-            bubbleHtml += `<span class="mc-source-tag">${name}</span>`;
+            const name = (s.filename || s.original_filename || 'Note').replace(/\s*\([^)]*\)$/, '').replace(/\.(txt|pdf|docx?)$/i, '');
+            const noteId = s.note_id || s.id || '';
+            if (noteId) {
+              bubbleHtml += `<a href="note-viewer.html?id=${noteId}" class="mc-source-tag">${name}</a>`;
+            } else {
+              bubbleHtml += `<span class="mc-source-tag">${name}</span>`;
+            }
           });
           bubbleHtml += '</div>';
         }
