@@ -1365,13 +1365,15 @@
     /* --- Responsive: Tablet Portrait --- */
     @media (max-width: 768px) {
       .back-to-dashboard {
-        top: 16px;
-        left: 16px;
-        width: 44px;
-        height: 44px;
+        top: 14px;
+        left: 14px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
       }
+
       .container {
-        padding: 60px 16px 24px;
+        padding: 60px 12px 24px;
       }
 
       .top-nav {
@@ -1382,90 +1384,220 @@
         display: none !important;
       }
 
-      body {
-        padding-bottom: 56px;
+      /* Good standing widget */
+      .good-standing-widget {
+        flex-wrap: wrap;
+        padding: 12px 14px;
+        gap: 8px;
       }
 
-      .toolbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 12px 16px;
-      }
-
-      .toolbar-actions {
-        width: 100%;
-      }
-
-      .toolbar-btn {
-        min-height: 44px;
-        flex: 1;
-      }
-
-      .desktop {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 16px;
-        padding: 12px;
-        min-height: auto;
-      }
-
-      .folder-icon, .note-icon {
-        width: 64px;
-        height: 64px;
-      }
-
-      .folder-icon svg {
-        width: 32px;
-        height: 32px;
-      }
-
-      .item-name {
-        font-size: 12px;
-        max-width: 90px;
+      /* Impact panel */
+      .impact-panel {
+        margin-bottom: 12px;
       }
 
       .impact-stats {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .good-standing-widget {
-        flex-wrap: wrap;
+      /* Toolbar: stack vertically, wrap buttons */
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+        margin-bottom: 16px;
+      }
+
+      .breadcrumb {
+        font-size: 14px;
+      }
+
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .toolbar-btn {
+        min-height: 42px;
+        padding: 8px 12px;
+        font-size: 12px;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      /* Upload button spans full width */
+      .toolbar-actions > .toolbar-btn:first-child {
+        grid-column: 1 / -1;
+      }
+
+      /* Desktop grid: list mode on mobile */
+      .desktop {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 4px 0;
+        min-height: auto;
+      }
+
+      .folder-item, .note-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+      }
+
+      .folder-item:hover, .note-item:hover {
+        transform: none;
+      }
+
+      .folder-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        box-shadow: none;
+      }
+
+      .folder-icon::before {
+        display: none;
+      }
+
+      .folder-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      .folder-item:hover .folder-icon {
+        transform: none;
+        box-shadow: none;
+      }
+
+      .note-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        font-size: 11px;
+        box-shadow: none;
+      }
+
+      .note-item:hover .note-icon {
+        transform: none;
+        box-shadow: none;
+      }
+
+      .item-name {
+        font-size: 14px;
+        text-align: left;
+        max-width: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+      }
+
+      .item-meta {
+        text-align: right;
+        flex-shrink: 0;
+        font-size: 11px;
+      }
+
+      /* Usage counter and private badge inline */
+      .usage-counter {
+        position: static;
+        transform: none;
+        opacity: 1;
+        font-size: 10px;
+      }
+
+      .private-badge {
+        position: static;
+        transform: none;
+        opacity: 1;
+        font-size: 9px;
+      }
+
+      .favorite-star {
+        position: static;
+        transform: none;
+        opacity: 1;
+      }
+
+      /* Preview panel: full screen overlay */
+      .preview-panel {
+        width: 100%;
+        right: -100%;
+        z-index: 500;
+      }
+
+      .preview-panel.active {
+        right: 0;
       }
 
       .preview-header {
-        padding: 16px;
+        padding: 14px 16px;
       }
 
       .preview-content {
-        padding: 16px;
+        padding: 14px 16px;
+      }
+
+      .container.preview-open {
+        margin-right: 0;
+      }
+
+      /* Context menu */
+      .context-menu {
+        min-width: 160px;
+      }
+
+      /* Upload modal */
+      .modal {
+        max-width: calc(100% - 24px) !important;
+        max-height: 85vh;
+        overflow-y: auto;
       }
     }
 
     /* --- Responsive: Phone --- */
     @media (max-width: 480px) {
       .container {
-        padding: 52px 12px 20px;
+        padding: 52px 8px 20px;
       }
 
-      .nav-link {
-        padding: 6px 6px;
-        font-size: 12px;
+      .toolbar {
+        padding: 10px;
       }
 
-      .desktop {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        padding: 8px;
+      .toolbar-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .toolbar-btn {
+        font-size: 11px;
+        padding: 8px 8px;
+        min-height: 38px;
+      }
+
+      .folder-item, .note-item {
+        padding: 10px 12px;
+        gap: 10px;
       }
 
       .folder-icon, .note-icon {
-        width: 56px;
-        height: 56px;
+        width: 40px;
+        height: 40px;
       }
 
       .item-name {
-        font-size: 11px;
-        max-width: 80px;
+        font-size: 13px;
       }
 
       .impact-stats {
@@ -1474,11 +1606,6 @@
 
       .breadcrumb {
         font-size: 13px;
-      }
-
-      .folder-item, .note-item {
-        padding: 10px;
-        gap: 8px;
       }
     }
 
