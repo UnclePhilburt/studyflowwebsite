@@ -1248,7 +1248,64 @@
 
   // ─── Outline Generator ────────────────────────────────────
   var outlineText = '';
+  var outlineJson = null;
+  var outlineFormat = 'mla';
   var outlineGenerating = false;
+
+  function renderOutlinePreview(oj) {
+    var h = '';
+    // Titles
+    if (oj.suggested_titles) {
+      h += '<div style="margin-bottom:12px;"><strong style="color:#7c9885;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Suggested Titles</strong>';
+      oj.suggested_titles.forEach(function(t) { h += '<div style="padding:4px 0;font-size:12px;">' + t + '</div>'; });
+      h += '</div>';
+    }
+    // Thesis
+    if (oj.thesis_direction) {
+      h += '<div style="margin-bottom:12px;padding:8px 10px;background:rgba(124,152,133,0.06);border-radius:6px;border-left:3px solid #7c9885;font-size:11px;color:#5d5d5d;"><strong>Thesis direction:</strong> ' + oj.thesis_direction + '</div>';
+    }
+    // Sections
+    if (oj.sections) {
+      oj.sections.forEach(function(sec) {
+        h += '<div style="margin-bottom:14px;">';
+        h += '<div style="font-weight:700;font-size:13px;color:#2d2d2d;margin-bottom:4px;">' + sec.heading + '</div>';
+        if (sec.main_idea) h += '<div style="font-size:11px;color:#7c9885;font-style:italic;margin-bottom:6px;">' + sec.main_idea + '</div>';
+        if (sec.key_points) {
+          sec.key_points.forEach(function(kp) {
+            h += '<div style="font-size:11px;padding:2px 0 2px 12px;color:#2d2d2d;">- ' + kp.text + ' <span style="color:#9ca3af;font-size:10px;">(' + kp.source + ')</span></div>';
+          });
+        }
+        if (sec.quotes && sec.quotes.length) {
+          sec.quotes.forEach(function(q) {
+            h += '<div style="font-size:11px;padding:2px 0 2px 12px;color:#6b7280;font-style:italic;">"' + q.text + '" <span style="color:#9ca3af;font-size:10px;">(' + q.source + ')</span></div>';
+          });
+        }
+        if (sec.connections && sec.connections.length) {
+          sec.connections.forEach(function(c) {
+            h += '<div style="font-size:10px;padding:2px 0 2px 12px;color:#e89b5f;">Connect: ' + c + '</div>';
+          });
+        }
+        if (sec.subsections) {
+          sec.subsections.forEach(function(sub) {
+            h += '<div style="margin:6px 0 0 16px;">';
+            h += '<div style="font-weight:600;font-size:12px;color:#2d2d2d;margin-bottom:2px;">' + sub.heading + '</div>';
+            if (sub.key_points) {
+              sub.key_points.forEach(function(kp) {
+                h += '<div style="font-size:11px;padding:1px 0 1px 10px;color:#2d2d2d;">- ' + kp.text + ' <span style="color:#9ca3af;font-size:10px;">(' + kp.source + ')</span></div>';
+              });
+            }
+            h += '</div>';
+          });
+        }
+        h += '</div>';
+      });
+    }
+    // Conclusion
+    if (oj.conclusion_direction) {
+      h += '<div style="margin-top:8px;padding:8px 10px;background:rgba(232,155,95,0.06);border-radius:6px;border-left:3px solid #e89b5f;font-size:11px;color:#5d5d5d;"><strong>Conclusion direction:</strong> ' + oj.conclusion_direction + '</div>';
+    }
+    return h;
+  }
 
   async function generateOutline() {
     if (outlineGenerating) return;
@@ -1297,14 +1354,21 @@
 
       var data = await response.json();
       outlineText = data.outline || '';
+      outlineJson = data.outline_json || null;
+      outlineFormat = data.format || 'mla';
 
-      // Render the outline with basic formatting
-      var formatted = outlineText
-        .replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
+      // Render preview in sidebar
+      if (outlineJson) {
+        var html = renderOutlinePreview(outlineJson);
+        result.innerHTML = html;
+      } else {
+        var formatted = outlineText
+          .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n/g, '<br>');
+        result.innerHTML = '<div class="outline-text">' + formatted + '</div>';
+      }
 
-      result.innerHTML = '<div class="outline-text">' + formatted + '</div>';
       insertBtn.style.display = 'flex';
       stats.style.display = 'block';
       stats.textContent = data.notes_used + ' notes analyzed, ' + data.chunks_analyzed + ' chunks processed';
@@ -1320,45 +1384,214 @@
   }
 
   function insertOutline() {
-    if (!outlineText) return;
+    if (!outlineJson && !outlineText) return;
 
     try {
       if (window.Asc && window.Asc.plugin && window.Asc.plugin.callCommand) {
-        // Pass data via Asc.scope (callCommand runs in a sandbox)
-        window.Asc.scope.outlineText = outlineText;
+        window.Asc.scope.oj = outlineJson;
+        window.Asc.scope.fmt = outlineFormat;
+        window.Asc.scope.rawText = outlineText;
 
         window.Asc.plugin.callCommand(function() {
-          var text = Asc.scope.outlineText;
-          var oDocument = Api.GetDocument();
-          var lines = text.split('\n');
-          for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            var oParagraph = Api.CreateParagraph();
+          var oj = Asc.scope.oj;
+          var fmt = Asc.scope.fmt;
+          var doc = Api.GetDocument();
 
-            if (line.match(/^\*\*(.*?)\*\*$/)) {
-              var headerText = line.replace(/\*\*/g, '');
-              var oRun = Api.CreateRun();
-              oRun.AddText(headerText);
-              oRun.SetBold(true);
-              oRun.SetFontSize(28);
-              oParagraph.AddElement(oRun);
-            } else if (line.trim() === '---') {
-              oParagraph.AddElement(Api.CreateRun());
-            } else {
-              var parts = line.split(/\*\*(.*?)\*\*/);
-              for (var j = 0; j < parts.length; j++) {
-                var run = Api.CreateRun();
-                run.AddText(parts[j]);
-                if (j % 2 === 1) run.SetBold(true);
-                oParagraph.AddElement(run);
-              }
-            }
+          // Format config
+          var font = 'Times New Roman';
+          var bodySize = 24; // 12pt in half-points
+          var h1Size = 28;   // 14pt
+          var h2Size = 26;   // 13pt
+          var spacing = 2;   // double spacing
 
-            oDocument.Push(oParagraph);
+          function makePara(text, opts) {
+            opts = opts || {};
+            var p = Api.CreateParagraph();
+            p.SetSpacingAfter(0);
+            p.SetSpacingBefore(0);
+            p.SetSpacingLine(480, 'auto'); // double spacing
+
+            if (opts.center) p.SetJc('center');
+            if (opts.indent) p.SetIndLeft(720); // 0.5 inch indent
+
+            var r = Api.CreateRun();
+            r.AddText(text || '');
+            r.SetFontFamily(font);
+            r.SetFontSize(opts.size || bodySize);
+            if (opts.bold) r.SetBold(true);
+            if (opts.italic) r.SetItalic(true);
+            if (opts.color) r.SetColor(opts.color[0], opts.color[1], opts.color[2]);
+            p.AddElement(r);
+            return p;
           }
+
+          function addSourceRun(p, source) {
+            var sr = Api.CreateRun();
+            sr.AddText(' (' + source + ')');
+            sr.SetFontFamily(font);
+            sr.SetFontSize(20); // 10pt
+            sr.SetColor(156, 163, 175);
+            sr.SetItalic(true);
+            p.AddElement(sr);
+          }
+
+          if (!oj) {
+            // Fallback: insert raw text
+            var lines = (Asc.scope.rawText || '').split('\n');
+            for (var i = 0; i < lines.length; i++) {
+              doc.Push(makePara(lines[i]));
+            }
+            return;
+          }
+
+          // === TITLE PAGE (APA/Chicago) or centered title (MLA) ===
+          var title = (oj.suggested_titles && oj.suggested_titles[0]) || 'Untitled Paper';
+
+          if (fmt === 'apa') {
+            // APA title page
+            doc.Push(makePara('')); doc.Push(makePara('')); doc.Push(makePara(''));
+            doc.Push(makePara(title, {bold: true, center: true, size: bodySize}));
+            doc.Push(makePara(''));
+            doc.Push(makePara('[Your Name]', {center: true}));
+            doc.Push(makePara('[University Name]', {center: true}));
+            doc.Push(makePara('[Course Name]', {center: true}));
+            doc.Push(makePara('[Instructor Name]', {center: true}));
+            doc.Push(makePara('[Date]', {center: true}));
+            // Page break would go here ideally
+            doc.Push(makePara(''));
+            doc.Push(makePara(''));
+          } else if (fmt === 'chicago') {
+            doc.Push(makePara('')); doc.Push(makePara('')); doc.Push(makePara(''));
+            doc.Push(makePara(title, {bold: true, center: true, size: bodySize}));
+            doc.Push(makePara(''));
+            doc.Push(makePara('[Your Name]', {center: true}));
+            doc.Push(makePara('[Date]', {center: true}));
+            doc.Push(makePara(''));
+            doc.Push(makePara(''));
+          } else {
+            // MLA header
+            doc.Push(makePara('[Your Name]'));
+            doc.Push(makePara('[Instructor Name]'));
+            doc.Push(makePara('[Course Name]'));
+            doc.Push(makePara('[Date]'));
+            doc.Push(makePara(title, {center: true, bold: false}));
+            doc.Push(makePara(''));
+          }
+
+          // === SUGGESTED TITLES ===
+          if (oj.suggested_titles && oj.suggested_titles.length > 1) {
+            doc.Push(makePara('Suggested Titles:', {bold: true, size: h2Size, color: [124, 152, 133]}));
+            for (var t = 0; t < oj.suggested_titles.length; t++) {
+              doc.Push(makePara('  ' + (t + 1) + '. ' + oj.suggested_titles[t], {italic: true}));
+            }
+            doc.Push(makePara(''));
+          }
+
+          // === THESIS DIRECTION ===
+          if (oj.thesis_direction) {
+            doc.Push(makePara('Thesis Direction:', {bold: true, size: h2Size, color: [124, 152, 133]}));
+            doc.Push(makePara(oj.thesis_direction, {italic: true, indent: true}));
+            doc.Push(makePara(''));
+          }
+
+          // === SECTIONS ===
+          if (oj.sections) {
+            for (var s = 0; s < oj.sections.length; s++) {
+              var sec = oj.sections[s];
+              var sectionNum = (s + 1) + '. ';
+
+              // Section heading
+              if (fmt === 'apa') {
+                doc.Push(makePara(sec.heading, {bold: true, center: true, size: h1Size}));
+              } else {
+                doc.Push(makePara(sectionNum + sec.heading, {bold: true, size: h1Size}));
+              }
+
+              // Main idea
+              if (sec.main_idea) {
+                doc.Push(makePara('Main idea: ' + sec.main_idea, {italic: true, color: [124, 152, 133]}));
+              }
+
+              doc.Push(makePara(''));
+
+              // Key points
+              if (sec.key_points && sec.key_points.length) {
+                doc.Push(makePara('Key points to address:', {bold: true, size: h2Size}));
+                for (var k = 0; k < sec.key_points.length; k++) {
+                  var kp = sec.key_points[k];
+                  var p = makePara('    -  ' + kp.text);
+                  if (kp.source) addSourceRun(p, kp.source);
+                  doc.Push(p);
+                }
+                doc.Push(makePara(''));
+              }
+
+              // Quotes
+              if (sec.quotes && sec.quotes.length) {
+                doc.Push(makePara('Notable quotes from your notes:', {bold: true, size: h2Size}));
+                for (var q = 0; q < sec.quotes.length; q++) {
+                  var qu = sec.quotes[q];
+                  var p = makePara('    "' + qu.text + '"', {italic: true});
+                  if (qu.source) addSourceRun(p, qu.source);
+                  doc.Push(p);
+                }
+                doc.Push(makePara(''));
+              }
+
+              // Connections
+              if (sec.connections && sec.connections.length) {
+                doc.Push(makePara('Connections to make:', {bold: true, size: h2Size, color: [232, 155, 95]}));
+                for (var cn = 0; cn < sec.connections.length; cn++) {
+                  doc.Push(makePara('    -  ' + sec.connections[cn], {color: [100, 100, 100]}));
+                }
+                doc.Push(makePara(''));
+              }
+
+              // Subsections
+              if (sec.subsections) {
+                for (var ss = 0; ss < sec.subsections.length; ss++) {
+                  var sub = sec.subsections[ss];
+                  if (fmt === 'apa') {
+                    doc.Push(makePara(sub.heading, {bold: true, italic: true, size: h2Size}));
+                  } else {
+                    doc.Push(makePara('    ' + sub.heading, {bold: true, size: h2Size}));
+                  }
+                  if (sub.key_points) {
+                    for (var sk = 0; sk < sub.key_points.length; sk++) {
+                      var skp = sub.key_points[sk];
+                      var p = makePara('        -  ' + skp.text);
+                      if (skp.source) addSourceRun(p, skp.source);
+                      doc.Push(p);
+                    }
+                  }
+                  doc.Push(makePara(''));
+                }
+              }
+
+              doc.Push(makePara(''));
+            }
+          }
+
+          // === CONCLUSION DIRECTION ===
+          if (oj.conclusion_direction) {
+            doc.Push(makePara('Conclusion Direction:', {bold: true, size: h1Size, color: [124, 152, 133]}));
+            doc.Push(makePara(oj.conclusion_direction, {italic: true, indent: true}));
+            doc.Push(makePara(''));
+          }
+
+          // === REFERENCES/WORKS CITED PLACEHOLDER ===
+          doc.Push(makePara(''));
+          if (fmt === 'apa') {
+            doc.Push(makePara('References', {bold: true, center: true, size: h1Size}));
+          } else if (fmt === 'chicago') {
+            doc.Push(makePara('Bibliography', {bold: true, center: true, size: h1Size}));
+          } else {
+            doc.Push(makePara('Works Cited', {center: true, size: h1Size}));
+          }
+          doc.Push(makePara('[Add your sources here]', {italic: true, color: [156, 163, 175]}));
+
         }, false, true);
 
-        // Visual feedback
         var btn = document.getElementById('outlineInsertBtn');
         btn.textContent = 'Inserted!';
         btn.style.background = '#7c9885';
@@ -1367,7 +1600,6 @@
           btn.style.background = '';
         }, 2000);
       } else {
-        // Fallback: copy to clipboard
         navigator.clipboard.writeText(outlineText).then(function() {
           alert('Outline copied to clipboard. Paste it into your document.');
         });
