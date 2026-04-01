@@ -708,49 +708,45 @@
     }
 
     @media (max-width: 768px) {
-      .back-to-dashboard {
-        top: 16px;
-        left: 16px;
-        width: 44px;
-        height: 44px;
+      body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0;
       }
+
+      .back-to-dashboard {
+        top: 14px;
+        left: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+      }
+
+      .top-nav, .bottom-tab-bar {
+        display: none !important;
+      }
+
       .container {
         height: auto;
         min-height: 100vh;
         min-height: 100dvh;
-        padding: 16px;
-      }
-
-      body {
-        overflow-y: auto;
-      }
-
-      .top-nav {
-        display: none !important;
-      }
-
-      .bottom-tab-bar {
-        display: none !important;
-      }
-
-      body {
-        padding-bottom: 56px;
+        padding: 56px 12px 24px;
       }
 
       .header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 12px;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
       }
 
       .header-left h1 {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         margin-bottom: 2px;
       }
 
       .header-left p {
-        font-size: 0.85rem;
+        font-size: 13px;
       }
 
       .header-right {
@@ -764,60 +760,93 @@
         justify-content: space-between;
       }
 
+      .month-nav button {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+      }
+
+      .current-month {
+        font-size: 1rem;
+        min-width: 140px;
+      }
+
       .upload-syllabus-btn {
         width: 100%;
         justify-content: center;
-        min-height: 44px;
+        min-height: 46px;
+        border-radius: 12px;
+        font-size: 14px;
       }
 
       .calendar-wrapper {
-        padding: 12px;
+        padding: 10px;
+        border-radius: 14px;
       }
 
       .calendar-grid {
-        gap: 4px;
-      }
-
-      .calendar-day {
-        padding: 4px;
+        gap: 3px;
       }
 
       .day-header {
-        font-size: 0.7rem;
-        padding: 8px 0;
+        font-size: 10px;
+        padding: 6px 0;
+        font-weight: 600;
+      }
+
+      .calendar-day {
+        padding: 4px 3px;
+        border-radius: 8px;
+        min-height: 52px;
       }
 
       .day-number {
-        font-size: 0.75rem;
+        font-size: 11px;
+        font-weight: 600;
       }
 
       .event-dot {
-        font-size: 0.6rem;
+        font-size: 8px;
         padding: 1px 4px;
+        border-radius: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
       }
 
       .upload-form {
         grid-template-columns: 1fr;
       }
 
-      .month-nav {
-        width: 100%;
-        justify-content: space-between;
+      /* Event detail modal */
+      .modal-content,
+      .event-modal-content {
+        max-width: calc(100% - 24px);
+        padding: 20px 16px;
+        border-radius: 16px;
+      }
+
+      /* Add event form */
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        font-size: 16px;
+        min-height: 44px;
       }
     }
 
-    /* --- Responsive: Phone --- */
     @media (max-width: 480px) {
       .container {
-        padding: 52px 8px 12px;
+        padding: 52px 8px 16px;
       }
 
       .header-left h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
       }
 
-      .header-left p {
-        font-size: 0.875rem;
+      .calendar-wrapper {
+        padding: 6px;
       }
 
       .calendar-grid {
@@ -825,41 +854,22 @@
       }
 
       .calendar-day {
-        padding: 2px;
+        padding: 3px 2px;
+        min-height: 46px;
         border-radius: 6px;
-        min-height: 48px;
       }
 
       .day-number {
-        font-size: 0.65rem;
+        font-size: 10px;
       }
 
       .day-header {
-        font-size: 0.6rem;
-        letter-spacing: 0;
+        font-size: 9px;
       }
 
       .event-dot {
-        font-size: 0.55rem;
+        font-size: 7px;
         padding: 1px 3px;
-      }
-
-      .month-nav button {
-        width: 44px;
-        height: 44px;
-      }
-
-      .current-month {
-        font-size: 1rem;
-      }
-
-      .nav-link {
-        padding: 6px 6px;
-        font-size: 12px;
-      }
-
-      .modal-content {
-        padding: 20px 16px;
       }
     }
 
