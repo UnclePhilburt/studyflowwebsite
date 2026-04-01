@@ -1480,7 +1480,7 @@
 
           // === SUGGESTED TITLES ===
           if (oj.suggested_titles && oj.suggested_titles.length > 1) {
-            doc.Push(makePara('Suggested Titles:', {bold: true, size: h2Size, color: [124, 152, 133]}));
+            doc.Push(makePara('Suggested Titles:', {bold: true, size: fmt === 'mla' ? bodySize : h2Size, color: [124, 152, 133]}));
             for (var t = 0; t < oj.suggested_titles.length; t++) {
               doc.Push(makePara('  ' + (t + 1) + '. ' + oj.suggested_titles[t], {italic: true}));
             }
@@ -1489,7 +1489,7 @@
 
           // === THESIS DIRECTION ===
           if (oj.thesis_direction) {
-            doc.Push(makePara('Thesis Direction:', {bold: true, size: h2Size, color: [124, 152, 133]}));
+            doc.Push(makePara('Thesis Direction:', {bold: true, size: fmt === 'mla' ? bodySize : h2Size, color: [124, 152, 133]}));
             doc.Push(makePara(oj.thesis_direction, {italic: true, indent: true}));
             doc.Push(makePara(''));
           }
@@ -1503,8 +1503,11 @@
               // Section heading
               if (fmt === 'apa') {
                 doc.Push(makePara(sec.heading, {bold: true, center: true, size: h1Size}));
-              } else {
+              } else if (fmt === 'chicago') {
                 doc.Push(makePara(sectionNum + sec.heading, {bold: true, size: h1Size}));
+              } else {
+                // MLA: no formal headers, just bold topic label
+                doc.Push(makePara(sec.heading, {bold: true, size: bodySize}));
               }
 
               // Main idea
@@ -1516,7 +1519,7 @@
 
               // Key points
               if (sec.key_points && sec.key_points.length) {
-                doc.Push(makePara('Key points to address:', {bold: true, size: h2Size}));
+                doc.Push(makePara('Key points to address:', {bold: true, size: fmt === 'mla' ? bodySize : h2Size}));
                 for (var k = 0; k < sec.key_points.length; k++) {
                   var kp = sec.key_points[k];
                   var p = makePara('    -  ' + kp.text);
@@ -1528,7 +1531,7 @@
 
               // Quotes
               if (sec.quotes && sec.quotes.length) {
-                doc.Push(makePara('Notable quotes from your notes:', {bold: true, size: h2Size}));
+                doc.Push(makePara('Notable quotes from your notes:', {bold: true, size: fmt === 'mla' ? bodySize : h2Size}));
                 for (var q = 0; q < sec.quotes.length; q++) {
                   var qu = sec.quotes[q];
                   var p = makePara('    "' + qu.text + '"', {italic: true});
@@ -1540,7 +1543,7 @@
 
               // Connections
               if (sec.connections && sec.connections.length) {
-                doc.Push(makePara('Connections to make:', {bold: true, size: h2Size, color: [232, 155, 95]}));
+                doc.Push(makePara('Connections to make:', {bold: true, size: fmt === 'mla' ? bodySize : h2Size, color: [232, 155, 95]}));
                 for (var cn = 0; cn < sec.connections.length; cn++) {
                   doc.Push(makePara('    -  ' + sec.connections[cn], {color: [100, 100, 100]}));
                 }
@@ -1553,6 +1556,8 @@
                   var sub = sec.subsections[ss];
                   if (fmt === 'apa') {
                     doc.Push(makePara(sub.heading, {bold: true, italic: true, size: h2Size}));
+                  } else if (fmt === 'mla') {
+                    doc.Push(makePara('    ' + sub.heading, {bold: true, size: bodySize}));
                   } else {
                     doc.Push(makePara('    ' + sub.heading, {bold: true, size: h2Size}));
                   }
@@ -1574,7 +1579,7 @@
 
           // === CONCLUSION DIRECTION ===
           if (oj.conclusion_direction) {
-            doc.Push(makePara('Conclusion Direction:', {bold: true, size: h1Size, color: [124, 152, 133]}));
+            doc.Push(makePara('Conclusion Direction:', {bold: true, size: fmt === 'mla' ? bodySize : h1Size, color: [124, 152, 133]}));
             doc.Push(makePara(oj.conclusion_direction, {italic: true, indent: true}));
             doc.Push(makePara(''));
           }
