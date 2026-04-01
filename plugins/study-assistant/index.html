@@ -1324,33 +1324,32 @@
 
     try {
       if (window.Asc && window.Asc.plugin && window.Asc.plugin.callCommand) {
-        var textToInsert = outlineText;
+        // Pass data via Asc.scope (callCommand runs in a sandbox)
+        window.Asc.scope.outlineText = outlineText;
+
         window.Asc.plugin.callCommand(function() {
+          var text = Asc.scope.outlineText;
           var oDocument = Api.GetDocument();
-          var lines = textToInsert.split('\n');
+          var lines = text.split('\n');
           for (var i = 0; i < lines.length; i++) {
             var line = lines[i];
             var oParagraph = Api.CreateParagraph();
 
-            // Check if it's a bold section header
             if (line.match(/^\*\*(.*?)\*\*$/)) {
               var headerText = line.replace(/\*\*/g, '');
               var oRun = Api.CreateRun();
               oRun.AddText(headerText);
               oRun.SetBold(true);
-              oRun.SetFontSize(28); // 14pt
+              oRun.SetFontSize(28);
               oParagraph.AddElement(oRun);
             } else if (line.trim() === '---') {
-              // Horizontal rule - skip or add spacing
               oParagraph.AddElement(Api.CreateRun());
             } else {
-              var oRun = Api.CreateRun();
-              // Handle inline bold
               var parts = line.split(/\*\*(.*?)\*\*/);
               for (var j = 0; j < parts.length; j++) {
                 var run = Api.CreateRun();
                 run.AddText(parts[j]);
-                if (j % 2 === 1) run.SetBold(true); // Odd indices are bold
+                if (j % 2 === 1) run.SetBold(true);
                 oParagraph.AddElement(run);
               }
             }
