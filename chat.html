@@ -919,21 +919,15 @@
       position: absolute;
       width: 200px;
       min-height: 200px;
-      background: #fef3c7;
-      border: 1px solid #f59e0b33;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px var(--shadow);
       z-index: 1;
       cursor: grab;
       display: flex;
       flex-direction: column;
       animation: cardExpand 0.3s ease forwards;
-    }
-
-    body[data-theme="dark"] .sticky-note {
-      background: #422006;
-      border-color: #92400e55;
-      color: #fef3c7;
     }
 
     .sticky-note-header {
@@ -945,7 +939,7 @@
     .sticky-note-delete {
       background: none;
       border: none;
-      color: #d97706;
+      color: var(--text-muted);
       cursor: pointer;
       font-size: 14px;
       opacity: 0;
@@ -965,11 +959,11 @@
       font-size: 12px;
       font-family: inherit;
       line-height: 1.5;
-      color: inherit;
+      color: var(--text-primary);
       outline: none;
     }
 
-    .sticky-note textarea::placeholder { color: #d97706aa; }
+    .sticky-note textarea::placeholder { color: var(--text-muted); }
 
     /* ============ WELCOME SCREEN ============ */
     #welcomeScreen {
