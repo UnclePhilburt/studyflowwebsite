@@ -320,6 +320,190 @@
 
     .spinner { width: 24px; height: 24px; border: 2px solid var(--border-color); border-top-color: var(--accent-primary); border-radius: 50%; animation: spin 0.6s linear infinite; margin: 0 auto 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============ MOBILE ============ */
+    .mobile-leaderboard { display: none; }
+
+    @media (max-width: 768px) {
+      /* Hide desktop graph */
+      #graphCanvas, .sidebar, .sidebar-toggle, .your-rank,
+      .node-tooltip, .graph-loading { display: none !important; }
+
+      body {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        height: auto;
+        background: #0a0a12;
+      }
+
+      .top-bar {
+        position: sticky;
+        top: 0;
+      }
+
+      .top-bar-search {
+        width: 140px;
+        font-size: 14px;
+        padding: 8px 14px;
+      }
+
+      .filter-bar {
+        position: sticky;
+        top: 56px;
+        padding: 0 12px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .filter-bar::-webkit-scrollbar { display: none; }
+
+      .filter-btn {
+        white-space: nowrap;
+        min-height: 36px;
+        font-size: 12px;
+      }
+
+      .mobile-leaderboard {
+        display: block;
+        padding: 12px;
+        padding-top: 110px;
+      }
+
+      /* Your rank banner */
+      .ml-your-rank {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        background: rgba(124, 152, 133, 0.1);
+        border: 1px solid rgba(124, 152, 133, 0.25);
+        border-radius: 14px;
+        margin-bottom: 16px;
+      }
+
+      .ml-your-rank-num {
+        font-size: 28px;
+        font-weight: 700;
+        color: #7c9885;
+        line-height: 1;
+      }
+
+      .ml-your-rank-info {
+        flex: 1;
+      }
+
+      .ml-your-rank-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #f0f0f0;
+      }
+
+      .ml-your-rank-meta {
+        font-size: 11px;
+        color: rgba(255,255,255,0.4);
+        margin-top: 2px;
+      }
+
+      /* Ranked list */
+      .ml-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .ml-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 12px;
+        transition: background 0.15s;
+      }
+
+      .ml-item:active { background: rgba(255,255,255,0.08); }
+
+      .ml-item.top-3 {
+        background: rgba(124, 152, 133, 0.08);
+        border-color: rgba(124, 152, 133, 0.2);
+      }
+
+      .ml-rank {
+        width: 28px;
+        font-size: 14px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.3);
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .ml-rank.gold { color: #d97706; }
+      .ml-rank.silver { color: #9ca3af; }
+      .ml-rank.bronze { color: #b45309; }
+
+      .ml-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .ml-info {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .ml-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #e0e0e0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .ml-uni {
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+        margin-top: 1px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .ml-pages {
+        font-size: 14px;
+        font-weight: 700;
+        color: #7c9885;
+        flex-shrink: 0;
+      }
+
+      .ml-pages-label {
+        font-size: 9px;
+        color: rgba(255,255,255,0.3);
+        text-transform: uppercase;
+      }
+
+      .ml-stat-col {
+        text-align: right;
+        flex-shrink: 0;
+      }
+
+      .ml-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255,255,255,0.3);
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -337,6 +521,20 @@
     <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
     <button class="filter-btn" onclick="setFilter('myUni', this)">My University</button>
     <button class="filter-btn" onclick="setFilter('top10', this)">Top 10</button>
+  </div>
+
+  <!-- Mobile Leaderboard List -->
+  <div class="mobile-leaderboard" id="mobileLeaderboard">
+    <div class="ml-your-rank" id="mlYourRank" style="display:none;">
+      <div class="ml-your-rank-num" id="mlYourRankNum">#-</div>
+      <div class="ml-your-rank-info">
+        <div class="ml-your-rank-name" id="mlYourRankName">-</div>
+        <div class="ml-your-rank-meta" id="mlYourRankMeta">- pages shared</div>
+      </div>
+    </div>
+    <div class="ml-list" id="mlList">
+      <div class="ml-empty">Loading...</div>
+    </div>
   </div>
 
   <canvas id="graphCanvas"></canvas>
@@ -1017,15 +1215,25 @@
       if (contributors.length === 0) {
         document.getElementById('graphLoading').style.display = 'block';
         document.getElementById('graphLoading').innerHTML = '<div style="color:var(--text-muted);">No contributors yet</div>';
+        if (window.innerWidth <= 768) {
+          document.getElementById('mlList').innerHTML = '<div class="ml-empty">No contributors yet</div>';
+        }
+        return;
+      }
+
+      // Find user's rank
+      const userEmail = currentUser.email?.split('@')[0];
+      const userIdx = contributors.findIndex(c => c.username === userEmail);
+
+      // Mobile: render list and skip graph
+      if (window.innerWidth <= 768) {
+        renderMobileList(contributors, userIdx);
         return;
       }
 
       buildNodes(contributors);
       renderSidebar();
 
-      // Find user's rank
-      const userEmail = currentUser.email?.split('@')[0];
-      const userIdx = contributors.findIndex(c => c.username === userEmail);
       if (userIdx >= 0) {
         document.getElementById('yourRank').style.display = 'flex';
         document.getElementById('yourRankNum').textContent = '#' + (userIdx + 1);
@@ -1034,6 +1242,53 @@
       }
 
       animate();
+    }
+
+    function renderMobileList(data, userIdx) {
+      // Your rank banner
+      if (userIdx >= 0) {
+        const u = data[userIdx];
+        document.getElementById('mlYourRank').style.display = 'flex';
+        document.getElementById('mlYourRankNum').textContent = '#' + (userIdx + 1);
+        document.getElementById('mlYourRankName').textContent = '@' + (u.username || 'Anonymous');
+        document.getElementById('mlYourRankMeta').textContent = (u.pages_contributed || 0) + ' pages shared';
+      }
+
+      const list = document.getElementById('mlList');
+      list.innerHTML = data.map((c, i) => {
+        const rank = i + 1;
+        const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        const initial = (c.username || '?')[0].toUpperCase();
+        const color = getUniColor(c.university);
+        const pages = c.pages_contributed || 0;
+        const uni = c.university || 'Unknown';
+        const name = c.username || 'Anonymous';
+        const isTop3 = rank <= 3 ? ' top-3' : '';
+
+        return `<div class="ml-item${isTop3}">
+          <div class="ml-rank ${rankClass}">${rank}</div>
+          <div class="ml-avatar" style="background:${color}">${initial}</div>
+          <div class="ml-info">
+            <div class="ml-name">@${name}</div>
+            <div class="ml-uni">${uni}</div>
+          </div>
+          <div class="ml-stat-col">
+            <div class="ml-pages">${pages}</div>
+            <div class="ml-pages-label">pages</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // Mobile search filter
+    if (window.innerWidth <= 768) {
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll('.ml-item').forEach(item => {
+          const text = item.textContent.toLowerCase();
+          item.style.display = text.includes(q) ? 'flex' : 'none';
+        });
+      });
     }
 
     init();
