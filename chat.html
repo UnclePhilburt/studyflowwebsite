@@ -3668,6 +3668,10 @@
       cards = [];
       connections = [];
       nextCardId = 0;
+
+      // Clear any orphaned SVG elements (fixes bug where connections persist between folders)
+      svgLayer.innerHTML = '';
+
       panX = 0; panY = 0; scale = 1;
       updateTransform();
     }
@@ -4372,8 +4376,8 @@
       } else if (action === 'newSubfolder') {
         createNewFolder(currentFolderId);
       } else if (action === 'newChat' || action === 'newCard') {
-        // Reset conversation for newChat so a fresh one starts
-        if (action === 'newChat') conversationId = null;
+        // Reset conversation so a fresh one starts
+        conversationId = null;
 
         // Spawn inline input bubble at right-click position
         const inputEl = document.createElement('div');
