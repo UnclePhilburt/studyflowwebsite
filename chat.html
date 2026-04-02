@@ -2382,6 +2382,9 @@
           // Track this conversation's first card for setting conversationId on click
           let firstCardInCluster = null;
 
+          // Track cards in THIS conversation cluster by their question text (for parent lookup)
+          const clusterCardMap = {}; // {question: cardId}
+
           for (const msg of messages) {
             if (msg.role === 'user') {
               pendingQuestion = msg.content;
@@ -2392,9 +2395,12 @@
               if (saved) {
                 cx = saved.x + clusterOffsetX;
                 cy = saved.y + clusterOffsetY;
-                parentId = saved.parentId !== null && saved.parentId !== undefined
-                  ? (saved.parentId < cards.length ? saved.parentId : lastCardId)
-                  : lastCardId;
+                // Look up parent by saved parent question text instead of array index
+                if (saved.parentQuestion && clusterCardMap[saved.parentQuestion] !== undefined) {
+                  parentId = clusterCardMap[saved.parentQuestion];
+                } else {
+                  parentId = lastCardId;
+                }
               } else {
                 cx = clusterOffsetX;
                 cy = fallbackY;
@@ -2404,6 +2410,9 @@
               const card = createCard(pendingQuestion, cx, cy, parentId);
               card._conversationId = conv.id;
               populateCard(card, msg.content, msg.sources, []);
+
+              // Add to cluster map so child cards can reference this as parent
+              clusterCardMap[pendingQuestion] = card.id;
 
               // Restore collapse state
               if (saved && saved.collapsed) {
@@ -3689,11 +3698,22 @@
           const cid = c._conversationId || conversationId;
           if (!cid) return;
           if (!convGroups[cid]) convGroups[cid] = [];
+
+          // Find parent card's question instead of saving numeric ID
+          let parentQuestion = null;
+          if (c.parentId !== null) {
+            const parentCard = cards.find(pc => pc.id === c.parentId);
+            if (parentCard) {
+              parentQuestion = parentCard.question;
+            }
+          }
+
           convGroups[cid].push({
             question: c.question,
             x: c.x,
             y: c.y,
-            parentId: c.parentId,
+            parentId: c.parentId, // Keep for backward compatibility
+            parentQuestion: parentQuestion, // NEW: parent's question text
             collapsed: c.element.classList.contains('collapsed')
           });
         });
