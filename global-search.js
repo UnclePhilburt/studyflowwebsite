@@ -308,20 +308,36 @@
     });
   }
 
-  async function getToken() {
-    // Try multiple ways pages store the auth token
-    if (window.authToken) return window.authToken;
+  var _gsToken = null;
 
-    // Try Supabase client (most pages have this)
-    var clients = [window.supabaseClient, window.supabase];
-    for (var i = 0; i < clients.length; i++) {
-      var c = clients[i];
+  async function getToken() {
+    if (_gsToken) return _gsToken;
+
+    // Try window.authToken (some pages expose it)
+    if (window.authToken) { _gsToken = window.authToken; return _gsToken; }
+
+    // Try any Supabase client-like object on window
+    var tryClients = ['supabaseClient', '_supabase', 'sb'];
+    for (var i = 0; i < tryClients.length; i++) {
+      var c = window[tryClients[i]];
       if (c && c.auth && c.auth.getSession) {
         try {
           var sess = await c.auth.getSession();
-          if (sess.data && sess.data.session) return sess.data.session.access_token;
+          if (sess.data && sess.data.session) { _gsToken = sess.data.session.access_token; return _gsToken; }
         } catch(e) {}
       }
+    }
+
+    // Last resort: create our own Supabase client to get the session
+    if (window.supabase && window.supabase.createClient) {
+      try {
+        var gsClient = window.supabase.createClient(
+          'https://mxddgbpxjoltaimftpmn.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+        );
+        var sess = await gsClient.auth.getSession();
+        if (sess.data && sess.data.session) { _gsToken = sess.data.session.access_token; return _gsToken; }
+      } catch(e) {}
     }
 
     return null;
