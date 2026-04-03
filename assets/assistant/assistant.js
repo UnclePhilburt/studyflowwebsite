@@ -223,12 +223,12 @@
   }
 
   function openWidgetPicker() {
-    // Try to click the actual widget picker button to trigger initialization
-    const widgetBtn = document.querySelector('[onclick*="toggleWidgetPicker"], .widget-picker-btn, #openWidgetPicker');
+    // Click the actual add widget button which triggers renderWidgetOptions()
+    const widgetBtn = document.getElementById('addWidgetBtn');
     if (widgetBtn) {
       widgetBtn.click();
     } else {
-      // Fallback: manually add class and hope it's initialized
+      // Fallback: manually add class (won't work properly but better than nothing)
       document.getElementById('widgetPicker')?.classList.add('active');
     }
   }
