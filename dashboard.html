@@ -3513,6 +3513,7 @@
       const currentAnimSpeed = localStorage.getItem('sf-anim') || 'normal';
       const currentClockFmt = localStorage.getItem('sf-clock') || '12h';
       const currentParticles = localStorage.getItem('sf-particles') || 'full';
+      const currentCursor = localStorage.getItem('sf-cursor') || 'default';
 
       function miniPreview(t) {
         const bg = t.colors[2], accent = t.colors[0], accent2 = t.colors[1], txt = t.text;
@@ -3659,6 +3660,12 @@
               ${optBtns([
                 {id:'off',label:'Off'},{id:'subtle',label:'Subtle'},{id:'full',label:'Full'}
               ], currentParticles, 'setParticles')}
+            </div>
+            <div>
+              ${secLabel('Cursor Style')}
+              ${optBtns([
+                {id:'default',label:'Default'},{id:'pointer',label:'Pointer'},{id:'crosshair',label:'Crosshair'},{id:'dot',label:'Dot'}
+              ], currentCursor, 'setCursor')}
             </div>
           </div>`;
       } else if (_settingsTab === 'fonts') {
@@ -6697,6 +6704,29 @@
       _rerender();
     }
 
+    function setCursor(style) {
+      localStorage.setItem('sf-cursor', style);
+      const canvas = document.getElementById('canvasContainer');
+      if (canvas) {
+        switch(style) {
+          case 'pointer':
+            canvas.style.cursor = 'pointer';
+            break;
+          case 'crosshair':
+            canvas.style.cursor = 'crosshair';
+            break;
+          case 'dot':
+            canvas.style.cursor = 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 16 16\'><circle cx=\'8\' cy=\'8\' r=\'3\' fill=\'%237c9885\'/></svg>") 8 8, auto';
+            break;
+          case 'default':
+          default:
+            canvas.style.cursor = 'default';
+            break;
+        }
+      }
+      _rerender();
+    }
+
     function setFloParticles(val) {
       localStorage.setItem('sf-flo-particles', val);
       // Notify Flo to update (event will be handled by assistant.js)
@@ -6932,6 +6962,8 @@
       if (animSpeed) setAnimSpeed(animSpeed);
       const particles = localStorage.getItem('sf-particles') || 'full';
       if (particles !== 'off') setTimeout(() => initParticles(particles), 500);
+      const cursor = localStorage.getItem('sf-cursor');
+      if (cursor) setCursor(cursor);
     })();
 
     async function selectTheme(themeId) {
