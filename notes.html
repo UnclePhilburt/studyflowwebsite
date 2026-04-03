@@ -2595,6 +2595,16 @@
         }
       });
 
+      // Single click to open folders in grid mode
+      if (isGridMode) {
+        const folderItems = desktop.querySelectorAll('.folder-item');
+        folderItems.forEach(item => {
+          item.addEventListener('click', () => {
+            openFolder(item.dataset.id);
+          });
+        });
+      }
+
       // Add double-click to folders in free-form mode
       if (!isGridMode) {
         const folderItems = desktop.querySelectorAll('.folder-item');
@@ -3314,9 +3324,11 @@
 
           isDraggingFreeForm = false;
         } else {
-          // This was a click - trigger preview for notes
+          // This was a click - trigger action
           if (draggedItem.type === 'note') {
             showPreview(draggedItem.id);
+          } else if (draggedItem.type === 'folder') {
+            openFolder(draggedItem.id);
           }
         }
 
