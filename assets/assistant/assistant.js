@@ -103,7 +103,7 @@
         { label: 'Import events', fn: () => { if (window.openCanvasImportModal) window.openCanvasImportModal(); }, primary: true }
       ],
       actions: [
-        { label: "What's on today?", fn: () => { loadDigest(); }, primary: true },
+        { label: "What's on today?", fn: () => { loadDigest(); }, primary: true, requiresEvents: true },
         { label: 'Import events', fn: () => { if (window.openCanvasImportModal) window.openCanvasImportModal(); } },
         { label: 'Study planning tips', fn: () => { askAssistant('Give me tips for planning my study schedule effectively', 'tips'); } }
       ]
@@ -300,12 +300,56 @@
     }
   }
 
+  async function hasUpcomingEvents() {
+    const token = getAuthToken();
+    if (!token) return false;
+
+    try {
+      // Check cache first
+      const cached = JSON.parse(localStorage.getItem(DIGEST_CACHE_KEY) || '{}');
+      if (cached.data && (Date.now() - cached.ts) < DIGEST_TTL) {
+        return (cached.data.events_today && cached.data.events_today.length > 0) ||
+               (cached.data.unread_notifications > 0);
+      }
+
+      // Fetch fresh data
+      const res = await fetch(`${BACKEND_URL}/api/assistant/digest`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+
+      // Cache it
+      localStorage.setItem(DIGEST_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+
+      return (data.events_today && data.events_today.length > 0) ||
+             (data.unread_notifications > 0);
+    } catch {
+      return false;
+    }
+  }
+
   function showDigestBubble(data) {
+    const hasEvents = data.events_today && data.events_today.length > 0;
+    const hasNotifs = data.unread_notifications > 0;
+
+    // If nothing scheduled, show different message
+    if (!hasEvents && !hasNotifs) {
+      const actions = [
+        { label: 'Add an event', fn: () => { window.location.href = 'calendar.html'; }, primary: true },
+        { label: 'Browse notes', fn: () => { window.location.href = 'browse.html'; } },
+        { label: 'OK', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ];
+      showBubble("Your schedule is clear today! Perfect time to get ahead on studying.", actions);
+      return;
+    }
+
+    // Has events/notifications
     const actions = [];
-    if (data.events_today && data.events_today.length > 0) {
+    if (hasEvents) {
       actions.push({ label: `View ${data.events_today.length} event${data.events_today.length > 1 ? 's' : ''} today`, fn: () => { window.location.href = 'calendar.html'; } });
     }
-    if (data.unread_notifications > 0) {
+    if (hasNotifs) {
       actions.push({ label: `${data.unread_notifications} unread notification${data.unread_notifications > 1 ? 's' : ''}`, fn: () => { /* open notif panel if available */ dismissBubble(); } });
     }
     actions.push({ label: 'Got it!', fn: () => { setExpression('happy'); dismissBubble(); } });
@@ -649,7 +693,7 @@
   }
 
   // ========== INTERACTION ==========
-  function onCharacterClick() {
+  async function onCharacterClick() {
     const wrap = document.getElementById('sf-assistant-wrap');
     if (wrap.classList.contains('minimized')) {
       wrap.classList.remove('minimized');
@@ -666,7 +710,18 @@
     // Show page actions
     const config = PAGE_ACTIONS[currentPage];
     if (config) {
-      showBubble(config.idle, config.actions);
+      let actions = [...config.actions]; // Clone array
+
+      // Check if there are events before showing digest-related buttons
+      if (currentPage === 'dashboard' || currentPage === 'calendar') {
+        const hasEvents = await hasUpcomingEvents();
+        if (!hasEvents) {
+          // Remove actions that require events
+          actions = actions.filter(a => !a.requiresEvents && a.label !== "What's my day look like?");
+        }
+      }
+
+      showBubble(config.idle, actions);
       setExpression('happy', 1.5);
     } else {
       showBubble("Hi! I'm " + ASSISTANT_NAME + ". Click me anytime for help.", [
@@ -681,13 +736,16 @@
     idleTimer = setTimeout(onIdle, IDLE_NUDGE_MS);
   }
 
-  function onIdle() {
+  async function onIdle() {
     if (bubbleVisible) return;
     if (document.getElementById('sf-assistant-wrap')?.classList.contains('minimized')) return;
 
-    // On dashboard, try to preload digest
+    // On dashboard, only show notification dot if there are events
     if (currentPage === 'dashboard' && getAuthToken()) {
-      showNotificationDot();
+      const hasEvents = await hasUpcomingEvents();
+      if (hasEvents) {
+        showNotificationDot();
+      }
       return;
     }
 
