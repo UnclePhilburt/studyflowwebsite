@@ -2011,14 +2011,16 @@
         unfiledConvos.forEach((conv, ci) => {
           const messages = conv.messages || [];
           const savedLayout = conv.canvas_layout;
-          const clusterOffsetX = clusterX;
+          // Use saved cluster position, or auto-space if not saved
+          const clusterOffsetX = (savedLayout && savedLayout.cluster_x !== undefined) ? savedLayout.cluster_x : clusterX;
+          const clusterOffsetY = (savedLayout && savedLayout.cluster_y !== undefined) ? savedLayout.cluster_y : 0;
 
           // Title label
           const titleLabel = document.createElement('div');
           titleLabel.className = 'cluster-title';
           titleLabel.textContent = conv.title || 'New Chat';
           titleLabel.style.left = clusterOffsetX + 'px';
-          titleLabel.style.top = '-40px';
+          titleLabel.style.top = (clusterOffsetY - 40) + 'px';
           world.appendChild(titleLabel);
           folderElements.push(titleLabel);
 
@@ -2029,8 +2031,10 @@
 
           let lastCardId = null;
           let pendingQuestion = null;
-          let fallbackY = 0;
+          let fallbackY = clusterOffsetY;
           let firstCard = null;
+          let maxX = clusterOffsetX;
+          const usingSavedCluster = (savedLayout && savedLayout.cluster_x !== undefined);
 
           for (const msg of messages) {
             if (msg.role === 'user') {
@@ -2040,7 +2044,7 @@
               let cx, cy, parentId;
               if (saved) {
                 cx = saved.x + clusterOffsetX;
-                cy = saved.y;
+                cy = saved.y + clusterOffsetY;
                 parentId = saved.parentId !== null && saved.parentId !== undefined
                   ? (saved.parentId < cards.length ? saved.parentId : lastCardId) : lastCardId;
               } else {
@@ -2062,7 +2066,7 @@
               if (!firstCard) firstCard = card;
 
               if (!saved) fallbackY += (card.element.offsetHeight || 200) + 100;
-              clusterX = Math.max(clusterX, cx + 600);
+              maxX = Math.max(maxX, cx + 600);
               lastCardId = card.id;
               pendingQuestion = null;
             }
@@ -2084,7 +2088,10 @@
             }
           });
 
-          clusterX += 200;
+          // Only update clusterX for auto-spacing if this conversation didn't have a saved cluster position
+          if (!usingSavedCluster) {
+            clusterX = maxX + 200;
+          }
         });
       }
 
@@ -2350,9 +2357,9 @@
           const messages = conv.messages || [];
           const savedLayout = conv.canvas_layout;
 
-          // Cluster offset -- space conversations apart
-          const clusterOffsetX = clusterX;
-          const clusterOffsetY = 0;
+          // Use saved cluster position, or auto-space if not saved
+          const clusterOffsetX = (savedLayout && savedLayout.cluster_x !== undefined) ? savedLayout.cluster_x : clusterX;
+          const clusterOffsetY = (savedLayout && savedLayout.cluster_y !== undefined) ? savedLayout.cluster_y : 0;
 
           // Title label (will be positioned relative to first card)
           const titleLabel = document.createElement('div');
@@ -2378,6 +2385,7 @@
           let fallbackY = clusterOffsetY;
           let maxX = clusterOffsetX;
           let maxY = clusterOffsetY;
+          const usingSavedCluster = (savedLayout && savedLayout.cluster_x !== undefined);
 
           // Track this conversation's first card for setting conversationId on click
           let firstCardInCluster = null;
@@ -2451,8 +2459,10 @@
             }
           });
 
-          // Space next cluster to the right
-          clusterX = maxX + 200;
+          // Only update clusterX for auto-spacing if this conversation didn't have a saved cluster position
+          if (!usingSavedCluster) {
+            clusterX = maxX + 200;
+          }
         });
 
         // Render subfolders from preloaded data
@@ -3049,9 +3059,11 @@
 
       // Sources HTML
       let sourcesHtml = '';
+      console.log('DEBUG populateCard sources:', sources); // DEBUG
       if (sources && sources.length > 0) {
         const noteSources = sources.filter(s => !s.from_wikipedia);
         const wikiSources = sources.filter(s => s.from_wikipedia && s.wikipedia_url);
+        console.log('DEBUG noteSources:', noteSources, 'wikiSources:', wikiSources); // DEBUG
 
         if (noteSources.length > 0) {
           sourcesHtml += '<div style="margin-top:12px;font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px;">Sources</div>';
@@ -3720,10 +3732,28 @@
 
         for (const [cid, layout] of Object.entries(convGroups)) {
           try {
+            // Find the minimum x and y to determine cluster position
+            const minX = Math.min(...layout.map(c => c.x));
+            const minY = Math.min(...layout.map(c => c.y));
+
+            // Convert absolute positions to relative positions
+            const relativeLayout = layout.map(c => ({
+              ...c,
+              x: c.x - minX,
+              y: c.y - minY
+            }));
+
             await fetch(`${BACKEND_URL}/api/conversations/${cid}/layout`, {
               method: 'PUT',
               headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ cards: layout, panX, panY, scale })
+              body: JSON.stringify({
+                cards: relativeLayout,
+                cluster_x: minX,
+                cluster_y: minY,
+                panX,
+                panY,
+                scale
+              })
             });
           } catch (e) {}
         }
