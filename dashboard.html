@@ -3689,11 +3689,23 @@
         const currentFloShape = localStorage.getItem('sf-flo-shape') || 'sphere';
         const currentFloHat = localStorage.getItem('sf-flo-hat') || 'none';
         const currentFloSize = localStorage.getItem('sf-flo-size') || 'medium';
+        const currentFloColor = localStorage.getItem('sf-flo-color') || 'sage';
 
         const shapeOptions = [
           {id:'sphere',label:'Sphere',desc:'Classic round buddy'},
           {id:'cube',label:'Cube',desc:'Square and bold'},
           {id:'cylinder',label:'Cylinder',desc:'Tall and smooth'}
+        ];
+
+        const colorOptions = [
+          {id:'sage',label:'Sage Green',color:'#7c9885'},
+          {id:'blue',label:'Sky Blue',color:'#6b9bd1'},
+          {id:'purple',label:'Lavender',color:'#9b88d1'},
+          {id:'pink',label:'Rose Pink',color:'#d18bb0'},
+          {id:'orange',label:'Peach',color:'#d1a56b'},
+          {id:'mint',label:'Mint',color:'#6bd1a8'},
+          {id:'coral',label:'Coral',color:'#d17b6b'},
+          {id:'yellow',label:'Sunshine',color:'#d1c76b'}
         ];
 
         const hatOptions = [
@@ -3755,6 +3767,24 @@
                 {id:'small',label:'Small'},{id:'medium',label:'Medium'},{id:'large',label:'Large'},{id:'xlarge',label:'Extra Large'}
               ], currentFloSize, 'setFloSize')}
               <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">How big Flo appears on screen</p>
+            </div>
+            <div>
+              ${secLabel('Color')}
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+                ${colorOptions.map(c => `
+                  <button onclick="setFloColor('${c.id}');renderSettingsPanel()" style="
+                    padding:10px;border-radius:8px;border:2px solid ${currentFloColor === c.id ? 'var(--accent-primary)' : 'var(--border-color)'};
+                    background:${c.color};
+                    font-size:10px;font-weight:600;
+                    font-family:inherit;cursor:pointer;transition:all 0.15s;text-align:center;
+                    color:white;text-shadow:0 1px 2px rgba(0,0,0,0.3);
+                    display:flex;align-items:center;justify-content:center;
+                    min-height:40px;
+                  " title="${c.label}">
+                    ${c.label}
+                  </button>
+                `).join('')}
+              </div>
             </div>
             <div>
               ${secLabel('Particle Effects')}
@@ -6752,6 +6782,13 @@
           canvas.style.height = size + 'px';
         }
       }
+      _rerender();
+    }
+
+    function setFloColor(val) {
+      localStorage.setItem('sf-flo-color', val);
+      // Flo needs to be recreated with the new color
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { color: val, recreate: true } }));
       _rerender();
     }
 

@@ -570,6 +570,35 @@
     initCharacter();
   }
 
+  // ========== COLOR MAPPING ==========
+  function getFloColor(colorId) {
+    const colorMap = {
+      'sage': 0x7c9885,
+      'blue': 0x6b9bd1,
+      'purple': 0x9b88d1,
+      'pink': 0xd18bb0,
+      'orange': 0xd1a56b,
+      'mint': 0x6bd1a8,
+      'coral': 0xd17b6b,
+      'yellow': 0xd1c76b
+    };
+    return colorMap[colorId] || 0x7c9885; // Default to sage
+  }
+
+  function getFloLidColor(colorId) {
+    const lidColorMap = {
+      'sage': 0x6a8573,
+      'blue': 0x5a85b8,
+      'purple': 0x8676b8,
+      'pink': 0xb87699,
+      'orange': 0xb88f5a,
+      'mint': 0x5ab88f,
+      'coral': 0xb8675a,
+      'yellow': 0xb8ad5a
+    };
+    return lidColorMap[colorId] || 0x6a8573; // Default to sage
+  }
+
   // ========== HAT CREATION ==========
   function createHat(hatType) {
     if (hatType === 'none') return null;
@@ -856,11 +885,12 @@
     rimLight.position.set(-2, 1, -2);
     scene.add(rimLight);
 
-    // Body - get shape from settings
+    // Body - get shape and color from settings
     const shape = localStorage.getItem('sf-flo-shape') || 'sphere';
+    const colorId = localStorage.getItem('sf-flo-color') || 'sage';
     const bodyGeo = createBodyGeometry(shape);
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x7c9885,
+      color: getFloColor(colorId),
       roughness: 0.6,
       metalness: 0.05
     });
@@ -893,7 +923,7 @@
 
     // Eyelids (for blink and expressions)
     const lidGeo = new THREE.SphereGeometry(0.24, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.5);
-    const lidMat = new THREE.MeshStandardMaterial({ color: 0x6a8573, roughness: 0.6 });
+    const lidMat = new THREE.MeshStandardMaterial({ color: getFloLidColor(colorId), roughness: 0.6 });
 
     leftLid = new THREE.Mesh(lidGeo, lidMat);
     leftLid.position.set(0, 0.06, 0.02);
@@ -1374,8 +1404,8 @@
       // Settings are already saved to localStorage by dashboard
       console.log('Flo settings updated:', e.detail);
 
-      // If shape or hat changed, need to recreate the 3D character
-      if (e.detail?.recreate && (e.detail?.shape || e.detail?.hat)) {
+      // If shape, hat, or color changed, need to recreate the 3D character
+      if (e.detail?.recreate && (e.detail?.shape || e.detail?.hat || e.detail?.color)) {
         recreateCharacter();
       }
     });
