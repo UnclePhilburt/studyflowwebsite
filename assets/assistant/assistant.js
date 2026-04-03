@@ -33,12 +33,12 @@
       welcomeActions: [
         { label: 'Take a tour', fn: () => { if (window.startOnboarding) window.startOnboarding(); }, primary: true },
         { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
-        { label: 'Change theme', fn: () => { clickThemePicker(); } }
+        { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
       actions: [
         { label: "What's my day look like?", fn: () => { loadDigest(); }, primary: true },
         { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
-        { label: 'Change theme', fn: () => { clickThemePicker(); } }
+        { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
       proactive: getTimeGreeting
     },
