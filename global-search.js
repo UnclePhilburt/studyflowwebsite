@@ -308,16 +308,31 @@
     });
   }
 
+  async function getToken() {
+    // Try multiple ways pages store the auth token
+    if (window.authToken) return window.authToken;
+
+    // Try Supabase client (most pages have this)
+    var clients = [window.supabaseClient, window.supabase];
+    for (var i = 0; i < clients.length; i++) {
+      var c = clients[i];
+      if (c && c.auth && c.auth.getSession) {
+        try {
+          var sess = await c.auth.getSession();
+          if (sess.data && sess.data.session) return sess.data.session.access_token;
+        } catch(e) {}
+      }
+    }
+
+    return null;
+  }
+
   async function doSearch(q) {
     try {
-      // Get auth token from page
-      var token = window.authToken;
+      var token = await getToken();
       if (!token) {
-        // Try to get from Supabase session
-        if (window.supabaseClient) {
-          var sess = await window.supabaseClient.auth.getSession();
-          if (sess.data && sess.data.session) token = sess.data.session.access_token;
-        }
+        document.getElementById('gsResults').innerHTML = '<div class="gs-empty">Not signed in</div>';
+        return;
       }
 
       var backendUrl = window.BACKEND_URL || 'https://studyflowsuite.onrender.com';
