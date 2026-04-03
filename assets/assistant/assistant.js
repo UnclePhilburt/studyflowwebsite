@@ -14,7 +14,7 @@
 
   // ========== STATE ==========
   let scene, camera, renderer, bodyMesh, leftEye, rightEye, leftPupil, rightPupil;
-  let leftLid, rightLid, leftBrow, rightBrow, mouth;
+  let leftLid, rightLid, leftBottomLid, rightBottomLid, leftBrow, rightBrow, mouth;
   let mouseX = 0, mouseY = 0;
   let bobTime = 0;
   let blinkTimer = 0;
@@ -569,6 +569,8 @@
     rightPupil = null;
     leftLid = null;
     rightLid = null;
+    leftBottomLid = null;
+    rightBottomLid = null;
     leftBrow = null;
     rightBrow = null;
     mouth = null;
@@ -944,6 +946,19 @@
     rightLid.scale.set(1.05, 1, 1.05);
     rightEye.add(rightLid);
 
+    // Bottom eyelids
+    leftBottomLid = new THREE.Mesh(lidGeo, lidMat);
+    leftBottomLid.position.set(0, -0.06, 0.02);
+    leftBottomLid.rotation.x = Math.PI * 0.5; // fully open = hidden at bottom
+    leftBottomLid.scale.set(1.05, 1, 1.05);
+    leftEye.add(leftBottomLid);
+
+    rightBottomLid = new THREE.Mesh(lidGeo, lidMat);
+    rightBottomLid.position.set(0, -0.06, 0.02);
+    rightBottomLid.rotation.x = Math.PI * 0.5;
+    rightBottomLid.scale.set(1.05, 1, 1.05);
+    rightEye.add(rightBottomLid);
+
     // Eyebrows for expressions
     const browCurve = new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(-0.1, 0, 0),
@@ -1152,9 +1167,15 @@
     if (expression === 'winking') {
       leftLid.rotation.x += (leftLidTarget - leftLid.rotation.x) * 0.15;
       rightLid.rotation.x += (rightLidTarget - rightLid.rotation.x) * 0.15;
+      // Bottom lids move opposite direction
+      leftBottomLid.rotation.x += (-leftLidTarget - leftBottomLid.rotation.x) * 0.15;
+      rightBottomLid.rotation.x += (-rightLidTarget - rightBottomLid.rotation.x) * 0.15;
     } else {
       leftLid.rotation.x += (lidTarget - leftLid.rotation.x) * 0.15;
       rightLid.rotation.x += (lidTarget - rightLid.rotation.x) * 0.15;
+      // Bottom lids move opposite direction
+      leftBottomLid.rotation.x += (-lidTarget - leftBottomLid.rotation.x) * 0.15;
+      rightBottomLid.rotation.x += (-lidTarget - rightBottomLid.rotation.x) * 0.15;
     }
 
     // Apply brow positions
