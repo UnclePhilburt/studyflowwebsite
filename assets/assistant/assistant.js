@@ -1358,8 +1358,8 @@
       // Settings are already saved to localStorage by dashboard
       console.log('Flo settings updated:', e.detail);
 
-      // If shape changed, need to recreate the 3D character
-      if (e.detail?.recreate && e.detail?.shape) {
+      // If shape or hat changed, need to recreate the 3D character
+      if (e.detail?.recreate && (e.detail?.shape || e.detail?.hat)) {
         recreateCharacter();
       }
     });
