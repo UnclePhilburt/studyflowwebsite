@@ -3680,6 +3680,51 @@
               </button>`;
             }).join('')}
           </div>`;
+      } else if (_settingsTab === 'flo') {
+        const currentFloParticles = localStorage.getItem('sf-flo-particles') || 'on';
+        const currentFloEmojis = localStorage.getItem('sf-flo-emojis') || 'on';
+        const currentFloMinimize = localStorage.getItem('sf-flo-minimize') || 'off';
+        const currentFloPosition = localStorage.getItem('sf-flo-position') || 'bottom-left';
+        const currentFloExpressions = localStorage.getItem('sf-flo-expressions') || 'full';
+
+        content = `
+          <div style="padding:12px 20px;display:flex;flex-direction:column;gap:16px;">
+            <div>
+              ${secLabel('Particle Effects')}
+              ${optBtns([
+                {id:'on',label:'Enabled'},{id:'off',label:'Disabled'}
+              ], currentFloParticles, 'setFloParticles')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Hearts, stars, and other visual effects when Flo reacts</p>
+            </div>
+            <div>
+              ${secLabel('Message Emojis')}
+              ${optBtns([
+                {id:'on',label:'Enabled'},{id:'off',label:'Disabled'}
+              ], currentFloEmojis, 'setFloEmojis')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Show emojis in Flo's speech bubbles</p>
+            </div>
+            <div>
+              ${secLabel('Expression Style')}
+              ${optBtns([
+                {id:'full',label:'Expressive'},{id:'subtle',label:'Subtle'},{id:'minimal',label:'Minimal'}
+              ], currentFloExpressions, 'setFloExpressions')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">How animated Flo's reactions are</p>
+            </div>
+            <div>
+              ${secLabel('Position')}
+              ${optBtns([
+                {id:'bottom-left',label:'Bottom Left'},{id:'bottom-right',label:'Bottom Right'}
+              ], currentFloPosition, 'setFloPosition')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Where Flo appears on the screen</p>
+            </div>
+            <div>
+              ${secLabel('Start Minimized')}
+              ${optBtns([
+                {id:'off',label:'Normal Size'},{id:'on',label:'Minimized'}
+              ], currentFloMinimize, 'setFloMinimize')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Flo starts small and out of the way</p>
+            </div>
+          </div>`;
       }
 
       body.innerHTML = `
@@ -3687,6 +3732,7 @@
           ${tabBtn('themes', 'Themes')}
           ${tabBtn('customize', 'Customize')}
           ${tabBtn('fonts', 'Fonts')}
+          ${tabBtn('flo', 'Flo')}
         </div>
         ${content}
       `;
@@ -6540,6 +6586,66 @@
         if (_particleAnim) { cancelAnimationFrame(_particleAnim); _particleAnim = null; }
       } else {
         initParticles(mode);
+      }
+      _rerender();
+    }
+
+    function setFloParticles(val) {
+      localStorage.setItem('sf-flo-particles', val);
+      // Notify Flo to update (event will be handled by assistant.js)
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { particles: val } }));
+      _rerender();
+    }
+
+    function setFloEmojis(val) {
+      localStorage.setItem('sf-flo-emojis', val);
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { emojis: val } }));
+      _rerender();
+    }
+
+    function setFloExpressions(val) {
+      localStorage.setItem('sf-flo-expressions', val);
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { expressions: val } }));
+      _rerender();
+    }
+
+    function setFloPosition(val) {
+      localStorage.setItem('sf-flo-position', val);
+      const wrap = document.getElementById('sf-assistant-wrap');
+      if (wrap) {
+        wrap.style.transition = 'all 0.3s ease';
+        if (val === 'bottom-right') {
+          wrap.style.left = 'auto';
+          wrap.style.right = '20px';
+          wrap.style.bottom = '20px';
+          wrap.style.top = 'auto';
+        } else if (val === 'top-left') {
+          wrap.style.left = '20px';
+          wrap.style.right = 'auto';
+          wrap.style.top = '20px';
+          wrap.style.bottom = 'auto';
+        } else if (val === 'top-right') {
+          wrap.style.left = 'auto';
+          wrap.style.right = '20px';
+          wrap.style.top = '20px';
+          wrap.style.bottom = 'auto';
+        } else {
+          wrap.style.left = '20px';
+          wrap.style.right = 'auto';
+          wrap.style.bottom = '20px';
+          wrap.style.top = 'auto';
+        }
+      }
+      _rerender();
+    }
+
+    function setFloMinimize(val) {
+      localStorage.setItem('sf-flo-minimize', val);
+      const wrap = document.getElementById('sf-assistant-wrap');
+      if (wrap && val === 'on') {
+        wrap.classList.add('minimized');
+      } else if (wrap) {
+        wrap.classList.remove('minimized');
       }
       _rerender();
     }

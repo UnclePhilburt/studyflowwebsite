@@ -402,6 +402,9 @@
 
   // ========== PARTICLE SYSTEM ==========
   function spawnParticle(type) {
+    // Check if particles are disabled
+    if (localStorage.getItem('sf-flo-particles') === 'off') return;
+
     const container = document.getElementById('sf-assistant-character');
     if (!container) return;
 
@@ -448,7 +451,11 @@
   function buildDOM() {
     const wrap = document.createElement('div');
     wrap.id = 'sf-assistant-wrap';
-    if (localStorage.getItem(MINIMIZED_KEY) === 'true') wrap.classList.add('minimized');
+
+    // Apply minimize setting (check both old key and new setting)
+    const oldMinimized = localStorage.getItem(MINIMIZED_KEY) === 'true';
+    const startMinimized = localStorage.getItem('sf-flo-minimize') === 'on';
+    if (oldMinimized || startMinimized) wrap.classList.add('minimized');
 
     wrap.innerHTML = `
       <div id="sf-assistant-bubble">
@@ -462,6 +469,21 @@
     `;
 
     document.body.appendChild(wrap);
+
+    // Apply position setting
+    const position = localStorage.getItem('sf-flo-position') || 'bottom-left';
+    if (position === 'bottom-right') {
+      wrap.style.left = 'auto';
+      wrap.style.right = '20px';
+    } else if (position === 'top-left') {
+      wrap.style.bottom = 'auto';
+      wrap.style.top = '20px';
+    } else if (position === 'top-right') {
+      wrap.style.left = 'auto';
+      wrap.style.right = '20px';
+      wrap.style.bottom = 'auto';
+      wrap.style.top = '20px';
+    }
 
     // Events
     document.getElementById('sf-assistant-character').addEventListener('click', onCharacterClick);
@@ -768,6 +790,20 @@
   }
 
   function setExpression(expr, duration = 2) {
+    const expressionStyle = localStorage.getItem('sf-flo-expressions') || 'full';
+
+    // Reduce expression intensity based on setting
+    if (expressionStyle === 'minimal') {
+      // Minimal: only basic expressions, shorter duration
+      if (['celebrating', 'excited', 'winking', 'sleeping'].includes(expr)) {
+        expr = 'happy'; // Simplify to basic happy
+      }
+      duration = Math.min(duration, 1); // Cap at 1 second
+    } else if (expressionStyle === 'subtle') {
+      // Subtle: all expressions but shorter duration
+      duration = duration * 0.5; // Half duration
+    }
+
     expression = expr;
     expressionTimer = duration;
 
@@ -796,7 +832,13 @@
     const msgEl = document.getElementById('sf-assistant-msg');
     const btnsEl = document.getElementById('sf-assistant-buttons');
 
-    msgEl.textContent = msg;
+    // Strip emojis if setting is off
+    let displayMsg = msg;
+    if (localStorage.getItem('sf-flo-emojis') === 'off') {
+      displayMsg = msg.replace(/[\u{1F000}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+    }
+
+    msgEl.textContent = displayMsg;
     btnsEl.innerHTML = '';
 
     actions.forEach(action => {
@@ -993,6 +1035,13 @@
     // Reset idle on any interaction
     ['click', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
       document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    // Listen for Flo settings changes from dashboard
+    window.addEventListener('flo-settings-changed', (e) => {
+      // Settings are already saved to localStorage by dashboard
+      // Just acknowledge the change happened
+      console.log('Flo settings updated:', e.detail);
     });
 
     // ---- NOTES PAGE EVENTS ----
