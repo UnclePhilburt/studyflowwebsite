@@ -3686,9 +3686,43 @@
         const currentFloMinimize = localStorage.getItem('sf-flo-minimize') || 'off';
         const currentFloPosition = localStorage.getItem('sf-flo-position') || 'bottom-left';
         const currentFloExpressions = localStorage.getItem('sf-flo-expressions') || 'full';
+        const currentFloShape = localStorage.getItem('sf-flo-shape') || 'sphere';
+
+        const shapeOptions = [
+          {id:'sphere',label:'Sphere',desc:'Classic round buddy'},
+          {id:'cube',label:'Cube',desc:'Square and bold'},
+          {id:'octahedron',label:'Octahedron',desc:'8-sided diamond'},
+          {id:'dodecahedron',label:'Dodecahedron',desc:'12-sided gem'},
+          {id:'icosahedron',label:'Icosahedron',desc:'20-sided wonder'},
+          {id:'tetrahedron',label:'Tetrahedron',desc:'Pyramid shape'},
+          {id:'cylinder',label:'Cylinder',desc:'Tall and smooth'},
+          {id:'cone',label:'Cone',desc:'Pointy friend'},
+          {id:'torus',label:'Torus',desc:'Donut shape'},
+          {id:'capsule',label:'Capsule',desc:'Pill-shaped'},
+          {id:'diamond',label:'Diamond',desc:'Double cone gem'},
+          {id:'star',label:'Star',desc:'5-pointed star'}
+        ];
 
         content = `
           <div style="padding:12px 20px;display:flex;flex-direction:column;gap:16px;">
+            <div>
+              ${secLabel('Body Shape')}
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                ${shapeOptions.map(s => `
+                  <button onclick="setFloShape('${s.id}');renderSettingsPanel()" style="
+                    padding:10px;border-radius:8px;border:1.5px solid ${currentFloShape === s.id ? 'var(--accent-primary)' : 'var(--border-color)'};
+                    background:${currentFloShape === s.id ? 'var(--accent-primary)' : 'none'};
+                    color:${currentFloShape === s.id ? 'white' : 'var(--text-secondary)'};
+                    font-size:11px;font-weight:${currentFloShape === s.id ? '600' : '500'};
+                    font-family:inherit;cursor:pointer;transition:all 0.15s;text-align:center;
+                    display:flex;flex-direction:column;gap:2px;
+                  " title="${s.desc}">
+                    <div style="font-weight:600;">${s.label}</div>
+                    <div style="font-size:9px;opacity:0.8;">${s.desc}</div>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
             <div>
               ${secLabel('Particle Effects')}
               ${optBtns([
@@ -6647,6 +6681,13 @@
       } else if (wrap) {
         wrap.classList.remove('minimized');
       }
+      _rerender();
+    }
+
+    function setFloShape(val) {
+      localStorage.setItem('sf-flo-shape', val);
+      // Flo needs to be recreated with the new shape
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { shape: val, recreate: true } }));
       _rerender();
     }
 

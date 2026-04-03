@@ -29,6 +29,7 @@
   let idleStartTime = Date.now();
   let celebrateTimer = 0;
   let particles = [];
+  let animationId = null;
 
   // ========== PAGE ACTION DEFINITIONS ==========
   const PAGE_ACTIONS = {
@@ -514,6 +515,129 @@
     });
   }
 
+  // ========== CHARACTER RECREATION ==========
+  function recreateCharacter() {
+    // Cancel existing animation loop
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+
+    // Clear the existing scene
+    if (scene) {
+      while(scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+      }
+    }
+
+    // Reinitialize character
+    const container = document.getElementById('sf-assistant-character');
+    if (container && renderer) {
+      // Remove old canvas
+      const oldCanvas = container.querySelector('canvas');
+      if (oldCanvas) oldCanvas.remove();
+    }
+
+    // Reset references
+    bodyMesh = null;
+    leftEye = null;
+    rightEye = null;
+    leftPupil = null;
+    rightPupil = null;
+    leftLid = null;
+    rightLid = null;
+    leftBrow = null;
+    rightBrow = null;
+    mouth = null;
+
+    // Recreate
+    initCharacter();
+  }
+
+  // ========== SHAPE CREATION ==========
+  function createBodyGeometry(shape) {
+    let bodyGeo;
+
+    switch(shape) {
+      case 'cube':
+        bodyGeo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
+        break;
+      case 'octahedron':
+        bodyGeo = new THREE.OctahedronGeometry(1.1, 0);
+        break;
+      case 'dodecahedron':
+        bodyGeo = new THREE.DodecahedronGeometry(1, 0);
+        break;
+      case 'icosahedron':
+        bodyGeo = new THREE.IcosahedronGeometry(1.1, 0);
+        break;
+      case 'tetrahedron':
+        bodyGeo = new THREE.TetrahedronGeometry(1.3, 0);
+        break;
+      case 'cylinder':
+        bodyGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.8, 32);
+        break;
+      case 'cone':
+        bodyGeo = new THREE.ConeGeometry(1, 2, 32);
+        break;
+      case 'torus':
+        bodyGeo = new THREE.TorusGeometry(0.7, 0.4, 24, 32);
+        break;
+      case 'capsule':
+        // Cylinder with spheres on top/bottom
+        const capsuleGroup = new THREE.Group();
+        const cylGeo = new THREE.CylinderGeometry(0.6, 0.6, 1, 32);
+        const topSphere = new THREE.SphereGeometry(0.6, 32, 32);
+        topSphere.translate(0, 0.5, 0);
+        const bottomSphere = new THREE.SphereGeometry(0.6, 32, 32);
+        bottomSphere.translate(0, -0.5, 0);
+        bodyGeo = new THREE.BufferGeometry();
+        bodyGeo = THREE.BufferGeometryUtils ?
+          THREE.BufferGeometryUtils.mergeBufferGeometries([cylGeo, topSphere, bottomSphere]) :
+          cylGeo; // Fallback if utils not available
+        break;
+      case 'diamond':
+        // Two cones joined at base
+        const topCone = new THREE.ConeGeometry(0.8, 1.2, 32);
+        topCone.translate(0, 0.6, 0);
+        const bottomCone = new THREE.ConeGeometry(0.8, 1.2, 32);
+        bottomCone.rotateX(Math.PI);
+        bottomCone.translate(0, -0.6, 0);
+        bodyGeo = new THREE.BufferGeometry();
+        bodyGeo = THREE.BufferGeometryUtils ?
+          THREE.BufferGeometryUtils.mergeBufferGeometries([topCone, bottomCone]) :
+          topCone; // Fallback
+        break;
+      case 'star':
+        // 5-pointed star using extrusion
+        const starShape = new THREE.Shape();
+        const outerRadius = 1;
+        const innerRadius = 0.4;
+        for (let i = 0; i < 10; i++) {
+          const angle = (i / 10) * Math.PI * 2;
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
+          const x = Math.cos(angle - Math.PI / 2) * radius;
+          const y = Math.sin(angle - Math.PI / 2) * radius;
+          if (i === 0) starShape.moveTo(x, y);
+          else starShape.lineTo(x, y);
+        }
+        starShape.closePath();
+        const extrudeSettings = { depth: 0.4, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.1, bevelSegments: 3 };
+        bodyGeo = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+        bodyGeo.rotateX(Math.PI / 2);
+        bodyGeo.translate(0, 0, -0.2);
+        break;
+      case 'sphere':
+      default:
+        bodyGeo = new THREE.SphereGeometry(1, 32, 32);
+        // Slightly squash vertically for a friendlier look
+        bodyGeo.scale(1, 0.92, 0.95);
+        break;
+    }
+
+    return bodyGeo;
+  }
+
   // ========== THREE.JS CHARACTER ==========
   function initCharacter() {
     const container = document.getElementById('sf-assistant-character');
@@ -543,10 +667,9 @@
     rimLight.position.set(-2, 1, -2);
     scene.add(rimLight);
 
-    // Body - soft rounded sphere
-    const bodyGeo = new THREE.SphereGeometry(1, 32, 32);
-    // Slightly squash vertically for a friendlier look
-    bodyGeo.scale(1, 0.92, 0.95);
+    // Body - get shape from settings
+    const shape = localStorage.getItem('sf-flo-shape') || 'sphere';
+    const bodyGeo = createBodyGeometry(shape);
     const bodyMat = new THREE.MeshStandardMaterial({
       color: 0x7c9885,
       roughness: 0.6,
@@ -642,7 +765,7 @@
   }
 
   function animate() {
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
 
     const dt = 0.016;
     bobTime += dt;
@@ -1040,8 +1163,12 @@
     // Listen for Flo settings changes from dashboard
     window.addEventListener('flo-settings-changed', (e) => {
       // Settings are already saved to localStorage by dashboard
-      // Just acknowledge the change happened
       console.log('Flo settings updated:', e.detail);
+
+      // If shape changed, need to recreate the 3D character
+      if (e.detail?.recreate && e.detail?.shape) {
+        recreateCharacter();
+      }
     });
 
     // ---- NOTES PAGE EVENTS ----
