@@ -287,6 +287,86 @@
       --canvas-bg: #000000; --canvas-grid: rgba(0, 255, 0, 0.3);
     }
 
+    body[data-theme="hc-black-yellow"] {
+      --bg-primary: #ffff00; --bg-secondary: #ffff33; --bg-tertiary: #ffff33;
+      --text-primary: #000000; --text-secondary: #000000; --text-muted: #333333;
+      --accent-primary: #000000; --accent-secondary: #333333; --accent-tertiary: #000000;
+      --border-color: #000000; --hover-bg: rgba(0, 0, 0, 0.05);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #ffff00; --shadow: rgba(0, 0, 0, 0.3);
+      --canvas-bg: #ffff00; --canvas-grid: rgba(0, 0, 0, 0.2);
+    }
+
+    body[data-theme="hc-cyan-black"] {
+      --bg-primary: #000000; --bg-secondary: #001a1a; --bg-tertiary: #001a1a;
+      --text-primary: #00ffff; --text-secondary: #00ffff; --text-muted: #00cccc;
+      --accent-primary: #00ffff; --accent-secondary: #00cccc; --accent-tertiary: #00ffff;
+      --border-color: #00ffff; --hover-bg: rgba(0, 255, 255, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(0, 255, 255, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(0, 255, 255, 0.3);
+    }
+
+    body[data-theme="hc-blue-black"] {
+      --bg-primary: #000000; --bg-secondary: #001a33; --bg-tertiary: #001a33;
+      --text-primary: #4da6ff; --text-secondary: #4da6ff; --text-muted: #3399ff;
+      --accent-primary: #4da6ff; --accent-secondary: #3399ff; --accent-tertiary: #4da6ff;
+      --border-color: #4da6ff; --hover-bg: rgba(77, 166, 255, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(77, 166, 255, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(77, 166, 255, 0.3);
+    }
+
+    body[data-theme="hc-white-navy"] {
+      --bg-primary: #001a4d; --bg-secondary: #002266; --bg-tertiary: #002266;
+      --text-primary: #ffffff; --text-secondary: #ffffff; --text-muted: #cccccc;
+      --accent-primary: #ffffff; --accent-secondary: #cccccc; --accent-tertiary: #ffffff;
+      --border-color: #ffffff; --hover-bg: rgba(255, 255, 255, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #001a4d; --shadow: rgba(255, 255, 255, 0.3);
+      --canvas-bg: #001a4d; --canvas-grid: rgba(255, 255, 255, 0.3);
+    }
+
+    body[data-theme="hc-orange-black"] {
+      --bg-primary: #000000; --bg-secondary: #1a0d00; --bg-tertiary: #1a0d00;
+      --text-primary: #ff9933; --text-secondary: #ff9933; --text-muted: #ff8000;
+      --accent-primary: #ff9933; --accent-secondary: #ff8000; --accent-tertiary: #ff9933;
+      --border-color: #ff9933; --hover-bg: rgba(255, 153, 51, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(255, 153, 51, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(255, 153, 51, 0.3);
+    }
+
+    body[data-theme="hc-magenta-black"] {
+      --bg-primary: #000000; --bg-secondary: #1a001a; --bg-tertiary: #1a001a;
+      --text-primary: #ff00ff; --text-secondary: #ff00ff; --text-muted: #cc00cc;
+      --accent-primary: #ff00ff; --accent-secondary: #cc00cc; --accent-tertiary: #ff00ff;
+      --border-color: #ff00ff; --hover-bg: rgba(255, 0, 255, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(255, 0, 255, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(255, 0, 255, 0.3);
+    }
+
+    body[data-theme="hc-lime-black"] {
+      --bg-primary: #000000; --bg-secondary: #1a1a00; --bg-tertiary: #1a1a00;
+      --text-primary: #ccff00; --text-secondary: #ccff00; --text-muted: #99cc00;
+      --accent-primary: #ccff00; --accent-secondary: #99cc00; --accent-tertiary: #ccff00;
+      --border-color: #ccff00; --hover-bg: rgba(204, 255, 0, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(204, 255, 0, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(204, 255, 0, 0.3);
+    }
+
+    body[data-theme="hc-white-purple"] {
+      --bg-primary: #4d004d; --bg-secondary: #660066; --bg-tertiary: #660066;
+      --text-primary: #ffffff; --text-secondary: #ffffff; --text-muted: #cccccc;
+      --accent-primary: #ffffff; --accent-secondary: #cccccc; --accent-tertiary: #ffffff;
+      --border-color: #ffffff; --hover-bg: rgba(255, 255, 255, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #4d004d; --shadow: rgba(255, 255, 255, 0.3);
+      --canvas-bg: #4d004d; --canvas-grid: rgba(255, 255, 255, 0.3);
+    }
+
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg-primary);
@@ -6354,7 +6434,15 @@
         { id: 'hc-black-white', name: 'Black & White', colors: ['#ffffff', '#cccccc', '#000000'], text: '#ffffff', border: '#ffffff' },
         { id: 'hc-white-black', name: 'White & Black', colors: ['#000000', '#333333', '#ffffff'], text: '#000000', border: '#000000' },
         { id: 'hc-yellow-black', name: 'Yellow on Black', colors: ['#ffff00', '#ffcc00', '#000000'], text: '#ffff00', border: '#ffff00' },
+        { id: 'hc-black-yellow', name: 'Black on Yellow', colors: ['#000000', '#333333', '#ffff00'], text: '#000000', border: '#000000' },
         { id: 'hc-green-black', name: 'Green on Black', colors: ['#00ff00', '#00cc00', '#000000'], text: '#00ff00', border: '#00ff00' },
+        { id: 'hc-cyan-black', name: 'Cyan on Black', colors: ['#00ffff', '#00cccc', '#000000'], text: '#00ffff', border: '#00ffff' },
+        { id: 'hc-blue-black', name: 'Blue on Black', colors: ['#4da6ff', '#3399ff', '#000000'], text: '#4da6ff', border: '#4da6ff' },
+        { id: 'hc-white-navy', name: 'White on Navy', colors: ['#ffffff', '#cccccc', '#001a4d'], text: '#ffffff', border: '#ffffff' },
+        { id: 'hc-orange-black', name: 'Orange on Black', colors: ['#ff9933', '#ff8000', '#000000'], text: '#ff9933', border: '#ff9933' },
+        { id: 'hc-magenta-black', name: 'Magenta on Black', colors: ['#ff00ff', '#cc00cc', '#000000'], text: '#ff00ff', border: '#ff00ff' },
+        { id: 'hc-lime-black', name: 'Lime on Black', colors: ['#ccff00', '#99cc00', '#000000'], text: '#ccff00', border: '#ccff00' },
+        { id: 'hc-white-purple', name: 'White on Purple', colors: ['#ffffff', '#cccccc', '#4d004d'], text: '#ffffff', border: '#ffffff' },
       ]
     };
 
