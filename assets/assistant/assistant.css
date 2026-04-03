@@ -131,10 +131,17 @@
 
 #sf-assistant-character:hover {
   transform: scale(1.08);
+  animation: sf-wiggle 0.5s ease-in-out;
 }
 
 #sf-assistant-character:active {
   transform: scale(0.95);
+}
+
+@keyframes sf-wiggle {
+  0%, 100% { transform: scale(1.08) rotate(0deg); }
+  25% { transform: scale(1.08) rotate(-5deg); }
+  75% { transform: scale(1.08) rotate(5deg); }
 }
 
 #sf-assistant-character canvas {

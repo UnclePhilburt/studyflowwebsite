@@ -14,22 +14,26 @@
 
   // ========== STATE ==========
   let scene, camera, renderer, bodyMesh, leftEye, rightEye, leftPupil, rightPupil;
-  let leftLid, rightLid;
+  let leftLid, rightLid, leftBrow, rightBrow, mouth;
   let mouseX = 0, mouseY = 0;
   let bobTime = 0;
   let blinkTimer = 0;
-  let expression = 'idle'; // idle, happy, sleepy, surprised, thinking
+  let expression = 'idle'; // idle, happy, sleepy, surprised, thinking, excited, confused, celebrating, worried, winking, sleeping
   let expressionTimer = 0;
   let bubbleVisible = false;
   let idleTimer = null;
   let hasNotification = false;
   let currentPage = '';
+  let clickCount = 0;
+  let clickTimer = null;
+  let idleStartTime = Date.now();
+  let celebrateTimer = 0;
 
   // ========== PAGE ACTION DEFINITIONS ==========
   const PAGE_ACTIONS = {
     'dashboard': {
-      welcome: "Welcome to your dashboard! Here's what you can do:",
-      idle: "Need anything?",
+      welcome: "Hey there! Let's make today awesome!",
+      idle: "What's up? Need a hand?",
       welcomeActions: [
         { label: 'Take a tour', fn: () => { if (window.startOnboarding) window.startOnboarding(); }, primary: true },
         { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
@@ -43,8 +47,8 @@
       proactive: getTimeGreeting
     },
     'notes': {
-      welcome: "This is your note library! Upload, organize, and share your study notes.",
-      idle: "Working on your notes?",
+      welcome: "Your personal study vault! Let's get some notes in here!",
+      idle: "Studying hard? I can help!",
       welcomeActions: [
         { label: 'Upload notes', fn: () => { if (window.showUploadModal) window.showUploadModal(); }, primary: true },
         { label: 'Create a new note', fn: () => { if (window.createNewNote) window.createNewNote(); } },
@@ -57,8 +61,8 @@
       ]
     },
     'chat': {
-      welcome: "Chat with AI about any topic! Your conversations are saved as a knowledge graph.",
-      idle: "Want to chat?",
+      welcome: "Let's chat about anything! I've got your back with AI-powered answers!",
+      idle: "Got questions? Let's talk!",
       welcomeActions: [
         { label: 'Start new chat', fn: () => { if (window.startNewChat) window.startNewChat(); }, primary: true },
         { label: 'Add a sticky note', fn: () => { if (window.createStickyNote) window.createStickyNote(20100, 20100); } },
@@ -71,8 +75,8 @@
       ]
     },
     'browse': {
-      welcome: "Browse the Nexus! Find notes shared by students across universities.",
-      idle: "Looking for something?",
+      welcome: "Welcome to the Nexus! Thousands of study notes at your fingertips!",
+      idle: "Looking for something cool?",
       welcomeActions: [
         { label: 'Open advanced filters', fn: () => { if (window.toggleAdvFilters) window.toggleAdvFilters(); }, primary: true },
         { label: 'Clear all filters', fn: () => { if (window.clearAdvFilters) window.clearAdvFilters(); } }
@@ -84,8 +88,8 @@
       ]
     },
     'flashcards': {
-      welcome: "Test your knowledge! Generate quizzes on any topic or race your friends.",
-      idle: "Ready to study?",
+      welcome: "Quiz time! Let's see what you know! (Or quiz your friends for fun!)",
+      idle: "Ready to test yourself?",
       welcomeActions: [
         { label: 'Start a quiz', fn: () => { focusQuizInput(); }, primary: true },
         { label: 'Create a race', fn: () => { if (window.generateCode) window.generateCode(); } }
@@ -168,24 +172,38 @@
 
   function getTimeGreeting() {
     const hour = new Date().getHours();
-    if (hour < 6) return { msg: "Burning the midnight oil? Don't forget to rest!", actions: [
-      { label: 'Start focus timer', fn: () => {} },
-      { label: "I'm just browsing", fn: () => dismissBubble() }
-    ]};
-    if (hour < 12) return { msg: "Good morning! Ready to study?", actions: [
-      { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
-      { label: "Let's go", fn: () => dismissBubble() }
-    ]};
-    if (hour < 17) return { msg: "Afternoon study session! You've got this.", actions: [
-      { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
-      { label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } }
-    ]};
-    if (hour < 22) return { msg: "Evening session! Nice dedication.", actions: [
-      { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
-      { label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } }
-    ]};
-    return { msg: "Late night studying? Make sure to get some sleep!", actions: [
-      { label: "I'll wrap up soon", fn: () => { setExpression('happy'); dismissBubble(); } }
+    if (hour < 6) {
+      setExpression('sleepy', 3);
+      return { msg: "Whoa! It's super late! You should get some sleep soon!", actions: [
+        { label: 'Just 5 more minutes...', fn: () => { setExpression('worried'); dismissBubble(); } },
+        { label: 'Yeah, you\'re right', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]};
+    }
+    if (hour < 12) {
+      setExpression('happy', 2);
+      return { msg: "Morning! Let's crush this day!", actions: [
+        { label: 'Let\'s do it!', fn: () => { setExpression('excited'); dismissBubble(); } },
+        { label: 'Show me around', fn: () => { if (window.startOnboarding) window.startOnboarding(); dismissBubble(); } }
+      ]};
+    }
+    if (hour < 17) {
+      setExpression('happy', 2);
+      return { msg: "Afternoon grind! You're doing great!", actions: [
+        { label: 'Thanks Flo!', fn: () => { setExpression('happy'); dismissBubble(); } },
+        { label: 'Show me something cool', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); dismissBubble(); } }
+      ]};
+    }
+    if (hour < 22) {
+      setExpression('happy', 2);
+      return { msg: "Evening study sesh! Love the dedication!", actions: [
+        { label: 'You know it!', fn: () => { setExpression('excited'); dismissBubble(); } },
+        { label: 'Help me focus', fn: () => dismissBubble() }
+      ]};
+    }
+    setExpression('sleepy', 2);
+    return { msg: "It's getting late! Don't forget to sleep!", actions: [
+      { label: 'Almost done!', fn: () => { setExpression('happy'); dismissBubble(); } },
+      { label: 'Good point', fn: () => { setExpression('winking', 2); dismissBubble(); } }
     ]};
   }
 
@@ -493,6 +511,23 @@
     rightLid.scale.set(1.05, 1, 1.05);
     rightEye.add(rightLid);
 
+    // Eyebrows for expressions
+    const browCurve = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(-0.1, 0, 0),
+      new THREE.Vector3(0, 0.05, 0),
+      new THREE.Vector3(0.1, 0, 0)
+    );
+    const browGeo = new THREE.BufferGeometry().setFromPoints(browCurve.getPoints(8));
+    const browMat = new THREE.LineBasicMaterial({ color: 0x4a6b52, linewidth: 3 });
+
+    leftBrow = new THREE.Line(browGeo, browMat);
+    leftBrow.position.set(-0.28, 0.42, 0.88);
+    bodyMesh.add(leftBrow);
+
+    rightBrow = new THREE.Line(browGeo, browMat);
+    rightBrow.position.set(0.28, 0.42, 0.88);
+    bodyMesh.add(rightBrow);
+
     // Small blush circles for cuteness
     const blushGeo = new THREE.CircleGeometry(0.12, 16);
     const blushMat = new THREE.MeshBasicMaterial({ color: 0xf0a0a0, transparent: true, opacity: 0.3 });
@@ -507,7 +542,7 @@
     rightBlush.lookAt(camera.position);
     bodyMesh.add(rightBlush);
 
-    // Small mouth
+    // Small mouth (will be updated dynamically for expressions)
     const mouthCurve = new THREE.QuadraticBezierCurve3(
       new THREE.Vector3(-0.15, -0.18, 0.95),
       new THREE.Vector3(0, -0.25, 0.98),
@@ -515,7 +550,7 @@
     );
     const mouthGeo = new THREE.BufferGeometry().setFromPoints(mouthCurve.getPoints(12));
     const mouthMat = new THREE.LineBasicMaterial({ color: 0x4a6b52, linewidth: 2 });
-    const mouth = new THREE.Line(mouthGeo, mouthMat);
+    mouth = new THREE.Line(mouthGeo, mouthMat);
     bodyMesh.add(mouth);
 
     // Start animation
@@ -529,8 +564,14 @@
     bobTime += dt;
     blinkTimer += dt;
     if (expressionTimer > 0) expressionTimer -= dt;
-    if (expressionTimer <= 0 && expression !== 'idle' && expression !== 'sleepy') {
+    if (expressionTimer <= 0 && expression !== 'idle' && expression !== 'sleepy' && expression !== 'sleeping') {
       expression = 'idle';
+    }
+
+    // Easter egg: Fall asleep after 2 hours of inactivity
+    const idleTime = (Date.now() - idleStartTime) / 1000 / 60; // minutes
+    if (idleTime > 120 && expression === 'idle' && !bubbleVisible) {
+      setExpression('sleeping', 999); // basically forever until interaction
     }
 
     // Idle bob
@@ -574,22 +615,87 @@
     }
 
     // Expression overrides
+    let browTarget = 0; // neutral position
+    let leftLidTarget = lidTarget;
+    let rightLidTarget = lidTarget;
+
     if (expression === 'happy') {
-      // Squint eyes slightly (happy)
-      lidTarget = -Math.PI * 0.35;
+      lidTarget = -Math.PI * 0.35; // squint
+      browTarget = 0.05; // slightly raised
+      leftEye.scale.setScalar(1);
+      rightEye.scale.setScalar(1);
+    } else if (expression === 'excited') {
+      lidTarget = -Math.PI * 0.55; // wide eyes
+      browTarget = 0.15; // raised brows
+      leftEye.scale.setScalar(1.2);
+      rightEye.scale.setScalar(1.2);
+      // Bounce animation
+      bodyMesh.position.y = bobY + Math.abs(Math.sin(bobTime * 6)) * 0.15;
     } else if (expression === 'sleepy') {
       lidTarget = -Math.PI * 0.2; // half closed
+      browTarget = -0.1; // lowered
+      leftEye.scale.setScalar(0.9);
+      rightEye.scale.setScalar(0.9);
+    } else if (expression === 'sleeping') {
+      lidTarget = 0; // fully closed
+      browTarget = -0.05;
+      leftEye.scale.setScalar(1);
+      rightEye.scale.setScalar(1);
     } else if (expression === 'surprised') {
-      lidTarget = -Math.PI * 0.55; // extra wide
-      leftEye.scale.setScalar(1.15);
-      rightEye.scale.setScalar(1.15);
+      lidTarget = -Math.PI * 0.6; // extra wide
+      browTarget = 0.2; // very raised
+      leftEye.scale.setScalar(1.3);
+      rightEye.scale.setScalar(1.3);
+    } else if (expression === 'confused') {
+      lidTarget = -Math.PI * 0.4;
+      browTarget = 0.1;
+      leftBrow.rotation.z = -0.2; // asymmetric brows
+      rightBrow.rotation.z = 0.1;
+      leftEye.scale.setScalar(1.05);
+      rightEye.scale.setScalar(1.05);
+      // Head tilt
+      bodyMesh.rotation.z = bobTilt + 0.15;
+    } else if (expression === 'worried') {
+      lidTarget = -Math.PI * 0.3;
+      browTarget = 0.15;
+      leftBrow.rotation.z = 0.15; // worried brows
+      rightBrow.rotation.z = -0.15;
+      leftEye.scale.setScalar(0.95);
+      rightEye.scale.setScalar(0.95);
+    } else if (expression === 'winking') {
+      leftLidTarget = 0; // left eye closed
+      rightLidTarget = -Math.PI * 0.5; // right eye open
+      browTarget = 0.1;
+      leftEye.scale.setScalar(1);
+      rightEye.scale.setScalar(1.1);
+    } else if (expression === 'celebrating') {
+      lidTarget = -Math.PI * 0.4; // happy squint
+      browTarget = 0.1;
+      leftEye.scale.setScalar(1.1);
+      rightEye.scale.setScalar(1.1);
+      // Spin animation
+      celebrateTimer += dt * 3;
+      bodyMesh.rotation.y = Math.sin(celebrateTimer) * 0.5;
+      bodyMesh.position.y = bobY + Math.abs(Math.sin(celebrateTimer * 2)) * 0.2;
     } else {
       leftEye.scale.setScalar(1);
       rightEye.scale.setScalar(1);
+      leftBrow.rotation.z = 0;
+      rightBrow.rotation.z = 0;
     }
 
-    leftLid.rotation.x += (lidTarget - leftLid.rotation.x) * 0.15;
-    rightLid.rotation.x += (lidTarget - rightLid.rotation.x) * 0.15;
+    // Apply eyelid positions (handle winking separately)
+    if (expression === 'winking') {
+      leftLid.rotation.x += (leftLidTarget - leftLid.rotation.x) * 0.15;
+      rightLid.rotation.x += (rightLidTarget - rightLid.rotation.x) * 0.15;
+    } else {
+      leftLid.rotation.x += (lidTarget - leftLid.rotation.x) * 0.15;
+      rightLid.rotation.x += (lidTarget - rightLid.rotation.x) * 0.15;
+    }
+
+    // Apply brow positions
+    leftBrow.position.y += (0.42 + browTarget - leftBrow.position.y) * 0.1;
+    rightBrow.position.y += (0.42 + browTarget - rightBrow.position.y) * 0.1;
 
     renderer.render(scene, camera);
   }
@@ -702,6 +808,22 @@
       return;
     }
 
+    // Easter egg: Click spam detection
+    clickCount++;
+    if (clickTimer) clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
+
+    if (clickCount === 10) {
+      // Dizzy spin easter egg!
+      setExpression('confused', 5);
+      showBubble("Whoa! I'm getting dizzy! Stop clicking me so much!", [
+        { label: 'Haha sorry!', fn: () => { setExpression('happy'); dismissBubble(); } },
+        { label: 'Do a backflip!', fn: () => { setExpression('celebrating', 3); dismissBubble(); } }
+      ]);
+      clickCount = 0;
+      return;
+    }
+
     if (bubbleVisible) {
       dismissBubble();
       return;
@@ -734,6 +856,10 @@
   function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
     idleTimer = setTimeout(onIdle, IDLE_NUDGE_MS);
+    idleStartTime = Date.now(); // Reset idle sleep timer
+    if (expression === 'sleeping') {
+      setExpression('surprised', 2); // Wake up!
+    }
   }
 
   async function onIdle() {
@@ -785,12 +911,30 @@
     // ---- NOTES PAGE EVENTS ----
     window.addEventListener('sf:note-uploaded', (e) => {
       const count = e.detail?.count || 1;
-      setExpression('happy', 3);
-      showBubble(`${count > 1 ? count + ' notes' : 'Note'} uploaded!`, [
-        { label: 'Share with a friend', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); dismissBubble(); } },
-        { label: 'Upload more', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } },
-        { label: 'Nice!', fn: () => { setExpression('happy'); dismissBubble(); } }
-      ]);
+      const totalNotes = e.detail?.totalNotes || 0;
+
+      // Easter egg: 100th note milestone!
+      if (totalNotes === 100) {
+        setExpression('celebrating', 8);
+        showBubble(`🎉 WHOA! YOUR 100TH NOTE! YOU'RE A LEGEND! 🎉`, [
+          { label: 'YEAH BABY!', fn: () => { setExpression('excited', 5); dismissBubble(); } },
+          { label: 'Share my collection!', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); dismissBubble(); } },
+          { label: 'Keep going!', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } }
+        ]);
+      } else if (totalNotes === 50) {
+        setExpression('excited', 4);
+        showBubble(`50 notes! Halfway to 100! You're crushing it!`, [
+          { label: 'Let\'s go!', fn: () => { setExpression('happy'); dismissBubble(); } },
+          { label: 'Upload more', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } }
+        ]);
+      } else {
+        setExpression('happy', 3);
+        showBubble(`${count > 1 ? count + ' notes' : 'Note'} uploaded! Nice!`, [
+          { label: 'Share it', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); dismissBubble(); } },
+          { label: 'Upload more', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } },
+          { label: 'Sweet!', fn: () => { setExpression('happy'); dismissBubble(); } }
+        ]);
+      }
     });
 
     window.addEventListener('sf:note-deleted', () => {
@@ -864,10 +1008,10 @@
 
     // ---- CHAT PAGE EVENTS ----
     window.addEventListener('sf:chat-started', () => {
-      setExpression('happy', 2);
-      showBubble("New conversation! Ask me anything about your notes.", [
-        { label: 'Suggest a topic', fn: () => { askAssistant('Suggest an interesting study topic to explore based on popular subjects', 'ask'); } },
-        { label: 'Got it', fn: () => dismissBubble() }
+      setExpression('excited', 2);
+      showBubble("Ooh, new chat! What are we talking about today?", [
+        { label: 'Surprise me!', fn: () => { askAssistant('Suggest an interesting study topic to explore based on popular subjects', 'ask'); } },
+        { label: 'Let\'s chat!', fn: () => { setExpression('happy'); dismissBubble(); } }
       ]);
     });
 
@@ -890,18 +1034,18 @@
     // ---- DASHBOARD EVENTS ----
     window.addEventListener('sf:widget-added', (e) => {
       const type = e.detail?.type || 'widget';
-      setExpression('happy', 2);
-      showBubble(`${type.replace(/([A-Z])/g, ' $1').trim()} widget added! Drag it to position it.`, [
-        { label: 'Add another', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); dismissBubble(); } },
-        { label: 'Nice', fn: () => dismissBubble() }
+      setExpression('excited', 2);
+      showBubble(`Sweet! ${type.replace(/([A-Z])/g, ' $1').trim()} widget added! Make it your own!`, [
+        { label: 'Add more!', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); dismissBubble(); } },
+        { label: 'Perfect!', fn: () => { setExpression('happy'); dismissBubble(); } }
       ]);
     });
 
     window.addEventListener('sf:theme-changed', (e) => {
-      setExpression('happy', 2);
-      showBubble("Looking good! Theme updated.", [
+      setExpression('excited', 2);
+      showBubble("Ooh! Fresh look! I dig it!", [
         { label: 'Try a wallpaper too', fn: () => { clickThemePicker(); dismissBubble(); } },
-        { label: 'Love it', fn: () => { setExpression('happy'); dismissBubble(); } }
+        { label: 'Thanks Flo!', fn: () => { setExpression('happy'); dismissBubble(); } }
       ]);
     });
 
@@ -944,10 +1088,18 @@
       const total = e.detail?.total || 0;
       const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-      if (pct >= 80) {
-        setExpression('happy', 4);
-        showBubble(`Amazing! ${correct}/${total} correct (${pct}%)! You really know your stuff!`, [
-          { label: 'Quiz me again', fn: () => { focusQuizInput(); dismissBubble(); } },
+      // Easter egg: Perfect score celebration!
+      if (pct === 100) {
+        setExpression('celebrating', 6);
+        showBubble(`PERFECT SCORE! ${correct}/${total} CORRECT! YOU'RE A GENIUS! 🎉`, [
+          { label: 'YEAH!', fn: () => { setExpression('excited', 3); dismissBubble(); } },
+          { label: 'Do it again!', fn: () => { focusQuizInput(); dismissBubble(); } },
+          { label: 'Tell everyone!', fn: () => { dismissBubble(); } }
+        ]);
+      } else if (pct >= 80) {
+        setExpression('excited', 4);
+        showBubble(`BOOM! ${correct}/${total} correct (${pct}%)! You crushed it!`, [
+          { label: 'Let\'s go!', fn: () => { focusQuizInput(); dismissBubble(); } },
           { label: 'Race a friend', fn: () => { if (window.generateCode) window.generateCode(); dismissBubble(); } }
         ]);
       } else if (pct >= 50) {
@@ -994,9 +1146,10 @@
     // ---- GLOBAL ERROR HANDLER ----
     window.addEventListener('sf:error', (e) => {
       const msg = e.detail?.message || 'Something went wrong';
-      setExpression('surprised', 3);
-      showBubble(`Oops! ${msg}. Try again in a moment.`, [
-        { label: 'OK', fn: () => dismissBubble() }
+      setExpression('worried', 3);
+      showBubble(`Uh oh! ${msg}. Don't worry, it happens! Try again?`, [
+        { label: 'Let\'s retry', fn: () => { setExpression('happy'); dismissBubble(); } },
+        { label: 'It\'s okay', fn: () => dismissBubble() }
       ]);
     });
 
