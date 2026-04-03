@@ -5727,58 +5727,63 @@
     }
 
     // Theme Picker widget
-    const THEME_OPTIONS = [
-      { id: 'default', name: 'Earthy', icon: '🌿', desc: 'Warm greens and browns' },
-      { id: 'dark', name: 'Dark', icon: '🌙', desc: 'Dark mode' },
-      { id: 'ocean', name: 'Ocean', icon: '🌊', desc: 'Cool blues' },
-      { id: 'sunset', name: 'Sunset', icon: '🌅', desc: 'Warm oranges' },
-      { id: 'minimal', name: 'Minimal', icon: '⚫', desc: 'Black and white' },
-      { id: 'forest', name: 'Forest', icon: '🌲', desc: 'Deep greens' },
-      { id: 'lavender', name: 'Lavender', icon: '💜', desc: 'Soft purples' },
-      { id: 'coffee', name: 'Coffee', icon: '☕', desc: 'Warm coffee tones' },
-      { id: 'rose', name: 'Rose', icon: '🌹', desc: 'Soft pinks' },
-      { id: 'midnight', name: 'Midnight', icon: '🌌', desc: 'Deep blue night' },
-      { id: 'ember', name: 'Ember', icon: '🔥', desc: 'Dark warm embers' },
-      { id: 'neon', name: 'Neon', icon: '💚', desc: 'Cyberpunk glow' },
-      { id: 'sand', name: 'Sand', icon: '🏜️', desc: 'Desert warmth' },
-      { id: 'arctic', name: 'Arctic', icon: '❄️', desc: 'Cool ice blues' },
-      { id: 'slate', name: 'Slate', icon: '🪨', desc: 'Cool neutral grays' },
-      { id: 'matcha', name: 'Matcha', icon: '🍵', desc: 'Soft tea greens' }
-    ];
+    const THEME_OPTIONS = {
+      light: [
+        { id: 'default', name: 'Earthy', colors: ['#8B9D83', '#D4A574', '#FAF8F5'] },
+        { id: 'ocean', name: 'Ocean', colors: ['#4a90a4', '#5fb3c8', '#F0F8FF'] },
+        { id: 'sunset', name: 'Sunset', colors: ['#d17a5f', '#e89b7f', '#FFF5F0'] },
+        { id: 'forest', name: 'Forest', colors: ['#5a8a5a', '#7aaa7a', '#F5F9F5'] },
+        { id: 'lavender', name: 'Lavender', colors: ['#8a7aa4', '#aa9ac8', '#F8F5FF'] },
+        { id: 'coffee', name: 'Coffee', colors: ['#8B6F4E', '#c49a6c', '#F5F0EB'] },
+        { id: 'rose', name: 'Rose', colors: ['#c47a7a', '#e0a0a0', '#FFF5F5'] },
+        { id: 'sand', name: 'Sand', colors: ['#c4784a', '#d8986a', '#F8F2EA'] },
+        { id: 'arctic', name: 'Arctic', colors: ['#5a9ab8', '#7abcd8', '#F0F6FA'] },
+        { id: 'slate', name: 'Slate', colors: ['#5a6a8a', '#7a8aaa', '#F2F4F6'] },
+        { id: 'matcha', name: 'Matcha', colors: ['#7aa45a', '#9ac47a', '#F4F8F2'] },
+        { id: 'minimal', name: 'Minimal', colors: ['#4a4a4a', '#6a6a6a', '#ffffff'] },
+      ],
+      dark: [
+        { id: 'dark', name: 'Dark', colors: ['#7c9885', '#e89b5f', '#1a1a1a'] },
+        { id: 'midnight', name: 'Midnight', colors: ['#5b8af5', '#7aa4ff', '#0f1628'] },
+        { id: 'ember', name: 'Ember', colors: ['#e8734a', '#f09060', '#1a1614'] },
+        { id: 'neon', name: 'Neon', colors: ['#00d4aa', '#ff6090', '#0a0a14'] },
+      ]
+    };
 
     function renderThemePicker(widgetData) {
       const container = document.getElementById(`widget-${widgetData.id}`);
       const currentTheme = document.body.getAttribute('data-theme') || 'default';
 
+      function renderSwatch(theme) {
+        const isActive = currentTheme === theme.id;
+        return `<button onclick="selectTheme('${theme.id}')" title="${theme.name}" style="
+          width:100%;padding:8px 10px;
+          background:${isActive ? 'var(--accent-primary)' : 'var(--hover-bg)'};
+          border:2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'};
+          border-radius:10px;cursor:pointer;font-family:inherit;
+          display:flex;align-items:center;gap:10px;
+          transition:all 0.15s;
+        " onmouseover="if(!${isActive})this.style.borderColor='var(--border-color)'"
+           onmouseout="if(!${isActive})this.style.borderColor='transparent'">
+          <div style="display:flex;gap:2px;flex-shrink:0;">
+            <div style="width:14px;height:14px;border-radius:50%;background:${theme.colors[0]};border:1px solid rgba(0,0,0,0.1);"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:${theme.colors[1]};border:1px solid rgba(0,0,0,0.1);"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:${theme.colors[2]};border:1px solid rgba(0,0,0,0.15);"></div>
+          </div>
+          <span style="font-size:12px;font-weight:${isActive ? '600' : '500'};color:${isActive ? 'white' : 'var(--text-primary)'};">${theme.name}</span>
+          ${isActive ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:auto;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </button>`;
+      }
+
       container.innerHTML = `
-        <div style="padding:16px;">
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;font-weight:500;">Choose Theme</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:280px;overflow-y:auto;">
-            ${THEME_OPTIONS.map(theme => `
-              <button
-                onclick="selectTheme('${theme.id}')"
-                style="
-                  padding:12px;
-                  background:${currentTheme === theme.id ? 'var(--accent-primary)' : 'var(--bg-secondary)'};
-                  color:${currentTheme === theme.id ? 'white' : 'var(--text-primary)'};
-                  border:2px solid ${currentTheme === theme.id ? 'var(--accent-primary)' : 'var(--border-color)'};
-                  border-radius:10px;
-                  cursor:pointer;
-                  font-family:inherit;
-                  display:flex;
-                  flex-direction:column;
-                  align-items:center;
-                  gap:6px;
-                  transition:all 0.2s ease;
-                "
-                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px var(--shadow)'"
-                onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'"
-              >
-                <div style="font-size:24px;">${theme.icon}</div>
-                <div style="font-size:11px;font-weight:600;">${theme.name}</div>
-                <div style="font-size:9px;opacity:0.8;text-align:center;">${theme.desc}</div>
-              </button>
-            `).join('')}
+        <div style="padding:12px;overflow-y:auto;max-height:360px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);padding:0 4px 6px;">Light</div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
+            ${THEME_OPTIONS.light.map(renderSwatch).join('')}
+          </div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);padding:0 4px 6px;">Dark</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            ${THEME_OPTIONS.dark.map(renderSwatch).join('')}
           </div>
         </div>
       `;
