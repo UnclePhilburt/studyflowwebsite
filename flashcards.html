@@ -176,39 +176,33 @@
     }
 
     /* Back to Dashboard Button */
-    .back-to-dashboard {
+    .nav-back {
       position: fixed;
-      top: 28px;
-      left: 28px;
-      width: 48px;
-      height: 48px;
+      top: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
       border-radius: 12px;
-      background: var(--bg-secondary);
-      border: 2px solid var(--border-color);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 99;
-      color: var(--accent-primary);
+      color: var(--text-primary);
       text-decoration: none;
-      box-shadow: 0 4px 20px var(--shadow);
-    }
-
-    .back-to-dashboard:hover {
-      background: var(--hover-bg);
-      box-shadow: 0 6px 30px var(--shadow);
-      transform: translateY(-2px);
-      border-color: var(--accent-primary);
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     @media (max-width: 768px) {
-      .back-to-dashboard {
-        top: 16px;
-        left: 16px;
-        width: 44px;
-        height: 44px;
+      .nav-back {
+        top: 14px;
+        left: 12px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
       }
     }
 
@@ -750,7 +744,7 @@
 <body>
 
 <!-- Back to Dashboard Button -->
-<a href="dashboard.html" class="back-to-dashboard" title="Back to Dashboard">
+<a href="dashboard.html" class="nav-back" title="Back to Dashboard">
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M19 12H5M12 19l-7-7 7-7"/>
   </svg>
