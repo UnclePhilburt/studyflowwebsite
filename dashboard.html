@@ -5780,7 +5780,7 @@
         const bg = t.colors[2], accent = t.colors[0], accent2 = t.colors[1], txt = t.text;
         const isActive = currentTheme === t.id;
         return `<div onclick="selectTheme('${t.id}')" style="
-          cursor:pointer;flex-shrink:0;width:110px;border-radius:10px;overflow:hidden;
+          cursor:pointer;border-radius:10px;overflow:hidden;width:100%;
           border:2px solid ${isActive ? accent : 'transparent'};
           box-shadow:${isActive ? '0 0 0 2px ' + accent + '40' : 'none'};
           transition:all 0.15s;
@@ -5823,11 +5823,11 @@
         content = `
           <div style="padding:8px 12px 4px;">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Light</div>
-            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
               ${THEME_OPTIONS.light.map(miniPreview).join('')}
             </div>
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin:8px 0 6px;">Dark</div>
-            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Dark</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
               ${THEME_OPTIONS.dark.map(miniPreview).join('')}
             </div>
           </div>`;
