@@ -5778,6 +5778,12 @@
       const currentFont = localStorage.getItem('sf-font') || 'inter';
       const currentGrid = localStorage.getItem('sf-grid') || 'dots';
       const currentRadius = localStorage.getItem('sf-radius') || '16';
+      const currentOpacity = localStorage.getItem('sf-opacity') || '100';
+      const currentDockPos = localStorage.getItem('sf-dock-pos') || 'bottom';
+      const currentDockHide = localStorage.getItem('sf-dock-hide') || 'off';
+      const currentAnimSpeed = localStorage.getItem('sf-anim') || 'normal';
+      const currentClockFmt = localStorage.getItem('sf-clock') || '12h';
+      const currentParticles = localStorage.getItem('sf-particles') || 'off';
 
       // Mini dashboard mockup
       function miniPreview(t) {
@@ -5836,38 +5842,81 @@
             </div>
           </div>`;
       } else if (_tpTab === 'customize') {
+        function optBtns(options, current, fn) {
+          return `<div style="display:flex;gap:4px;flex-wrap:wrap;">${options.map(o => `
+            <button onclick="${fn}('${o.id}')" style="
+              padding:6px 10px;border-radius:7px;font-size:10px;font-weight:500;font-family:inherit;cursor:pointer;
+              border:1.5px solid ${current === o.id ? 'var(--accent-primary)' : 'var(--border-color)'};
+              background:${current === o.id ? 'var(--accent-primary)' : 'none'};
+              color:${current === o.id ? 'white' : 'var(--text-secondary)'};
+              transition:all 0.15s;flex:${o.flex || '1'};
+            ">${o.label}</button>
+          `).join('')}</div>`;
+        }
+        function secLabel(text) {
+          return `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:5px;">${text}</div>`;
+        }
         content = `
-          <div style="padding:10px 12px;display:flex;flex-direction:column;gap:14px;">
+          <div style="padding:10px 12px;display:flex;flex-direction:column;gap:12px;">
             <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Canvas Grid</div>
-              <div style="display:flex;gap:6px;">
-                ${['dots', 'lines', 'crosses', 'none'].map(g => `
-                  <button onclick="setCanvasGrid('${g}')" style="
-                    flex:1;padding:8px 0;border-radius:8px;font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;
-                    border:1.5px solid ${currentGrid === g ? 'var(--accent-primary)' : 'var(--border-color)'};
-                    background:${currentGrid === g ? 'var(--accent-primary)' : 'none'};
-                    color:${currentGrid === g ? 'white' : 'var(--text-secondary)'};
-                    transition:all 0.15s;
-                  ">${g.charAt(0).toUpperCase() + g.slice(1)}</button>
-                `).join('')}
+              ${secLabel('Custom Accent')}
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="color" value="${getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#8B9D83'}" onchange="setCustomAccent(this.value)" style="width:28px;height:28px;border:none;border-radius:6px;cursor:pointer;background:none;">
+                <span style="font-size:11px;color:var(--text-secondary);">Accent color</span>
+                <button onclick="clearCustomAccent()" style="margin-left:auto;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:inherit;">Reset</button>
               </div>
             </div>
             <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Widget Corners</div>
-              <div style="display:flex;align-items:center;gap:10px;">
+              ${secLabel('Canvas Grid')}
+              ${optBtns([
+                {id:'dots',label:'Dots'},{id:'lines',label:'Lines'},{id:'crosses',label:'Crosses'},{id:'none',label:'None'}
+              ], currentGrid, 'setCanvasGrid')}
+            </div>
+            <div>
+              ${secLabel('Widget Corners')}
+              <div style="display:flex;align-items:center;gap:8px;">
                 <span style="font-size:10px;color:var(--text-muted);">Sharp</span>
                 <input type="range" min="0" max="24" value="${currentRadius}" oninput="setWidgetRadius(this.value)" style="flex:1;accent-color:var(--accent-primary);">
                 <span style="font-size:10px;color:var(--text-muted);">Round</span>
               </div>
-              <div style="text-align:center;font-size:10px;color:var(--text-muted);margin-top:2px;">${currentRadius}px</div>
             </div>
             <div>
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Custom Accent</div>
+              ${secLabel('Widget Opacity')}
               <div style="display:flex;align-items:center;gap:8px;">
-                <input type="color" value="${getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#8B9D83'}" onchange="setCustomAccent(this.value)" style="width:32px;height:32px;border:none;border-radius:8px;cursor:pointer;background:none;">
-                <span style="font-size:11px;color:var(--text-secondary);">Override accent color</span>
-                <button onclick="clearCustomAccent()" style="margin-left:auto;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:6px;padding:4px 8px;cursor:pointer;font-family:inherit;">Reset</button>
+                <span style="font-size:10px;color:var(--text-muted);">Glass</span>
+                <input type="range" min="40" max="100" value="${currentOpacity}" oninput="setWidgetOpacity(this.value)" style="flex:1;accent-color:var(--accent-primary);">
+                <span style="font-size:10px;color:var(--text-muted);">Solid</span>
               </div>
+            </div>
+            <div>
+              ${secLabel('Dock Position')}
+              ${optBtns([
+                {id:'bottom',label:'Bottom'},{id:'left',label:'Left'},{id:'right',label:'Right'}
+              ], currentDockPos, 'setDockPosition')}
+            </div>
+            <div>
+              ${secLabel('Dock Auto-Hide')}
+              ${optBtns([
+                {id:'off',label:'Always Show'},{id:'on',label:'Auto-Hide'}
+              ], currentDockHide, 'setDockAutoHide')}
+            </div>
+            <div>
+              ${secLabel('Animation Speed')}
+              ${optBtns([
+                {id:'fast',label:'Fast'},{id:'normal',label:'Normal'},{id:'reduced',label:'Reduced'}
+              ], currentAnimSpeed, 'setAnimSpeed')}
+            </div>
+            <div>
+              ${secLabel('Clock Format')}
+              ${optBtns([
+                {id:'12h',label:'12 Hour'},{id:'24h',label:'24 Hour'}
+              ], currentClockFmt, 'setClockFormat')}
+            </div>
+            <div>
+              ${secLabel('Ambient Particles')}
+              ${optBtns([
+                {id:'off',label:'Off'},{id:'subtle',label:'Subtle'},{id:'full',label:'Full'}
+              ], currentParticles, 'setParticles')}
             </div>
           </div>`;
       } else if (_tpTab === 'fonts') {
@@ -5965,6 +6014,155 @@
       activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
     }
 
+    function setWidgetOpacity(val) {
+      localStorage.setItem('sf-opacity', val);
+      const opacity = val / 100;
+      document.querySelectorAll('.widget').forEach(w => {
+        w.style.opacity = opacity;
+      });
+      _rerender();
+    }
+
+    function setDockPosition(pos) {
+      localStorage.setItem('sf-dock-pos', pos);
+      const dock = document.querySelector('.dock');
+      if (!dock) return;
+      dock.style.transition = 'all 0.3s ease';
+      if (pos === 'left') {
+        dock.style.bottom = '50%'; dock.style.left = '12px'; dock.style.right = 'auto';
+        dock.style.transform = 'translateY(50%)'; dock.style.flexDirection = 'column';
+        dock.style.borderRadius = '16px'; dock.style.maxWidth = '64px'; dock.style.padding = '12px 8px';
+      } else if (pos === 'right') {
+        dock.style.bottom = '50%'; dock.style.right = '12px'; dock.style.left = 'auto';
+        dock.style.transform = 'translateY(50%)'; dock.style.flexDirection = 'column';
+        dock.style.borderRadius = '16px'; dock.style.maxWidth = '64px'; dock.style.padding = '12px 8px';
+      } else {
+        dock.style.bottom = '20px'; dock.style.left = '50%'; dock.style.right = 'auto';
+        dock.style.transform = 'translateX(-50%)'; dock.style.flexDirection = 'row';
+        dock.style.borderRadius = '20px'; dock.style.maxWidth = 'none'; dock.style.padding = '12px 24px';
+      }
+      _rerender();
+    }
+
+    function setDockAutoHide(val) {
+      localStorage.setItem('sf-dock-hide', val);
+      const dock = document.querySelector('.dock');
+      if (!dock) return;
+      if (val === 'on') {
+        dock.style.opacity = '0'; dock.style.transition = 'opacity 0.3s';
+        dock.onmouseenter = () => { dock.style.opacity = '1'; };
+        dock.onmouseleave = () => { dock.style.opacity = '0'; };
+      } else {
+        dock.style.opacity = '1';
+        dock.onmouseenter = null; dock.onmouseleave = null;
+      }
+      _rerender();
+    }
+
+    function setAnimSpeed(speed) {
+      localStorage.setItem('sf-anim', speed);
+      if (speed === 'fast') {
+        document.documentElement.style.setProperty('--anim-speed', '0.15s');
+      } else if (speed === 'reduced') {
+        document.documentElement.style.setProperty('--anim-speed', '0s');
+      } else {
+        document.documentElement.style.setProperty('--anim-speed', '0.3s');
+      }
+      _rerender();
+    }
+
+    function setClockFormat(fmt) {
+      localStorage.setItem('sf-clock', fmt);
+      // Re-render any clock widgets
+      activeWidgets.forEach(w => { if (w.type === 'clock') WIDGET_TYPES.clock.render(w); });
+      _rerender();
+    }
+
+    let _particleCanvas = null;
+    let _particleCtx = null;
+    let _particles = [];
+    let _particleAnim = null;
+
+    function setParticles(mode) {
+      localStorage.setItem('sf-particles', mode);
+      if (mode === 'off') {
+        if (_particleCanvas) { _particleCanvas.remove(); _particleCanvas = null; }
+        if (_particleAnim) { cancelAnimationFrame(_particleAnim); _particleAnim = null; }
+      } else {
+        initParticles(mode);
+      }
+      _rerender();
+    }
+
+    function initParticles(mode) {
+      if (!_particleCanvas) {
+        _particleCanvas = document.createElement('canvas');
+        _particleCanvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;';
+        document.getElementById('canvasContainer').appendChild(_particleCanvas);
+      }
+      _particleCanvas.width = window.innerWidth;
+      _particleCanvas.height = window.innerHeight;
+      _particleCtx = _particleCanvas.getContext('2d');
+
+      const count = mode === 'full' ? 40 : 15;
+      _particles = [];
+      for (let i = 0; i < count; i++) {
+        _particles.push({
+          x: Math.random() * _particleCanvas.width,
+          y: Math.random() * _particleCanvas.height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 2 + 0.5,
+          alpha: Math.random() * 0.3 + 0.05
+        });
+      }
+      if (!_particleAnim) animateParticles();
+    }
+
+    function animateParticles() {
+      if (!_particleCtx || !_particleCanvas) return;
+      _particleCtx.clearRect(0, 0, _particleCanvas.width, _particleCanvas.height);
+      const accent = getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#8B9D83';
+
+      _particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = _particleCanvas.width;
+        if (p.x > _particleCanvas.width) p.x = 0;
+        if (p.y < 0) p.y = _particleCanvas.height;
+        if (p.y > _particleCanvas.height) p.y = 0;
+
+        _particleCtx.globalAlpha = p.alpha;
+        _particleCtx.beginPath();
+        _particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        _particleCtx.fillStyle = accent;
+        _particleCtx.fill();
+      });
+
+      // Draw faint lines between close particles
+      for (let i = 0; i < _particles.length; i++) {
+        for (let j = i + 1; j < _particles.length; j++) {
+          const dx = _particles[i].x - _particles[j].x;
+          const dy = _particles[i].y - _particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            _particleCtx.globalAlpha = 0.05 * (1 - dist / 120);
+            _particleCtx.beginPath();
+            _particleCtx.moveTo(_particles[i].x, _particles[i].y);
+            _particleCtx.lineTo(_particles[j].x, _particles[j].y);
+            _particleCtx.strokeStyle = accent;
+            _particleCtx.lineWidth = 0.5;
+            _particleCtx.stroke();
+          }
+        }
+      }
+
+      _particleAnim = requestAnimationFrame(animateParticles);
+    }
+
+    function _rerender() {
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
     // Apply saved customizations on load
     (function applySavedCustomizations() {
       const accent = localStorage.getItem('sf-accent');
@@ -5991,6 +6189,20 @@
           document.querySelectorAll('.widget').forEach(w => { w.style.borderRadius = radius + 'px'; });
         }, 500);
       }
+      const opacity = localStorage.getItem('sf-opacity');
+      if (opacity) {
+        setTimeout(() => {
+          document.querySelectorAll('.widget').forEach(w => { w.style.opacity = opacity / 100; });
+        }, 500);
+      }
+      const dockPos = localStorage.getItem('sf-dock-pos');
+      if (dockPos && dockPos !== 'bottom') setTimeout(() => setDockPosition(dockPos), 300);
+      const dockHide = localStorage.getItem('sf-dock-hide');
+      if (dockHide === 'on') setTimeout(() => setDockAutoHide('on'), 300);
+      const animSpeed = localStorage.getItem('sf-anim');
+      if (animSpeed) setAnimSpeed(animSpeed);
+      const particles = localStorage.getItem('sf-particles');
+      if (particles && particles !== 'off') setTimeout(() => initParticles(particles), 500);
     })();
 
     async function selectTheme(themeId) {
