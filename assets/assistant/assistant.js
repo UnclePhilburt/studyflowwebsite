@@ -4,10 +4,13 @@
 
   // ========== CONFIG ==========
   const ASSISTANT_NAME = 'Flo';
+  const BACKEND_URL = 'https://studyflowsuite.onrender.com';
   const IDLE_NUDGE_MS = 45000; // 45 seconds before proactive nudge
   const SEEN_KEY = 'sf-assistant-seen';
   const MINIMIZED_KEY = 'sf-assistant-minimized';
   const NAME_KEY = 'sf-assistant-name';
+  const DIGEST_CACHE_KEY = 'sf-assistant-digest';
+  const DIGEST_TTL = 10 * 60 * 1000; // 10 minutes
 
   // ========== STATE ==========
   let scene, camera, renderer, bodyMesh, leftEye, rightEye, leftPupil, rightPupil;
@@ -29,12 +32,12 @@
       idle: "Need anything?",
       welcomeActions: [
         { label: 'Take a tour', fn: () => { if (window.startOnboarding) window.startOnboarding(); }, primary: true },
-        { label: 'Add a widget', fn: () => { if (window.addWidget) document.getElementById('widgetPicker')?.classList.add('active'); } },
+        { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
         { label: 'Change theme', fn: () => { clickThemePicker(); } }
       ],
       actions: [
+        { label: "What's my day look like?", fn: () => { loadDigest(); }, primary: true },
         { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
-        { label: 'Reset my view', fn: () => { if (window.resetCanvasView) window.resetCanvasView(); } },
         { label: 'Change theme', fn: () => { clickThemePicker(); } }
       ],
       proactive: getTimeGreeting
@@ -49,7 +52,7 @@
       ],
       actions: [
         { label: 'Upload notes', fn: () => { if (window.showUploadModal) window.showUploadModal(); }, primary: true },
-        { label: 'Show favorites', fn: () => { if (window.toggleFavoritesFilter) window.toggleFavoritesFilter(); } },
+        { label: 'Give me study tips', fn: () => { askAssistant('Give me quick study tips for organizing my notes effectively', 'tips'); } },
         { label: 'Show shared notes', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); } }
       ]
     },
@@ -63,8 +66,8 @@
       ],
       actions: [
         { label: 'Start new chat', fn: () => { if (window.startNewChat) window.startNewChat(); }, primary: true },
-        { label: 'Fit all to screen', fn: () => { if (window.fitAll) window.fitAll(); } },
-        { label: 'Add sticky note', fn: () => { if (window.createStickyNote) window.createStickyNote(20100, 20100); } }
+        { label: 'Suggest a study topic', fn: () => { askAssistant('Suggest an interesting study topic I should explore', 'ask'); } },
+        { label: 'Fit all to screen', fn: () => { if (window.fitAll) window.fitAll(); } }
       ]
     },
     'browse': {
@@ -75,6 +78,7 @@
         { label: 'Clear all filters', fn: () => { if (window.clearAdvFilters) window.clearAdvFilters(); } }
       ],
       actions: [
+        { label: 'What should I study?', fn: () => { askAssistant('Based on popular notes, what are trending study topics right now?', 'ask'); }, primary: true },
         { label: 'Advanced filters', fn: () => { if (window.toggleAdvFilters) window.toggleAdvFilters(); } },
         { label: 'Clear filters', fn: () => { if (window.clearAdvFilters) window.clearAdvFilters(); } }
       ]
@@ -88,6 +92,7 @@
       ],
       actions: [
         { label: 'Start a quiz', fn: () => { focusQuizInput(); }, primary: true },
+        { label: 'Suggest a quiz topic', fn: () => { askAssistant('Suggest 3 good quiz topics for a college student to test themselves on', 'ask'); } },
         { label: 'Race a friend', fn: () => { if (window.generateCode) window.generateCode(); } }
       ]
     },
@@ -98,9 +103,9 @@
         { label: 'Import events', fn: () => { if (window.openCanvasImportModal) window.openCanvasImportModal(); }, primary: true }
       ],
       actions: [
+        { label: "What's on today?", fn: () => { loadDigest(); }, primary: true },
         { label: 'Import events', fn: () => { if (window.openCanvasImportModal) window.openCanvasImportModal(); } },
-        { label: 'Next month', fn: () => { if (window.nextMonth) window.nextMonth(); } },
-        { label: 'Previous month', fn: () => { if (window.previousMonth) window.previousMonth(); } }
+        { label: 'Study planning tips', fn: () => { askAssistant('Give me tips for planning my study schedule effectively', 'tips'); } }
       ]
     },
     'leaderboard': {
@@ -110,14 +115,32 @@
         { label: 'Toggle sidebar', fn: () => { if (window.toggleSidebar) window.toggleSidebar(); }, primary: true }
       ],
       actions: [
+        { label: 'How do I rank up?', fn: () => { askAssistant('How can I improve my ranking on the StudyFlow Nexus leaderboard? What actions give the most points?', 'tips'); }, primary: true },
         { label: 'Toggle sidebar', fn: () => { if (window.toggleSidebar) window.toggleSidebar(); } }
       ]
     },
     'study-groups': {
       welcome: "Study groups! Collaborate with classmates in real-time.",
       idle: "Need help with groups?",
-      welcomeActions: [],
-      actions: []
+      welcomeActions: [
+        { label: 'Group study tips', fn: () => { askAssistant('Give me tips for effective group study sessions', 'tips'); }, primary: true }
+      ],
+      actions: [
+        { label: 'Group study tips', fn: () => { askAssistant('Give me tips for effective group study sessions', 'tips'); }, primary: true }
+      ]
+    },
+    'note-viewer': {
+      welcome: "Reading a note! I can help you understand it.",
+      idle: "Need help with this note?",
+      welcomeActions: [
+        { label: 'Summarize this', fn: () => { summarizeCurrentNote(); }, primary: true },
+        { label: 'Quiz me on this', fn: () => { quizCurrentNote(); } }
+      ],
+      actions: [
+        { label: 'Summarize this', fn: () => { summarizeCurrentNote(); }, primary: true },
+        { label: 'Quiz me on this', fn: () => { quizCurrentNote(); } },
+        { label: 'Explain a concept', fn: () => { askAssistant('Explain the main concepts from this study material in simple terms', 'ask'); } }
+      ]
     }
   };
 
@@ -179,6 +202,128 @@
   function focusQuizInput() {
     const input = document.querySelector('input[placeholder*="topic"], input[placeholder*="Topic"], #topicInput');
     if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth' }); }
+  }
+
+  // ========== AI BACKEND ==========
+  function getAuthToken() {
+    return localStorage.getItem('auth_token');
+  }
+
+  async function askAssistant(message, action = 'ask') {
+    const token = getAuthToken();
+    if (!token) {
+      showBubble("Sign in to use AI features!", [
+        { label: 'Sign in', fn: () => { window.location.href = 'signup.html'; } },
+        { label: 'Maybe later', fn: () => dismissBubble() }
+      ]);
+      return;
+    }
+
+    // Show loading state
+    setExpression('thinking', 10);
+    showBubbleLoading("Thinking...");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/assistant/ask`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, page: currentPage, action })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Request failed');
+      }
+
+      const data = await res.json();
+      setExpression('happy', 2);
+
+      // Build follow-up buttons from AI response
+      const followButtons = (data.followups || []).map(f => ({
+        label: f.label,
+        fn: () => { askAssistant(f.message, f.action); }
+      }));
+      followButtons.push({ label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } });
+
+      showBubbleAI(data.response, followButtons, data.sources);
+
+    } catch (e) {
+      console.error('Assistant ask error:', e);
+      setExpression('surprised', 2);
+      showBubble("Sorry, I couldn't get an answer right now. Try again in a moment.", [
+        { label: 'Try again', fn: () => { askAssistant(message, action); } },
+        { label: 'Dismiss', fn: () => dismissBubble() }
+      ]);
+    }
+  }
+
+  async function loadDigest() {
+    const token = getAuthToken();
+    if (!token) {
+      showBubble("Sign in to see your daily digest!", [
+        { label: 'Sign in', fn: () => { window.location.href = 'signup.html'; } }
+      ]);
+      return;
+    }
+
+    // Check cache
+    try {
+      const cached = JSON.parse(localStorage.getItem(DIGEST_CACHE_KEY) || '{}');
+      if (cached.data && (Date.now() - cached.ts) < DIGEST_TTL) {
+        showDigestBubble(cached.data);
+        return;
+      }
+    } catch {}
+
+    setExpression('thinking', 5);
+    showBubbleLoading("Checking your day...");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/assistant/digest`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to load digest');
+      const data = await res.json();
+
+      // Cache it
+      localStorage.setItem(DIGEST_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
+
+      setExpression('happy', 2);
+      showDigestBubble(data);
+    } catch (e) {
+      console.error('Digest error:', e);
+      setExpression('idle');
+      showBubble("Couldn't load your digest right now.", [
+        { label: 'Try again', fn: () => loadDigest() },
+        { label: 'Dismiss', fn: () => dismissBubble() }
+      ]);
+    }
+  }
+
+  function showDigestBubble(data) {
+    const actions = [];
+    if (data.events_today && data.events_today.length > 0) {
+      actions.push({ label: `View ${data.events_today.length} event${data.events_today.length > 1 ? 's' : ''} today`, fn: () => { window.location.href = 'calendar.html'; } });
+    }
+    if (data.unread_notifications > 0) {
+      actions.push({ label: `${data.unread_notifications} unread notification${data.unread_notifications > 1 ? 's' : ''}`, fn: () => { /* open notif panel if available */ dismissBubble(); } });
+    }
+    actions.push({ label: 'Got it!', fn: () => { setExpression('happy'); dismissBubble(); } });
+
+    showBubble(data.summary, actions);
+  }
+
+  function summarizeCurrentNote() {
+    // Try to get the note title from the page
+    const titleEl = document.getElementById('note-title') || document.getElementById('previewTitle');
+    const title = titleEl ? titleEl.textContent : 'this note';
+    askAssistant(`Summarize the key points of the note titled "${title}"`, 'summarize');
+  }
+
+  function quizCurrentNote() {
+    const titleEl = document.getElementById('note-title') || document.getElementById('previewTitle');
+    const title = titleEl ? titleEl.textContent : 'this note';
+    askAssistant(`Create a short quiz about the note titled "${title}"`, 'quiz');
   }
 
   // ========== BUILD DOM ==========
@@ -443,6 +588,56 @@
     resetIdleTimer();
   }
 
+  function showBubbleLoading(msg) {
+    const bubble = document.getElementById('sf-assistant-bubble');
+    const msgEl = document.getElementById('sf-assistant-msg');
+    const btnsEl = document.getElementById('sf-assistant-buttons');
+
+    msgEl.innerHTML = `<span style="display:flex;align-items:center;gap:8px;"><span class="sf-loading-dots"></span> ${msg}</span>`;
+    btnsEl.innerHTML = '';
+    bubble.classList.add('visible');
+    bubbleVisible = true;
+  }
+
+  function showBubbleAI(response, actions = [], sources = []) {
+    const bubble = document.getElementById('sf-assistant-bubble');
+    const msgEl = document.getElementById('sf-assistant-msg');
+    const btnsEl = document.getElementById('sf-assistant-buttons');
+
+    // Format AI response - convert markdown-ish to simple HTML
+    let formatted = response
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    let html = `<div style="font-size:12.5px;line-height:1.6;color:inherit;">${formatted}</div>`;
+
+    // Add sources if any
+    if (sources && sources.length > 0) {
+      html += `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(128,128,128,0.2);font-size:10px;color:#999;">`;
+      html += sources.map(s => `From: ${s.filename}`).join('<br>');
+      html += `</div>`;
+    }
+
+    msgEl.innerHTML = html;
+    btnsEl.innerHTML = '';
+
+    actions.forEach(action => {
+      const btn = document.createElement('button');
+      btn.className = 'sf-assistant-btn' + (action.primary ? ' primary' : '');
+      btn.textContent = action.label;
+      btn.addEventListener('click', () => {
+        action.fn();
+        if (!action.keepOpen) dismissBubble();
+      });
+      btnsEl.appendChild(btn);
+    });
+
+    bubble.classList.add('visible');
+    bubbleVisible = true;
+    hideNotificationDot();
+    resetIdleTimer();
+  }
+
   function showNotificationDot() {
     const dot = document.getElementById('sf-assistant-dot');
     if (dot) { dot.classList.add('visible'); hasNotification = true; }
@@ -490,12 +685,17 @@
     if (bubbleVisible) return;
     if (document.getElementById('sf-assistant-wrap')?.classList.contains('minimized')) return;
 
+    // On dashboard, try to preload digest
+    if (currentPage === 'dashboard' && getAuthToken()) {
+      showNotificationDot();
+      return;
+    }
+
     const config = PAGE_ACTIONS[currentPage];
     if (config && config.proactive) {
       const proactive = config.proactive();
       if (proactive) {
         showNotificationDot();
-        // Don't auto-show, just show the dot. User clicks to see it.
       }
     }
   }

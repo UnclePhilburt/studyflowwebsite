@@ -167,6 +167,30 @@
   50% { transform: scale(1.2); }
 }
 
+/* Loading dots for AI thinking */
+.sf-loading-dots::after {
+  content: '...';
+  animation: sf-loading-dots 1.2s infinite;
+  display: inline-block;
+  width: 12px;
+  text-align: left;
+}
+
+@keyframes sf-loading-dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+
+/* AI response styling inside bubble */
+#sf-assistant-msg strong {
+  font-weight: 700;
+}
+
+#sf-assistant-bubble .sf-assistant-btn {
+  margin-top: 2px;
+}
+
 /* Minimized state */
 #sf-assistant-wrap.minimized #sf-assistant-character {
   width: 28px;
