@@ -3766,6 +3766,9 @@
             console.error(`[SAVE ERROR] Conversation ${cid}:`, e);
           }
         }
+
+        // Invalidate preload cache so next load gets fresh data
+        invalidatePreload();
       }, 1000);
     }
 
