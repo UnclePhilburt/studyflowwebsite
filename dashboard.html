@@ -416,6 +416,23 @@
       font-weight: 500 !important; /* Slightly bolder text for readability */
     }
 
+    /* Color Blind Modes - Accessibility Filters */
+    html.cb-deuteranopia {
+      filter: url('#deuteranopia-filter');
+    }
+
+    html.cb-protanopia {
+      filter: url('#protanopia-filter');
+    }
+
+    html.cb-tritanopia {
+      filter: url('#tritanopia-filter');
+    }
+
+    html.cb-achromatopsia {
+      filter: grayscale(100%);
+    }
+
     /* Top right user menu */
     .top-nav {
       position: fixed;
@@ -3043,6 +3060,35 @@
 </head>
 <body>
 
+  <!-- Color Blind Filters (SVG) -->
+  <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+    <defs>
+      <!-- Deuteranopia (red-green color blindness - most common) -->
+      <filter id="deuteranopia-filter">
+        <feColorMatrix type="matrix" values="0.625 0.375 0   0 0
+                                               0.7   0.3   0   0 0
+                                               0     0.3   0.7 0 0
+                                               0     0     0   1 0"/>
+      </filter>
+
+      <!-- Protanopia (red-green color blindness - another variant) -->
+      <filter id="protanopia-filter">
+        <feColorMatrix type="matrix" values="0.567 0.433 0     0 0
+                                               0.558 0.442 0     0 0
+                                               0     0.242 0.758 0 0
+                                               0     0     0     1 0"/>
+      </filter>
+
+      <!-- Tritanopia (blue-yellow color blindness) -->
+      <filter id="tritanopia-filter">
+        <feColorMatrix type="matrix" values="0.95 0.05  0     0 0
+                                               0    0.433 0.567 0 0
+                                               0    0.475 0.525 0 0
+                                               0    0     0     1 0"/>
+      </filter>
+    </defs>
+  </svg>
+
   <!-- Settings Panel -->
   <div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsPanel()"></div>
   <div class="settings-panel" id="settingsPanel">
@@ -3664,6 +3710,7 @@
       const currentClockFmt = localStorage.getItem('sf-clock') || '12h';
       const currentParticles = localStorage.getItem('sf-particles') || 'full';
       const currentCursor = localStorage.getItem('sf-cursor') || 'default';
+      const currentColorBlind = localStorage.getItem('sf-colorblind') || 'none';
 
       function miniPreview(t) {
         const bg = t.colors[2], accent = t.colors[0], accent2 = t.colors[1], txt = t.text;
@@ -3821,6 +3868,17 @@
                 {id:'default',label:'Default'},{id:'custom',label:'Custom'}
               ], currentCursor, 'setCursor')}
               <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Custom cursor changes based on what you're hovering over</p>
+            </div>
+            <div>
+              ${secLabel('Color Blind Mode')}
+              ${optBtns([
+                {id:'none',label:'None'},
+                {id:'deuteranopia',label:'Deuteranopia'},
+                {id:'protanopia',label:'Protanopia'},
+                {id:'tritanopia',label:'Tritanopia'},
+                {id:'achromatopsia',label:'Grayscale'}
+              ], currentColorBlind, 'setColorBlindMode')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Adjust colors for different types of color blindness</p>
             </div>
           </div>`;
       } else if (_settingsTab === 'fonts') {
@@ -6492,6 +6550,7 @@
       const currentAnimSpeed = localStorage.getItem('sf-anim') || 'normal';
       const currentClockFmt = localStorage.getItem('sf-clock') || '12h';
       const currentParticles = localStorage.getItem('sf-particles') || 'full';
+      const currentColorBlind = localStorage.getItem('sf-colorblind') || 'none';
 
       // Mini dashboard mockup
       function miniPreview(t) {
@@ -6654,6 +6713,17 @@
               ${optBtns([
                 {id:'off',label:'Off'},{id:'subtle',label:'Subtle'},{id:'full',label:'Full'}
               ], currentParticles, 'setParticles')}
+            </div>
+            <div>
+              ${secLabel('Color Blind Mode')}
+              ${optBtns([
+                {id:'none',label:'None',flex:'1'},
+                {id:'deuteranopia',label:'Deuteranopia',flex:'1'},
+                {id:'protanopia',label:'Protanopia',flex:'1'},
+                {id:'tritanopia',label:'Tritanopia',flex:'1'},
+                {id:'achromatopsia',label:'Grayscale',flex:'1'}
+              ], currentColorBlind, 'setColorBlindMode')}
+              <p style="font-size:10px;color:var(--text-muted);margin-top:4px;line-height:1.4;">Adjust colors for color blindness</p>
             </div>
           </div>`;
       } else if (_tpTab === 'fonts') {
@@ -6884,6 +6954,20 @@
       localStorage.setItem('sf-cursor', style);
       if (window.updateCustomCursor) {
         window.updateCustomCursor();
+      }
+      _rerender();
+    }
+
+    function setColorBlindMode(mode) {
+      localStorage.setItem('sf-colorblind', mode);
+      const html = document.documentElement;
+
+      // Remove existing color blind class
+      html.classList.remove('cb-deuteranopia', 'cb-protanopia', 'cb-tritanopia', 'cb-achromatopsia');
+
+      // Apply new filter
+      if (mode !== 'none') {
+        html.classList.add('cb-' + mode);
       }
       _rerender();
     }
@@ -7125,6 +7209,10 @@
       if (particles !== 'off') setTimeout(() => initParticles(particles), 500);
       const cursor = localStorage.getItem('sf-cursor');
       if (cursor) setCursor(cursor);
+      const colorBlind = localStorage.getItem('sf-colorblind');
+      if (colorBlind && colorBlind !== 'none') {
+        document.documentElement.classList.add('cb-' + colorBlind);
+      }
     })();
 
     async function selectTheme(themeId) {
