@@ -258,8 +258,9 @@
       position: absolute;
       top: 56px;
       right: 0;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--bg-tertiary);
       backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
       border-radius: 14px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(139, 126, 115, 0.1);
@@ -1197,15 +1198,16 @@
     }
 
     .widget-picker-content {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--bg-tertiary);
       backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
       border-radius: 20px;
       padding: 32px;
       max-width: 500px;
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 20px 60px var(--shadow);
     }
 
     .widget-picker-title {
@@ -1232,8 +1234,9 @@
     }
 
     .clock-modal-content {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--bg-tertiary);
       backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
       border-radius: 20px;
       padding: 32px;
       max-width: 600px;
@@ -1366,8 +1369,9 @@
     }
 
     .quote-modal-content {
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--bg-tertiary);
       backdrop-filter: blur(30px);
+      border: 1px solid var(--border-color);
       border-radius: 20px;
       padding: 32px;
       max-width: 600px;
@@ -1455,8 +1459,8 @@
       padding: 16px;
       border-radius: 12px;
       margin-bottom: 12px;
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid rgba(139, 126, 115, 0.12);
+      background: var(--hover-bg);
+      border: 1px solid var(--border-color);
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
@@ -1465,8 +1469,8 @@
     }
 
     .widget-option:hover {
-      background: rgba(139, 157, 131, 0.08);
-      border-color: rgba(139, 157, 131, 0.2);
+      background: var(--widget-bg);
+      border-color: var(--accent-primary);
     }
 
     .widget-option.coming-soon {
@@ -1475,8 +1479,8 @@
     }
 
     .widget-option.coming-soon:hover {
-      background: rgba(255, 255, 255, 0.5);
-      border-color: rgba(139, 126, 115, 0.12);
+      background: var(--hover-bg);
+      border-color: var(--border-color);
     }
 
     .widget-option-info {
@@ -1492,11 +1496,11 @@
 
     .widget-option-desc {
       font-size: 12px;
-      color: #9B8B7E;
+      color: var(--text-muted);
     }
 
     .widget-option-add {
-      background: linear-gradient(135deg, #8B9D83, #7A8C73);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       color: white;
       border: none;
       border-radius: 8px;
@@ -1510,11 +1514,12 @@
 
     .widget-option-add:hover {
       transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(139, 157, 131, 0.3);
+      box-shadow: 0 4px 12px var(--shadow);
     }
 
     .widget-option-add:disabled {
-      background: #E8E5E1;
+      background: var(--border-color);
+      color: var(--text-muted);
       cursor: not-allowed;
       transform: none;
     }
@@ -5888,7 +5893,7 @@
         // Show selection modal
         const modalHtml = `
           <div class="group-select-modal" id="groupSelectModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
-            <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
+            <div style="background:var(--bg-tertiary);backdrop-filter:blur(30px);border:1px solid var(--border-color);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
               <h3 style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:20px;text-align:center;">Select Study Group</h3>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 ${groups.map(group => `
@@ -6136,7 +6141,7 @@
 
         const modalHtml = `
           <div class="group-select-modal" id="calendarGroupSelectModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
-            <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
+            <div style="background:var(--bg-tertiary);backdrop-filter:blur(30px);border:1px solid var(--border-color);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
               <h3 style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:20px;text-align:center;">Select Study Group</h3>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 ${groups.map(group => `
@@ -6215,7 +6220,7 @@
 
       const modalHtml = `
         <div class="day-events-modal" id="dayEventsModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1003;">
-          <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(30px);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
+          <div style="background:var(--bg-tertiary);backdrop-filter:blur(30px);border:1px solid var(--border-color);border-radius:20px;padding:32px;max-width:400px;width:90%;max-height:60vh;overflow-y:auto;">
             <h3 style="font-size:18px;font-weight:500;color:var(--text-primary);margin-bottom:8px;text-align:center;">${new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
             <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
               ${events.map(event => `
