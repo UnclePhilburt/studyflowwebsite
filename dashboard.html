@@ -367,6 +367,11 @@
       --canvas-bg: #4d004d; --canvas-grid: rgba(255, 255, 255, 0.3);
     }
 
+    /* Text Size Accessibility - Base font size can be scaled via html font-size percentage */
+    html {
+      font-size: 100%; /* Default - can be changed to 80%, 120%, 140%, 160% via settings */
+    }
+
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg-primary);
@@ -3711,6 +3716,7 @@
       const currentParticles = localStorage.getItem('sf-particles') || 'full';
       const currentCursor = localStorage.getItem('sf-cursor') || 'default';
       const currentColorBlind = localStorage.getItem('sf-colorblind') || 'none';
+      const currentTextSize = localStorage.getItem('sf-textsize') || '100';
 
       function miniPreview(t) {
         const bg = t.colors[2], accent = t.colors[0], accent2 = t.colors[1], txt = t.text;
@@ -3868,6 +3874,17 @@
                 {id:'default',label:'Default'},{id:'custom',label:'Custom'}
               ], currentCursor, 'setCursor')}
               <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Custom cursor changes based on what you're hovering over</p>
+            </div>
+            <div>
+              ${secLabel('Text Size')}
+              ${optBtns([
+                {id:'80',label:'Small'},
+                {id:'100',label:'Normal'},
+                {id:'120',label:'Large'},
+                {id:'140',label:'XL'},
+                {id:'160',label:'Huge'}
+              ], currentTextSize, 'setTextSize')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Adjust text size for better readability</p>
             </div>
             <div>
               ${secLabel('Color Blind Mode')}
@@ -6551,6 +6568,7 @@
       const currentClockFmt = localStorage.getItem('sf-clock') || '12h';
       const currentParticles = localStorage.getItem('sf-particles') || 'full';
       const currentColorBlind = localStorage.getItem('sf-colorblind') || 'none';
+      const currentTextSize = localStorage.getItem('sf-textsize') || '100';
 
       // Mini dashboard mockup
       function miniPreview(t) {
@@ -6713,6 +6731,17 @@
               ${optBtns([
                 {id:'off',label:'Off'},{id:'subtle',label:'Subtle'},{id:'full',label:'Full'}
               ], currentParticles, 'setParticles')}
+            </div>
+            <div>
+              ${secLabel('Text Size')}
+              ${optBtns([
+                {id:'80',label:'Small'},
+                {id:'100',label:'Normal'},
+                {id:'120',label:'Large'},
+                {id:'140',label:'XL'},
+                {id:'160',label:'Huge'}
+              ], currentTextSize, 'setTextSize')}
+              <p style="font-size:10px;color:var(--text-muted);margin-top:4px;line-height:1.4;">Adjust text size for readability</p>
             </div>
             <div>
               ${secLabel('Color Blind Mode')}
@@ -6972,6 +7001,14 @@
       _rerender();
     }
 
+    function setTextSize(size) {
+      localStorage.setItem('sf-textsize', size);
+      const percentage = parseInt(size);
+      // Apply text size multiplier to entire document
+      document.documentElement.style.fontSize = percentage + '%';
+      _rerender();
+    }
+
     function setFloParticles(val) {
       localStorage.setItem('sf-flo-particles', val);
       // Notify Flo to update (event will be handled by assistant.js)
@@ -7212,6 +7249,10 @@
       const colorBlind = localStorage.getItem('sf-colorblind');
       if (colorBlind && colorBlind !== 'none') {
         document.documentElement.classList.add('cb-' + colorBlind);
+      }
+      const textSize = localStorage.getItem('sf-textsize');
+      if (textSize) {
+        document.documentElement.style.fontSize = textSize + '%';
       }
     })();
 
