@@ -4050,6 +4050,14 @@
 
     // Wheel zoom -- same as chat page
     canvasContainer.addEventListener('wheel', (e) => {
+      // Let widgets scroll their own content
+      const widgetEl = e.target.closest('.widget-content');
+      if (widgetEl) {
+        const canScrollH = widgetEl.scrollWidth > widgetEl.clientWidth;
+        const canScrollV = widgetEl.scrollHeight > widgetEl.clientHeight;
+        if (canScrollH || canScrollV) return; // Let it scroll naturally
+      }
+
       e.preventDefault();
 
       if (e.ctrlKey || e.metaKey) {
