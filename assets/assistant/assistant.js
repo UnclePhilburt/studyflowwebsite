@@ -36,12 +36,12 @@
       idle: "What's up? Need a hand?",
       welcomeActions: [
         { label: 'Take a tour', fn: () => { if (window.startOnboarding) window.startOnboarding(); }, primary: true },
-        { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
+        { label: 'Add a widget', fn: () => { openWidgetPicker(); } },
         { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
       actions: [
         { label: "What's my day look like?", fn: () => { loadDigest(); }, primary: true },
-        { label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
+        { label: 'Add a widget', fn: () => { openWidgetPicker(); } },
         { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
       proactive: getTimeGreeting
@@ -190,7 +190,7 @@
       setExpression('happy', 2);
       return { msg: "Afternoon grind! You're doing great!", actions: [
         { label: 'Thanks Flo!', fn: () => { setExpression('happy'); dismissBubble(); } },
-        { label: 'Show me something cool', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); dismissBubble(); } }
+        { label: 'Show me something cool', fn: () => { openWidgetPicker(); dismissBubble(); } }
       ]};
     }
     if (hour < 22) {
@@ -220,6 +220,17 @@
   function focusQuizInput() {
     const input = document.querySelector('input[placeholder*="topic"], input[placeholder*="Topic"], #topicInput');
     if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth' }); }
+  }
+
+  function openWidgetPicker() {
+    // Try to click the actual widget picker button to trigger initialization
+    const widgetBtn = document.querySelector('[onclick*="toggleWidgetPicker"], .widget-picker-btn, #openWidgetPicker');
+    if (widgetBtn) {
+      widgetBtn.click();
+    } else {
+      // Fallback: manually add class and hope it's initialized
+      document.getElementById('widgetPicker')?.classList.add('active');
+    }
   }
 
   // ========== AI BACKEND ==========
@@ -1042,7 +1053,7 @@
       const type = e.detail?.type || 'widget';
       setExpression('excited', 2);
       showBubble(`Sweet! ${type.replace(/([A-Z])/g, ' $1').trim()} widget added! Make it your own!`, [
-        { label: 'Add more!', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); dismissBubble(); } },
+        { label: 'Add more!', fn: () => { openWidgetPicker(); dismissBubble(); } },
         { label: 'Perfect!', fn: () => { setExpression('happy'); dismissBubble(); } }
       ]);
     });
