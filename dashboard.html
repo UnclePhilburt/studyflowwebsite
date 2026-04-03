@@ -3844,19 +3844,29 @@
         const zoomSpeed = 0.005;
         const delta = -e.deltaY * zoomSpeed;
         const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
-
         const mx = e.clientX;
         const my = e.clientY;
         const worldX = (mx - canvasPan.x) / canvasScale;
         const worldY = (my - canvasPan.y) / canvasScale;
-
         canvasScale = newScale;
         canvasPan.x = mx - worldX * canvasScale;
         canvasPan.y = my - worldY * canvasScale;
-      } else {
-        // PAN (two-finger scroll on trackpad, or mouse wheel)
+      } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.5 || e.deltaMode === 0 && Math.abs(e.deltaX) > 2) {
+        // PAN (trackpad -- has significant horizontal delta)
         canvasPan.x -= e.deltaX;
         canvasPan.y -= e.deltaY;
+      } else {
+        // ZOOM (mouse wheel -- vertical only)
+        const zoomSpeed = 0.001;
+        const delta = -e.deltaY * zoomSpeed;
+        const newScale = Math.min(3, Math.max(0.25, canvasScale + delta * canvasScale));
+        const mx = e.clientX;
+        const my = e.clientY;
+        const worldX = (mx - canvasPan.x) / canvasScale;
+        const worldY = (my - canvasPan.y) / canvasScale;
+        canvasScale = newScale;
+        canvasPan.x = mx - worldX * canvasScale;
+        canvasPan.y = my - worldY * canvasScale;
       }
 
       updateCanvasTransform();
