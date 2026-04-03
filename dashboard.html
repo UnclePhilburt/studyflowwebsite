@@ -5783,7 +5783,7 @@
       const currentDockHide = localStorage.getItem('sf-dock-hide') || 'off';
       const currentAnimSpeed = localStorage.getItem('sf-anim') || 'normal';
       const currentClockFmt = localStorage.getItem('sf-clock') || '12h';
-      const currentParticles = localStorage.getItem('sf-particles') || 'off';
+      const currentParticles = localStorage.getItem('sf-particles') || 'full';
 
       // Mini dashboard mockup
       function miniPreview(t) {
@@ -6201,8 +6201,8 @@
       if (dockHide === 'on') setTimeout(() => setDockAutoHide('on'), 300);
       const animSpeed = localStorage.getItem('sf-anim');
       if (animSpeed) setAnimSpeed(animSpeed);
-      const particles = localStorage.getItem('sf-particles');
-      if (particles && particles !== 'off') setTimeout(() => initParticles(particles), 500);
+      const particles = localStorage.getItem('sf-particles') || 'full';
+      if (particles !== 'off') setTimeout(() => initParticles(particles), 500);
     })();
 
     async function selectTheme(themeId) {
