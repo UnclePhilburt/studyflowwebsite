@@ -486,6 +486,22 @@
       wrap.style.top = '20px';
     }
 
+    // Apply size setting
+    const size = localStorage.getItem('sf-flo-size') || 'medium';
+    const character = document.getElementById('sf-assistant-character');
+    if (character) {
+      let pixelSize;
+      switch(size) {
+        case 'small': pixelSize = 50; break;
+        case 'medium': pixelSize = 70; break;
+        case 'large': pixelSize = 100; break;
+        case 'xlarge': pixelSize = 140; break;
+        default: pixelSize = 70;
+      }
+      character.style.width = pixelSize + 'px';
+      character.style.height = pixelSize + 'px';
+    }
+
     // Events
     document.getElementById('sf-assistant-character').addEventListener('click', onCharacterClick);
     document.getElementById('sf-assistant-dismiss').addEventListener('click', (e) => {

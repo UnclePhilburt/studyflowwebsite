@@ -3688,6 +3688,7 @@
         const currentFloExpressions = localStorage.getItem('sf-flo-expressions') || 'full';
         const currentFloShape = localStorage.getItem('sf-flo-shape') || 'sphere';
         const currentFloHat = localStorage.getItem('sf-flo-hat') || 'none';
+        const currentFloSize = localStorage.getItem('sf-flo-size') || 'medium';
 
         const shapeOptions = [
           {id:'sphere',label:'Sphere',desc:'Classic round buddy'},
@@ -3747,6 +3748,13 @@
                   </button>
                 `).join('')}
               </div>
+            </div>
+            <div>
+              ${secLabel('Size')}
+              ${optBtns([
+                {id:'small',label:'Small'},{id:'medium',label:'Medium'},{id:'large',label:'Large'},{id:'xlarge',label:'Extra Large'}
+              ], currentFloSize, 'setFloSize')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">How big Flo appears on screen</p>
             </div>
             <div>
               ${secLabel('Particle Effects')}
@@ -6720,6 +6728,30 @@
       localStorage.setItem('sf-flo-hat', val);
       // Flo needs to be recreated with the new hat
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { hat: val, recreate: true } }));
+      _rerender();
+    }
+
+    function setFloSize(val) {
+      localStorage.setItem('sf-flo-size', val);
+      const wrap = document.getElementById('sf-assistant-wrap');
+      const character = document.getElementById('sf-assistant-character');
+      if (wrap && character) {
+        let size;
+        switch(val) {
+          case 'small': size = 50; break;
+          case 'medium': size = 70; break;
+          case 'large': size = 100; break;
+          case 'xlarge': size = 140; break;
+          default: size = 70;
+        }
+        character.style.width = size + 'px';
+        character.style.height = size + 'px';
+        const canvas = character.querySelector('canvas');
+        if (canvas) {
+          canvas.style.width = size + 'px';
+          canvas.style.height = size + 'px';
+        }
+      }
       _rerender();
     }
 

@@ -145,8 +145,8 @@
 }
 
 #sf-assistant-character canvas {
-  width: 70px !important;
-  height: 70px !important;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
 }
 
