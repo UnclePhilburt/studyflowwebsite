@@ -221,6 +221,88 @@
   border-width: 1px;
 }
 
+/* Particle effects */
+.sf-particle {
+  position: absolute;
+  font-size: 16px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+  transition: none;
+}
+
+.sf-particle.active {
+  animation: sf-particle-float 2s ease-out forwards;
+}
+
+@keyframes sf-particle-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.5);
+  }
+}
+
+.sf-particle-zzz {
+  font-size: 14px;
+  font-weight: bold;
+  color: #888;
+  font-style: italic;
+}
+
+.sf-particle-zzz.active {
+  animation: sf-particle-zzz 3s ease-out forwards;
+}
+
+@keyframes sf-particle-zzz {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) translateX(20px) scale(1.2);
+  }
+}
+
+.sf-particle-confetti.active {
+  animation: sf-particle-confetti 1.5s ease-out forwards;
+}
+
+@keyframes sf-particle-confetti {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px) rotate(720deg) scale(0.3);
+  }
+}
+
+.sf-particle-lightning,
+.sf-particle-fire {
+  font-size: 20px;
+}
+
+.sf-particle-lightning.active {
+  animation: sf-particle-zap 0.8s ease-out forwards;
+}
+
+@keyframes sf-particle-zap {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
 /* Hide on very small screens */
 @media (max-width: 480px) {
   #sf-assistant-wrap {
@@ -241,6 +323,10 @@
   #sf-assistant-character canvas {
     width: 56px !important;
     height: 56px !important;
+  }
+
+  .sf-particle {
+    font-size: 12px;
   }
 }
 

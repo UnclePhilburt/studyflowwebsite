@@ -28,12 +28,13 @@
   let clickTimer = null;
   let idleStartTime = Date.now();
   let celebrateTimer = 0;
+  let particles = [];
 
   // ========== PAGE ACTION DEFINITIONS ==========
   const PAGE_ACTIONS = {
     'dashboard': {
-      welcome: "Hey there! Let's make today awesome!",
-      idle: "What's up? Need a hand?",
+      welcome: "Hey there! 👋 Let's make today awesome!",
+      idle: "What's up? Need a hand? 🤔",
       welcomeActions: [
         { label: 'Take a tour', fn: () => { if (window.startOnboarding) window.startOnboarding(); }, primary: true },
         { label: 'Add a widget', fn: () => { openWidgetPicker(); } },
@@ -47,8 +48,8 @@
       proactive: getTimeGreeting
     },
     'notes': {
-      welcome: "Your personal study vault! Let's get some notes in here!",
-      idle: "Studying hard? I can help!",
+      welcome: "Your personal study vault! 📚 Let's get some notes in here!",
+      idle: "Studying hard? I can help! 💡",
       welcomeActions: [
         { label: 'Upload notes', fn: () => { if (window.showUploadModal) window.showUploadModal(); }, primary: true },
         { label: 'Create a new note', fn: () => { if (window.createNewNote) window.createNewNote(); } },
@@ -61,8 +62,8 @@
       ]
     },
     'chat': {
-      welcome: "Let's chat about anything! I've got your back with AI-powered answers!",
-      idle: "Got questions? Let's talk!",
+      welcome: "Let's chat about anything! 💬 I've got your back with AI-powered answers!",
+      idle: "Got questions? Let's talk! 🗨️",
       welcomeActions: [
         { label: 'Start new chat', fn: () => { if (window.startNewChat) window.startNewChat(); }, primary: true },
         { label: 'Add a sticky note', fn: () => { if (window.createStickyNote) window.createStickyNote(20100, 20100); } },
@@ -88,8 +89,8 @@
       ]
     },
     'flashcards': {
-      welcome: "Quiz time! Let's see what you know! (Or quiz your friends for fun!)",
-      idle: "Ready to test yourself?",
+      welcome: "Quiz time! 📝 Let's see what you know! (Or quiz your friends for fun!)",
+      idle: "Ready to test yourself? 🧠",
       welcomeActions: [
         { label: 'Start a quiz', fn: () => { focusQuizInput(); }, primary: true },
         { label: 'Create a race', fn: () => { if (window.generateCode) window.generateCode(); } }
@@ -174,34 +175,34 @@
     const hour = new Date().getHours();
     if (hour < 6) {
       setExpression('sleepy', 3);
-      return { msg: "Whoa! It's super late! You should get some sleep soon!", actions: [
+      return { msg: "Whoa! 😴 It's super late! You should get some sleep soon!", actions: [
         { label: 'Just 5 more minutes...', fn: () => { setExpression('worried'); dismissBubble(); } },
         { label: 'Yeah, you\'re right', fn: () => { setExpression('happy'); dismissBubble(); } }
       ]};
     }
     if (hour < 12) {
       setExpression('happy', 2);
-      return { msg: "Morning! Let's crush this day!", actions: [
+      return { msg: "Morning! ☀️ Let's crush this day!", actions: [
         { label: 'Let\'s do it!', fn: () => { setExpression('excited'); dismissBubble(); } },
         { label: 'Show me around', fn: () => { if (window.startOnboarding) window.startOnboarding(); dismissBubble(); } }
       ]};
     }
     if (hour < 17) {
       setExpression('happy', 2);
-      return { msg: "Afternoon grind! You're doing great!", actions: [
+      return { msg: "Afternoon grind! 💪 You're doing great!", actions: [
         { label: 'Thanks Flo!', fn: () => { setExpression('happy'); dismissBubble(); } },
         { label: 'Show me something cool', fn: () => { openWidgetPicker(); dismissBubble(); } }
       ]};
     }
     if (hour < 22) {
       setExpression('happy', 2);
-      return { msg: "Evening study sesh! Love the dedication!", actions: [
+      return { msg: "Evening study sesh! 🌙 Love the dedication!", actions: [
         { label: 'You know it!', fn: () => { setExpression('excited'); dismissBubble(); } },
         { label: 'Help me focus', fn: () => dismissBubble() }
       ]};
     }
     setExpression('sleepy', 2);
-    return { msg: "It's getting late! Don't forget to sleep!", actions: [
+    return { msg: "It's getting late! 😴 Don't forget to sleep!", actions: [
       { label: 'Almost done!', fn: () => { setExpression('happy'); dismissBubble(); } },
       { label: 'Good point', fn: () => { setExpression('winking', 2); dismissBubble(); } }
     ]};
@@ -399,6 +400,50 @@
     askAssistant(`Create a short quiz about the note titled "${title}"`, 'quiz');
   }
 
+  // ========== PARTICLE SYSTEM ==========
+  function spawnParticle(type) {
+    const container = document.getElementById('sf-assistant-character');
+    if (!container) return;
+
+    const particle = document.createElement('div');
+    particle.className = `sf-particle sf-particle-${type}`;
+
+    // Position relative to Flo
+    const startX = 35 + (Math.random() - 0.5) * 30;
+    const startY = 35 + (Math.random() - 0.5) * 30;
+    particle.style.left = startX + 'px';
+    particle.style.top = startY + 'px';
+
+    // Set particle content based on type
+    const particleContent = {
+      'heart': '❤️',
+      'star': '⭐',
+      'zzz': 'Z',
+      'sweat': '💧',
+      'question': '❓',
+      'sparkle': '✨',
+      'music': '🎵',
+      'confetti': '🎊',
+      'lightning': '⚡',
+      'fire': '🔥'
+    };
+    particle.textContent = particleContent[type] || '✨';
+
+    container.appendChild(particle);
+
+    // Animate and remove
+    setTimeout(() => particle.classList.add('active'), 10);
+    setTimeout(() => {
+      particle.remove();
+    }, 2000);
+  }
+
+  function spawnParticleBurst(type, count = 5) {
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => spawnParticle(type), i * 100);
+    }
+  }
+
   // ========== BUILD DOM ==========
   function buildDOM() {
     const wrap = document.createElement('div');
@@ -591,6 +636,11 @@
       setExpression('sleeping', 999); // basically forever until interaction
     }
 
+    // Spawn ZZZ particles when sleeping
+    if (expression === 'sleeping' && Math.random() < 0.05) {
+      spawnParticle('zzz');
+    }
+
     // Idle bob
     const bobY = Math.sin(bobTime * 2) * 0.06;
     const bobTilt = Math.sin(bobTime * 1.3) * 0.03;
@@ -720,6 +770,24 @@
   function setExpression(expr, duration = 2) {
     expression = expr;
     expressionTimer = duration;
+
+    // Trigger particles for certain expressions
+    if (expr === 'happy') {
+      spawnParticle('heart');
+    } else if (expr === 'excited') {
+      spawnParticleBurst('star', 3);
+    } else if (expr === 'celebrating') {
+      spawnParticleBurst('confetti', 8);
+      spawnParticleBurst('star', 5);
+    } else if (expr === 'sleeping') {
+      // ZZZ particles will spawn continuously in animate loop
+    } else if (expr === 'worried') {
+      spawnParticle('sweat');
+    } else if (expr === 'confused') {
+      spawnParticleBurst('question', 2);
+    } else if (expr === 'thinking') {
+      spawnParticle('sparkle');
+    }
   }
 
   // ========== BUBBLE SYSTEM ==========
@@ -833,7 +901,9 @@
     if (clickCount === 10) {
       // Dizzy spin easter egg!
       setExpression('confused', 5);
-      showBubble("Whoa! I'm getting dizzy! Stop clicking me so much!", [
+      spawnParticleBurst('question', 8);
+      spawnParticleBurst('sweat', 4);
+      showBubble("Whoa! 😵 I'm getting dizzy! Stop clicking me so much!", [
         { label: 'Haha sorry!', fn: () => { setExpression('happy'); dismissBubble(); } },
         { label: 'Do a backflip!', fn: () => { setExpression('celebrating', 3); dismissBubble(); } }
       ]);
@@ -933,14 +1003,19 @@
       // Easter egg: 100th note milestone!
       if (totalNotes === 100) {
         setExpression('celebrating', 8);
-        showBubble(`🎉 WHOA! YOUR 100TH NOTE! YOU'RE A LEGEND! 🎉`, [
+        spawnParticleBurst('confetti', 15);
+        spawnParticleBurst('star', 10);
+        spawnParticleBurst('fire', 5);
+        showBubble(`🎉🏆 WHOA! YOUR 100TH NOTE! YOU'RE A LEGEND! 🏆🎉`, [
           { label: 'YEAH BABY!', fn: () => { setExpression('excited', 5); dismissBubble(); } },
           { label: 'Share my collection!', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); dismissBubble(); } },
           { label: 'Keep going!', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } }
         ]);
       } else if (totalNotes === 50) {
         setExpression('excited', 4);
-        showBubble(`50 notes! Halfway to 100! You're crushing it!`, [
+        spawnParticleBurst('star', 6);
+        spawnParticleBurst('fire', 3);
+        showBubble(`50 notes! 🎯 Halfway to 100! You're crushing it! 🔥`, [
           { label: 'Let\'s go!', fn: () => { setExpression('happy'); dismissBubble(); } },
           { label: 'Upload more', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } }
         ]);
@@ -1108,14 +1183,17 @@
       // Easter egg: Perfect score celebration!
       if (pct === 100) {
         setExpression('celebrating', 6);
-        showBubble(`PERFECT SCORE! ${correct}/${total} CORRECT! YOU'RE A GENIUS! 🎉`, [
+        spawnParticleBurst('fire', 10);
+        spawnParticleBurst('lightning', 5);
+        showBubble(`PERFECT SCORE! 🏆 ${correct}/${total} CORRECT! YOU'RE A GENIUS! 🎉🎊✨`, [
           { label: 'YEAH!', fn: () => { setExpression('excited', 3); dismissBubble(); } },
           { label: 'Do it again!', fn: () => { focusQuizInput(); dismissBubble(); } },
           { label: 'Tell everyone!', fn: () => { dismissBubble(); } }
         ]);
       } else if (pct >= 80) {
         setExpression('excited', 4);
-        showBubble(`BOOM! ${correct}/${total} correct (${pct}%)! You crushed it!`, [
+        spawnParticleBurst('star', 5);
+        showBubble(`BOOM! 💥 ${correct}/${total} correct (${pct}%)! You crushed it! 🎯`, [
           { label: 'Let\'s go!', fn: () => { focusQuizInput(); dismissBubble(); } },
           { label: 'Race a friend', fn: () => { if (window.generateCode) window.generateCode(); dismissBubble(); } }
         ]);
