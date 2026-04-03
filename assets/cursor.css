@@ -1,14 +1,12 @@
 /* StudyFlow Custom Cursors */
 
-/* Hide default cursor when custom is enabled */
-body.custom-cursor,
-body.custom-cursor * {
-  cursor: none !important;
-}
-
 /* Default cursor - simple dot with ring */
 body.custom-cursor {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='5' fill='%237c9885'/><circle cx='16' cy='16' r='10' fill='none' stroke='%237c9885' stroke-width='2' opacity='0.5'/></svg>") 16 16, auto;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='5' fill='%237c9885'/><circle cx='16' cy='16' r='10' fill='none' stroke='%237c9885' stroke-width='2' opacity='0.5'/></svg>") 16 16, auto !important;
+}
+
+body.custom-cursor * {
+  cursor: inherit;
 }
 
 /* Grab cursor - hand with grab motion */
