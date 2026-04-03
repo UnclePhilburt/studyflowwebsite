@@ -392,27 +392,21 @@
         }
 
         // Load the file content
+        // All files are stored as PDFs on backend, so always use image viewer (prevents copying)
         const viewer = document.getElementById('viewerArea');
-        const fileType = (data.file_type || '').toLowerCase();
 
-        if (fileType === 'pdf') {
-          // Try image-based viewing first (more secure, works everywhere)
-          try {
-            const imgRes = await fetch(`${BACKEND_URL}/api/shared/${token}/view-as-images`);
-            if (imgRes.ok) {
-              const imgData = await imgRes.json();
-              viewer.innerHTML = imgData.images.map((img, i) =>
-                `<img class="page-image" src="data:image/png;base64,${img}" alt="Page ${i + 1}" draggable="false" oncontextmenu="return false">`
-              ).join('');
-            } else {
-              // Fallback to iframe
-              viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
-            }
-          } catch {
+        try {
+          const imgRes = await fetch(`${BACKEND_URL}/api/shared/${token}/view-as-images`);
+          if (imgRes.ok) {
+            const imgData = await imgRes.json();
+            viewer.innerHTML = imgData.images.map((img, i) =>
+              `<img class="page-image" src="data:image/png;base64,${img}" alt="Page ${i + 1}" draggable="false" oncontextmenu="return false">`
+            ).join('');
+          } else {
+            // Fallback to iframe only if image loading fails
             viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
           }
-        } else {
-          // For non-PDF, use iframe
+        } catch {
           viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
         }
 
