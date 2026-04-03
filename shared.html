@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View a shared study note on StudyFlow Suite.">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Shared Note - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
+      min-height: 100vh;
+      color: #2d2d2d;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      background: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #7c9885;
+      text-decoration: none;
+    }
+
+    .badge {
+      background: #7c9885;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .note-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .note-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+      color: #888;
+      flex-wrap: wrap;
+    }
+
+    .note-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .viewer-area {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+      min-height: 60vh;
+    }
+
+    .viewer-area iframe {
+      width: 100%;
+      height: 80vh;
+      border: none;
+    }
+
+    .page-image {
+      width: 100%;
+      display: block;
+      border-bottom: 1px solid #eee;
+    }
+
+    .error-state, .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .error-state h2 { font-size: 22px; margin-bottom: 8px; }
+    .error-state p { color: #888; font-size: 14px; margin-bottom: 20px; }
+
+    .cta-btn {
+      background: #7c9885;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .cta-btn:hover { background: #6a8573; }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #eee;
+      border-top-color: #7c9885;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .expiry-banner {
+      background: #fff3cd;
+      color: #856404;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px 0;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .footer a { color: #7c9885; text-decoration: none; font-weight: 600; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .container { padding: 12px; }
+      .note-title { font-size: 18px; }
+      .note-meta { gap: 10px; font-size: 12px; }
+      .viewer-area iframe { height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Loading State -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading shared note...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" id="errorState" style="display:none;">
+      <h2 id="errorTitle">Note Not Found</h2>
+      <p id="errorMessage">This share link may have expired or been revoked.</p>
+      <a href="index.html" class="cta-btn">Go to StudyFlow</a>
+    </div>
+
+    <!-- Note Content -->
+    <div id="noteContent" style="display:none;">
+      <div class="header">
+        <div class="header-top">
+          <a href="index.html" class="logo">StudyFlow Suite</a>
+          <span class="badge">Shared Note</span>
+        </div>
+        <div class="note-title" id="noteTitle"></div>
+        <div class="note-meta">
+          <span id="metaSharedBy"></span>
+          <span id="metaPages"></span>
+          <span id="metaType"></span>
+        </div>
+      </div>
+
+      <div id="expiryBanner" class="expiry-banner" style="display:none;"></div>
+
+      <div class="viewer-area" id="viewerArea"></div>
+
+      <div class="footer">
+        Shared via <a href="index.html">StudyFlow Suite</a> -- the collaborative study platform.
+        <br>
+        <a href="signup.html" style="margin-top:8px;display:inline-block;">Sign up free to upload and share your own notes</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+
+    async function loadSharedNote() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token) {
+        showError('Invalid Link', 'No share token provided.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/shared/${token}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 410) {
+            showError('Link Expired', 'This share link has expired. Ask the owner to create a new one.');
+          } else {
+            showError('Note Not Found', data.error || 'This share link may have been revoked.');
+          }
+          return;
+        }
+
+        // Set page info
+        document.title = `${data.filename} - StudyFlow Suite`;
+        document.getElementById('noteTitle').textContent = data.filename;
+        document.getElementById('metaSharedBy').textContent = `Shared by ${data.shared_by}`;
+        document.getElementById('metaPages').textContent = `${data.page_count || '?'} pages`;
+        document.getElementById('metaType').textContent = (data.file_type || '').toUpperCase();
+
+        // Show expiry info
+        if (data.expires_at) {
+          const exp = new Date(data.expires_at);
+          const now = new Date();
+          const hoursLeft = Math.round((exp - now) / (1000 * 60 * 60));
+          const banner = document.getElementById('expiryBanner');
+          if (hoursLeft < 48) {
+            banner.textContent = `This link expires in ${hoursLeft <= 1 ? 'less than an hour' : hoursLeft + ' hours'}.`;
+            banner.style.display = 'block';
+          }
+        }
+
+        // Load the file content
+        const viewer = document.getElementById('viewerArea');
+        const fileType = (data.file_type || '').toLowerCase();
+
+        if (fileType === 'pdf') {
+          // Try image-based viewing first (more secure, works everywhere)
+          try {
+            const imgRes = await fetch(`${BACKEND_URL}/api/shared/${token}/view-as-images`);
+            if (imgRes.ok) {
+              const imgData = await imgRes.json();
+              viewer.innerHTML = imgData.images.map((img, i) =>
+                `<img class="page-image" src="data:image/png;base64,${img}" alt="Page ${i + 1}">`
+              ).join('');
+            } else {
+              // Fallback to iframe
+              viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
+            }
+          } catch {
+            viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
+          }
+        } else {
+          // For non-PDF, use iframe
+          viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
+        }
+
+        // Show content
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('noteContent').style.display = 'block';
+
+      } catch (e) {
+        console.error('Error loading shared note:', e);
+        showError('Something went wrong', 'Could not load this shared note. Please try again.');
+      }
+    }
+
+    function showError(title, message) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorTitle').textContent = title;
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('errorState').style.display = 'flex';
+    }
+
+    loadSharedNote();
+  </script>
+</body>
+</html>
