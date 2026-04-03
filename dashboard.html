@@ -5770,12 +5770,29 @@
       { id: 'jetbrains', name: 'JetBrains Mono', family: "'JetBrains Mono', monospace", desc: 'Coder aesthetic', url: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap' },
     ];
 
+    const WALLPAPER_OPTIONS = [
+      { id: 'mountain_range', name: 'Mountains', file: 'mountain_range.jpg' },
+      { id: 'desert', name: 'Desert', file: 'mostafa_meraji-desert-7951761_1920.jpg' },
+      { id: 'koi', name: 'Koi Pond', file: 'nika_akin-koi-4543131_1920.jpg' },
+      { id: 'bear', name: 'Bear', file: 'biancavandijk-bear-7675987_1920.jpg' },
+      { id: 'cape', name: 'Coastal', file: 'kanenori-cape-7404790_1920.jpg' },
+      { id: 'sunrise', name: 'Sunrise', file: 'aszak-sunrise-9750192_1920.jpg' },
+      { id: 'flower', name: 'Flower', file: 'himmelstraeume-flower-7543035_1920.jpg' },
+      { id: 'mountain_lake', name: 'Lake', file: 'yamabon-mountain-6815304_1920.jpg' },
+      { id: 'nature', name: 'Nature', file: 'yoshitaka2-nature-9332892.jpg' },
+      { id: 'cliffs', name: 'Cliffs', file: 'pexels-cliffs-1866832_1920.jpg' },
+      { id: 'leaf', name: 'Leaf', file: 'soramang-leaf-1482948_1920.jpg' },
+      { id: 'snowfall', name: 'Snowfall', file: 'kristamonique-snowfall-201496_1920.jpg' },
+      { id: 'blackboard', name: 'Blackboard', file: 'pexels-blackboard-1846865_1920.jpg' },
+    ];
+
     let _tpTab = 'themes';
 
     function renderThemePicker(widgetData) {
       const container = document.getElementById(`widget-${widgetData.id}`);
       const currentTheme = document.body.getAttribute('data-theme') || 'default';
       const currentFont = localStorage.getItem('sf-font') || 'inter';
+      const currentWallpaper = localStorage.getItem('sf-wallpaper') || 'none';
       const currentGrid = localStorage.getItem('sf-grid') || 'dots';
       const currentRadius = localStorage.getItem('sf-radius') || '16';
       const currentOpacity = localStorage.getItem('sf-opacity') || '100';
@@ -5858,6 +5875,31 @@
         }
         content = `
           <div style="padding:10px 12px;display:flex;flex-direction:column;gap:12px;">
+            <div>
+              ${secLabel('Wallpaper')}
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">
+                <div onclick="setWallpaper('none')" style="
+                  cursor:pointer;border-radius:6px;overflow:hidden;aspect-ratio:16/10;
+                  border:2px solid ${currentWallpaper === 'none' ? 'var(--accent-primary)' : 'transparent'};
+                  background:var(--canvas-bg);display:flex;align-items:center;justify-content:center;
+                  transition:all 0.15s;
+                " title="Default canvas">
+                  <span style="font-size:9px;font-weight:600;color:var(--text-muted);">None</span>
+                </div>
+                ${WALLPAPER_OPTIONS.map(w => `
+                  <div onclick="setWallpaper('${w.id}')" style="
+                    cursor:pointer;border-radius:6px;overflow:hidden;aspect-ratio:16/10;
+                    border:2px solid ${currentWallpaper === w.id ? 'var(--accent-primary)' : 'transparent'};
+                    background:url('assets/wallpapers/${w.file}') center/cover;
+                    transition:all 0.15s;position:relative;
+                  " title="${w.name}">
+                    <div style="position:absolute;bottom:0;left:0;right:0;padding:2px 4px;
+                      background:linear-gradient(transparent,rgba(0,0,0,0.6));
+                      font-size:8px;color:white;font-weight:500;">${w.name}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
             <div>
               ${secLabel('Custom Accent')}
               <div style="display:flex;align-items:center;gap:8px;">
@@ -5954,11 +5996,41 @@
       `;
     }
 
-    function setCanvasGrid(type) {
-      localStorage.setItem('sf-grid', type);
-      // Update canvas background
+    function setWallpaper(id) {
       const cc = document.getElementById('canvasContainer');
       if (!cc) return;
+      if (id === 'none') {
+        localStorage.removeItem('sf-wallpaper');
+        cc.style.backgroundImage = '';
+        cc.style.backgroundSize = '';
+        cc.style.backgroundPosition = '';
+        cc.style.backgroundAttachment = '';
+        // Re-apply canvas grid
+        const grid = localStorage.getItem('sf-grid') || 'dots';
+        setCanvasGrid(grid);
+        return;
+      }
+      const wp = WALLPAPER_OPTIONS.find(w => w.id === id);
+      if (!wp) return;
+      localStorage.setItem('sf-wallpaper', id);
+      cc.style.backgroundImage = `url('assets/wallpapers/${wp.file}')`;
+      cc.style.backgroundSize = 'cover';
+      cc.style.backgroundPosition = 'center';
+      cc.style.backgroundAttachment = 'fixed';
+      // Re-render picker to update selection
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
+    function setCanvasGrid(type) {
+      localStorage.setItem('sf-grid', type);
+      // Only update canvas grid if no wallpaper is active
+      const cc = document.getElementById('canvasContainer');
+      if (!cc) return;
+      if (localStorage.getItem('sf-wallpaper')) {
+        // Wallpaper is active, skip grid update
+        activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+        return;
+      }
       if (type === 'dots') {
         cc.style.backgroundImage = 'radial-gradient(circle, var(--canvas-grid) 1px, transparent 1px)';
         cc.style.backgroundSize = '24px 24px';
@@ -6169,6 +6241,21 @@
       if (accent) {
         document.documentElement.style.setProperty('--accent-primary', accent);
         document.documentElement.style.setProperty('--accent-secondary', accent);
+      }
+      const wallpaperId = localStorage.getItem('sf-wallpaper');
+      if (wallpaperId) {
+        const wp = WALLPAPER_OPTIONS.find(w => w.id === wallpaperId);
+        if (wp) {
+          setTimeout(() => {
+            const cc = document.getElementById('canvasContainer');
+            if (cc) {
+              cc.style.backgroundImage = `url('assets/wallpapers/${wp.file}')`;
+              cc.style.backgroundSize = 'cover';
+              cc.style.backgroundPosition = 'center';
+              cc.style.backgroundAttachment = 'fixed';
+            }
+          }, 100);
+        }
       }
       const fontId = localStorage.getItem('sf-font');
       if (fontId) {
