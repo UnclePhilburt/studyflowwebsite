@@ -400,7 +400,7 @@
         <div id="sf-assistant-msg"></div>
         <div id="sf-assistant-buttons"></div>
       </div>
-      <div id="sf-assistant-character" title="Click to chat with ${ASSISTANT_NAME}">
+      <div id="sf-assistant-character" title="Click to chat with ${ASSISTANT_NAME} | Right-click to minimize">
         <div id="sf-assistant-dot"></div>
       </div>
     `;
@@ -414,13 +414,19 @@
       dismissBubble();
     });
 
-    // Double-click to minimize/restore
-    document.getElementById('sf-assistant-character').addEventListener('dblclick', (e) => {
+    // Right-click to minimize/restore (changed from double-click to avoid easter egg conflict)
+    document.getElementById('sf-assistant-character').addEventListener('contextmenu', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       const wrap = document.getElementById('sf-assistant-wrap');
       const isMin = wrap.classList.toggle('minimized');
       localStorage.setItem(MINIMIZED_KEY, isMin);
-      if (isMin) dismissBubble();
+      if (isMin) {
+        dismissBubble();
+        setExpression('sleepy', 1);
+      } else {
+        setExpression('happy', 2);
+      }
     });
 
     // Track mouse for eye movement
