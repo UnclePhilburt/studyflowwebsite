@@ -246,6 +246,47 @@
       --canvas-bg: #e2eddc; --canvas-grid: rgba(122, 164, 90, 0.12);
     }
 
+    /* High Contrast Themes - WCAG AAA Compliant */
+    body[data-theme="hc-black-white"] {
+      --bg-primary: #000000; --bg-secondary: #1a1a1a; --bg-tertiary: #1a1a1a;
+      --text-primary: #ffffff; --text-secondary: #ffffff; --text-muted: #cccccc;
+      --accent-primary: #ffffff; --accent-secondary: #cccccc; --accent-tertiary: #ffffff;
+      --border-color: #ffffff; --hover-bg: rgba(255, 255, 255, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(255, 255, 255, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(255, 255, 255, 0.3);
+    }
+
+    body[data-theme="hc-white-black"] {
+      --bg-primary: #ffffff; --bg-secondary: #f0f0f0; --bg-tertiary: #f0f0f0;
+      --text-primary: #000000; --text-secondary: #000000; --text-muted: #333333;
+      --accent-primary: #000000; --accent-secondary: #333333; --accent-tertiary: #000000;
+      --border-color: #000000; --hover-bg: rgba(0, 0, 0, 0.05);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #ffffff; --shadow: rgba(0, 0, 0, 0.3);
+      --canvas-bg: #ffffff; --canvas-grid: rgba(0, 0, 0, 0.2);
+    }
+
+    body[data-theme="hc-yellow-black"] {
+      --bg-primary: #000000; --bg-secondary: #1a1a00; --bg-tertiary: #1a1a00;
+      --text-primary: #ffff00; --text-secondary: #ffff00; --text-muted: #ffcc00;
+      --accent-primary: #ffff00; --accent-secondary: #ffcc00; --accent-tertiary: #ffff00;
+      --border-color: #ffff00; --hover-bg: rgba(255, 255, 0, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(255, 255, 0, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(255, 255, 0, 0.3);
+    }
+
+    body[data-theme="hc-green-black"] {
+      --bg-primary: #000000; --bg-secondary: #001a00; --bg-tertiary: #001a00;
+      --text-primary: #00ff00; --text-secondary: #00ff00; --text-muted: #00cc00;
+      --accent-primary: #00ff00; --accent-secondary: #00cc00; --accent-tertiary: #00ff00;
+      --border-color: #00ff00; --hover-bg: rgba(0, 255, 0, 0.1);
+      --gradient-start: transparent; --gradient-end: transparent;
+      --widget-bg: #000000; --shadow: rgba(0, 255, 0, 0.3);
+      --canvas-bg: #000000; --canvas-grid: rgba(0, 255, 0, 0.3);
+    }
+
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg-primary);
@@ -264,6 +305,35 @@
         radial-gradient(circle at 80% 70%, var(--gradient-end) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
+    }
+
+    /* High Contrast Mode Overrides - Remove transparency and blur */
+    body[data-theme^="hc-"]::before {
+      display: none; /* Remove gradient overlay */
+    }
+
+    body[data-theme^="hc-"] .widget {
+      backdrop-filter: none !important;
+      background: var(--bg-primary) !important;
+      border-width: 2px !important;
+      box-shadow: 0 0 0 1px var(--border-color) !important;
+    }
+
+    body[data-theme^="hc-"] .user-menu,
+    body[data-theme^="hc-"] .notifications-panel,
+    body[data-theme^="hc-"] .settings-panel {
+      backdrop-filter: none !important;
+      background: var(--bg-primary) !important;
+    }
+
+    body[data-theme^="hc-"] .dock {
+      backdrop-filter: none !important;
+      background: var(--bg-primary) !important;
+      border-width: 2px !important;
+    }
+
+    body[data-theme^="hc-"] * {
+      font-weight: 500 !important; /* Slightly bolder text for readability */
     }
 
     /* Top right user menu */
@@ -6279,6 +6349,12 @@
         { id: 'midnight', name: 'Midnight', colors: ['#5b8af5', '#7aa4ff', '#0f1628'], text: '#e8ecf4', border: '#5b8af5' },
         { id: 'ember', name: 'Ember', colors: ['#e8734a', '#f09060', '#1a1614'], text: '#f0e8e0', border: '#e8734a' },
         { id: 'neon', name: 'Neon', colors: ['#00d4aa', '#ff6090', '#0a0a14'], text: '#e0e8f0', border: '#00d4aa' },
+      ],
+      highContrast: [
+        { id: 'hc-black-white', name: 'Black & White', colors: ['#ffffff', '#cccccc', '#000000'], text: '#ffffff', border: '#ffffff' },
+        { id: 'hc-white-black', name: 'White & Black', colors: ['#000000', '#333333', '#ffffff'], text: '#000000', border: '#000000' },
+        { id: 'hc-yellow-black', name: 'Yellow on Black', colors: ['#ffff00', '#ffcc00', '#000000'], text: '#ffff00', border: '#ffff00' },
+        { id: 'hc-green-black', name: 'Green on Black', colors: ['#00ff00', '#00cc00', '#000000'], text: '#00ff00', border: '#00ff00' },
       ]
     };
 
@@ -6377,8 +6453,12 @@
               ${THEME_OPTIONS.light.map(miniPreview).join('')}
             </div>
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Dark</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
               ${THEME_OPTIONS.dark.map(miniPreview).join('')}
+            </div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">High Contrast</div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:8px;">
+              ${THEME_OPTIONS.highContrast.map(miniPreview).join('')}
             </div>
           </div>`;
       } else if (_tpTab === 'customize') {
