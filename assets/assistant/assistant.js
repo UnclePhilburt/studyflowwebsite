@@ -930,30 +930,32 @@
     rightPupil.position.set(0, 0, 0.14);
     rightEye.add(rightPupil);
 
-    // Eyelids (for blink and expressions)
-    const lidGeo = new THREE.SphereGeometry(0.24, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.5);
+    // Top Eyelids (for blink and expressions)
+    const topLidGeo = new THREE.SphereGeometry(0.24, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.5);
     const lidMat = new THREE.MeshStandardMaterial({ color: getFloLidColor(colorId), roughness: 0.6 });
 
-    leftLid = new THREE.Mesh(lidGeo, lidMat);
+    leftLid = new THREE.Mesh(topLidGeo, lidMat);
     leftLid.position.set(0, 0.06, 0.02);
     leftLid.rotation.x = -Math.PI * 0.5; // fully open = hidden
     leftLid.scale.set(1.05, 1, 1.05);
     leftEye.add(leftLid);
 
-    rightLid = new THREE.Mesh(lidGeo, lidMat);
+    rightLid = new THREE.Mesh(topLidGeo, lidMat);
     rightLid.position.set(0, 0.06, 0.02);
     rightLid.rotation.x = -Math.PI * 0.5;
     rightLid.scale.set(1.05, 1, 1.05);
     rightEye.add(rightLid);
 
-    // Bottom eyelids
-    leftBottomLid = new THREE.Mesh(lidGeo, lidMat);
+    // Bottom eyelids (bottom hemisphere)
+    const bottomLidGeo = new THREE.SphereGeometry(0.24, 24, 24, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5);
+
+    leftBottomLid = new THREE.Mesh(bottomLidGeo, lidMat);
     leftBottomLid.position.set(0, -0.06, 0.02);
     leftBottomLid.rotation.x = Math.PI * 0.5; // fully open = hidden at bottom
     leftBottomLid.scale.set(1.05, 1, 1.05);
     leftEye.add(leftBottomLid);
 
-    rightBottomLid = new THREE.Mesh(lidGeo, lidMat);
+    rightBottomLid = new THREE.Mesh(bottomLidGeo, lidMat);
     rightBottomLid.position.set(0, -0.06, 0.02);
     rightBottomLid.rotation.x = Math.PI * 0.5;
     rightBottomLid.scale.set(1.05, 1, 1.05);
