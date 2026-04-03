@@ -3687,6 +3687,7 @@
         const currentFloPosition = localStorage.getItem('sf-flo-position') || 'bottom-left';
         const currentFloExpressions = localStorage.getItem('sf-flo-expressions') || 'full';
         const currentFloShape = localStorage.getItem('sf-flo-shape') || 'sphere';
+        const currentFloHat = localStorage.getItem('sf-flo-hat') || 'none';
 
         const shapeOptions = [
           {id:'sphere',label:'Sphere',desc:'Classic round buddy'},
@@ -3701,6 +3702,21 @@
           {id:'capsule',label:'Capsule',desc:'Pill-shaped'},
           {id:'diamond',label:'Diamond',desc:'Double cone gem'},
           {id:'star',label:'Star',desc:'5-pointed star'}
+        ];
+
+        const hatOptions = [
+          {id:'none',label:'None',desc:'No hat'},
+          {id:'tophat',label:'Top Hat',desc:'Fancy and classy'},
+          {id:'wizard',label:'Wizard Hat',desc:'Magical pointy hat'},
+          {id:'party',label:'Party Hat',desc:'Celebration cone'},
+          {id:'baseball',label:'Baseball Cap',desc:'Sporty and casual'},
+          {id:'crown',label:'Crown',desc:'Royal headpiece'},
+          {id:'beanie',label:'Beanie',desc:'Cozy winter hat'},
+          {id:'cowboy',label:'Cowboy Hat',desc:'Yeehaw western'},
+          {id:'chef',label:'Chef Hat',desc:'Master chef style'},
+          {id:'santa',label:'Santa Hat',desc:'Ho ho ho'},
+          {id:'propeller',label:'Propeller',desc:'Spinning beanie'},
+          {id:'halo',label:'Halo',desc:'Angel ring'}
         ];
 
         content = `
@@ -3719,6 +3735,24 @@
                   " title="${s.desc}">
                     <div style="font-weight:600;">${s.label}</div>
                     <div style="font-size:9px;opacity:0.8;">${s.desc}</div>
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            <div>
+              ${secLabel('Hat')}
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+                ${hatOptions.map(h => `
+                  <button onclick="setFloHat('${h.id}');renderSettingsPanel()" style="
+                    padding:10px;border-radius:8px;border:1.5px solid ${currentFloHat === h.id ? 'var(--accent-primary)' : 'var(--border-color)'};
+                    background:${currentFloHat === h.id ? 'var(--accent-primary)' : 'none'};
+                    color:${currentFloHat === h.id ? 'white' : 'var(--text-secondary)'};
+                    font-size:11px;font-weight:${currentFloHat === h.id ? '600' : '500'};
+                    font-family:inherit;cursor:pointer;transition:all 0.15s;text-align:center;
+                    display:flex;flex-direction:column;gap:2px;
+                  " title="${h.desc}">
+                    <div style="font-weight:600;">${h.label}</div>
+                    <div style="font-size:9px;opacity:0.8;">${h.desc}</div>
                   </button>
                 `).join('')}
               </div>
@@ -6688,6 +6722,13 @@
       localStorage.setItem('sf-flo-shape', val);
       // Flo needs to be recreated with the new shape
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { shape: val, recreate: true } }));
+      _rerender();
+    }
+
+    function setFloHat(val) {
+      localStorage.setItem('sf-flo-hat', val);
+      // Flo needs to be recreated with the new hat
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { hat: val, recreate: true } }));
       _rerender();
     }
 

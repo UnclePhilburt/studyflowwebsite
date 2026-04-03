@@ -554,6 +554,179 @@
     initCharacter();
   }
 
+  // ========== HAT CREATION ==========
+  function createHat(hatType) {
+    if (hatType === 'none') return null;
+
+    let hat;
+    const hatMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.5, metalness: 0.1 });
+    const accentMat = new THREE.MeshStandardMaterial({ color: 0xcc2222, roughness: 0.4, metalness: 0.2 });
+
+    switch(hatType) {
+      case 'tophat':
+        // Cylinder on top with brim
+        const topHatGroup = new THREE.Group();
+        const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.05, 32), hatMat);
+        brim.position.y = 1.0;
+        topHatGroup.add(brim);
+        const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.6, 32), hatMat);
+        cylinder.position.y = 1.35;
+        topHatGroup.add(cylinder);
+        // Red band
+        const band = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.1, 32), accentMat);
+        band.position.y = 1.1;
+        topHatGroup.add(band);
+        hat = topHatGroup;
+        break;
+
+      case 'wizard':
+        // Tall cone with stars
+        const wizardGroup = new THREE.Group();
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.2, 32), new THREE.MeshStandardMaterial({ color: 0x2222aa, roughness: 0.5 }));
+        cone.position.y = 1.5;
+        wizardGroup.add(cone);
+        // Star decals
+        for (let i = 0; i < 3; i++) {
+          const star = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.5 }));
+          star.position.set(Math.cos(i * 2) * 0.3, 1.2 + i * 0.2, Math.sin(i * 2) * 0.3);
+          wizardGroup.add(star);
+        }
+        // Brim
+        const wizardBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.05, 32), new THREE.MeshStandardMaterial({ color: 0x2222aa, roughness: 0.5 }));
+        wizardBrim.position.y = 0.95;
+        wizardGroup.add(wizardBrim);
+        hat = wizardGroup;
+        break;
+
+      case 'party':
+        // Simple cone
+        hat = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1, 32), new THREE.MeshStandardMaterial({ color: 0xff6600, roughness: 0.4 }));
+        hat.position.y = 1.4;
+        break;
+
+      case 'baseball':
+        // Hemisphere with visor
+        const capGroup = new THREE.Group();
+        const capTop = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x2244cc, roughness: 0.6 }));
+        capTop.position.y = 1.0;
+        capGroup.add(capTop);
+        // Visor
+        const visor = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 0.05, 32, 1, false, 0, Math.PI), hatMat);
+        visor.position.set(0, 0.95, 0.3);
+        visor.rotation.x = Math.PI / 6;
+        capGroup.add(visor);
+        hat = capGroup;
+        break;
+
+      case 'crown':
+        // Crown with points
+        const crownGroup = new THREE.Group();
+        const crownBase = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 0.3, 32), new THREE.MeshStandardMaterial({ color: 0xffdd00, metalness: 0.8, roughness: 0.2 }));
+        crownBase.position.y = 1.05;
+        crownGroup.add(crownBase);
+        // Points
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          const point = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.3, 4), new THREE.MeshStandardMaterial({ color: 0xffdd00, metalness: 0.8, roughness: 0.2 }));
+          point.position.set(Math.cos(angle) * 0.45, 1.3, Math.sin(angle) * 0.45);
+          crownGroup.add(point);
+        }
+        hat = crownGroup;
+        break;
+
+      case 'beanie':
+        // Rounded top with folded brim
+        const beanieGroup = new THREE.Group();
+        const beanieTop = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 1.5), new THREE.MeshStandardMaterial({ color: 0x884422, roughness: 0.9 }));
+        beanieTop.position.y = 1.1;
+        beanieGroup.add(beanieTop);
+        const beanieFold = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.08, 16, 32), new THREE.MeshStandardMaterial({ color: 0x663311, roughness: 0.9 }));
+        beanieFold.position.y = 0.95;
+        beanieFold.rotation.x = Math.PI / 2;
+        beanieGroup.add(beanieFold);
+        hat = beanieGroup;
+        break;
+
+      case 'cowboy':
+        // Wide brim with curved top
+        const cowboyGroup = new THREE.Group();
+        const cowboyBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.05, 32), new THREE.MeshStandardMaterial({ color: 0x8b6914, roughness: 0.8 }));
+        cowboyBrim.position.y = 1.0;
+        cowboyGroup.add(cowboyBrim);
+        const cowboyTop = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0x8b6914, roughness: 0.8 }));
+        cowboyTop.position.y = 1.15;
+        cowboyGroup.add(cowboyTop);
+        hat = cowboyGroup;
+        break;
+
+      case 'chef':
+        // Puffy chef hat
+        const chefGroup = new THREE.Group();
+        const chefBase = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 0.2, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7 }));
+        chefBase.position.y = 1.0;
+        chefGroup.add(chefBase);
+        const chefPuff = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32, 0, Math.PI * 2, 0, Math.PI / 1.5), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7 }));
+        chefPuff.position.y = 1.25;
+        chefPuff.scale.set(1, 0.8, 1);
+        chefGroup.add(chefPuff);
+        hat = chefGroup;
+        break;
+
+      case 'santa':
+        // Red cone with white trim and pom-pom
+        const santaGroup = new THREE.Group();
+        const santaCone = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1, 32), accentMat);
+        santaCone.position.y = 1.4;
+        santaCone.rotation.z = 0.3;
+        santaGroup.add(santaCone);
+        const santaTrim = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.08, 16, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }));
+        santaTrim.position.y = 0.95;
+        santaTrim.rotation.x = Math.PI / 2;
+        santaGroup.add(santaTrim);
+        const pomPom = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }));
+        pomPom.position.set(0.4, 1.7, 0.2);
+        santaGroup.add(pomPom);
+        hat = santaGroup;
+        break;
+
+      case 'propeller':
+        // Beanie with spinning propeller
+        const propGroup = new THREE.Group();
+        const propBeanie = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xff8800, roughness: 0.7 }));
+        propBeanie.position.y = 1.0;
+        propGroup.add(propBeanie);
+        // Propeller blades
+        const blade1 = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.02, 0.1), new THREE.MeshStandardMaterial({ color: 0xffff00, metalness: 0.5 }));
+        blade1.position.y = 1.35;
+        propGroup.add(blade1);
+        const blade2 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 0.6), new THREE.MeshStandardMaterial({ color: 0xffff00, metalness: 0.5 }));
+        blade2.position.y = 1.35;
+        propGroup.add(blade2);
+        // Store reference for spinning animation
+        propGroup.userData.isPropeller = true;
+        hat = propGroup;
+        break;
+
+      case 'halo':
+        // Floating ring above head
+        hat = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.06, 16, 32), new THREE.MeshStandardMaterial({
+          color: 0xffff00,
+          emissive: 0xffff00,
+          emissiveIntensity: 0.6,
+          metalness: 0.8,
+          roughness: 0.2
+        }));
+        hat.position.y = 1.5;
+        hat.rotation.x = Math.PI / 2;
+        break;
+
+      default:
+        return null;
+    }
+
+    return hat;
+  }
+
   // ========== SHAPE CREATION ==========
   function createBodyGeometry(shape) {
     let bodyGeo;
@@ -760,6 +933,15 @@
     mouth = new THREE.Line(mouthGeo, mouthMat);
     bodyMesh.add(mouth);
 
+    // Add hat if selected
+    const hatType = localStorage.getItem('sf-flo-hat') || 'none';
+    const hat = createHat(hatType);
+    if (hat) {
+      bodyMesh.add(hat);
+      // Store reference for animations (like propeller spinning)
+      bodyMesh.userData.hat = hat;
+    }
+
     // Start animation
     animate();
   }
@@ -809,6 +991,17 @@
 
       // Slight body lean toward cursor
       bodyMesh.rotation.y = dx * 0.15;
+    }
+
+    // Animate propeller hat if equipped
+    if (bodyMesh && bodyMesh.userData.hat && bodyMesh.userData.hat.userData.isPropeller) {
+      bodyMesh.userData.hat.rotation.y += 0.2; // Spin the propeller
+    }
+
+    // Animate halo (gentle float)
+    const hatType = localStorage.getItem('sf-flo-hat');
+    if (hatType === 'halo' && bodyMesh && bodyMesh.userData.hat) {
+      bodyMesh.userData.hat.position.y = 1.5 + Math.sin(bobTime * 3) * 0.08;
     }
 
     // Blink
