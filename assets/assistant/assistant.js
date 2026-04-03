@@ -819,8 +819,8 @@
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-    camera.position.set(0, 0.2, 4.5);
-    camera.lookAt(0, 0, 0);
+    camera.position.set(0, 0.3, 4.5);
+    camera.lookAt(0, -0.1, 0);
 
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(size, size);
