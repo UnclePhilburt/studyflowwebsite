@@ -89,6 +89,162 @@ body.custom-cursor .search-input {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='14' cy='14' r='8' fill='none' stroke='%237c9885' stroke-width='2.5'/><path d='M20 20 L26 26' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round'/></svg>") 8 8, text;
 }
 
+/* Copy cursor - two overlapping squares */
+body.custom-cursor .copy-btn,
+body.custom-cursor [data-action="copy"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='8' y='12' width='14' height='14' rx='2' fill='none' stroke='%236bd1a8' stroke-width='2'/><rect x='10' y='6' width='14' height='14' rx='2' fill='white' stroke='%236bd1a8' stroke-width='2'/></svg>") 16 16, pointer;
+}
+
+/* Zoom in cursor - magnifying glass with plus */
+body.custom-cursor .zoom-in,
+body.custom-cursor [data-action="zoom-in"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='13' cy='13' r='8' fill='none' stroke='%239b88d1' stroke-width='2'/><path d='M13 9 L13 17 M9 13 L17 13' stroke='%239b88d1' stroke-width='2' stroke-linecap='round'/><path d='M19 19 L26 26' stroke='%239b88d1' stroke-width='2.5' stroke-linecap='round'/></svg>") 8 8, zoom-in;
+}
+
+/* Zoom out cursor - magnifying glass with minus */
+body.custom-cursor .zoom-out,
+body.custom-cursor [data-action="zoom-out"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='13' cy='13' r='8' fill='none' stroke='%239b88d1' stroke-width='2'/><path d='M9 13 L17 13' stroke='%239b88d1' stroke-width='2' stroke-linecap='round'/><path d='M19 19 L26 26' stroke='%239b88d1' stroke-width='2.5' stroke-linecap='round'/></svg>") 8 8, zoom-out;
+}
+
+/* Download cursor - down arrow into box */
+body.custom-cursor .download-btn,
+body.custom-cursor [data-action="download"],
+body.custom-cursor a[download] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 8 L16 20 M10 14 L16 20 L22 14' stroke='%236bd1a8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/><path d='M8 22 L8 26 L24 26 L24 22' stroke='%236bd1a8' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Share cursor - connected dots */
+body.custom-cursor .share-btn,
+body.custom-cursor [data-action="share"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='22' cy='10' r='4' fill='%236b9bd1'/><circle cx='10' cy='16' r='4' fill='%236b9bd1'/><circle cx='22' cy='22' r='4' fill='%236b9bd1'/><path d='M14 14 L18 12 M14 18 L18 20' stroke='%236b9bd1' stroke-width='2'/></svg>") 16 16, pointer;
+}
+
+/* Close/exit cursor - X mark */
+body.custom-cursor .close-btn,
+body.custom-cursor [data-action="close"],
+body.custom-cursor .modal-close {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M10 10 L22 22 M22 10 L10 22' stroke='%23d17b6b' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Bookmark/save cursor - bookmark flag */
+body.custom-cursor .bookmark-btn,
+body.custom-cursor [data-action="bookmark"],
+body.custom-cursor .save-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M10 6 L10 26 L16 22 L22 26 L22 6 Z' fill='none' stroke='%23d1a56b' stroke-width='2.5' stroke-linejoin='round'/></svg>") 16 16, pointer;
+}
+
+/* Star/favorite cursor - star */
+body.custom-cursor .favorite-btn,
+body.custom-cursor [data-action="favorite"],
+body.custom-cursor .star-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 6 L18 14 L26 14 L20 19 L22 27 L16 22 L10 27 L12 19 L6 14 L14 14 Z' fill='%23d1c76b' stroke='%23d1c76b' stroke-width='1.5'/></svg>") 16 16, pointer;
+}
+
+/* Settings/config cursor - gear */
+body.custom-cursor .settings-btn,
+body.custom-cursor [data-action="settings"],
+body.custom-cursor #settingsBtn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='5' fill='none' stroke='%237c9885' stroke-width='2'/><path d='M16 6 L16 10 M16 22 L16 26 M6 16 L10 16 M22 16 L26 16 M9 9 L11.5 11.5 M20.5 20.5 L23 23 M23 9 L20.5 11.5 M11.5 20.5 L9 23' stroke='%237c9885' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Refresh cursor - circular arrow */
+body.custom-cursor .refresh-btn,
+body.custom-cursor [data-action="refresh"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M26 12 A10 10 0 0 1 16 26 A10 10 0 0 1 6 16 A10 10 0 0 1 14 6.5 L14 10 L20 6 L14 2 L14 5.5' fill='none' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Expand cursor - outward arrows */
+body.custom-cursor .expand-btn,
+body.custom-cursor [data-action="expand"],
+body.custom-cursor .fullscreen-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M8 14 L8 8 L14 8 M24 8 L24 14 M24 18 L24 24 L18 24 M8 24 L8 18 M10 10 L14 14 M22 10 L18 14 M22 22 L18 18 M10 22 L14 18' stroke='%239b88d1' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Collapse cursor - inward arrows */
+body.custom-cursor .collapse-btn,
+body.custom-cursor [data-action="collapse"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M14 8 L14 14 L8 14 M24 14 L18 14 L18 8 M18 24 L18 18 L24 18 M8 18 L14 18 L14 24 M14 10 L10 14 M18 10 L22 14 M18 22 L22 18 M14 22 L10 18' stroke='%239b88d1' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Print cursor - printer */
+body.custom-cursor .print-btn,
+body.custom-cursor [data-action="print"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='10' y='6' width='12' height='6' fill='none' stroke='%237c9885' stroke-width='2'/><rect x='6' y='12' width='20' height='10' rx='2' fill='none' stroke='%237c9885' stroke-width='2'/><rect x='10' y='18' width='12' height='8' fill='none' stroke='%237c9885' stroke-width='2'/></svg>") 16 16, pointer;
+}
+
+/* Calendar cursor - calendar */
+body.custom-cursor .calendar-btn,
+body.custom-cursor [data-action="calendar"],
+body.custom-cursor input[type="date"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='6' y='8' width='20' height='18' rx='2' fill='none' stroke='%23d1a56b' stroke-width='2'/><path d='M6 14 L26 14 M12 6 L12 10 M20 6 L20 10' stroke='%23d1a56b' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Chat/message cursor - speech bubble */
+body.custom-cursor .chat-btn,
+body.custom-cursor [data-action="chat"],
+body.custom-cursor .message-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M8 8 L24 8 Q26 8 26 10 L26 20 Q26 22 24 22 L18 22 L12 28 L12 22 L8 22 Q6 22 6 20 L6 10 Q6 8 8 8' fill='none' stroke='%236b9bd1' stroke-width='2' stroke-linejoin='round'/></svg>") 16 16, pointer;
+}
+
+/* Lock cursor - padlock */
+body.custom-cursor .lock-btn,
+body.custom-cursor [data-action="lock"],
+body.custom-cursor .private-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='10' y='16' width='12' height='10' rx='2' fill='none' stroke='%23d17b6b' stroke-width='2'/><path d='M12 16 L12 12 Q12 8 16 8 Q20 8 20 12 L20 16' fill='none' stroke='%23d17b6b' stroke-width='2'/><circle cx='16' cy='20' r='1.5' fill='%23d17b6b'/></svg>") 16 16, pointer;
+}
+
+/* Unlock cursor - open padlock */
+body.custom-cursor .unlock-btn,
+body.custom-cursor [data-action="unlock"],
+body.custom-cursor .public-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='10' y='16' width='12' height='10' rx='2' fill='none' stroke='%236bd1a8' stroke-width='2'/><path d='M12 16 L12 12 Q12 8 16 8 Q20 8 20 12 L20 14' fill='none' stroke='%236bd1a8' stroke-width='2'/><circle cx='16' cy='20' r='1.5' fill='%236bd1a8'/></svg>") 16 16, pointer;
+}
+
+/* Help/info cursor - question mark in circle */
+body.custom-cursor .help-btn,
+body.custom-cursor [data-action="help"],
+body.custom-cursor .info-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='10' fill='none' stroke='%236b9bd1' stroke-width='2'/><path d='M14 12 Q14 10 16 10 Q18 10 18 12 Q18 14 16 15 L16 18 M16 22 L16 22.5' stroke='%236b9bd1' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, help;
+}
+
+/* Pin cursor - pushpin */
+body.custom-cursor .pin-btn,
+body.custom-cursor [data-action="pin"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M14 8 L18 8 L20 12 L22 12 L22 16 L18 16 L18 24 L14 24 L14 16 L10 16 L10 12 L12 12 Z' fill='%23d17b6b' stroke='%23d17b6b' stroke-width='1'/></svg>") 16 8, pointer;
+}
+
+/* Video/play cursor - play button */
+body.custom-cursor .video-btn,
+body.custom-cursor [data-action="play"],
+body.custom-cursor video {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='10' fill='none' stroke='%239b88d1' stroke-width='2'/><path d='M14 12 L14 20 L20 16 Z' fill='%239b88d1'/></svg>") 16 16, pointer;
+}
+
+/* Code cursor - brackets */
+body.custom-cursor code,
+body.custom-cursor pre,
+body.custom-cursor .code-block {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M12 10 L8 16 L12 22 M20 10 L24 16 L20 22 M18 8 L14 24' stroke='%236bd1a8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") 16 16, text;
+}
+
+/* Calculator cursor - calculator */
+body.custom-cursor .calculator-btn,
+body.custom-cursor [data-action="calculate"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='8' y='6' width='16' height='20' rx='2' fill='none' stroke='%237c9885' stroke-width='2'/><rect x='10' y='8' width='12' height='4' rx='1' fill='%237c9885'/><circle cx='12' cy='16' r='1.5' fill='%237c9885'/><circle cx='16' cy='16' r='1.5' fill='%237c9885'/><circle cx='20' cy='16' r='1.5' fill='%237c9885'/><circle cx='12' cy='20' r='1.5' fill='%237c9885'/><circle cx='16' cy='20' r='1.5' fill='%237c9885'/><circle cx='20' cy='20' r='1.5' fill='%237c9885'/></svg>") 16 16, pointer;
+}
+
+/* Notification cursor - bell */
+body.custom-cursor .notification-btn,
+body.custom-cursor #notifBell {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 6 L16 8 M16 8 Q12 8 12 12 L12 18 L10 20 L22 20 L20 18 L20 12 Q20 8 16 8 M14 22 Q14 24 16 24 Q18 24 18 22' fill='none' stroke='%23d1c76b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") 16 16, pointer;
+}
+
+/* Move/drag all cursor - four arrows */
+body.custom-cursor [draggable="true"]:active {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 6 L16 26 M6 16 L26 16 M12 10 L16 6 L20 10 M12 22 L16 26 L20 22 M10 12 L6 16 L10 20 M22 12 L26 16 L22 20' stroke='%237c9885' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") 16 16, move;
+}
+
 /* Particle trail */
 .sf-cursor-particle {
   position: fixed;
