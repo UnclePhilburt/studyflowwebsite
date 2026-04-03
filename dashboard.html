@@ -6132,63 +6132,55 @@
         '<div class="mh-skeleton mh-skeleton-card"></div>' +
         '<div class="mh-skeleton mh-skeleton-card"></div>';
 
-      // Load stats, recent chats, and upgrade status in parallel
-      const [statsData, chatsData, userData] = await Promise.allSettled([
-        fetch(BACKEND_URL + '/api/notes/list', { headers: { 'Authorization': 'Bearer ' + authToken } }).then(r => r.ok ? r.json() : []),
-        fetch(BACKEND_URL + '/api/conversations', { headers: { 'Authorization': 'Bearer ' + authToken } }).then(r => r.ok ? r.json() : { conversations: [] }),
-        fetch(BACKEND_URL + '/api/current-user', { headers: { 'Authorization': 'Bearer ' + authToken } }).then(r => r.ok ? r.json() : null)
-      ]);
-
-      const notes = statsData.status === 'fulfilled' ? (Array.isArray(statsData.value) ? statsData.value : []) : [];
-      const convos = chatsData.status === 'fulfilled' ? (chatsData.value.conversations || []) : [];
-      document.getElementById('mobileSub').textContent = 'Ready to study?';
-      document.getElementById('mobileStatNotes').textContent = notes.length;
-      document.getElementById('mobileStatChats').textContent = convos.length;
-
-      // Groups count
+      // Single API call for all mobile dashboard data
       try {
-        const groupsRes = await fetch(BACKEND_URL + '/api/study-groups', { headers: { 'Authorization': 'Bearer ' + authToken } });
-        if (groupsRes.ok) {
-          const groupsData = await groupsRes.json();
-          document.getElementById('mobileStatGroups').textContent = (groupsData.groups || []).length;
+        const res = await fetch(BACKEND_URL + '/api/mobile-dashboard', { headers: { 'Authorization': 'Bearer ' + authToken } });
+        if (!res.ok) throw new Error('Failed to load dashboard');
+        const data = await res.json();
+
+        document.getElementById('mobileSub').textContent = 'Ready to study?';
+        document.getElementById('mobileStatNotes').textContent = data.notes_count || 0;
+        document.getElementById('mobileStatChats').textContent = data.chats_count || 0;
+        document.getElementById('mobileStatGroups').textContent = data.groups_count || 0;
+
+        const convos = data.recent_chats || [];
+
+        // Continue where you left off
+        if (convos.length > 0) {
+          document.getElementById('mhContinue').style.display = 'block';
+          document.getElementById('mhContinueTitle').textContent = convos[0].title || 'New Chat';
+          document.getElementById('mhContinueCard').href = 'chat.html?c=' + convos[0].id;
         }
-      } catch(e) { document.getElementById('mobileStatGroups').textContent = '0'; }
 
-      // Continue where you left off
-      if (convos.length > 0) {
-        const lastConvo = convos[0];
-        document.getElementById('mhContinue').style.display = 'block';
-        document.getElementById('mhContinueTitle').textContent = lastConvo.title || 'New Chat';
-        document.getElementById('mhContinueCard').href = 'chat.html?c=' + lastConvo.id;
-      }
+        // Recent chats
+        const recentContainer = document.getElementById('mobileRecentChats');
+        if (convos.length === 0) {
+          recentContainer.innerHTML = '<div class="mobile-empty">No recent chats yet</div>';
+        } else {
+          recentContainer.innerHTML = convos.map(c => {
+            const time = c.updated_at ? timeAgo(c.updated_at) : '';
+            const title = c.title || 'New Chat';
+            return `<a href="chat.html?c=${c.id}" class="mobile-recent-item">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="mobile-recent-title">${title}</span>
+              <span class="mobile-recent-time">${time}</span>
+            </a>`;
+          }).join('');
+        }
 
-      // Recent chats
-      const recentContainer = document.getElementById('mobileRecentChats');
-      if (convos.length === 0) {
-        recentContainer.innerHTML = '<div class="mobile-empty">No recent chats yet</div>';
-      } else {
-        recentContainer.innerHTML = convos.slice(0, 5).map(c => {
-          const time = c.updated_at ? timeAgo(c.updated_at) : '';
-          const title = c.title || 'New Chat';
-          return `<a href="chat.html?c=${c.id}" class="mobile-recent-item">
-            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span class="mobile-recent-title">${title}</span>
-            <span class="mobile-recent-time">${time}</span>
-          </a>`;
-        }).join('');
-      }
-
-      // User profile & upgrade banner
-      const user = userData.status === 'fulfilled' ? userData.value : null;
-      if (user) {
-        const tier = user.subscription_tier || user.tier || 'free';
-        if (tier === 'free') {
+        // Upgrade banner & username
+        if (data.tier === 'free') {
           document.getElementById('mobileUpgradeBanner').classList.add('visible');
         }
-        if (user.username && user.username !== 'Anonymous') {
-          document.getElementById('mobileGreeting').textContent = timeGreeting + ', ' + user.username;
-          document.getElementById('mhAvatar').textContent = user.username.charAt(0).toUpperCase();
+        if (data.username && data.username !== 'Anonymous') {
+          document.getElementById('mobileGreeting').textContent = timeGreeting + ', ' + data.username;
+          document.getElementById('mhAvatar').textContent = data.username.charAt(0).toUpperCase();
         }
+      } catch(e) {
+        document.getElementById('mobileSub').textContent = 'Ready to study?';
+        document.getElementById('mobileStatNotes').textContent = '0';
+        document.getElementById('mobileStatChats').textContent = '0';
+        document.getElementById('mobileStatGroups').textContent = '0';
       }
     }
 
