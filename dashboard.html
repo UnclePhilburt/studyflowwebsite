@@ -3690,6 +3690,7 @@
         const currentFloHat = localStorage.getItem('sf-flo-hat') || 'none';
         const currentFloSize = localStorage.getItem('sf-flo-size') || 'medium';
         const currentFloColor = localStorage.getItem('sf-flo-color') || 'sage';
+        const currentFloEyelids = localStorage.getItem('sf-flo-eyelids') || '0';
 
         const shapeOptions = [
           {id:'sphere',label:'Sphere',desc:'Classic round buddy'},
@@ -3785,6 +3786,15 @@
                   </button>
                 `).join('')}
               </div>
+            </div>
+            <div>
+              ${secLabel('Eyelids')}
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:11px;color:var(--text-muted);">Open</span>
+                <input type="range" min="0" max="100" value="${currentFloEyelids}" oninput="setFloEyelids(this.value)" style="flex:1;accent-color:var(--accent-primary);">
+                <span style="font-size:11px;color:var(--text-muted);">Closed</span>
+              </div>
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Control how sleepy Flo looks</p>
             </div>
             <div>
               ${secLabel('Particle Effects')}
@@ -6790,6 +6800,12 @@
       // Flo needs to be recreated with the new color
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { color: val, recreate: true } }));
       _rerender();
+    }
+
+    function setFloEyelids(val) {
+      localStorage.setItem('sf-flo-eyelids', val);
+      // Send event to update eyelids in real-time (no recreation needed)
+      window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { eyelids: val } }));
     }
 
     function initParticles(mode) {

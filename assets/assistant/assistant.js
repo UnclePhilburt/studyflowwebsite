@@ -30,6 +30,7 @@
   let celebrateTimer = 0;
   let particles = [];
   let animationId = null;
+  let manualEyelidPosition = null; // null = auto, 0-100 = manual control
 
   // ========== PAGE ACTION DEFINITIONS ==========
   const PAGE_ACTIONS = {
@@ -500,6 +501,12 @@
       }
       character.style.width = pixelSize + 'px';
       character.style.height = pixelSize + 'px';
+    }
+
+    // Apply eyelid setting
+    const eyelidSetting = localStorage.getItem('sf-flo-eyelids');
+    if (eyelidSetting !== null && eyelidSetting !== '0') {
+      manualEyelidPosition = parseInt(eyelidSetting);
     }
 
     // Events
@@ -1052,8 +1059,14 @@
 
     // Blink
     let lidTarget = -Math.PI * 0.5; // open
-    if (blinkTimer > 3 + Math.random() * 2) {
-      // Blink cycle
+
+    // Manual eyelid control overrides automatic blinking
+    if (manualEyelidPosition !== null) {
+      // 0 = fully open (-PI * 0.5), 100 = fully closed (0)
+      const closedAmount = manualEyelidPosition / 100;
+      lidTarget = -Math.PI * 0.5 + Math.PI * 0.5 * closedAmount;
+    } else if (blinkTimer > 3 + Math.random() * 2) {
+      // Blink cycle (only if not manually controlled)
       const blinkPhase = (blinkTimer % 0.3) / 0.3;
       if (blinkPhase < 0.5) {
         lidTarget = -Math.PI * 0.5 + Math.PI * 0.5 * (blinkPhase * 2);
@@ -1407,6 +1420,12 @@
       // If shape, hat, or color changed, need to recreate the 3D character
       if (e.detail?.recreate && (e.detail?.shape || e.detail?.hat || e.detail?.color)) {
         recreateCharacter();
+      }
+
+      // If eyelids changed, update the manual position
+      if (e.detail?.eyelids !== undefined) {
+        const val = parseInt(e.detail.eyelids);
+        manualEyelidPosition = val; // 0 = open, 100 = closed
       }
     });
 
