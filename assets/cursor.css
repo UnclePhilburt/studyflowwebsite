@@ -1,0 +1,120 @@
+/* StudyFlow Custom Cursors */
+
+/* Hide default cursor when custom is enabled */
+body.custom-cursor,
+body.custom-cursor * {
+  cursor: none !important;
+}
+
+/* Default cursor - simple dot with ring */
+body.custom-cursor {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='5' fill='%237c9885'/><circle cx='16' cy='16' r='10' fill='none' stroke='%237c9885' stroke-width='2' opacity='0.5'/></svg>") 16 16, auto;
+}
+
+/* Grab cursor - hand with grab motion */
+body.custom-cursor .widget-header,
+body.custom-cursor [draggable="true"],
+body.custom-cursor .draggable {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 8 L16 4 M10 10 L7 7 M22 10 L25 7 M8 16 L4 16 M24 16 L28 16 M10 22 L7 25 M22 22 L25 25' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round'/><circle cx='16' cy='16' r='6' fill='%237c9885'/></svg>") 16 16, grab;
+}
+
+body.custom-cursor .widget-header:active,
+body.custom-cursor [draggable="true"]:active {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 10 L16 6 M12 12 L9 9 M20 12 L23 9 M10 16 L6 16 M22 16 L26 16 M12 20 L9 23 M20 20 L23 23' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round'/><circle cx='16' cy='16' r='4' fill='%237c9885'/></svg>") 16 16, grabbing;
+}
+
+/* Edit cursor - pencil */
+body.custom-cursor input,
+body.custom-cursor textarea,
+body.custom-cursor [contenteditable="true"],
+body.custom-cursor .note-item,
+body.custom-cursor .note-card {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M8 24 L4 28 L8 28 L8 24 Z M10 22 L22 10 L26 14 L14 26 L10 22 Z' fill='%236b9bd1'/><rect x='21' y='7' width='6' height='6' rx='1' fill='%236b9bd1' transform='rotate(45 24 10)'/></svg>") 4 28, text;
+}
+
+/* Delete cursor - trash can */
+body.custom-cursor .delete-btn,
+body.custom-cursor [data-action="delete"],
+body.custom-cursor .remove-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='8' y='10' width='16' height='18' rx='2' fill='none' stroke='%23d17b6b' stroke-width='2'/><path d='M6 10 L26 10 M12 6 L20 6 M12 14 L12 22 M16 14 L16 22 M20 14 L20 22' stroke='%23d17b6b' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Add cursor - plus sign */
+body.custom-cursor #addWidgetBtn,
+body.custom-cursor [data-action="add"],
+body.custom-cursor .add-btn {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' fill='none' stroke='%236bd1a8' stroke-width='2.5'/><path d='M16 8 L16 24 M8 16 L24 16' stroke='%236bd1a8' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Pointer cursor - finger pointing */
+body.custom-cursor button,
+body.custom-cursor a,
+body.custom-cursor .clickable,
+body.custom-cursor [role="button"] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M12 8 L12 18 M16 6 L16 18 M20 8 L20 18 M8 18 L8 22 Q8 26 12 26 L20 26 Q24 26 24 22 L24 16' fill='none' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='16' cy='4' r='2' fill='%237c9885'/></svg>") 16 4, pointer;
+}
+
+/* Loading cursor - spinner */
+body.custom-cursor.loading,
+body.custom-cursor .loading {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='10' fill='none' stroke='%237c9885' stroke-width='3' stroke-dasharray='20 40' opacity='0.8'><animateTransform attributeName='transform' type='rotate' from='0 16 16' to='360 16 16' dur='1s' repeatCount='indefinite'/></circle><circle cx='16' cy='16' r='3' fill='%237c9885'/></svg>") 16 16, wait;
+}
+
+/* Study mode specific cursors */
+body.custom-cursor .quiz-option:hover {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='16' cy='16' r='10' fill='none' stroke='%239b88d1' stroke-width='2.5'/><path d='M16 12 L16 18 M16 21 L16 22' stroke='%239b88d1' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+body.custom-cursor .flashcard:hover {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect x='6' y='8' width='20' height='16' rx='2' fill='none' stroke='%23d1a56b' stroke-width='2'/><path d='M10 14 L22 14 M10 18 L18 18' stroke='%23d1a56b' stroke-width='2' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Upload/drop area cursor */
+body.custom-cursor .upload-area,
+body.custom-cursor [data-upload] {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M16 10 L16 22 M10 16 L16 10 L22 16' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/><path d='M8 24 L24 24' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Link cursor - chain link */
+body.custom-cursor a[href]:not([href^='#']) {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M12 14 L10 16 Q8 18 8 20 Q8 22 10 24 L14 24 Q16 24 18 22 M20 18 L22 16 Q24 14 24 12 Q24 10 22 8 L18 8 Q16 8 14 10' fill='none' stroke='%236b9bd1' stroke-width='2.5' stroke-linecap='round'/></svg>") 16 16, pointer;
+}
+
+/* Resize cursor - arrows */
+body.custom-cursor .resize-handle {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><path d='M8 16 L24 16 M16 8 L16 24 M12 12 L8 16 L12 20 M20 12 L24 16 L20 20 M12 8 L16 12 L20 8 M12 24 L16 20 L20 24' stroke='%237c9885' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") 16 16, nwse-resize;
+}
+
+/* Search cursor - magnifying glass */
+body.custom-cursor input[type="search"],
+body.custom-cursor .search-input {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><circle cx='14' cy='14' r='8' fill='none' stroke='%237c9885' stroke-width='2.5'/><path d='M20 20 L26 26' stroke='%237c9885' stroke-width='2.5' stroke-linecap='round'/></svg>") 8 8, text;
+}
+
+/* Particle trail */
+.sf-cursor-particle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999999;
+  opacity: 0;
+  transform: scale(1);
+  transition: none;
+}
+
+.sf-cursor-particle.active {
+  animation: cursorParticle 0.8s ease-out forwards;
+}
+
+@keyframes cursorParticle {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) translateY(-20px);
+  }
+}

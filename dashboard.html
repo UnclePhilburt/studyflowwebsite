@@ -3664,8 +3664,9 @@
             <div>
               ${secLabel('Cursor Style')}
               ${optBtns([
-                {id:'default',label:'Default'},{id:'pointer',label:'Pointer'},{id:'crosshair',label:'Crosshair'},{id:'dot',label:'Dot'}
+                {id:'default',label:'Default'},{id:'custom',label:'Custom'}
               ], currentCursor, 'setCursor')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Custom cursor changes based on what you're hovering over</p>
             </div>
           </div>`;
       } else if (_settingsTab === 'fonts') {
@@ -6706,23 +6707,8 @@
 
     function setCursor(style) {
       localStorage.setItem('sf-cursor', style);
-      const canvas = document.getElementById('canvasContainer');
-      if (canvas) {
-        switch(style) {
-          case 'pointer':
-            canvas.style.cursor = 'pointer';
-            break;
-          case 'crosshair':
-            canvas.style.cursor = 'crosshair';
-            break;
-          case 'dot':
-            canvas.style.cursor = 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 16 16\'><circle cx=\'8\' cy=\'8\' r=\'3\' fill=\'%237c9885\'/></svg>") 8 8, auto';
-            break;
-          case 'default':
-          default:
-            canvas.style.cursor = 'default';
-            break;
-        }
+      if (window.updateCustomCursor) {
+        window.updateCustomCursor();
       }
       _rerender();
     }
@@ -7869,6 +7855,8 @@
     });
   </script>
 <script src="global-search.js"></script>
+<link rel="stylesheet" href="assets/cursor.css">
+<script src="assets/cursor.js"></script>
 <link rel="stylesheet" href="assets/assistant/assistant.css">
 <script src="assets/assistant/assistant.js"></script>
 </body>
