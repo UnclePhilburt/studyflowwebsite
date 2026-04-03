@@ -15,12 +15,42 @@
       background: linear-gradient(180deg, #f5f4f0 0%, #ede9e4 100%);
       min-height: 100vh;
       color: #2d2d2d;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
     }
 
     .container {
       max-width: 1000px;
       margin: 0 auto;
       padding: 24px;
+    }
+
+    /* Watermark overlay */
+    .watermark-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .watermark-diagonal {
+      font-size: 32px;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.06);
+      transform: rotate(-45deg);
+      white-space: nowrap;
+      user-select: none;
+      text-align: center;
+      line-height: 1.8;
+      font-family: 'Inter', sans-serif;
     }
 
     .header {
@@ -76,6 +106,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       overflow: hidden;
       min-height: 60vh;
+      position: relative;
     }
 
     .viewer-area iframe {
@@ -88,6 +119,30 @@
       width: 100%;
       display: block;
       border-bottom: 1px solid #eee;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Attribution section */
+    .attribution {
+      background: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-top: 16px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .attribution strong { color: #2d2d2d; }
+
+    .attribution .notice {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      color: #999;
+      font-size: 12px;
     }
 
     .error-state, .loading-state {
@@ -154,10 +209,27 @@
       .note-title { font-size: 18px; }
       .note-meta { gap: 10px; font-size: 12px; }
       .viewer-area iframe { height: 60vh; }
+      .watermark-diagonal { font-size: 20px; }
+    }
+
+    /* Print protection */
+    @media print {
+      body { display: none !important; }
     }
   </style>
 </head>
 <body>
+  <!-- Watermark overlay -->
+  <div class="watermark-overlay" id="watermarkOverlay">
+    <div class="watermark-diagonal">
+      StudyFlow Suite - For Reference Only
+      <br>
+      Source: <span id="watermark-username">@Loading...</span> - ID: <span id="watermark-id">#00000</span>
+      <br>
+      Not for Submission
+    </div>
+  </div>
+
   <div class="container">
     <!-- Loading State -->
     <div class="loading-state" id="loadingState">
@@ -182,6 +254,8 @@
         <div class="note-title" id="noteTitle"></div>
         <div class="note-meta">
           <span id="metaSharedBy"></span>
+          <span id="metaUniversity"></span>
+          <span id="metaCourse"></span>
           <span id="metaPages"></span>
           <span id="metaType"></span>
         </div>
@@ -190,6 +264,25 @@
       <div id="expiryBanner" class="expiry-banner" style="display:none;"></div>
 
       <div class="viewer-area" id="viewerArea"></div>
+
+      <!-- Full attribution -->
+      <div class="attribution" id="attribution">
+        <strong>Source:</strong> Uploaded by <span id="attrUsername">@anonymous</span>
+        <span id="attrUniversityLine"></span>
+        <span id="attrCourseLine"></span>
+        <span id="attrProfessorLine"></span>
+        <span id="attrSemesterLine"></span>
+        <br>
+        <strong>Share ID:</strong> <span id="attrShareId">#00000</span>
+        <br>
+        <strong>Uploaded:</strong> <span id="attrDate">-</span>
+        <div class="notice">
+          This note is shared for reference purposes only. Do not submit as your own work.
+          Redistribution or commercial use is prohibited. By viewing this note, you agree to
+          <a href="terms.html" style="color:#7c9885;">StudyFlow's Terms of Service</a> and
+          <a href="academic-integrity.html" style="color:#7c9885;">Academic Integrity Policy</a>.
+        </div>
+      </div>
 
       <div class="footer">
         Shared via <a href="index.html">StudyFlow Suite</a> -- the collaborative study platform.
@@ -201,6 +294,21 @@
 
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Disable common copy shortcuts
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p')) {
+        e.preventDefault();
+      }
+    });
+
+    // Disable drag on images
+    document.addEventListener('dragstart', (e) => {
+      if (e.target.tagName === 'IMG') e.preventDefault();
+    });
 
     async function loadSharedNote() {
       const params = new URLSearchParams(window.location.search);
@@ -224,12 +332,52 @@
           return;
         }
 
-        // Set page info
+        // Set page title
         document.title = `${data.filename} - StudyFlow Suite`;
+
+        // Header info
         document.getElementById('noteTitle').textContent = data.filename;
         document.getElementById('metaSharedBy').textContent = `Shared by ${data.shared_by}`;
         document.getElementById('metaPages').textContent = `${data.page_count || '?'} pages`;
         document.getElementById('metaType').textContent = (data.file_type || '').toUpperCase();
+
+        // University and course in header meta
+        const metaUni = document.getElementById('metaUniversity');
+        const metaCourse = document.getElementById('metaCourse');
+        if (data.university) {
+          metaUni.textContent = data.university;
+        } else {
+          metaUni.style.display = 'none';
+        }
+        if (data.course_code) {
+          metaCourse.textContent = data.course_code;
+        } else {
+          metaCourse.style.display = 'none';
+        }
+
+        // Watermark
+        document.getElementById('watermark-username').textContent = '@' + (data.shared_by_username || 'anonymous');
+        document.getElementById('watermark-id').textContent = '#' + (data.share_id || data.note_id.substring(0, 5));
+
+        // Attribution
+        document.getElementById('attrUsername').textContent = '@' + (data.shared_by_username || 'anonymous');
+        document.getElementById('attrShareId').textContent = '#' + (data.share_id || '00000');
+
+        if (data.university) {
+          document.getElementById('attrUniversityLine').innerHTML = ' from <strong>' + escapeHtml(data.university) + '</strong>';
+        }
+        if (data.course_code) {
+          document.getElementById('attrCourseLine').innerHTML = '<br><strong>Course:</strong> ' + escapeHtml(data.course_code);
+        }
+        if (data.professor) {
+          document.getElementById('attrProfessorLine').innerHTML = '<br><strong>Professor:</strong> ' + escapeHtml(data.professor);
+        }
+        if (data.semester) {
+          document.getElementById('attrSemesterLine').innerHTML = '<br><strong>Semester:</strong> ' + escapeHtml(data.semester);
+        }
+        if (data.uploaded_at) {
+          document.getElementById('attrDate').textContent = new Date(data.uploaded_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
 
         // Show expiry info
         if (data.expires_at) {
@@ -254,7 +402,7 @@
             if (imgRes.ok) {
               const imgData = await imgRes.json();
               viewer.innerHTML = imgData.images.map((img, i) =>
-                `<img class="page-image" src="data:image/png;base64,${img}" alt="Page ${i + 1}">`
+                `<img class="page-image" src="data:image/png;base64,${img}" alt="Page ${i + 1}" draggable="false" oncontextmenu="return false">`
               ).join('');
             } else {
               // Fallback to iframe
@@ -268,7 +416,7 @@
           viewer.innerHTML = `<iframe src="${BACKEND_URL}/api/shared/${token}/view-file"></iframe>`;
         }
 
-        // Show content
+        // Show content, hide loading
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('noteContent').style.display = 'block';
 
@@ -280,9 +428,16 @@
 
     function showError(title, message) {
       document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('watermarkOverlay').style.display = 'none';
       document.getElementById('errorTitle').textContent = title;
       document.getElementById('errorMessage').textContent = message;
       document.getElementById('errorState').style.display = 'flex';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
     }
 
     loadSharedNote();
