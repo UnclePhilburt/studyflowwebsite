@@ -719,23 +719,237 @@
 
   // ========== EVENT REACTIONS ==========
   function setupEventListeners() {
-    // Listen for uploads on notes page
-    window.addEventListener('sf-note-uploaded', () => {
-      setExpression('happy', 3);
-      showBubble("Nice upload!", [
-        { label: 'Make it public', fn: () => { dismissBubble(); } },
-        { label: 'Share with a friend', fn: () => { dismissBubble(); } }
-      ]);
-    });
-
-    // Listen for errors
-    window.addEventListener('error', () => {
-      setExpression('surprised', 2);
-    });
-
     // Reset idle on any interaction
     ['click', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
       document.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    // ---- NOTES PAGE EVENTS ----
+    window.addEventListener('sf:note-uploaded', (e) => {
+      const count = e.detail?.count || 1;
+      setExpression('happy', 3);
+      showBubble(`${count > 1 ? count + ' notes' : 'Note'} uploaded!`, [
+        { label: 'Share with a friend', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); dismissBubble(); } },
+        { label: 'Upload more', fn: () => { if (window.showUploadModal) window.showUploadModal(); dismissBubble(); } },
+        { label: 'Nice!', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+    });
+
+    window.addEventListener('sf:note-deleted', () => {
+      setExpression('idle');
+      // Brief acknowledgment, auto-dismiss
+      showBubble("Note deleted.", [
+        { label: 'OK', fn: () => dismissBubble() }
+      ]);
+      setTimeout(dismissBubble, 2500);
+    });
+
+    window.addEventListener('sf:folder-created', (e) => {
+      setExpression('happy', 2);
+      const name = e.detail?.name || 'folder';
+      showBubble(`Folder "${name}" created!`, [
+        { label: 'Open it', fn: () => { dismissBubble(); } },
+        { label: 'Great', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+    });
+
+    window.addEventListener('sf:folder-deleted', () => {
+      setExpression('idle');
+      showBubble("Folder deleted.", [{ label: 'OK', fn: () => dismissBubble() }]);
+      setTimeout(dismissBubble, 2500);
+    });
+
+    window.addEventListener('sf:folder-opened', (e) => {
+      // Subtle - just reset idle, don't show bubble for navigation
+      resetIdleTimer();
+    });
+
+    window.addEventListener('sf:note-shared', (e) => {
+      setExpression('happy', 3);
+      showBubble("Share link created! Anyone with the link can view your note.", [
+        { label: 'Copy link', fn: () => { if (window.copyShareLink) window.copyShareLink(); } , keepOpen: true },
+        { label: 'Awesome', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+    });
+
+    window.addEventListener('sf:share-revoked', () => {
+      setExpression('idle');
+      showBubble("Share link revoked. The link will stop working immediately.", [
+        { label: 'OK', fn: () => dismissBubble() }
+      ]);
+    });
+
+    window.addEventListener('sf:visibility-changed', (e) => {
+      const isPublic = e.detail?.isPublic;
+      setExpression('happy', 2);
+      if (isPublic) {
+        showBubble("Note is now public on the Nexus! Students can discover it.", [
+          { label: 'Share the link too', fn: () => { dismissBubble(); } },
+          { label: 'Cool', fn: () => dismissBubble() }
+        ]);
+      } else {
+        showBubble("Note is now private. Only you can see it.", [
+          { label: 'Got it', fn: () => dismissBubble() }
+        ]);
+      }
+    });
+
+    window.addEventListener('sf:note-preview', (e) => {
+      const title = e.detail?.title || 'this note';
+      // Only show after a short delay if they're still previewing
+      setTimeout(() => {
+        if (!bubbleVisible) {
+          showNotificationDot();
+        }
+      }, 3000);
+    });
+
+    // ---- CHAT PAGE EVENTS ----
+    window.addEventListener('sf:chat-started', () => {
+      setExpression('happy', 2);
+      showBubble("New conversation! Ask me anything about your notes.", [
+        { label: 'Suggest a topic', fn: () => { askAssistant('Suggest an interesting study topic to explore based on popular subjects', 'ask'); } },
+        { label: 'Got it', fn: () => dismissBubble() }
+      ]);
+    });
+
+    window.addEventListener('sf:chat-response', () => {
+      // Subtle acknowledgment - just a happy expression, no bubble
+      setExpression('happy', 1.5);
+    });
+
+    window.addEventListener('sf:chat-folder-created', () => {
+      setExpression('happy', 2);
+      showBubble("Chat folder created! Drag conversations into it to stay organized.", [
+        { label: 'Got it', fn: () => dismissBubble() }
+      ]);
+    });
+
+    window.addEventListener('sf:conversation-deleted', () => {
+      setExpression('idle');
+    });
+
+    // ---- DASHBOARD EVENTS ----
+    window.addEventListener('sf:widget-added', (e) => {
+      const type = e.detail?.type || 'widget';
+      setExpression('happy', 2);
+      showBubble(`${type.replace(/([A-Z])/g, ' $1').trim()} widget added! Drag it to position it.`, [
+        { label: 'Add another', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); dismissBubble(); } },
+        { label: 'Nice', fn: () => dismissBubble() }
+      ]);
+    });
+
+    window.addEventListener('sf:theme-changed', (e) => {
+      setExpression('happy', 2);
+      showBubble("Looking good! Theme updated.", [
+        { label: 'Try a wallpaper too', fn: () => { clickThemePicker(); dismissBubble(); } },
+        { label: 'Love it', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+    });
+
+    window.addEventListener('sf:wallpaper-changed', (e) => {
+      setExpression('happy', 2);
+      showBubble("Nice wallpaper! Your dashboard is looking great.", [
+        { label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+    });
+
+    // ---- BROWSE PAGE EVENTS ----
+    window.addEventListener('sf:search-performed', (e) => {
+      const count = e.detail?.resultCount || 0;
+      const query = e.detail?.query || '';
+      if (count === 0 && query) {
+        setExpression('thinking', 2);
+        showBubble(`No results for "${query}". Try different keywords or check the filters.`, [
+          { label: 'Clear filters', fn: () => { if (window.clearAdvFilters) window.clearAdvFilters(); dismissBubble(); } },
+          { label: 'Ask me about it', fn: () => { askAssistant(`Tell me about: ${query}`, 'ask'); } },
+          { label: 'OK', fn: () => dismissBubble() }
+        ]);
+      } else if (count > 0) {
+        // Don't interrupt browsing, just a subtle reaction
+        setExpression('happy', 1);
+      }
+    });
+
+    // ---- FLASHCARDS EVENTS ----
+    window.addEventListener('sf:quiz-started', (e) => {
+      const topic = e.detail?.topic || 'a topic';
+      setExpression('happy', 2);
+      showBubble(`Quiz on "${topic}" starting! Good luck!`, [
+        { label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+      setTimeout(dismissBubble, 3000);
+    });
+
+    window.addEventListener('sf:quiz-completed', (e) => {
+      const correct = e.detail?.correct || 0;
+      const total = e.detail?.total || 0;
+      const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      if (pct >= 80) {
+        setExpression('happy', 4);
+        showBubble(`Amazing! ${correct}/${total} correct (${pct}%)! You really know your stuff!`, [
+          { label: 'Quiz me again', fn: () => { focusQuizInput(); dismissBubble(); } },
+          { label: 'Race a friend', fn: () => { if (window.generateCode) window.generateCode(); dismissBubble(); } }
+        ]);
+      } else if (pct >= 50) {
+        setExpression('happy', 3);
+        showBubble(`Nice effort! ${correct}/${total} correct (${pct}%). Keep studying and you'll ace it!`, [
+          { label: 'Retry missed questions', fn: () => { if (window.retryMissed) window.retryMissed(); dismissBubble(); } },
+          { label: 'Study tips', fn: () => { askAssistant(`I scored ${pct}% on a quiz. Give me tips to improve my study technique`, 'tips'); } }
+        ]);
+      } else {
+        setExpression('thinking', 3);
+        showBubble(`${correct}/${total} correct (${pct}%). Don't worry -- let's review and try again!`, [
+          { label: 'Retry missed', fn: () => { if (window.retryMissed) window.retryMissed(); dismissBubble(); } },
+          { label: 'Help me study this', fn: () => { askAssistant(`I scored poorly on a quiz. Help me understand the material better and give study strategies`, 'tips'); } }
+        ]);
+      }
+    });
+
+    window.addEventListener('sf:race-completed', (e) => {
+      setExpression('happy', 3);
+      showBubble("Race finished! That was intense!", [
+        { label: 'Rematch', fn: () => { if (window.rematch) window.rematch(); dismissBubble(); } },
+        { label: 'New quiz', fn: () => { focusQuizInput(); dismissBubble(); } }
+      ]);
+    });
+
+    // ---- CALENDAR EVENTS ----
+    window.addEventListener('sf:events-imported', (e) => {
+      const count = e.detail?.count || 0;
+      setExpression('happy', 3);
+      showBubble(`${count} event${count !== 1 ? 's' : ''} imported from Canvas! Your calendar is up to date.`, [
+        { label: 'View today', fn: () => { dismissBubble(); } },
+        { label: 'Great', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+    });
+
+    window.addEventListener('sf:event-completed', () => {
+      setExpression('happy', 2);
+      showBubble("Event marked complete! Keep up the good work.", [
+        { label: 'Thanks!', fn: () => dismissBubble() }
+      ]);
+      setTimeout(dismissBubble, 2500);
+    });
+
+    // ---- GLOBAL ERROR HANDLER ----
+    window.addEventListener('sf:error', (e) => {
+      const msg = e.detail?.message || 'Something went wrong';
+      setExpression('surprised', 3);
+      showBubble(`Oops! ${msg}. Try again in a moment.`, [
+        { label: 'OK', fn: () => dismissBubble() }
+      ]);
+    });
+
+    // Catch unhandled JS errors
+    window.addEventListener('error', (e) => {
+      setExpression('surprised', 1.5);
+    });
+
+    // Catch unhandled promise rejections
+    window.addEventListener('unhandledrejection', () => {
+      setExpression('surprised', 1);
     });
   }
 

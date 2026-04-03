@@ -1080,6 +1080,7 @@
   async function startQuiz() {
     var topic = document.getElementById('topicInput').value.trim();
     if (!topic) return;
+    window.dispatchEvent(new CustomEvent('sf:quiz-started', { detail: { topic } }));
 
     currentTopic = topic;
     document.getElementById('topicError').textContent = '';
@@ -1291,6 +1292,7 @@
   // ─── Results ───
   function showResults() {
     showScreen('resultsScreen');
+    window.dispatchEvent(new CustomEvent('sf:quiz-completed', { detail: { correct: correctCount, total: questions.length } }));
 
     var total = questions.length;
     var pct = Math.round((correctCount / total) * 100);
@@ -1589,6 +1591,7 @@
 
   function showRaceResults() {
     showScreen('raceResultsScreen');
+    window.dispatchEvent(new CustomEvent('sf:race-completed', { detail: { score: raceCorrect } }));
     document.getElementById('raceYouFinal').textContent = raceCorrect;
     document.getElementById('raceThemFinal').textContent = opponentCorrect;
 

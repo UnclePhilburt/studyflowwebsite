@@ -1830,6 +1830,7 @@
         currentOffset = offset;
 
         displayCards(results, query);
+        window.dispatchEvent(new CustomEvent('sf:search-performed', { detail: { query, resultCount: results.length } }));
 
         // Show/hide load more button
         const loadMoreContainer = document.getElementById('loadMoreContainer');

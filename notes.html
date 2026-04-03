@@ -2890,6 +2890,7 @@
           statusEl.textContent = `${uploadedCount} file${uploadedCount > 1 ? 's' : ''} uploaded successfully!`;
           statusEl.style.color = 'var(--accent-primary)';
         }
+        window.dispatchEvent(new CustomEvent('sf:note-uploaded', { detail: { count: uploadedCount } }));
 
         setTimeout(() => {
           closeUploadModal();
@@ -2922,6 +2923,7 @@
         if (response.ok) {
           const folder = await response.json();
           folders.push(folder);
+          window.dispatchEvent(new CustomEvent('sf:folder-created', { detail: { name: folder.name } }));
           closeNewFolderModal();
           renderDesktop();
         } else {
@@ -2934,6 +2936,7 @@
 
     function openFolder(folderId) {
       currentFolder = folderId;
+      window.dispatchEvent(new CustomEvent('sf:folder-opened', { detail: { folderId } }));
       updateBreadcrumb();
       renderDesktop();
     }
@@ -3189,6 +3192,7 @@
         if (response.ok) {
           // Update local note object
           note.is_public = newPublicState;
+          window.dispatchEvent(new CustomEvent('sf:visibility-changed', { detail: { isPublic: newPublicState } }));
           console.log(`Note is now ${newPublicState ? 'public' : 'private'}`);
 
           // Re-render desktop to show changes
@@ -3225,6 +3229,7 @@
           if (response.ok) {
             folders = folders.filter(f => f.id !== itemToDelete.id);
             renderDesktop();
+            window.dispatchEvent(new CustomEvent('sf:folder-deleted'));
           } else {
             alert('Failed to delete folder');
           }
@@ -3244,6 +3249,7 @@
             // Remove note from local array and re-render immediately
             allNotes = allNotes.filter(n => n.id !== itemToDelete.id);
             renderDesktop();
+            window.dispatchEvent(new CustomEvent('sf:note-deleted'));
           } else {
             alert('Failed to delete note');
           }
@@ -3439,6 +3445,7 @@
         if (response.ok) {
           const data = await response.json();
           sharedNotesMap[shareModalNoteId] = { share_token: data.share_token, expires_at: data.expires_at };
+          window.dispatchEvent(new CustomEvent('sf:note-shared', { detail: { noteId: shareModalNoteId, token: data.share_token } }));
           renderDesktop();
           // Show result
           openShareModal(shareModalNoteId);
@@ -3476,6 +3483,7 @@
 
         if (response.ok) {
           delete sharedNotesMap[shareModalNoteId];
+          window.dispatchEvent(new CustomEvent('sf:share-revoked'));
           renderDesktop();
           closeShareModal();
         } else {
@@ -3800,6 +3808,7 @@
       if (!note) return;
 
       previewedNote = note;
+      window.dispatchEvent(new CustomEvent('sf:note-preview', { detail: { noteId, title: note.original_filename } }));
 
       // Update preview info
       const filename = note.original_filename || 'Untitled';

@@ -1154,6 +1154,7 @@
 
         if (response.ok) {
           alert(`Success! Imported ${data.events_count} assignments from Canvas`);
+          window.dispatchEvent(new CustomEvent('sf:events-imported', { detail: { count: data.events_count } }));
           closeCanvasImportModal();
           await loadEvents();
           renderCalendar();
@@ -1349,6 +1350,7 @@
         });
 
         if (response.ok) {
+          window.dispatchEvent(new CustomEvent('sf:event-completed'));
           await loadEvents();
           renderCalendar();
           closeEventDetails();

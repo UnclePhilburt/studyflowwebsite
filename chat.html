@@ -2625,6 +2625,7 @@
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
+        window.dispatchEvent(new CustomEvent('sf:chat-folder-created'));
         // Refresh current view (force refresh to bypass stale preload cache)
         _preloadedData = null;
         if (currentLevel === 'folder') {
@@ -3546,9 +3547,11 @@
         createFollowupBubbles(card, suggestions);
         panToCard(card);
         saveLayout();
+        window.dispatchEvent(new CustomEvent('sf:chat-response', { detail: { hasResponse: true } }));
 
       } catch (err) {
         console.error('Chat error:', err);
+        window.dispatchEvent(new CustomEvent('sf:error', { detail: { page: 'chat', message: 'Chat request failed' } }));
         populateCard(card, 'Sorry, something went wrong. Please try again.', null, []);
       }
     }
@@ -3791,6 +3794,7 @@
         } else if (currentLevel === 'home') {
           navigateHome();
         }
+        window.dispatchEvent(new CustomEvent('sf:conversation-deleted'));
       } catch (e) {
         if (el) el.style.opacity = '1';
         console.error('Delete error:', e);
@@ -3800,6 +3804,7 @@
     function startNewChat() {
       clearCanvas();
       clearLevelElements();
+      window.dispatchEvent(new CustomEvent('sf:chat-started'));
       conversationId = null;
       currentLevel = 'conversation';
       updateBreadcrumb();

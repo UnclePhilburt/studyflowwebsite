@@ -4311,6 +4311,7 @@
           data: defaultData
         };
         activeWidgets.push(newWidget);
+        window.dispatchEvent(new CustomEvent('sf:widget-added', { detail: { type: widgetType } }));
         await saveWidgets();
         renderWidgets();
         renderWidgetOptions();
@@ -6028,6 +6029,7 @@
       const wp = WALLPAPER_OPTIONS.find(w => w.id === id);
       if (!wp) return;
       localStorage.setItem('sf-wallpaper', id);
+      window.dispatchEvent(new CustomEvent('sf:wallpaper-changed', { detail: { wallpaper: id } }));
       cc.style.backgroundImage = `url('assets/wallpapers/${wp.file}')`;
       cc.style.backgroundSize = 'cover';
       cc.style.backgroundPosition = 'center';
@@ -6330,6 +6332,7 @@
 
       // Save to localStorage
       localStorage.setItem('dashboard-theme', themeId);
+      window.dispatchEvent(new CustomEvent('sf:theme-changed', { detail: { theme: themeId } }));
 
       // Update all theme picker widgets
       activeWidgets.forEach(widget => {
