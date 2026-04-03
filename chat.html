@@ -2015,6 +2015,8 @@
           const clusterOffsetX = (savedLayout && savedLayout.cluster_x !== undefined) ? savedLayout.cluster_x : clusterX;
           const clusterOffsetY = (savedLayout && savedLayout.cluster_y !== undefined) ? savedLayout.cluster_y : 0;
 
+          console.log(`[LOAD HOME] Conversation ${conv.id} (${conv.title}): cluster_x=${savedLayout?.cluster_x}, cluster_y=${savedLayout?.cluster_y}, using saved=${savedLayout && savedLayout.cluster_x !== undefined}`);
+
           // Title label
           const titleLabel = document.createElement('div');
           titleLabel.className = 'cluster-title';
@@ -2360,6 +2362,9 @@
           // Use saved cluster position, or auto-space if not saved
           const clusterOffsetX = (savedLayout && savedLayout.cluster_x !== undefined) ? savedLayout.cluster_x : clusterX;
           const clusterOffsetY = (savedLayout && savedLayout.cluster_y !== undefined) ? savedLayout.cluster_y : 0;
+
+          console.log(`[LOAD FOLDER] Conversation ${conv.id} (${conv.title}): cluster_x=${savedLayout?.cluster_x}, cluster_y=${savedLayout?.cluster_y}, using saved=${savedLayout && savedLayout.cluster_x !== undefined}`);
+
 
           // Title label (will be positioned relative to first card)
           const titleLabel = document.createElement('div');
@@ -3743,6 +3748,8 @@
               y: c.y - minY
             }));
 
+            console.log(`[SAVE] Conversation ${cid}: cluster_x=${minX}, cluster_y=${minY}, cards=${layout.length}`);
+
             await fetch(`${BACKEND_URL}/api/conversations/${cid}/layout`, {
               method: 'PUT',
               headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
@@ -3755,7 +3762,9 @@
                 scale
               })
             });
-          } catch (e) {}
+          } catch (e) {
+            console.error(`[SAVE ERROR] Conversation ${cid}:`, e);
+          }
         }
       }, 1000);
     }
