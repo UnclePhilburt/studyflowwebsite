@@ -5729,65 +5729,257 @@
     // Theme Picker widget
     const THEME_OPTIONS = {
       light: [
-        { id: 'default', name: 'Earthy', colors: ['#8B9D83', '#D4A574', '#FAF8F5'] },
-        { id: 'ocean', name: 'Ocean', colors: ['#4a90a4', '#5fb3c8', '#F0F8FF'] },
-        { id: 'sunset', name: 'Sunset', colors: ['#d17a5f', '#e89b7f', '#FFF5F0'] },
-        { id: 'forest', name: 'Forest', colors: ['#5a8a5a', '#7aaa7a', '#F5F9F5'] },
-        { id: 'lavender', name: 'Lavender', colors: ['#8a7aa4', '#aa9ac8', '#F8F5FF'] },
-        { id: 'coffee', name: 'Coffee', colors: ['#8B6F4E', '#c49a6c', '#F5F0EB'] },
-        { id: 'rose', name: 'Rose', colors: ['#c47a7a', '#e0a0a0', '#FFF5F5'] },
-        { id: 'sand', name: 'Sand', colors: ['#c4784a', '#d8986a', '#F8F2EA'] },
-        { id: 'arctic', name: 'Arctic', colors: ['#5a9ab8', '#7abcd8', '#F0F6FA'] },
-        { id: 'slate', name: 'Slate', colors: ['#5a6a8a', '#7a8aaa', '#F2F4F6'] },
-        { id: 'matcha', name: 'Matcha', colors: ['#7aa45a', '#9ac47a', '#F4F8F2'] },
-        { id: 'minimal', name: 'Minimal', colors: ['#4a4a4a', '#6a6a6a', '#ffffff'] },
+        { id: 'default', name: 'Earthy', colors: ['#8B9D83', '#D4A574', '#FAF8F5'], text: '#2C2C2C', border: '#8B9D83' },
+        { id: 'ocean', name: 'Ocean', colors: ['#4a90a4', '#5fb3c8', '#F0F8FF'], text: '#1e3a5f', border: '#4a90a4' },
+        { id: 'sunset', name: 'Sunset', colors: ['#d17a5f', '#e89b7f', '#FFF5F0'], text: '#4a2c2a', border: '#d17a5f' },
+        { id: 'forest', name: 'Forest', colors: ['#5a8a5a', '#7aaa7a', '#F5F9F5'], text: '#2a3a2a', border: '#5a8a5a' },
+        { id: 'lavender', name: 'Lavender', colors: ['#8a7aa4', '#aa9ac8', '#F8F5FF'], text: '#3a2a4a', border: '#8a7aa4' },
+        { id: 'coffee', name: 'Coffee', colors: ['#8B6F4E', '#c49a6c', '#F5F0EB'], text: '#3a2d24', border: '#8B6F4E' },
+        { id: 'rose', name: 'Rose', colors: ['#c47a7a', '#e0a0a0', '#FFF5F5'], text: '#4a2a2a', border: '#c47a7a' },
+        { id: 'sand', name: 'Sand', colors: ['#c4784a', '#d8986a', '#F8F2EA'], text: '#4a3828', border: '#c4784a' },
+        { id: 'arctic', name: 'Arctic', colors: ['#5a9ab8', '#7abcd8', '#F0F6FA'], text: '#1e2e3e', border: '#5a9ab8' },
+        { id: 'slate', name: 'Slate', colors: ['#5a6a8a', '#7a8aaa', '#F2F4F6'], text: '#1e2430', border: '#5a6a8a' },
+        { id: 'matcha', name: 'Matcha', colors: ['#7aa45a', '#9ac47a', '#F4F8F2'], text: '#2a3424', border: '#7aa45a' },
+        { id: 'minimal', name: 'Minimal', colors: ['#4a4a4a', '#6a6a6a', '#ffffff'], text: '#1a1a1a', border: '#4a4a4a' },
       ],
       dark: [
-        { id: 'dark', name: 'Dark', colors: ['#7c9885', '#e89b5f', '#1a1a1a'] },
-        { id: 'midnight', name: 'Midnight', colors: ['#5b8af5', '#7aa4ff', '#0f1628'] },
-        { id: 'ember', name: 'Ember', colors: ['#e8734a', '#f09060', '#1a1614'] },
-        { id: 'neon', name: 'Neon', colors: ['#00d4aa', '#ff6090', '#0a0a14'] },
+        { id: 'dark', name: 'Dark', colors: ['#7c9885', '#e89b5f', '#1a1a1a'], text: '#f5f5f5', border: '#7c9885' },
+        { id: 'midnight', name: 'Midnight', colors: ['#5b8af5', '#7aa4ff', '#0f1628'], text: '#e8ecf4', border: '#5b8af5' },
+        { id: 'ember', name: 'Ember', colors: ['#e8734a', '#f09060', '#1a1614'], text: '#f0e8e0', border: '#e8734a' },
+        { id: 'neon', name: 'Neon', colors: ['#00d4aa', '#ff6090', '#0a0a14'], text: '#e0e8f0', border: '#00d4aa' },
       ]
     };
+
+    const FONT_OPTIONS = [
+      { id: 'inter', name: 'Inter', family: "'Inter', -apple-system, sans-serif", desc: 'Clean and modern (default)' },
+      { id: 'system', name: 'System', family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", desc: 'Native OS font' },
+      { id: 'poppins', name: 'Poppins', family: "'Poppins', sans-serif", desc: 'Rounded and friendly', url: 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' },
+      { id: 'dm-sans', name: 'DM Sans', family: "'DM Sans', sans-serif", desc: 'Geometric and sharp', url: 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap' },
+      { id: 'jetbrains', name: 'JetBrains Mono', family: "'JetBrains Mono', monospace", desc: 'Coder aesthetic', url: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap' },
+    ];
+
+    let _tpTab = 'themes';
 
     function renderThemePicker(widgetData) {
       const container = document.getElementById(`widget-${widgetData.id}`);
       const currentTheme = document.body.getAttribute('data-theme') || 'default';
+      const currentFont = localStorage.getItem('sf-font') || 'inter';
+      const currentGrid = localStorage.getItem('sf-grid') || 'dots';
+      const currentRadius = localStorage.getItem('sf-radius') || '16';
 
-      function renderSwatch(theme) {
-        const isActive = currentTheme === theme.id;
-        return `<button onclick="selectTheme('${theme.id}')" title="${theme.name}" style="
-          width:100%;padding:8px 10px;
-          background:${isActive ? 'var(--accent-primary)' : 'var(--hover-bg)'};
-          border:2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'};
-          border-radius:10px;cursor:pointer;font-family:inherit;
-          display:flex;align-items:center;gap:10px;
+      // Mini dashboard mockup
+      function miniPreview(t) {
+        const bg = t.colors[2], accent = t.colors[0], accent2 = t.colors[1], txt = t.text;
+        const isActive = currentTheme === t.id;
+        return `<div onclick="selectTheme('${t.id}')" style="
+          cursor:pointer;flex-shrink:0;width:110px;border-radius:10px;overflow:hidden;
+          border:2px solid ${isActive ? accent : 'transparent'};
+          box-shadow:${isActive ? '0 0 0 2px ' + accent + '40' : 'none'};
           transition:all 0.15s;
-        " onmouseover="if(!${isActive})this.style.borderColor='var(--border-color)'"
-           onmouseout="if(!${isActive})this.style.borderColor='transparent'">
-          <div style="display:flex;gap:2px;flex-shrink:0;">
-            <div style="width:14px;height:14px;border-radius:50%;background:${theme.colors[0]};border:1px solid rgba(0,0,0,0.1);"></div>
-            <div style="width:14px;height:14px;border-radius:50%;background:${theme.colors[1]};border:1px solid rgba(0,0,0,0.1);"></div>
-            <div style="width:14px;height:14px;border-radius:50%;background:${theme.colors[2]};border:1px solid rgba(0,0,0,0.15);"></div>
+        " title="${t.name}">
+          <div style="background:${bg};padding:6px;height:80px;position:relative;">
+            <div style="display:flex;gap:3px;margin-bottom:4px;">
+              <div style="width:8px;height:8px;border-radius:3px;background:${accent};"></div>
+              <div style="width:8px;height:8px;border-radius:3px;background:${accent2};"></div>
+              <div style="width:8px;height:8px;border-radius:3px;background:${accent}44;"></div>
+            </div>
+            <div style="display:flex;gap:4px;">
+              <div style="width:40px;height:28px;border-radius:4px;background:${accent}18;border:1px solid ${accent}30;"></div>
+              <div style="width:40px;height:28px;border-radius:4px;background:${accent}18;border:1px solid ${accent}30;"></div>
+            </div>
+            <div style="position:absolute;bottom:4px;left:6px;right:6px;height:10px;border-radius:8px;background:${accent}20;display:flex;gap:3px;align-items:center;padding:0 4px;">
+              <div style="width:4px;height:4px;border-radius:50%;background:${accent};"></div>
+              <div style="width:4px;height:4px;border-radius:50%;background:${accent2};"></div>
+              <div style="width:4px;height:4px;border-radius:50%;background:${accent};opacity:0.5;"></div>
+            </div>
           </div>
-          <span style="font-size:12px;font-weight:${isActive ? '600' : '500'};color:${isActive ? 'white' : 'var(--text-primary)'};">${theme.name}</span>
-          ${isActive ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:auto;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
-        </button>`;
+          <div style="background:${bg};padding:4px 6px;border-top:1px solid ${accent}20;display:flex;align-items:center;gap:4px;">
+            ${isActive ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="' + accent + '" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+            <span style="font-size:10px;font-weight:${isActive ? '700' : '500'};color:${txt};">${t.name}</span>
+          </div>
+        </div>`;
+      }
+
+      function tabBtn(id, label) {
+        const active = _tpTab === id;
+        return `<button onclick="_tpTab='${id}';renderThemePicker(activeWidgets.find(w=>w.id==='${widgetData.id}'))" style="
+          flex:1;padding:6px 0;border:none;border-bottom:2px solid ${active ? 'var(--accent-primary)' : 'transparent'};
+          background:none;color:${active ? 'var(--accent-primary)' : 'var(--text-muted)'};
+          font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.15s;
+        ">${label}</button>`;
+      }
+
+      let content = '';
+
+      if (_tpTab === 'themes') {
+        content = `
+          <div style="padding:8px 12px 4px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Light</div>
+            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+              ${THEME_OPTIONS.light.map(miniPreview).join('')}
+            </div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin:8px 0 6px;">Dark</div>
+            <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;">
+              ${THEME_OPTIONS.dark.map(miniPreview).join('')}
+            </div>
+          </div>`;
+      } else if (_tpTab === 'customize') {
+        content = `
+          <div style="padding:10px 12px;display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Canvas Grid</div>
+              <div style="display:flex;gap:6px;">
+                ${['dots', 'lines', 'crosses', 'none'].map(g => `
+                  <button onclick="setCanvasGrid('${g}')" style="
+                    flex:1;padding:8px 0;border-radius:8px;font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;
+                    border:1.5px solid ${currentGrid === g ? 'var(--accent-primary)' : 'var(--border-color)'};
+                    background:${currentGrid === g ? 'var(--accent-primary)' : 'none'};
+                    color:${currentGrid === g ? 'white' : 'var(--text-secondary)'};
+                    transition:all 0.15s;
+                  ">${g.charAt(0).toUpperCase() + g.slice(1)}</button>
+                `).join('')}
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Widget Corners</div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:10px;color:var(--text-muted);">Sharp</span>
+                <input type="range" min="0" max="24" value="${currentRadius}" oninput="setWidgetRadius(this.value)" style="flex:1;accent-color:var(--accent-primary);">
+                <span style="font-size:10px;color:var(--text-muted);">Round</span>
+              </div>
+              <div style="text-align:center;font-size:10px;color:var(--text-muted);margin-top:2px;">${currentRadius}px</div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:6px;">Custom Accent</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="color" value="${getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#8B9D83'}" onchange="setCustomAccent(this.value)" style="width:32px;height:32px;border:none;border-radius:8px;cursor:pointer;background:none;">
+                <span style="font-size:11px;color:var(--text-secondary);">Override accent color</span>
+                <button onclick="clearCustomAccent()" style="margin-left:auto;font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border-color);border-radius:6px;padding:4px 8px;cursor:pointer;font-family:inherit;">Reset</button>
+              </div>
+            </div>
+          </div>`;
+      } else if (_tpTab === 'fonts') {
+        content = `
+          <div style="padding:10px 12px;display:flex;flex-direction:column;gap:4px;">
+            ${FONT_OPTIONS.map(f => {
+              const isActive = currentFont === f.id;
+              return `<button onclick="setFont('${f.id}')" style="
+                width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid ${isActive ? 'var(--accent-primary)' : 'transparent'};
+                background:${isActive ? 'var(--hover-bg)' : 'none'};cursor:pointer;font-family:inherit;
+                display:flex;align-items:center;gap:10px;text-align:left;transition:all 0.15s;
+              ">
+                <div style="font-family:${f.family};font-size:16px;font-weight:600;color:var(--text-primary);width:24px;text-align:center;">Aa</div>
+                <div>
+                  <div style="font-size:12px;font-weight:${isActive ? '600' : '500'};color:var(--text-primary);">${f.name}</div>
+                  <div style="font-size:10px;color:var(--text-muted);">${f.desc}</div>
+                </div>
+                ${isActive ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2.5" style="margin-left:auto;"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+              </button>`;
+            }).join('')}
+          </div>`;
       }
 
       container.innerHTML = `
-        <div style="padding:12px;overflow-y:auto;max-height:360px;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);padding:0 4px 6px;">Light</div>
-          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
-            ${THEME_OPTIONS.light.map(renderSwatch).join('')}
+        <div style="display:flex;flex-direction:column;height:100%;">
+          <div style="display:flex;border-bottom:1px solid var(--border-color);flex-shrink:0;">
+            ${tabBtn('themes', 'Themes')}
+            ${tabBtn('customize', 'Customize')}
+            ${tabBtn('fonts', 'Fonts')}
           </div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);padding:0 4px 6px;">Dark</div>
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            ${THEME_OPTIONS.dark.map(renderSwatch).join('')}
+          <div style="flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;">
+            ${content}
           </div>
         </div>
       `;
     }
+
+    function setCanvasGrid(type) {
+      localStorage.setItem('sf-grid', type);
+      // Update canvas background
+      const cc = document.getElementById('canvasContainer');
+      if (!cc) return;
+      if (type === 'dots') {
+        cc.style.backgroundImage = 'radial-gradient(circle, var(--canvas-grid) 1px, transparent 1px)';
+        cc.style.backgroundSize = '24px 24px';
+      } else if (type === 'lines') {
+        cc.style.backgroundImage = 'linear-gradient(var(--canvas-grid) 1px, transparent 1px), linear-gradient(90deg, var(--canvas-grid) 1px, transparent 1px)';
+        cc.style.backgroundSize = '24px 24px';
+      } else if (type === 'crosses') {
+        cc.style.backgroundImage = 'radial-gradient(circle, var(--canvas-grid) 1px, transparent 1px)';
+        cc.style.backgroundSize = '12px 12px';
+      } else {
+        cc.style.backgroundImage = 'none';
+      }
+      // Re-render picker
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
+    function setWidgetRadius(val) {
+      localStorage.setItem('sf-radius', val);
+      document.querySelectorAll('.widget').forEach(w => { w.style.borderRadius = val + 'px'; });
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
+    function setCustomAccent(color) {
+      localStorage.setItem('sf-accent', color);
+      document.documentElement.style.setProperty('--accent-primary', color);
+      // Derive secondary (slightly darker)
+      document.documentElement.style.setProperty('--accent-secondary', color);
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
+    function clearCustomAccent() {
+      localStorage.removeItem('sf-accent');
+      document.documentElement.style.removeProperty('--accent-primary');
+      document.documentElement.style.removeProperty('--accent-secondary');
+      // Re-apply theme to reset
+      const t = localStorage.getItem('dashboard-theme') || 'default';
+      document.body.setAttribute('data-theme', t);
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
+    function setFont(fontId) {
+      const font = FONT_OPTIONS.find(f => f.id === fontId);
+      if (!font) return;
+      localStorage.setItem('sf-font', fontId);
+      // Load font if needed
+      if (font.url && !document.querySelector(`link[href="${font.url}"]`)) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = font.url;
+        document.head.appendChild(link);
+      }
+      document.body.style.fontFamily = font.family;
+      activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
+    }
+
+    // Apply saved customizations on load
+    (function applySavedCustomizations() {
+      const accent = localStorage.getItem('sf-accent');
+      if (accent) {
+        document.documentElement.style.setProperty('--accent-primary', accent);
+        document.documentElement.style.setProperty('--accent-secondary', accent);
+      }
+      const fontId = localStorage.getItem('sf-font');
+      if (fontId) {
+        const font = FONT_OPTIONS.find(f => f.id === fontId);
+        if (font) {
+          if (font.url && !document.querySelector(`link[href="${font.url}"]`)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = font.url;
+            document.head.appendChild(link);
+          }
+          document.body.style.fontFamily = font.family;
+        }
+      }
+      const radius = localStorage.getItem('sf-radius');
+      if (radius) {
+        setTimeout(() => {
+          document.querySelectorAll('.widget').forEach(w => { w.style.borderRadius = radius + 'px'; });
+        }, 500);
+      }
+    })();
 
     async function selectTheme(themeId) {
       // Apply theme immediately
