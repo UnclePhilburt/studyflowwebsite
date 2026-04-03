@@ -3538,10 +3538,11 @@
       previewedNote = note;
 
       // Update preview info
-      document.getElementById('previewTitle').textContent = note.original_filename;
+      const filename = note.original_filename || 'Untitled';
+      document.getElementById('previewTitle').textContent = filename;
       document.getElementById('previewPages').textContent = note.pages || '?';
       document.getElementById('previewDate').textContent = new Date(note.uploaded_at).toLocaleDateString();
-      document.getElementById('previewType').textContent = note.original_filename.split('.').pop().toUpperCase();
+      document.getElementById('previewType').textContent = filename.split('.').pop().toUpperCase();
 
       // Show loading state
       const viewer = document.getElementById('previewViewer');
