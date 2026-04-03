@@ -2009,11 +2009,54 @@
         menuUserEmail.textContent = session.user.email;
       }
 
-      await loadUserProfile();
-      await loadGoodStandingStatus();
-      await loadFavorites();
-      await loadFolders();
-      await loadNotes();
+      // Single consolidated call for all page data
+      try {
+        const initRes = await fetch(`${BACKEND_URL}/api/notes/page-init`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (initRes.ok) {
+          const initData = await initRes.json();
+
+          // Profile
+          userProfile = initData.profile || {};
+
+          // Good standing
+          if (initData.profile) {
+            updateGoodStandingUI(initData.profile);
+          }
+
+          // Favorites
+          favoriteNoteIds = new Set((initData.favorites || []).map(f => f.note_id));
+
+          // Folders
+          folders = initData.folders || [];
+
+          // Notes + render
+          allNotes = initData.notes || [];
+          currentNotes = allNotes.filter(n => n.folder_id === currentFolder || (!n.folder_id && !currentFolder));
+          renderDesktop();
+
+          // Usage stats
+          if (initData.usage_stats) {
+            document.getElementById('totalUsage').textContent = initData.usage_stats.totalUsage || 0;
+            document.getElementById('activeNotes').textContent = initData.usage_stats.activeNotes || 0;
+          }
+        } else {
+          // Fallback to individual calls
+          await loadUserProfile();
+          await loadGoodStandingStatus();
+          await loadFavorites();
+          await loadFolders();
+          await loadNotes();
+        }
+      } catch (e) {
+        console.error('Page init error, falling back:', e);
+        await loadUserProfile();
+        await loadGoodStandingStatus();
+        await loadFavorites();
+        await loadFolders();
+        await loadNotes();
+      }
     }
 
     // Load user profile from Supabase
@@ -2070,6 +2113,42 @@
       } catch (error) {
         console.error('Error saving folder:', error);
         return false;
+      }
+    }
+
+    function updateGoodStandingUI(profile) {
+      const widget = document.getElementById('goodStandingWidget');
+      const icon = document.getElementById('standingIcon');
+      const title = document.getElementById('standingTitle');
+      const message = document.getElementById('standingMessage');
+      const badge = document.getElementById('standingBadge');
+      const badgeText = document.getElementById('badgeText');
+
+      if (profile.subscription_tier === 'pro' && profile.subscription_status === 'active') {
+        widget.style.display = 'flex';
+        widget.className = 'good-standing-widget scholars-club';
+        icon.textContent = 'Star';
+        title.textContent = "Scholar's Club";
+        message.textContent = 'Unlimited access to all features';
+        badge.className = 'scholars-club-badge';
+        badgeText.textContent = 'Active Member';
+        isInGoodStanding = true;
+      } else if (profile.good_standing === true) {
+        widget.style.display = 'flex';
+        icon.textContent = 'Check';
+        title.textContent = 'Good Standing';
+        message.textContent = 'You can download notes from the community';
+        badge.className = 'standing-badge good';
+        badgeText.textContent = 'Active';
+        isInGoodStanding = true;
+      } else {
+        widget.style.display = 'flex';
+        icon.textContent = 'X';
+        title.textContent = 'Upload Required';
+        message.textContent = 'Upload a note this month to maintain Good Standing';
+        badge.className = 'standing-badge warning';
+        badgeText.textContent = 'Action Needed';
+        isInGoodStanding = false;
       }
     }
 
