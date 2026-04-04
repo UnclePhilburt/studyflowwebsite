@@ -74,20 +74,18 @@
       const timeout = setTimeout(() => controller.abort(), 8000);
 
       const res = await fetch(BACKEND_URL + '/health', {
-        method: 'GET',
+        method: 'HEAD',
+        mode: 'no-cors',
         signal: controller.signal,
         cache: 'no-store'
       });
       clearTimeout(timeout);
 
-      if (res.ok) {
-        if (serverDown) {
-          serverDown = false;
-          showBanner('Server is back! All features restored.', '#d4edda', '#155724', '#28a745');
-          hideBanner(3000);
-        }
-      } else {
-        onServerDown();
+      // With no-cors, opaque response means server is reachable
+      if (serverDown) {
+        serverDown = false;
+        showBanner('Server is back! All features restored.', '#d4edda', '#155724', '#28a745');
+        hideBanner(3000);
       }
     } catch (e) {
       onServerDown();
