@@ -1848,9 +1848,15 @@
     const ACHIEVEMENT_ICONS = {
       rocket: '&#x1F680;', graduation: '&#x1F393;', book: '&#x1F4D6;', users: '&#x1F465;',
       chat: '&#x1F4AC;', link: '&#x1F517;', globe: '&#x1F30D;', star: '&#x2B50;',
-      heart: '&#x2764;', award: '&#x1F3C6;', crown: '&#x1F451;', folder: '&#x1F4C1;',
+      heart: '&#x2764;&#xFE0F;', award: '&#x1F3C6;', crown: '&#x1F451;', folder: '&#x1F4C1;',
       archive: '&#x1F4E6;', layers: '&#x1F4DA;', message: '&#x1F4E8;', flag: '&#x1F6A9;',
-      megaphone: '&#x1F4E3;', palette: '&#x1F3A8;', grid: '&#x2B1C;', sparkle: '&#x2728;'
+      megaphone: '&#x1F4E3;', palette: '&#x1F3A8;', grid: '&#x2B1C;', sparkle: '&#x2728;',
+      box: '&#x1F4E6;', pen: '&#x270F;&#xFE0F;', bookmark: '&#x1F516;', download: '&#x2B07;&#xFE0F;',
+      network: '&#x1F310;', brain: '&#x1F9E0;', lightbulb: '&#x1F4A1;', telescope: '&#x1F52D;',
+      calendar: '&#x1F4C5;', image: '&#x1F5BC;&#xFE0F;', tophat: '&#x1F3A9;', rainbow: '&#x1F308;',
+      type: '&#x1F524;', cursor: '&#x1F5B1;&#xFE0F;', moon: '&#x1F319;', sunrise: '&#x1F305;',
+      medal: '&#x1F3C5;', hourglass: '&#x231B;', infinity: '&#x267E;&#xFE0F;', share: '&#x1F4E4;',
+      robot: '&#x1F916;', trophy: '&#x1F3C6;', lock: '&#x1F512;'
     };
 
     async function loadAchievements() {
@@ -1867,34 +1873,41 @@
         let html = '';
         let currentCategory = '';
 
+        // Group by category
+        const categories = {};
         for (const a of data.achievements) {
-          if (a.category !== currentCategory) {
-            currentCategory = a.category;
-            html += `<div class="achievements-category">${currentCategory}</div><div class="achievements-grid">`;
-            // Close previous grid if not first
-            if (html.indexOf('</div><div class="achievements-category">') > -1) {
-              html = html.replace(/<div class="achievements-category">/, '</div><div class="achievements-category">');
-            }
+          if (!categories[a.category]) categories[a.category] = [];
+          categories[a.category].push(a);
+        }
+
+        for (const [category, items] of Object.entries(categories)) {
+          html += `<div class="achievements-category">${category === 'Secret' ? 'Secret Achievements' : category}</div><div class="achievements-grid">`;
+
+          for (const a of items) {
+            const isHidden = a.hidden && !a.unlocked;
+            const icon = isHidden ? ACHIEVEMENT_ICONS['lock'] : (ACHIEVEMENT_ICONS[a.icon] || '&#x2B50;');
+            const name = isHidden ? '???' : a.name;
+            const desc = isHidden ? 'Keep exploring to discover this!' : a.desc;
+            const pct = a.goal > 0 ? Math.round((a.progress / a.goal) * 100) : 0;
+            const showProgress = a.goal > 1 && !isHidden;
+            const progressHtml = showProgress
+              ? `<div class="achievement-progress"><div class="achievement-progress-bar" style="width:${pct}%"></div></div>`
+              : '';
+
+            html += `
+              <div class="achievement-item ${a.unlocked ? 'unlocked' : 'locked'}" title="${desc}${showProgress ? ' (' + a.progress + '/' + a.goal + ')' : ''}">
+                <div class="achievement-icon">${icon}</div>
+                <div class="achievement-info">
+                  <div class="achievement-name">${name}</div>
+                  <div class="achievement-desc">${desc}</div>
+                  ${progressHtml}
+                </div>
+              </div>
+            `;
           }
 
-          const icon = ACHIEVEMENT_ICONS[a.icon] || '&#x2B50;';
-          const pct = a.goal > 0 ? Math.round((a.progress / a.goal) * 100) : 0;
-          const progressHtml = a.goal > 1
-            ? `<div class="achievement-progress"><div class="achievement-progress-bar" style="width:${pct}%"></div></div>`
-            : '';
-
-          html += `
-            <div class="achievement-item ${a.unlocked ? 'unlocked' : 'locked'}" title="${a.desc}${a.goal > 1 ? ' (' + a.progress + '/' + a.goal + ')' : ''}">
-              <div class="achievement-icon">${icon}</div>
-              <div class="achievement-info">
-                <div class="achievement-name">${a.name}</div>
-                <div class="achievement-desc">${a.desc}</div>
-                ${progressHtml}
-              </div>
-            </div>
-          `;
+          html += '</div>';
         }
-        html += '</div>';
 
         container.innerHTML = html;
       } catch (e) {
