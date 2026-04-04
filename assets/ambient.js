@@ -1,10 +1,11 @@
-// Ambient Sound Generator - Web Audio API, zero file downloads
+// Ambient Sound Generator v2 - improved Web Audio API synthesis
 (function() {
   'use strict';
 
   let ctx = null;
   let masterGain = null;
   let activeNodes = [];
+  let activeTimers = [];
   let currentSound = null;
   let volume = 0.3;
 
@@ -31,36 +32,58 @@
     activeNodes.forEach(node => {
       try { node.stop ? node.stop() : node.disconnect(); } catch {}
     });
+    activeTimers.forEach(t => clearTimeout(t));
     activeNodes = [];
+    activeTimers = [];
     currentSound = null;
   }
 
-  // ========== SOUND GENERATORS ==========
+  function addTimer(fn, ms) {
+    const t = setTimeout(fn, ms);
+    activeTimers.push(t);
+    return t;
+  }
+
+  // ========== NOISE BUFFERS ==========
+  // Longer buffers (8s) with stereo decorrelation for less obvious looping
 
   function createNoiseBuffer(seconds, type) {
     const c = getContext();
-    const sampleRate = c.sampleRate;
-    const length = sampleRate * seconds;
-    const buffer = c.createBuffer(2, length, sampleRate);
+    const sr = c.sampleRate;
+    const len = sr * seconds;
+    const buffer = c.createBuffer(2, len, sr);
 
     for (let ch = 0; ch < 2; ch++) {
       const data = buffer.getChannelData(ch);
-      let lastOut = 0;
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      let lastBrown = 0;
 
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < len; i++) {
         const white = Math.random() * 2 - 1;
 
         if (type === 'brown') {
-          lastOut = (lastOut + (0.02 * white)) / 1.02;
-          data[i] = lastOut * 3.5;
+          lastBrown = (lastBrown + (0.02 * white)) / 1.02;
+          data[i] = lastBrown * 3.5;
         } else if (type === 'pink') {
-          // Simple pink noise approximation
-          lastOut = 0.99886 * lastOut + white * 0.0555179;
-          data[i] = lastOut + white * 0.5362;
-          data[i] *= 0.11;
+          // Voss-McCartney pink noise (more accurate)
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.06;
+          b6 = white * 0.115926;
         } else {
           data[i] = white;
         }
+      }
+
+      // Crossfade loop point (last 0.1s fades into first 0.1s) to prevent click
+      const fade = Math.floor(sr * 0.1);
+      for (let i = 0; i < fade; i++) {
+        const t = i / fade;
+        data[len - fade + i] = data[len - fade + i] * (1 - t) + data[i] * t;
       }
     }
     return buffer;
@@ -74,194 +97,409 @@
     return source;
   }
 
+  // ========== UTILITY ==========
+
+  function makeFilter(type, freq, q) {
+    const c = getContext();
+    const f = c.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = freq;
+    if (q !== undefined) f.Q.value = q;
+    return f;
+  }
+
+  function makeLFO(freq, amount, target) {
+    const c = getContext();
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = amount;
+    osc.connect(gain);
+    gain.connect(target);
+    osc.start();
+    activeNodes.push(osc, gain);
+  }
+
+  function makeGain(val) {
+    const c = getContext();
+    const g = c.createGain();
+    g.gain.value = val;
+    return g;
+  }
+
+  // ========== SOUND GENERATORS ==========
+
   function generateWhite() {
     const c = getContext();
-    const buffer = createNoiseBuffer(2, 'white');
+    const buffer = createNoiseBuffer(8, 'white');
     const source = loopBuffer(buffer);
-    const gain = c.createGain();
-    gain.gain.value = 0.15;
-    source.connect(gain);
+    const gain = makeGain(0.08);
+
+    // Gentle highshelf rolloff so it's not harsh
+    const shelf = makeFilter('highshelf', 6000);
+    shelf.gain.value = -6;
+
+    source.connect(shelf);
+    shelf.connect(gain);
     gain.connect(masterGain);
     source.start();
-    activeNodes.push(source, gain);
+    activeNodes.push(source, shelf, gain);
   }
 
   function generateBrown() {
     const c = getContext();
-    const buffer = createNoiseBuffer(2, 'brown');
-    const source = loopBuffer(buffer);
-    const gain = c.createGain();
-    gain.gain.value = 0.5;
-    source.connect(gain);
-    gain.connect(masterGain);
-    source.start();
-    activeNodes.push(source, gain);
+    // Two decorrelated brown noise sources panned slightly for width
+    for (let i = 0; i < 2; i++) {
+      const buffer = createNoiseBuffer(8, 'brown');
+      const source = loopBuffer(buffer);
+      const gain = makeGain(0.35);
+
+      const lp = makeFilter('lowpass', 600);
+      const pan = c.createStereoPanner();
+      pan.pan.value = i === 0 ? -0.3 : 0.3;
+
+      source.connect(lp);
+      lp.connect(gain);
+      gain.connect(pan);
+      pan.connect(masterGain);
+      source.start();
+      activeNodes.push(source, lp, gain, pan);
+    }
+
+    // Subtle slow variation
+    const modBuffer = createNoiseBuffer(8, 'brown');
+    const modSource = loopBuffer(modBuffer);
+    const modGain = makeGain(0.05);
+    modSource.connect(modGain);
+    modGain.connect(masterGain);
+    modSource.start();
+    activeNodes.push(modSource, modGain);
   }
 
   function generateRain() {
     const c = getContext();
 
-    // Base: filtered white noise for steady rain
-    const noiseBuffer = createNoiseBuffer(4, 'white');
-    const noise = loopBuffer(noiseBuffer);
-    const noiseGain = c.createGain();
-    noiseGain.gain.value = 0.12;
+    // Layer 1: Steady rain - wide-band noise shaped to sound like rain on a surface
+    const steadyBuf = createNoiseBuffer(8, 'white');
+    const steady = loopBuffer(steadyBuf);
+    const steadyGain = makeGain(0.07);
 
-    // Bandpass filter to shape it like rain
-    const filter = c.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 3000;
-    filter.Q.value = 0.5;
+    const bp1 = makeFilter('bandpass', 2500, 0.4);
+    const bp2 = makeFilter('bandpass', 5000, 0.6);
+    const hp = makeFilter('highpass', 300);
 
-    // Highpass to remove rumble
-    const hp = c.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 400;
+    // Split into two frequency bands for richness
+    steady.connect(bp1);
+    steady.connect(bp2);
+    bp1.connect(hp);
+    bp2.connect(steadyGain);
+    hp.connect(steadyGain);
+    steadyGain.connect(masterGain);
+    steady.start();
+    activeNodes.push(steady, bp1, bp2, hp, steadyGain);
 
-    noise.connect(filter);
-    filter.connect(hp);
-    hp.connect(noiseGain);
-    noiseGain.connect(masterGain);
-    noise.start();
-    activeNodes.push(noise, filter, hp, noiseGain);
+    // Layer 2: Low rumble (rain on roof / distant)
+    const rumbleBuf = createNoiseBuffer(8, 'brown');
+    const rumble = loopBuffer(rumbleBuf);
+    const rumbleGain = makeGain(0.06);
+    const rumbleLp = makeFilter('lowpass', 400);
+    rumble.connect(rumbleLp);
+    rumbleLp.connect(rumbleGain);
+    rumbleGain.connect(masterGain);
+    rumble.start();
+    activeNodes.push(rumble, rumbleLp, rumbleGain);
 
-    // Layer: low rumble for distant thunder/heavy rain
-    const brownBuffer = createNoiseBuffer(3, 'brown');
-    const brown = loopBuffer(brownBuffer);
-    const brownGain = c.createGain();
-    brownGain.gain.value = 0.08;
-    const lp = c.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 500;
-    brown.connect(lp);
-    lp.connect(brownGain);
-    brownGain.connect(masterGain);
-    brown.start();
-    activeNodes.push(brown, lp, brownGain);
+    // Slow modulation on the rumble (gusts of heavier rain)
+    makeLFO(0.05, 0.03, rumbleGain.gain);
 
-    // Droplet pops
-    function drip() {
+    // Layer 3: Mid-frequency patter
+    const midBuf = createNoiseBuffer(8, 'pink');
+    const mid = loopBuffer(midBuf);
+    const midGain = makeGain(0.05);
+    const midBp = makeFilter('bandpass', 1200, 0.3);
+    mid.connect(midBp);
+    midBp.connect(midGain);
+    midGain.connect(masterGain);
+    mid.start();
+    activeNodes.push(mid, midBp, midGain);
+
+    // Layer 4: Individual droplets (granular synthesis approach)
+    function droplet() {
       if (currentSound !== 'rain') return;
+      const now = c.currentTime;
+
+      // Randomize: some are soft taps, some are splashier
+      const isSplash = Math.random() > 0.7;
+      const freq = isSplash ? (1000 + Math.random() * 2000) : (3000 + Math.random() * 5000);
+      const dur = isSplash ? (0.04 + Math.random() * 0.06) : (0.01 + Math.random() * 0.03);
+      const vol = isSplash ? (0.015 + Math.random() * 0.02) : (0.005 + Math.random() * 0.012);
+
       const osc = c.createOscillator();
       const g = c.createGain();
+      const f = makeFilter('bandpass', freq, 2);
+      const pan = c.createStereoPanner();
+      pan.pan.value = (Math.random() - 0.5) * 1.6; // wide stereo
+
       osc.type = 'sine';
-      osc.frequency.value = 2000 + Math.random() * 4000;
-      g.gain.setValueAtTime(0.02 + Math.random() * 0.03, c.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.05);
-      osc.connect(g);
-      g.connect(masterGain);
-      osc.start();
-      osc.stop(c.currentTime + 0.06);
-      setTimeout(drip, 50 + Math.random() * 200);
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + dur);
+      g.gain.setValueAtTime(vol, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+      osc.connect(f);
+      f.connect(g);
+      g.connect(pan);
+      pan.connect(masterGain);
+      osc.start(now);
+      osc.stop(now + dur + 0.01);
+
+      // Schedule next droplet (variable density)
+      const next = 20 + Math.random() * 120;
+      addTimer(droplet, next);
     }
-    setTimeout(drip, 100);
+    addTimer(droplet, 50);
+
+    // Layer 5: Occasional heavier splash clusters
+    function splashCluster() {
+      if (currentSound !== 'rain') return;
+      const count = 3 + Math.floor(Math.random() * 5);
+      for (let i = 0; i < count; i++) {
+        addTimer(() => {
+          if (currentSound !== 'rain') return;
+          const now = c.currentTime;
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          const pan = c.createStereoPanner();
+          pan.pan.value = (Math.random() - 0.5) * 1.2;
+          osc.type = 'triangle';
+          osc.frequency.value = 800 + Math.random() * 1500;
+          g.gain.setValueAtTime(0.02, now);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+          osc.connect(g);
+          g.connect(pan);
+          pan.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }, i * (10 + Math.random() * 30));
+      }
+      addTimer(splashCluster, 2000 + Math.random() * 5000);
+    }
+    addTimer(splashCluster, 1000);
   }
 
   function generateOcean() {
     const c = getContext();
 
-    // Brown noise base
-    const buffer = createNoiseBuffer(4, 'brown');
-    const source = loopBuffer(buffer);
-    const gain = c.createGain();
-    gain.gain.value = 0.35;
+    // Layer 1: Deep base - slowly modulated brown noise
+    const deepBuf = createNoiseBuffer(8, 'brown');
+    const deep = loopBuffer(deepBuf);
+    const deepGain = makeGain(0.25);
+    const deepLp = makeFilter('lowpass', 500);
+    deep.connect(deepLp);
+    deepLp.connect(deepGain);
+    deepGain.connect(masterGain);
+    deep.start();
+    activeNodes.push(deep, deepLp, deepGain);
 
-    // Slow LFO to modulate volume (waves)
-    const lfo = c.createOscillator();
-    const lfoGain = c.createGain();
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.08; // slow wave cycle
-    lfoGain.gain.value = 0.15;
-    lfo.connect(lfoGain);
-    lfoGain.connect(gain.gain);
-    lfo.start();
+    // Primary wave cycle - slow amplitude modulation
+    makeLFO(0.06, 0.12, deepGain.gain);
+    // Secondary slower cycle for variation
+    makeLFO(0.023, 0.06, deepGain.gain);
 
-    // Lowpass for muffled ocean sound
-    const lp = c.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 800;
+    // Layer 2: Mid-range body with filter sweep
+    const midBuf = createNoiseBuffer(8, 'brown');
+    const mid = loopBuffer(midBuf);
+    const midGain = makeGain(0.15);
+    const midBp = makeFilter('bandpass', 600, 0.4);
+    mid.connect(midBp);
+    midBp.connect(midGain);
+    midGain.connect(masterGain);
+    mid.start();
+    activeNodes.push(mid, midBp, midGain);
 
-    source.connect(lp);
-    lp.connect(gain);
-    gain.connect(masterGain);
-    source.start();
-    activeNodes.push(source, lp, gain, lfo, lfoGain);
+    // Sweep the filter frequency to simulate waves rolling
+    makeLFO(0.07, 200, midBp.frequency);
+    makeLFO(0.12, 0.08, midGain.gain);
 
-    // Higher layer for foam/hiss
-    const whiteBuffer = createNoiseBuffer(3, 'white');
-    const white = loopBuffer(whiteBuffer);
-    const whiteGain = c.createGain();
-    whiteGain.gain.value = 0.04;
-    const hp = c.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 2000;
+    // Layer 3: Foam and hiss (waves crashing)
+    const foamBuf = createNoiseBuffer(8, 'white');
+    const foam = loopBuffer(foamBuf);
+    const foamGain = makeGain(0.02);
+    const foamHp = makeFilter('highpass', 2500);
+    const foamBp = makeFilter('bandpass', 4000, 0.5);
+    foam.connect(foamHp);
+    foamHp.connect(foamBp);
+    foamBp.connect(foamGain);
+    foamGain.connect(masterGain);
+    foam.start();
+    activeNodes.push(foam, foamHp, foamBp, foamGain);
 
-    const lfo2 = c.createOscillator();
-    const lfo2Gain = c.createGain();
-    lfo2.type = 'sine';
-    lfo2.frequency.value = 0.1;
-    lfo2Gain.gain.value = 0.03;
-    lfo2.connect(lfo2Gain);
-    lfo2Gain.connect(whiteGain.gain);
-    lfo2.start();
+    // Foam swells with the waves but slightly offset
+    makeLFO(0.07, 0.018, foamGain.gain);
+    makeLFO(0.13, 0.01, foamGain.gain);
 
-    white.connect(hp);
-    hp.connect(whiteGain);
-    whiteGain.connect(masterGain);
-    white.start();
-    activeNodes.push(white, hp, whiteGain, lfo2, lfo2Gain);
+    // Layer 4: Stereo width - slightly different noise in each ear
+    const widthBuf = createNoiseBuffer(8, 'pink');
+    const width = loopBuffer(widthBuf);
+    const widthGain = makeGain(0.03);
+    const widthPan = c.createStereoPanner();
+    widthPan.pan.value = 0;
+    const widthLp = makeFilter('lowpass', 1000);
+    width.connect(widthLp);
+    widthLp.connect(widthGain);
+    widthGain.connect(widthPan);
+    widthPan.connect(masterGain);
+    width.start();
+    activeNodes.push(width, widthLp, widthGain, widthPan);
+
+    // Pan slowly side to side
+    makeLFO(0.03, 0.6, widthPan.pan);
+
+    // Layer 5: Occasional wave crash emphasis
+    function waveCrash() {
+      if (currentSound !== 'ocean') return;
+      const now = c.currentTime;
+      const dur = 2 + Math.random() * 3;
+
+      const buf = createNoiseBuffer(1, 'white');
+      const src = c.createBufferSource();
+      src.buffer = buf;
+      const g = c.createGain();
+      const bp = makeFilter('bandpass', 1500 + Math.random() * 2000, 0.3);
+
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.03 + Math.random() * 0.02, now + dur * 0.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+      src.connect(bp);
+      bp.connect(g);
+      g.connect(masterGain);
+      src.start(now);
+      src.stop(now + dur);
+
+      addTimer(waveCrash, 4000 + Math.random() * 8000);
+    }
+    addTimer(waveCrash, 3000);
   }
 
   function generateFire() {
     const c = getContext();
 
-    // Base crackle: filtered noise
-    const buffer = createNoiseBuffer(3, 'pink');
-    const source = loopBuffer(buffer);
-    const gain = c.createGain();
-    gain.gain.value = 0.2;
+    // Layer 1: Warm base hum
+    const baseBuf = createNoiseBuffer(8, 'brown');
+    const base = loopBuffer(baseBuf);
+    const baseGain = makeGain(0.12);
+    const baseLp = makeFilter('lowpass', 250);
+    base.connect(baseLp);
+    baseLp.connect(baseGain);
+    baseGain.connect(masterGain);
+    base.start();
+    activeNodes.push(base, baseLp, baseGain);
 
-    const bp = c.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 1500;
-    bp.Q.value = 0.8;
+    // Gentle breathing modulation
+    makeLFO(0.15, 0.03, baseGain.gain);
 
-    source.connect(bp);
-    bp.connect(gain);
-    gain.connect(masterGain);
-    source.start();
-    activeNodes.push(source, bp, gain);
+    // Layer 2: Mid crackle bed (pink noise filtered)
+    const crackleBuf = createNoiseBuffer(8, 'pink');
+    const crackle = loopBuffer(crackleBuf);
+    const crackleGain = makeGain(0.08);
+    const crackleBp = makeFilter('bandpass', 2000, 0.6);
+    const crackleHp = makeFilter('highpass', 800);
+    crackle.connect(crackleBp);
+    crackleBp.connect(crackleHp);
+    crackleHp.connect(crackleGain);
+    crackleGain.connect(masterGain);
+    crackle.start();
+    activeNodes.push(crackle, crackleBp, crackleHp, crackleGain);
 
-    // Low warmth
-    const brownBuffer = createNoiseBuffer(2, 'brown');
-    const brown = loopBuffer(brownBuffer);
-    const brownGain = c.createGain();
-    brownGain.gain.value = 0.1;
-    const lp = c.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 300;
-    brown.connect(lp);
-    lp.connect(brownGain);
-    brownGain.connect(masterGain);
-    brown.start();
-    activeNodes.push(brown, lp, brownGain);
-
-    // Random pops/crackles
-    function pop() {
+    // Layer 3: Random individual pops and crackles
+    function crackPop() {
       if (currentSound !== 'fire') return;
+      const now = c.currentTime;
+
+      // Vary between small tick, medium pop, and louder snap
+      const type = Math.random();
+      let freq, dur, vol, waveform;
+
+      if (type < 0.5) {
+        // Small tick
+        freq = 2000 + Math.random() * 4000;
+        dur = 0.005 + Math.random() * 0.01;
+        vol = 0.01 + Math.random() * 0.02;
+        waveform = 'sine';
+      } else if (type < 0.85) {
+        // Medium pop
+        freq = 500 + Math.random() * 1500;
+        dur = 0.01 + Math.random() * 0.03;
+        vol = 0.02 + Math.random() * 0.04;
+        waveform = 'triangle';
+      } else {
+        // Loud snap
+        freq = 200 + Math.random() * 800;
+        dur = 0.02 + Math.random() * 0.05;
+        vol = 0.04 + Math.random() * 0.06;
+        waveform = 'square';
+      }
+
       const osc = c.createOscillator();
       const g = c.createGain();
-      osc.type = 'square';
-      osc.frequency.value = 100 + Math.random() * 500;
-      g.gain.setValueAtTime(0.04 + Math.random() * 0.06, c.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.02 + Math.random() * 0.03);
+      const pan = c.createStereoPanner();
+      pan.pan.value = (Math.random() - 0.5) * 0.8;
+
+      osc.type = waveform;
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(freq * 0.3, 50), now + dur);
+      g.gain.setValueAtTime(vol, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
       osc.connect(g);
-      g.connect(masterGain);
-      osc.start();
-      osc.stop(c.currentTime + 0.05);
-      setTimeout(pop, 100 + Math.random() * 400);
+      g.connect(pan);
+      pan.connect(masterGain);
+      osc.start(now);
+      osc.stop(now + dur + 0.01);
+
+      // Variable timing - sometimes rapid bursts, sometimes sparse
+      const next = 30 + Math.random() * 250;
+      addTimer(crackPop, next);
     }
-    setTimeout(pop, 200);
+    addTimer(crackPop, 100);
+
+    // Layer 4: Occasional burst of rapid crackles (log shifting)
+    function crackBurst() {
+      if (currentSound !== 'fire') return;
+      const burstCount = 5 + Math.floor(Math.random() * 10);
+      for (let i = 0; i < burstCount; i++) {
+        addTimer(() => {
+          if (currentSound !== 'fire') return;
+          const now = c.currentTime;
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          osc.type = 'square';
+          osc.frequency.value = 300 + Math.random() * 2000;
+          g.gain.setValueAtTime(0.015, now);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.008);
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + 0.015);
+        }, i * (5 + Math.random() * 15));
+      }
+      addTimer(crackBurst, 3000 + Math.random() * 8000);
+    }
+    addTimer(crackBurst, 2000);
+
+    // Layer 5: Very low woosh (air drawn into fire)
+    const wooshBuf = createNoiseBuffer(8, 'brown');
+    const woosh = loopBuffer(wooshBuf);
+    const wooshGain = makeGain(0.04);
+    const wooshLp = makeFilter('lowpass', 150);
+    woosh.connect(wooshLp);
+    wooshLp.connect(wooshGain);
+    wooshGain.connect(masterGain);
+    woosh.start();
+    activeNodes.push(woosh, wooshLp, wooshGain);
+    makeLFO(0.2, 0.02, wooshGain.gain);
   }
 
   // ========== PUBLIC API ==========
@@ -301,10 +539,7 @@
     isPlaying: () => currentSound !== null,
   };
 
-  // Restore saved state
+  // Restore saved volume
   const savedVol = localStorage.getItem('sf-ambient-vol');
   if (savedVol) volume = parseFloat(savedVol);
-
-  // Don't auto-resume sound (requires user gesture for AudioContext)
-  // Instead, show the last-used sound as selected in the UI
 })();
