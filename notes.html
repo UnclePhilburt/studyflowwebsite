@@ -1727,7 +1727,7 @@
     <a href="browse.html" class="nav-link">Nexus</a>
     <a href="calendar.html" class="nav-link">Calendar</a>
     <div class="user-avatar-wrapper">
-      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" role="button" aria-label="User menu"></div>
       <div class="user-menu" id="userMenu">
         <div class="user-menu-header">
           <div class="user-menu-email" id="menuUserEmail">Loading...</div>
@@ -2065,7 +2065,7 @@
           <span class="preview-meta-value" id="previewType">-</span>
         </div>
       </div>
-      <button class="preview-close" onclick="closePreview()">
+      <button class="preview-close" onclick="closePreview()" aria-label="Close preview">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>

@@ -885,7 +885,7 @@
     <a href="browse.html" class="nav-link">Nexus</a>
     <a href="calendar.html" class="nav-link active">Calendar</a>
     <div class="user-avatar-wrapper">
-      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" role="button" aria-label="User menu"></div>
       <div class="user-menu" id="userMenu">
         <div class="user-menu-header">
           <div class="user-menu-email" id="menuUserEmail">Loading...</div>
@@ -918,9 +918,9 @@
       </div>
       <div class="header-right">
         <div class="month-nav">
-          <button onclick="previousMonth()">‹</button>
+          <button onclick="previousMonth()" aria-label="Previous month">‹</button>
           <div class="current-month" id="currentMonth">January 2026</div>
-          <button onclick="nextMonth()">›</button>
+          <button onclick="nextMonth()" aria-label="Next month">›</button>
         </div>
         <button class="upload-syllabus-btn" onclick="openCanvasImportModal()">
           <span>📅</span>

@@ -964,7 +964,7 @@
   <div class="group-detail" id="groupDetail">
     <!-- Mobile chat header (visible only on mobile) -->
     <div class="mobile-chat-header" id="mobileChatHeader">
-      <button onclick="closeGroup()" style="width:36px;height:36px;border-radius:10px;border:none;background:var(--hover-bg);color:var(--text-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+      <button onclick="closeGroup()" aria-label="Close group" style="width:36px;height:36px;border-radius:10px;border:none;background:var(--hover-bg);color:var(--text-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div id="mobileChatGroupName" style="font-size:15px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
@@ -987,7 +987,7 @@
       </div>
       <div class="chat-input-bar">
         <textarea class="chat-input" id="chatInput" placeholder="Message the group..." rows="1"></textarea>
-        <button class="chat-send" id="chatSend" disabled>
+        <button class="chat-send" id="chatSend" disabled aria-label="Send message">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

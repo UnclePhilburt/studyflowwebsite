@@ -1529,7 +1529,7 @@
     <a href="browse.html" class="nav-link">Nexus</a>
     <a href="calendar.html" class="nav-link">Calendar</a>
     <div class="user-avatar-wrapper">
-      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()"></div>
+      <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" role="button" aria-label="User menu"></div>
       <div class="user-menu" id="userMenu">
         <div class="user-menu-header">
           <div class="user-menu-email" id="menuUserEmail">Loading...</div>
@@ -1573,7 +1573,7 @@
 
       <!-- Floating Action Button -->
       <div class="fab-container">
-        <button class="fab" id="fabBtn">
+        <button class="fab" id="fabBtn" aria-label="Create new document">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
