@@ -981,8 +981,13 @@
 
   <!-- Screen: Loading -->
   <div class="screen loading-screen" id="loadingScreen">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Generating questions...</div>
+    <div style="width:200px;margin:0 auto;">
+      <div class="sf-skeleton sf-skeleton-title" style="width:70%;margin:0 auto 16px;"></div>
+      <div class="sf-skeleton sf-skeleton-text long" style="margin-bottom:12px;"></div>
+      <div class="sf-skeleton sf-skeleton-text medium"></div>
+      <div class="sf-skeleton sf-skeleton-text short"></div>
+    </div>
+    <div class="loading-text" style="margin-top:16px;">Generating questions...</div>
     <div class="loading-subtext" id="loadingSubtext">Searching Nexus notes</div>
   </div>
 
@@ -1677,6 +1682,7 @@
   });
 </script>
 <script src="global-search.js"></script>
+<link rel="stylesheet" href="assets/skeleton.css">
 <link rel="stylesheet" href="assets/toast.css">
 <script src="assets/toast.js"></script>
 <script src="assets/pwa.js"></script>

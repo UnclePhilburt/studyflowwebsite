@@ -1414,7 +1414,7 @@
 
     // Show loading state on the card table
     function showLoading() {
-      document.getElementById('cardTable').innerHTML = '<div class="loading-msg">Loading notes...</div>';
+      document.getElementById('cardTable').innerHTML = '<div class="sf-skeleton-browse">' + Array(4).fill('<div class="sf-skeleton-browse-item"><div class="sf-skeleton sf-skeleton-browse-thumb"></div><div class="sf-skeleton-browse-lines"><div class="sf-skeleton sf-skeleton-text long"></div><div class="sf-skeleton sf-skeleton-text medium"></div><div class="sf-skeleton sf-skeleton-text short"></div></div></div>').join('') + '</div>';
       document.getElementById('hintText').style.display = 'none';
     }
 
@@ -2076,6 +2076,7 @@
     }
   </script>
 <script src="global-search.js"></script>
+<link rel="stylesheet" href="assets/skeleton.css">
 <link rel="stylesheet" href="assets/toast.css">
 <script src="assets/toast.js"></script>
 <script src="assets/pwa.js"></script>

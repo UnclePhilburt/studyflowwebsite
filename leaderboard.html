@@ -649,8 +649,15 @@
   <canvas id="graphCanvas"></canvas>
 
   <div class="graph-loading" id="graphLoading">
-    <div class="spinner"></div>
-    Loading network...
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <div class="sf-skeleton sf-skeleton-circle" style="width:60px;height:60px;"></div>
+      <div class="sf-skeleton sf-skeleton-text medium" style="width:120px;"></div>
+      <div style="display:flex;gap:20px;margin-top:8px;">
+        <div class="sf-skeleton sf-skeleton-circle" style="width:40px;height:40px;"></div>
+        <div class="sf-skeleton sf-skeleton-circle" style="width:40px;height:40px;"></div>
+        <div class="sf-skeleton sf-skeleton-circle" style="width:40px;height:40px;"></div>
+      </div>
+    </div>
   </div>
 
   <div class="node-tooltip" id="tooltip">
@@ -1409,6 +1416,7 @@
     init();
   </script>
 <script src="global-search.js"></script>
+<link rel="stylesheet" href="assets/skeleton.css">
 <link rel="stylesheet" href="assets/toast.css">
 <script src="assets/toast.js"></script>
 <script src="assets/pwa.js"></script>

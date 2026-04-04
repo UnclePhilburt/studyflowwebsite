@@ -1,0 +1,129 @@
+/* Loading skeleton system */
+
+.sf-skeleton {
+  background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.03) 50%, rgba(0,0,0,0.06) 75%);
+  background-size: 200% 100%;
+  animation: sf-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes sf-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sf-skeleton-text {
+  height: 12px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.sf-skeleton-text.short { width: 40%; }
+.sf-skeleton-text.medium { width: 65%; }
+.sf-skeleton-text.long { width: 90%; }
+
+.sf-skeleton-title {
+  height: 18px;
+  width: 50%;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.sf-skeleton-circle {
+  border-radius: 50%;
+}
+
+.sf-skeleton-card {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Grid of skeleton cards */
+.sf-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.sf-skeleton-note {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.sf-skeleton-note-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+}
+
+.sf-skeleton-note-name {
+  height: 10px;
+  width: 80px;
+  border-radius: 3px;
+}
+
+.sf-skeleton-note-meta {
+  height: 8px;
+  width: 50px;
+  border-radius: 3px;
+}
+
+/* Chat skeleton */
+.sf-skeleton-chat-card {
+  width: 280px;
+  height: 180px;
+  border-radius: 14px;
+  margin: 20px;
+}
+
+/* Browse skeleton row */
+.sf-skeleton-browse {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.sf-skeleton-browse-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.sf-skeleton-browse-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.sf-skeleton-browse-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Dark theme */
+body[data-theme="dark"] .sf-skeleton,
+body[data-theme="midnight"] .sf-skeleton,
+body[data-theme="ember"] .sf-skeleton,
+body[data-theme="neon"] .sf-skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.06) 75%);
+  background-size: 200% 100%;
+}
+
+body[data-theme="dark"] .sf-skeleton-card,
+body[data-theme="midnight"] .sf-skeleton-card,
+body[data-theme="ember"] .sf-skeleton-card,
+body[data-theme="neon"] .sf-skeleton-card {
+  border-color: rgba(255,255,255,0.05);
+}
