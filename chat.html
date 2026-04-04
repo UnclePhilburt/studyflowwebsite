@@ -2667,7 +2667,8 @@
 
     async function deleteFolder(folderId, folderName) {
       ctxMenu.classList.remove('active');
-      if (!confirm(`Delete "${folderName}"? Conversations inside will become unfiled.`)) return;
+      const confirmed = await sfConfirm(`Delete "${folderName}"? Conversations inside will become unfiled.`);
+      if (!confirmed) return;
       try {
         await fetch(`${BACKEND_URL}/api/chat-folders/${folderId}`, {
           method: 'DELETE',
@@ -3778,7 +3779,8 @@
 
     async function deleteConversation(convId, el) {
       ctxMenu.classList.remove('active');
-      if (!confirm('Delete this conversation?')) return;
+      const confirmed = await sfConfirm('Delete this conversation?');
+      if (!confirmed) return;
       try {
         if (el) el.style.opacity = '0';
         await fetch(`${BACKEND_URL}/api/conversations/${convId}`, {
@@ -4304,7 +4306,8 @@
 
     async function deleteSelected() {
       const count = selectedItems.length;
-      if (!confirm(`Delete ${count} item${count > 1 ? 's' : ''}? Conversations in deleted folders will become unfiled.`)) return;
+      const confirmed = await sfConfirm(`Delete ${count} item${count > 1 ? 's' : ''}? Conversations in deleted folders will become unfiled.`);
+      if (!confirmed) return;
 
       for (const item of selectedItems) {
         try {

@@ -1992,7 +1992,8 @@
 
   async function deleteDocument(docId, event) {
     event.stopPropagation();
-    if (!confirm('Delete this document? This action cannot be undone.')) return;
+    const confirmed = await sfConfirm('Delete this document? This action cannot be undone.');
+    if (!confirmed) return;
 
     try {
       const resp = await fetch(`${BACKEND_URL}/api/office/${docId}`, {
@@ -2152,7 +2153,8 @@
   }
 
   async function revokeShare(docId, userId) {
-    if (!confirm('Remove this person\'s access?')) return;
+    const confirmed = await sfConfirm('Remove this person\'s access?');
+    if (!confirmed) return;
     try {
       await fetch(`${BACKEND_URL}/api/office/${docId}/share/${userId}`, {
         method: 'DELETE',

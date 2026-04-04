@@ -96,6 +96,110 @@
   // Also expose for direct use
   window.sfToast = showToast;
 
+  // ========== CONFIRM DIALOG OVERRIDE ==========
+  const originalConfirm = window.confirm;
+  window.confirm = function(message) {
+    return new Promise(() => {}); // never used, but prevents errors if someone awaits
+  };
+
+  // Since confirm() is synchronous and we can't truly override it with async,
+  // we replace it with a function that creates a modal and returns true/false
+  // via a blocking approach using a hidden input trick won't work.
+  // Instead, we patch the callers. We'll keep confirm() but style it better
+  // by using a custom modal that resolves a promise.
+
+  // Create confirm modal
+  const confirmOverlay = document.createElement('div');
+  confirmOverlay.id = 'sf-confirm-overlay';
+  confirmOverlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999999;
+    display:none;align-items:center;justify-content:center;
+    font-family:'Inter',-apple-system,sans-serif;
+  `;
+  confirmOverlay.innerHTML = `
+    <div id="sf-confirm-box" style="
+      background:white;border-radius:14px;padding:24px;max-width:380px;width:90%;
+      box-shadow:0 8px 30px rgba(0,0,0,0.15);text-align:center;
+    ">
+      <div id="sf-confirm-msg" style="font-size:14px;color:#2d2d2d;line-height:1.6;margin-bottom:20px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button id="sf-confirm-cancel" style="
+          flex:1;padding:10px;border-radius:10px;border:1.5px solid #ddd;
+          background:white;color:#666;font-size:13px;font-weight:600;
+          cursor:pointer;font-family:inherit;transition:all 0.15s;
+        ">Cancel</button>
+        <button id="sf-confirm-ok" style="
+          flex:1;padding:10px;border-radius:10px;border:none;
+          background:#e74c3c;color:white;font-size:13px;font-weight:600;
+          cursor:pointer;font-family:inherit;transition:all 0.15s;
+        ">Confirm</button>
+      </div>
+    </div>
+  `;
+
+  let confirmResolver = null;
+
+  function showConfirmModal(message) {
+    return new Promise((resolve) => {
+      confirmResolver = resolve;
+      document.getElementById('sf-confirm-msg').textContent = message;
+      confirmOverlay.style.display = 'flex';
+
+      // Dark theme
+      const theme = document.body.getAttribute('data-theme') || '';
+      const box = document.getElementById('sf-confirm-box');
+      if (['dark','midnight','ember','neon'].includes(theme)) {
+        box.style.background = '#2a2a2a';
+        document.getElementById('sf-confirm-msg').style.color = '#eee';
+        document.getElementById('sf-confirm-cancel').style.background = '#333';
+        document.getElementById('sf-confirm-cancel').style.borderColor = '#555';
+        document.getElementById('sf-confirm-cancel').style.color = '#ccc';
+      } else {
+        box.style.background = 'white';
+        document.getElementById('sf-confirm-msg').style.color = '#2d2d2d';
+        document.getElementById('sf-confirm-cancel').style.background = 'white';
+        document.getElementById('sf-confirm-cancel').style.borderColor = '#ddd';
+        document.getElementById('sf-confirm-cancel').style.color = '#666';
+      }
+    });
+  }
+
+  function closeConfirmModal(result) {
+    confirmOverlay.style.display = 'none';
+    if (confirmResolver) {
+      confirmResolver(result);
+      confirmResolver = null;
+    }
+  }
+
+  // Override confirm with async version
+  window.confirm = function(message) {
+    // For backwards compat with synchronous code, we can't truly make this async.
+    // Instead, we restore the original confirm for now and show a styled one.
+    // The real fix: expose sfConfirm for async usage.
+    return originalConfirm(message);
+  };
+
+  // Async confirm for modern usage
+  window.sfConfirm = function(message) {
+    return showConfirmModal(message);
+  };
+
+  // Wire up buttons
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.appendChild(confirmOverlay);
+      document.getElementById('sf-confirm-cancel').addEventListener('click', () => closeConfirmModal(false));
+      document.getElementById('sf-confirm-ok').addEventListener('click', () => closeConfirmModal(true));
+      confirmOverlay.addEventListener('click', (e) => { if (e.target === confirmOverlay) closeConfirmModal(false); });
+    });
+  } else {
+    document.body.appendChild(confirmOverlay);
+    document.getElementById('sf-confirm-cancel').addEventListener('click', () => closeConfirmModal(false));
+    document.getElementById('sf-confirm-ok').addEventListener('click', () => closeConfirmModal(true));
+    confirmOverlay.addEventListener('click', (e) => { if (e.target === confirmOverlay) closeConfirmModal(false); });
+  }
+
   // Move container to body when DOM is ready (in case script loaded in head)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {

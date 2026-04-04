@@ -3461,7 +3461,8 @@
 
     async function revokeShareLink() {
       if (!shareModalNoteId) return;
-      if (!confirm('Stop sharing this note? The link will stop working immediately.')) return;
+      const confirmed = await sfConfirm('Stop sharing this note? The link will stop working immediately.');
+      if (!confirmed) return;
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/notes/${shareModalNoteId}/share`, {
