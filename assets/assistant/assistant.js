@@ -53,6 +53,7 @@
       ],
       actions: [
         { label: "What's my day look like?", fn: () => { loadDigest(); }, primary: true },
+        { label: 'Start focus session', fn: () => { showPomodoroSetup(); } },
         { label: 'Add a widget', fn: () => { openWidgetPicker(); } },
         { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
@@ -430,6 +431,73 @@
     actions.push({ label: 'Got it!', fn: () => { setExpression('happy'); dismissBubble(); } });
 
     showBubble(data.summary, actions);
+  }
+
+  // ========== POMODORO SETUP ==========
+  function showPomodoroSetup() {
+    const bubble = document.getElementById('sf-assistant-bubble');
+    const msgEl = document.getElementById('sf-assistant-msg');
+    const btnsEl = document.getElementById('sf-assistant-buttons');
+
+    setExpression('happy', 3);
+
+    msgEl.innerHTML = `
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Start a Focus Session</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:#888;">Focus time</span>
+          <select id="flo-pomo-work" style="padding:4px 8px;border-radius:6px;border:1px solid #ddd;font-size:12px;font-family:inherit;">
+            <option value="15">15 min</option>
+            <option value="25" selected>25 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">60 min</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:#888;">Break time</span>
+          <select id="flo-pomo-break" style="padding:4px 8px;border-radius:6px;border:1px solid #ddd;font-size:12px;font-family:inherit;">
+            <option value="3">3 min</option>
+            <option value="5" selected>5 min</option>
+            <option value="10">10 min</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:#888;">Rounds</span>
+          <select id="flo-pomo-rounds" style="padding:4px 8px;border-radius:6px;border:1px solid #ddd;font-size:12px;font-family:inherit;">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      </div>
+    `;
+
+    btnsEl.innerHTML = '';
+    const startBtn = document.createElement('button');
+    startBtn.className = 'sf-assistant-btn primary';
+    startBtn.textContent = 'Start Focus';
+    startBtn.addEventListener('click', () => {
+      const work = parseInt(document.getElementById('flo-pomo-work').value);
+      const brk = parseInt(document.getElementById('flo-pomo-break').value);
+      const rounds = parseInt(document.getElementById('flo-pomo-rounds').value);
+      if (window.startPomodoro) {
+        window.startPomodoro({ work, break: brk, longBreak: brk * 3, rounds });
+      }
+      dismissBubble();
+      setExpression('happy', 2);
+    });
+    btnsEl.appendChild(startBtn);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'sf-assistant-btn';
+    cancelBtn.textContent = 'Maybe later';
+    cancelBtn.addEventListener('click', () => dismissBubble());
+    btnsEl.appendChild(cancelBtn);
+
+    bubble.classList.add('visible');
+    bubbleVisible = true;
   }
 
   function getNoteId() {
@@ -1927,6 +1995,31 @@
         { label: 'Thanks!', fn: () => dismissBubble() }
       ]);
       setTimeout(dismissBubble, 2500);
+    });
+
+    // ---- POMODORO EVENTS ----
+    window.addEventListener('sf:pomodoro-complete', (e) => {
+      const round = e.detail?.round || 1;
+      const total = e.detail?.total || 4;
+      setExpression('happy', 4);
+      if (round >= total) {
+        showBubble(`Session complete! ${round} pomodoros done! You earned a long break.`, [
+          { label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } }
+        ]);
+      } else {
+        const breaks = ['Stretch your legs!', 'Grab some water!', 'Rest your eyes!', 'Take a deep breath!'];
+        const tip = breaks[Math.floor(Math.random() * breaks.length)];
+        showBubble(`Pomodoro ${round}/${total} done! Break time. ${tip}`, [
+          { label: 'Got it', fn: () => dismissBubble() }
+        ]);
+      }
+    });
+
+    window.addEventListener('sf:break-complete', () => {
+      setExpression('happy', 2);
+      showBubble("Break's over! Back to focus mode. You've got this!", [
+        { label: "Let's go!", fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
     });
 
     // ---- GLOBAL ERROR HANDLER ----
