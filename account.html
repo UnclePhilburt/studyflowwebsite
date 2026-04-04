@@ -333,6 +333,76 @@
     }
 
     /* Settings Card */
+    /* Achievements Card */
+    .achievements-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 2px solid rgba(124, 152, 133, 0.15);
+      padding: 40px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 24px rgba(124, 152, 133, 0.08);
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.25s backwards;
+    }
+    .achievements-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+    }
+    .achievements-title {
+      font-family: 'Lora', Georgia, serif; font-size: 20px; font-weight: 600; color: #2d2d2d;
+    }
+    .achievements-count {
+      font-size: 13px; color: #7c9885; font-weight: 600; background: rgba(124,152,133,0.1);
+      padding: 4px 12px; border-radius: 20px;
+    }
+    .achievements-category {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+      color: #999; margin: 16px 0 8px;
+    }
+    .achievements-category:first-of-type { margin-top: 0; }
+    .achievements-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;
+    }
+    .achievement-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 12px;
+      border: 1.5px solid rgba(124,152,133,0.12);
+      background: rgba(255,255,255,0.6);
+      transition: all 0.2s;
+    }
+    .achievement-item.unlocked {
+      border-color: rgba(124,152,133,0.3);
+      background: rgba(124,152,133,0.06);
+    }
+    .achievement-item.locked {
+      opacity: 0.5; filter: grayscale(0.5);
+    }
+    .achievement-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+      background: rgba(124,152,133,0.1);
+    }
+    .achievement-item.unlocked .achievement-icon {
+      background: rgba(124,152,133,0.2);
+    }
+    .achievement-info { flex: 1; min-width: 0; }
+    .achievement-name {
+      font-size: 12px; font-weight: 600; color: #2d2d2d;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .achievement-desc {
+      font-size: 10px; color: #999; margin-top: 1px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .achievement-progress {
+      margin-top: 4px; height: 3px; background: rgba(0,0,0,0.06);
+      border-radius: 2px; overflow: hidden;
+    }
+    .achievement-progress-bar {
+      height: 100%; background: #7c9885; border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
     .settings-card {
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(10px);
@@ -1202,6 +1272,17 @@
       </div>
     </div>
 
+    <!-- Achievements Card -->
+    <div class="achievements-card">
+      <div class="achievements-header">
+        <h3 class="achievements-title">Achievements</h3>
+        <span class="achievements-count" id="achievementsCount">Loading...</span>
+      </div>
+      <div id="achievementsContent">
+        <div style="text-align:center;padding:20px;color:#999;">Loading achievements...</div>
+      </div>
+    </div>
+
     <!-- Settings Card -->
     <div class="settings-card">
       <h3 class="settings-title">Settings</h3>
@@ -1763,11 +1844,71 @@
       }
     });
 
+    // Achievements
+    const ACHIEVEMENT_ICONS = {
+      rocket: '&#x1F680;', graduation: '&#x1F393;', book: '&#x1F4D6;', users: '&#x1F465;',
+      chat: '&#x1F4AC;', link: '&#x1F517;', globe: '&#x1F30D;', star: '&#x2B50;',
+      heart: '&#x2764;', award: '&#x1F3C6;', crown: '&#x1F451;', folder: '&#x1F4C1;',
+      archive: '&#x1F4E6;', layers: '&#x1F4DA;', message: '&#x1F4E8;', flag: '&#x1F6A9;',
+      megaphone: '&#x1F4E3;', palette: '&#x1F3A8;', grid: '&#x2B1C;', sparkle: '&#x2728;'
+    };
+
+    async function loadAchievements() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/achievements`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+
+        document.getElementById('achievementsCount').textContent = `${data.unlocked}/${data.total} unlocked`;
+
+        const container = document.getElementById('achievementsContent');
+        let html = '';
+        let currentCategory = '';
+
+        for (const a of data.achievements) {
+          if (a.category !== currentCategory) {
+            currentCategory = a.category;
+            html += `<div class="achievements-category">${currentCategory}</div><div class="achievements-grid">`;
+            // Close previous grid if not first
+            if (html.indexOf('</div><div class="achievements-category">') > -1) {
+              html = html.replace(/<div class="achievements-category">/, '</div><div class="achievements-category">');
+            }
+          }
+
+          const icon = ACHIEVEMENT_ICONS[a.icon] || '&#x2B50;';
+          const pct = a.goal > 0 ? Math.round((a.progress / a.goal) * 100) : 0;
+          const progressHtml = a.goal > 1
+            ? `<div class="achievement-progress"><div class="achievement-progress-bar" style="width:${pct}%"></div></div>`
+            : '';
+
+          html += `
+            <div class="achievement-item ${a.unlocked ? 'unlocked' : 'locked'}" title="${a.desc}${a.goal > 1 ? ' (' + a.progress + '/' + a.goal + ')' : ''}">
+              <div class="achievement-icon">${icon}</div>
+              <div class="achievement-info">
+                <div class="achievement-name">${a.name}</div>
+                <div class="achievement-desc">${a.desc}</div>
+                ${progressHtml}
+              </div>
+            </div>
+          `;
+        }
+        html += '</div>';
+
+        container.innerHTML = html;
+      } catch (e) {
+        console.error('Achievements error:', e);
+        document.getElementById('achievementsContent').innerHTML = '<div style="text-align:center;padding:20px;color:#999;">Could not load achievements</div>';
+      }
+    }
+
     // Initialize (load subscription after profile sets authToken)
     (async () => {
       await loadProfile();
       await loadSubscriptionStatus();
       await loadDailyDownloadStatus();
+      loadAchievements();
     })();
   </script>
 
