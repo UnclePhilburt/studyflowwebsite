@@ -53,7 +53,7 @@
       ],
       actions: [
         { label: "What's my day look like?", fn: () => { loadDigest(); }, primary: true },
-        { label: 'Start focus session', fn: () => { showPomodoroSetup(); } },
+        { label: 'Start focus session', fn: () => { showPomodoroSetup(); }, keepOpen: true },
         { label: 'Add a widget', fn: () => { openWidgetPicker(); } },
         { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
