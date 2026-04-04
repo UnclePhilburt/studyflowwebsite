@@ -7047,9 +7047,9 @@
     function setTextSize(size) {
       localStorage.setItem('sf-textsize', size);
       saveAllCustomizations();
-      const percentage = parseInt(size);
-      // Apply text size multiplier to entire document
-      document.documentElement.style.fontSize = percentage + '%';
+      const scale = parseInt(size) / 100;
+      // Use CSS zoom to scale all elements including px-based font sizes
+      document.body.style.zoom = scale;
       _rerender();
     }
 
@@ -7347,8 +7347,8 @@
         document.documentElement.classList.add('cb-' + colorBlind);
       }
       const textSize = localStorage.getItem('sf-textsize');
-      if (textSize) {
-        document.documentElement.style.fontSize = textSize + '%';
+      if (textSize && textSize !== '100') {
+        document.body.style.zoom = parseInt(textSize) / 100;
       }
     })();
 
