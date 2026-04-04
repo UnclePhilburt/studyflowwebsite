@@ -1,0 +1,133 @@
+/* Toast notification system */
+
+#sf-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999998;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 380px;
+}
+
+.sf-toast {
+  pointer-events: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2d2d2d;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 380px;
+  word-break: break-word;
+}
+
+.sf-toast.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.sf-toast.removing {
+  transform: translateX(120%);
+  opacity: 0;
+}
+
+.sf-toast-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.sf-toast.success .sf-toast-icon {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.sf-toast.error .sf-toast-icon {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.sf-toast.warning .sf-toast-icon {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.sf-toast.info .sf-toast-icon {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.sf-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.sf-toast-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.sf-toast-msg {
+  font-size: 12.5px;
+  color: #666;
+}
+
+.sf-toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.sf-toast-close:hover {
+  color: #888;
+}
+
+/* Dark theme */
+body[data-theme="dark"] .sf-toast,
+body[data-theme="midnight"] .sf-toast,
+body[data-theme="ember"] .sf-toast,
+body[data-theme="neon"] .sf-toast {
+  background: #2a2a2a;
+  color: #eee;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+body[data-theme="dark"] .sf-toast-msg,
+body[data-theme="midnight"] .sf-toast-msg,
+body[data-theme="ember"] .sf-toast-msg,
+body[data-theme="neon"] .sf-toast-msg {
+  color: #aaa;
+}
+
+@media (max-width: 480px) {
+  #sf-toast-container {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+}
