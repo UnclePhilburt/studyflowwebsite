@@ -15,6 +15,7 @@
   const GLOBAL_SHORTCUTS = [
     { keys: [modKey, 'K'], label: 'Search', fn: () => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: isMac, ctrlKey: !isMac })); } },
     { keys: ['/'], label: 'Show keyboard shortcuts', fn: () => toggleShortcutsPanel() },
+    { keys: ['L'], label: 'Toggle reading guide', fn: () => { if (window.toggleReadingGuide) window.toggleReadingGuide(); } },
     { keys: ['Esc'], label: 'Close panel / modal', fn: null },
   ];
 

@@ -3589,6 +3589,7 @@
           if (data.cursor) localStorage.setItem('sf-cursor', data.cursor);
           if (data.colorblind) localStorage.setItem('sf-colorblind', data.colorblind);
           if (data.textsize) localStorage.setItem('sf-textsize', data.textsize);
+          if (data.reading_guide) localStorage.setItem('sf-reading-guide', data.reading_guide);
           // Flo assistant settings
           if (data.flo && typeof data.flo === 'object') {
             const f = data.flo;
@@ -3760,6 +3761,7 @@
       const currentCursor = localStorage.getItem('sf-cursor') || 'default';
       const currentColorBlind = localStorage.getItem('sf-colorblind') || 'none';
       const currentTextSize = localStorage.getItem('sf-textsize') || '100';
+      const currentReadingGuide = localStorage.getItem('sf-reading-guide') || 'off';
 
       function miniPreview(t) {
         const bg = t.colors[2], accent = t.colors[0], accent2 = t.colors[1], txt = t.text;
@@ -3939,6 +3941,13 @@
                 {id:'achromatopsia',label:'Grayscale'}
               ], currentColorBlind, 'setColorBlindMode')}
               <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Adjust colors for different types of color blindness</p>
+            </div>
+            <div>
+              ${secLabel('Reading Guide')}
+              ${optBtns([
+                {id:'off',label:'Off'},{id:'on',label:'On'}
+              ], currentReadingGuide, 'setReadingGuide')}
+              <p style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Shows a horizontal bar that follows your cursor to help track lines of text (L to toggle)</p>
             </div>
           </div>`;
       } else if (_settingsTab === 'fonts') {
@@ -7056,6 +7065,22 @@
       _rerender();
     }
 
+    function setReadingGuide(val) {
+      localStorage.setItem('sf-reading-guide', val);
+      saveAllCustomizations();
+      const guide = document.getElementById('sf-reading-guide');
+      if (guide) {
+        guide.style.display = val === 'on' ? 'block' : 'none';
+      }
+      // Sync with the reading-guide.js module
+      if (val === 'on' && window.toggleReadingGuide && localStorage.getItem('sf-reading-guide') !== 'on') {
+        window.toggleReadingGuide();
+      } else if (val === 'off' && window.toggleReadingGuide && localStorage.getItem('sf-reading-guide') === 'on') {
+        window.toggleReadingGuide();
+      }
+      _rerender();
+    }
+
     function setTextSize(size) {
       localStorage.setItem('sf-textsize', size);
       saveAllCustomizations();
@@ -7083,7 +7108,8 @@
           particles: localStorage.getItem('sf-particles') || 'full',
           cursor: localStorage.getItem('sf-cursor') || 'default',
           colorblind: localStorage.getItem('sf-colorblind') || 'none',
-          textsize: localStorage.getItem('sf-textsize') || '100'
+          textsize: localStorage.getItem('sf-textsize') || '100',
+          reading_guide: localStorage.getItem('sf-reading-guide') || 'off'
         });
       }, 500);
     }
@@ -8274,6 +8300,7 @@
 <script src="global-search.js"></script>
 <link rel="stylesheet" href="assets/cursor.css">
 <script src="assets/cursor.js"></script>
+<script src="assets/reading-guide.js"></script>
 <link rel="stylesheet" href="assets/shortcuts.css">
 <script src="assets/shortcuts.js"></script>
 <link rel="stylesheet" href="assets/assistant/assistant.css">
