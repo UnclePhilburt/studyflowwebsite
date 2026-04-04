@@ -1241,7 +1241,7 @@
     camera.lookAt(0, 0, 0);
 
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(size, size);
+    renderer.setSize(size, size, false); // false = don't update style, let CSS handle display size
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     container.insertBefore(renderer.domElement, container.firstChild);
