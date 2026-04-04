@@ -423,30 +423,10 @@ select:focus-visible {
   }
 }
 
-/* Hide on very small screens */
-@media (max-width: 480px) {
+/* Hide Flo assistant on mobile devices */
+@media (max-width: 768px) {
   #sf-assistant-wrap {
-    bottom: 12px;
-    left: 12px;
-  }
-
-  #sf-assistant-bubble {
-    max-width: 260px;
-    min-width: 200px;
-  }
-
-  #sf-assistant-character {
-    width: 56px;
-    height: 56px;
-  }
-
-  #sf-assistant-character canvas {
-    width: 56px !important;
-    height: 56px !important;
-  }
-
-  .sf-particle {
-    font-size: 12px;
+    display: none !important;
   }
 }
 
