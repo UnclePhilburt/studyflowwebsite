@@ -2,6 +2,15 @@
 (function() {
   'use strict';
 
+  // ========== SKIP LINK ==========
+  (function() {
+    const link = document.createElement('a');
+    link.href = '#main-content';
+    link.className = 'sf-skip-link';
+    link.textContent = 'Skip to main content';
+    document.body.insertBefore(link, document.body.firstChild);
+  })();
+
   // ========== CONFIG ==========
   const ASSISTANT_NAME = 'Flo';
   const BACKEND_URL = 'https://studyflowsuite.onrender.com';

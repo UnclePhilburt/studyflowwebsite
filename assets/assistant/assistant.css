@@ -69,6 +69,29 @@ body[data-theme="neon"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(200, 200, 200, 0.35);
 }
 
+/* Skip to content link */
+.sf-skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 999999;
+  background: #7c9885;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 0 0 10px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, sans-serif;
+  text-decoration: none;
+  transition: top 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.sf-skip-link:focus {
+  top: 0;
+  outline: none;
+}
+
 /* Focus indicators - visible outlines for keyboard navigation only */
 *:focus {
   outline: none;
