@@ -3284,6 +3284,37 @@
   <!-- Add widget button -->
   <button class="add-widget-btn" id="addWidgetBtn" title="Add widget">+</button>
 
+  <!-- Keyboard help hint -->
+  <div id="keyboardHint" style="
+    position:fixed;top:24px;left:80px;z-index:100;
+    display:flex;align-items:center;gap:8px;
+    padding:8px 14px;border-radius:10px;
+    background:var(--widget-bg);backdrop-filter:blur(20px);
+    box-shadow:0 2px 8px var(--shadow);
+    cursor:pointer;transition:all 0.3s ease;opacity:0.7;
+    font-family:'Inter',-apple-system,sans-serif;
+  " onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'?'}))" title="View all keyboard shortcuts">
+    <span style="
+      display:inline-flex;align-items:center;justify-content:center;
+      min-width:22px;height:22px;padding:0 6px;
+      background:var(--hover-bg);border:1px solid var(--border-color);
+      border-radius:5px;font-size:11px;font-weight:600;
+      color:var(--text-secondary);box-shadow:0 1px 0 var(--border-color);
+      font-family:'Inter',monospace;
+    " id="hintKey">?</span>
+    <span style="font-size:12px;color:var(--text-secondary);font-weight:500;">Shortcuts</span>
+    <button onclick="event.stopPropagation();document.getElementById('keyboardHint').style.display='none';localStorage.setItem('sf-hide-kb-hint','1');" style="
+      background:none;border:none;color:var(--text-muted);font-size:14px;
+      cursor:pointer;padding:0 0 0 4px;line-height:1;
+    ">&times;</button>
+  </div>
+  <script>
+    // Hide hint if user dismissed it before
+    if (localStorage.getItem('sf-hide-kb-hint') === '1') {
+      document.getElementById('keyboardHint').style.display = 'none';
+    }
+  </script>
+
   <!-- Upgrade Banner (free users only) -->
   <div class="upgrade-banner" id="upgradeBanner" style="display:none;">
     <div class="upgrade-banner-content">
