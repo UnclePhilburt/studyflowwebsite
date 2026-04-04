@@ -3285,26 +3285,16 @@
   <button class="add-widget-btn" id="addWidgetBtn" title="Add widget">+</button>
 
   <!-- Keyboard help hint -->
-  <div id="keyboardHint" style="
+  <button id="keyboardHint" style="
     position:fixed;top:24px;left:80px;z-index:100;
-    display:flex;align-items:center;gap:6px;
-    padding:8px 14px;border-radius:10px;
+    width:44px;height:44px;border-radius:12px;border:none;
     background:var(--widget-bg);backdrop-filter:blur(20px);
     box-shadow:0 2px 8px var(--shadow);
     cursor:pointer;transition:all 0.3s ease;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:600;color:var(--text-secondary);
     font-family:'Inter',-apple-system,sans-serif;
-  " onclick="if(window.toggleShortcutsPanel)window.toggleShortcutsPanel()" title="View all keyboard shortcuts">
-    <span style="font-size:12px;color:var(--text-secondary);font-weight:500;">Press</span>
-    <span style="
-      display:inline-flex;align-items:center;justify-content:center;
-      min-width:22px;height:22px;padding:0 6px;
-      background:var(--hover-bg);border:1px solid var(--border-color);
-      border-radius:5px;font-size:12px;font-weight:700;
-      color:var(--text-primary);box-shadow:0 1px 0 var(--border-color);
-      font-family:'Inter',monospace;
-    ">/</span>
-    <span style="font-size:12px;color:var(--text-secondary);font-weight:500;">for shortcuts</span>
-  </div>
+  " onclick="if(window.toggleShortcutsPanel)window.toggleShortcutsPanel()" title="Keyboard shortcuts ( / )">?</button>
 
   <!-- Upgrade Banner (free users only) -->
   <div class="upgrade-banner" id="upgradeBanner" style="display:none;">
