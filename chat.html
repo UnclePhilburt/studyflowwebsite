@@ -1407,21 +1407,26 @@
     /* ============ MINIMAP ============ */
     .minimap {
       position: fixed;
-      bottom: 88px;
-      left: 16px;
-      width: 160px;
-      height: 100px;
+      top: 80px;
+      right: 20px;
+      width: 180px;
+      height: 120px;
       background: var(--bg-tertiary);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       z-index: 200;
-      box-shadow: 0 2px 12px var(--shadow);
-      opacity: 0.8;
-      transition: opacity 0.2s;
+      box-shadow: 0 4px 16px var(--shadow);
+      opacity: 0.85;
+      transition: all 0.2s;
+      cursor: pointer;
     }
 
-    .minimap:hover { opacity: 1; }
+    .minimap:hover {
+      opacity: 1;
+      transform: scale(1.02);
+      box-shadow: 0 6px 20px var(--shadow);
+    }
 
     .minimap canvas {
       width: 100%;
@@ -1891,9 +1896,9 @@
     </button>
   </div>
 
-  <!-- Minimap -->
-  <div class="minimap" id="minimap">
-    <canvas id="minimapCanvas" width="320" height="200"></canvas>
+  <!-- Minimap - Top Right Overview -->
+  <div class="minimap" id="minimap" title="Canvas Overview - Click to navigate">
+    <canvas id="minimapCanvas" width="360" height="240"></canvas>
   </div>
 
   <!-- Top buttons -->
