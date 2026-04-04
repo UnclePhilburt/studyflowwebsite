@@ -2,38 +2,44 @@
   "name": "StudyFlow Suite",
   "short_name": "StudyFlow",
   "description": "AI-powered study platform with notes, flashcards, and collaborative tools",
-  "start_url": "/dashboard.html",
+  "start_url": "./dashboard.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f5f4f0",
   "theme_color": "#7c9885",
   "orientation": "any",
+  "id": "studyflow-suite",
   "icons": [
     {
       "src": "icon128.png",
       "sizes": "128x128",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icon192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icon512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["education", "productivity"],
-  "screenshots": [
-    {
-      "src": "assets/screenshot.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "StudyFlow Dashboard"
-    }
-  ]
+  "categories": ["education", "productivity"]
 }
