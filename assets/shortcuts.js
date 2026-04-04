@@ -21,7 +21,6 @@
         { keys: ['S'], label: 'Open settings panel', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } },
         { keys: ['W'], label: 'Add a widget', fn: () => { document.getElementById('widgetPicker')?.classList.add('active'); } },
         { keys: ['R'], label: 'Reset canvas view', fn: () => { if (window.resetCanvasView) window.resetCanvasView(); } },
-        { keys: ['F'], label: 'Fit all widgets', fn: () => { /* fit all logic */ } },
         { keys: ['+'], label: 'Zoom in', fn: () => { if (window.zoomCanvas) window.zoomCanvas(1.2); } },
         { keys: ['-'], label: 'Zoom out', fn: () => { if (window.zoomCanvas) window.zoomCanvas(0.8); } },
       ]
@@ -32,7 +31,7 @@
         { keys: ['U'], label: 'Upload notes', fn: () => { if (window.showUploadModal) window.showUploadModal(); } },
         { keys: ['N'], label: 'New note', fn: () => { if (window.createNewNote) window.createNewNote(); } },
         { keys: ['F'], label: 'New folder', fn: () => { if (window.showNewFolderModal) window.showNewFolderModal(); } },
-        { keys: ['G'], label: 'Toggle grid/free mode', fn: () => { if (window.toggleGridMode) window.toggleGridMode(); } },
+        { keys: ['G'], label: 'Toggle grid / free mode', fn: () => { if (window.toggleGridMode) window.toggleGridMode(); } },
         { keys: ['1'], label: 'Show favorites', fn: () => { if (window.toggleFavoritesFilter) window.toggleFavoritesFilter(); } },
         { keys: ['2'], label: 'Show shared', fn: () => { if (window.toggleSharedFilter) window.toggleSharedFilter(); } },
         { keys: ['Backspace'], label: 'Go to root folder', fn: () => { if (window.navigateToRoot) window.navigateToRoot(); } },
@@ -58,6 +57,7 @@
       title: 'Flashcards',
       shortcuts: [
         { keys: ['T'], label: 'Focus topic input', fn: () => { const i = document.getElementById('topicInput'); if (i) i.focus(); } },
+        { keys: ['R'], label: 'Race a friend', fn: () => { if (window.generateCode) window.generateCode(); } },
         { keys: ['Enter'], label: 'Start quiz / Submit answer', fn: null },
       ]
     },
@@ -77,6 +77,34 @@
     },
     'study-groups': {
       title: 'Study Groups',
+      shortcuts: [
+        { keys: ['N'], label: 'Create new group', fn: () => { if (window.createGroup) window.createGroup(); } },
+        { keys: ['I'], label: 'Invite user', fn: () => { if (window.inviteUser) window.inviteUser(); } },
+        { keys: ['Escape'], label: 'Close group', fn: () => { if (window.closeGroup) window.closeGroup(); } },
+      ]
+    },
+    'account': {
+      title: 'Account',
+      shortcuts: [
+        { keys: ['E'], label: 'Verify .edu email', fn: () => { if (window.showEduEmailModal) window.showEduEmailModal(); } },
+      ]
+    },
+    'note-viewer': {
+      title: 'Note Viewer',
+      shortcuts: [
+        { keys: ['D'], label: 'Download note', fn: () => { if (window.downloadNote) window.downloadNote(); } },
+        { keys: ['A'], label: 'Annotate note', fn: () => { if (window.openAnnotationEditor) window.openAnnotationEditor(); } },
+      ]
+    },
+    'office': {
+      title: 'Office',
+      shortcuts: [
+        { keys: [modKey, 'S'], label: 'Save document', fn: null },
+        { keys: ['N'], label: 'New document', fn: () => { if (window.createDocument) window.createDocument('docx'); } },
+      ]
+    },
+    'index': {
+      title: 'Home',
       shortcuts: []
     }
   };
