@@ -333,6 +333,58 @@
     }
 
     /* Settings Card */
+    /* Account Tabs */
+    .account-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid rgba(124,152,133,0.1);
+    }
+
+    .account-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .account-tab:hover {
+      color: #2d2d2d;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .account-tab.active {
+      background: white;
+      color: #7c9885;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .account-tab-panel {
+      display: none;
+    }
+
+    .account-tab-panel.active {
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .account-tab {
+        padding: 8px 8px;
+        font-size: 12px;
+      }
+    }
+
     /* Achievements Card */
     .achievements-card {
       background: rgba(255, 255, 255, 0.9);
@@ -1184,6 +1236,16 @@
       <p class="header-subtitle">Manage your profile and preferences</p>
     </div>
 
+    <!-- Tabs -->
+    <div class="account-tabs">
+      <button class="account-tab active" onclick="switchAccountTab('profile')">Profile</button>
+      <button class="account-tab" onclick="switchAccountTab('achievements')">Achievements</button>
+      <button class="account-tab" onclick="switchAccountTab('activity')">Activity</button>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="account-tab-panel active" id="tab-profile">
+
     <!-- Profile Card -->
     <div class="profile-card">
       <div class="profile-header">
@@ -1272,6 +1334,49 @@
       </div>
     </div>
 
+    <!-- Settings Card -->
+    <div class="settings-card">
+      <h3 class="settings-title">Settings</h3>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">University Email (.edu)</div>
+          <div class="setting-description">Verify your .edu email to access the Nexus note library.</div>
+          <div class="edu-email-status" id="eduEmailStatus"><span id="eduEmailDisplay">Not verified</span></div>
+        </div>
+        <button class="verify-edu-btn" id="verifyEduBtn" onclick="showEduEmailModal()">Add .edu Email</button>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">University</div>
+          <div class="setting-description">Setting your university helps prioritize notes from your school in chat results.</div>
+          <div class="edu-email-status"><span id="universityDisplay">Not set</span></div>
+          <div style="margin-top:8px;position:relative;">
+            <input type="text" id="universityInput" placeholder="Search your university..." autocomplete="off" style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;background:rgba(255,255,255,0.7);">
+            <div id="universityAcctDropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid rgba(124,152,133,0.15);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);margin-top:4px;max-height:180px;overflow-y:auto;display:none;z-index:10;"></div>
+          </div>
+          <button id="saveUniversityBtn" style="margin-top:8px;padding:7px 16px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:none;">Save</button>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-label">Nexus</div>
+          <div class="setting-description">Share your notes to access everyone's notes. Turn off to keep notes private.</div>
+          <div class="sync-status" id="syncStatus"><span>Synced with account</span></div>
+        </div>
+        <div class="toggle-switch active" id="nexusToggle"><div class="toggle-slider"></div></div>
+      </div>
+
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+
+    </div><!-- end tab-profile -->
+
+    <!-- Achievements Tab -->
+    <div class="account-tab-panel" id="tab-achievements">
+
     <!-- Achievements Card -->
     <div class="achievements-card">
       <div class="achievements-header">
@@ -1282,6 +1387,11 @@
         <div style="text-align:center;padding:20px;color:#999;">Loading achievements...</div>
       </div>
     </div>
+
+    </div><!-- end tab-achievements -->
+
+    <!-- Activity Tab -->
+    <div class="account-tab-panel" id="tab-activity">
 
     <!-- Study Streak Card -->
     <div class="achievements-card" style="animation-delay:0.3s;">
@@ -1317,59 +1427,7 @@
       </div>
     </div>
 
-    <!-- Settings Card -->
-    <div class="settings-card">
-      <h3 class="settings-title">Settings</h3>
-
-      <!-- University Email Verification -->
-      <div class="setting-item">
-        <div class="setting-info">
-          <div class="setting-label">University Email (.edu)</div>
-          <div class="setting-description">
-            Verify your .edu email to access the Nexus note library. Your login email stays the same.
-          </div>
-          <div class="edu-email-status" id="eduEmailStatus">
-            <span id="eduEmailDisplay">Not verified</span>
-          </div>
-        </div>
-        <button class="verify-edu-btn" id="verifyEduBtn" onclick="showEduEmailModal()">Add .edu Email</button>
-      </div>
-
-      <div class="setting-item">
-        <div class="setting-info">
-          <div class="setting-label">University</div>
-          <div class="setting-description">
-            Setting your university helps prioritize notes from your school in chat results, giving you more relevant answers tailored to your coursework, professors, and exam material.
-          </div>
-          <div class="edu-email-status">
-            <span id="universityDisplay">Not set</span>
-          </div>
-          <div style="margin-top:8px;position:relative;">
-            <input type="text" id="universityInput" placeholder="Search your university..." autocomplete="off" style="width:100%;padding:9px 14px;border:1.5px solid rgba(124,152,133,0.2);border-radius:10px;font-size:13px;font-family:inherit;outline:none;color:#2d2d2d;background:rgba(255,255,255,0.7);">
-            <div id="universityAcctDropdown" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid rgba(124,152,133,0.15);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);margin-top:4px;max-height:180px;overflow-y:auto;display:none;z-index:10;"></div>
-          </div>
-          <button id="saveUniversityBtn" style="margin-top:8px;padding:7px 16px;background:linear-gradient(135deg,#7c9885,#6a8573);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:none;">Save</button>
-        </div>
-      </div>
-
-      <div class="setting-item">
-        <div class="setting-info">
-          <div class="setting-label">Nexus</div>
-          <div class="setting-description">
-            Share your notes to access everyone's notes. Turn off to keep notes private (you won't see others' notes).
-          </div>
-          <div class="sync-status" id="syncStatus">
-            <span>✓</span>
-            <span>Synced with account</span>
-          </div>
-        </div>
-        <div class="toggle-switch active" id="nexusToggle">
-          <div class="toggle-slider"></div>
-        </div>
-      </div>
-
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
-    </div>
+    </div><!-- end tab-activity -->
 
     <!-- .edu Email Modal -->
     <div class="modal-overlay" id="eduEmailModal">
@@ -1952,13 +2010,28 @@
       }
     }
 
+    // Tab switching
+    function switchAccountTab(tabId) {
+      document.querySelectorAll('.account-tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tabId)?.classList.add('active');
+      event.target.classList.add('active');
+      // Load data on first switch
+      if (tabId === 'achievements' && !window._achievementsLoaded) {
+        loadAchievements();
+        window._achievementsLoaded = true;
+      }
+      if (tabId === 'activity' && !window._streakLoaded) {
+        loadStudyStreak();
+        window._streakLoaded = true;
+      }
+    }
+
     // Initialize (load subscription after profile sets authToken)
     (async () => {
       await loadProfile();
       await loadSubscriptionStatus();
       await loadDailyDownloadStatus();
-      loadAchievements();
-      loadStudyStreak();
     })();
 
     async function loadStudyStreak() {
