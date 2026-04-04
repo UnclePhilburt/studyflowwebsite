@@ -73,7 +73,7 @@
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
 
-      const res = await fetch(BACKEND_URL + '/api/stats', {
+      const res = await fetch(BACKEND_URL + '/health', {
         method: 'GET',
         signal: controller.signal,
         cache: 'no-store'
