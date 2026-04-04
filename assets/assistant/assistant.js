@@ -1730,6 +1730,153 @@
     }, 1500);
   }
 
+  // ========== ONBOARDING ==========
+  const ONBOARDING_DISMISSED_KEY = 'sf-onboarding-dismissed';
+
+  async function checkOnboarding() {
+    // Don't show if not on dashboard or not logged in
+    if (currentPage !== 'dashboard') return;
+    const token = getAuthToken();
+    if (!token) return;
+
+    // Don't show if user explicitly dismissed it after completing
+    if (localStorage.getItem(ONBOARDING_DISMISSED_KEY) === 'done') return;
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/achievements`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const gettingStarted = (data.achievements || []).filter(a => a.category === 'Getting Started');
+      const allDone = gettingStarted.every(a => a.unlocked);
+
+      if (allDone) {
+        // All done, never show again
+        localStorage.setItem(ONBOARDING_DISMISSED_KEY, 'done');
+        return;
+      }
+
+      const completed = gettingStarted.filter(a => a.unlocked).length;
+      const total = gettingStarted.length;
+
+      // Show the prompt after a short delay
+      setTimeout(() => {
+        if (bubbleVisible) return; // don't interrupt if already showing something
+        setExpression('happy', 3);
+        showBubble(`Getting started! You've completed ${completed}/${total} steps.`, [
+          { label: 'Show checklist', fn: () => { showOnboardingModal(gettingStarted); }, keepOpen: true },
+          { label: 'Maybe later', fn: () => { dismissBubble(); } }
+        ]);
+      }, 3000);
+
+    } catch (e) {
+      console.error('Onboarding check error:', e);
+    }
+  }
+
+  function showOnboardingModal(achievements) {
+    dismissBubble();
+
+    // Build modal
+    let existing = document.getElementById('sf-onboarding-modal');
+    if (existing) existing.remove();
+
+    const isDark = ['dark','midnight','ember','neon'].includes(
+      document.body.getAttribute('data-theme') || ''
+    );
+    const bg = isDark ? '#2a2a2a' : 'white';
+    const text = isDark ? '#eee' : '#2d2d2d';
+    const muted = isDark ? '#999' : '#888';
+    const border = isDark ? '#444' : '#eee';
+
+    const completed = achievements.filter(a => a.unlocked).length;
+    const total = achievements.length;
+    const pct = Math.round((completed / total) * 100);
+
+    const ONBOARDING_ACTIONS = {
+      'first_steps': null,
+      'scholar': () => { window.location.href = 'account.html'; },
+      'librarian': () => { window.location.href = 'notes.html'; },
+      'social_butterfly': () => { window.location.href = 'study-groups.html'; },
+      'conversationalist': () => { window.location.href = 'chat.html'; },
+    };
+
+    const ICONS = {
+      'first_steps': '&#x1F680;',
+      'scholar': '&#x1F393;',
+      'librarian': '&#x1F4D6;',
+      'social_butterfly': '&#x1F465;',
+      'conversationalist': '&#x1F4AC;',
+    };
+
+    let itemsHtml = achievements.map(a => {
+      const done = a.unlocked;
+      const icon = ICONS[a.id] || '&#x2B50;';
+      const action = ONBOARDING_ACTIONS[a.id];
+      const clickable = !done && action;
+
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid ${border};${clickable ? 'cursor:pointer;' : ''}"
+          ${clickable ? `onclick="this.querySelector('a')?.click ? window.location.href=this.dataset.href : null" data-href="${
+            a.id === 'scholar' ? 'account.html' : a.id === 'librarian' ? 'notes.html' : a.id === 'social_butterfly' ? 'study-groups.html' : a.id === 'conversationalist' ? 'chat.html' : ''
+          }"` : ''}>
+          <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+            background:${done ? '#d4edda' : isDark ? '#333' : '#f5f5f5'};font-size:${done ? '14px' : '16px'};flex-shrink:0;">
+            ${done ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : icon}
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:${done ? '500' : '600'};color:${done ? muted : text};${done ? 'text-decoration:line-through;' : ''}">${a.name}</div>
+            <div style="font-size:11px;color:${muted};">${a.desc}</div>
+          </div>
+          ${clickable ? `<div style="font-size:11px;color:#7c9885;font-weight:600;">Go &rarr;</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    const overlay = document.createElement('div');
+    overlay.id = 'sf-onboarding-modal';
+    overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Inter',-apple-system,sans-serif;`;
+    overlay.innerHTML = `
+      <div style="background:${bg};border-radius:16px;padding:28px;max-width:420px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,0.15);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:18px;font-weight:700;color:${text};">Getting Started</div>
+          <button onclick="document.getElementById('sf-onboarding-modal').remove()" style="background:none;border:none;color:${muted};font-size:20px;cursor:pointer;">&times;</button>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:12px;color:${muted};">${completed}/${total} complete</span>
+            <span style="font-size:12px;font-weight:600;color:#7c9885;">${pct}%</span>
+          </div>
+          <div style="height:6px;background:${isDark ? '#333' : '#eee'};border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:#7c9885;border-radius:3px;transition:width 0.5s;"></div>
+          </div>
+        </div>
+        ${itemsHtml}
+        <div style="margin-top:16px;text-align:center;">
+          <button onclick="document.getElementById('sf-onboarding-modal').remove()" style="padding:10px 24px;border-radius:10px;border:none;background:#7c9885;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Got it</button>
+        </div>
+      </div>
+    `;
+
+    // Click overlay to close
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+
+    // Make "Go" items clickable
+    overlay.querySelectorAll('[data-href]').forEach(el => {
+      if (el.dataset.href) {
+        el.addEventListener('click', () => {
+          window.location.href = el.dataset.href;
+        });
+      }
+    });
+
+    document.body.appendChild(overlay);
+  }
+
   // ========== EVENT REACTIONS ==========
   function setupEventListeners() {
     // Reset idle on any interaction
@@ -2063,6 +2210,7 @@
         initCharacter();
         setupEventListeners();
         triggerWelcome();
+        checkOnboarding();
         resetIdleTimer();
       };
       document.head.appendChild(script);
