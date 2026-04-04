@@ -110,6 +110,9 @@
       state.currentRound++;
       playChime();
 
+      // Save to backend
+      savePomodoroToBackend(state.workMin);
+
       // Dispatch event for Flo
       window.dispatchEvent(new CustomEvent('sf:pomodoro-complete', {
         detail: { round: state.currentRound, total: state.totalRounds }
@@ -238,6 +241,17 @@
         </div>
       </div>
     `;
+  }
+
+  // ========== BACKEND SYNC ==========
+  function savePomodoroToBackend(workMinutes) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    fetch('https://studyflowsuite.onrender.com/api/pomodoro/complete', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ work_minutes: workMinutes })
+    }).catch(() => {});
   }
 
   // ========== PUBLIC API ==========
