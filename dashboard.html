@@ -7349,7 +7349,12 @@
       const dockHide = localStorage.getItem('sf-dock-hide');
       if (dockHide === 'on') setTimeout(() => setDockAutoHide('on'), 300);
       const animSpeed = localStorage.getItem('sf-anim');
-      if (animSpeed) setAnimSpeed(animSpeed);
+      if (animSpeed) {
+        setAnimSpeed(animSpeed);
+      } else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setAnimSpeed('reduced');
+        localStorage.setItem('sf-anim', 'reduced');
+      }
       const particles = localStorage.getItem('sf-particles') || 'full';
       if (particles !== 'off') setTimeout(() => initParticles(particles), 500);
       const cursor = localStorage.getItem('sf-cursor');
