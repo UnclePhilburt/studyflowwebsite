@@ -423,17 +423,206 @@
     showBubble(data.summary, actions);
   }
 
-  function summarizeCurrentNote() {
-    // Try to get the note title from the page
-    const titleEl = document.getElementById('note-title') || document.getElementById('previewTitle');
-    const title = titleEl ? titleEl.textContent : 'this note';
-    askAssistant(`Summarize the key points of the note titled "${title}"`, 'summarize');
+  function getNoteId() {
+    // From note-viewer URL param
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('id')) return params.get('id');
+    // From notes page preview
+    if (window.previewedNote && window.previewedNote.id) return window.previewedNote.id;
+    return null;
   }
 
-  function quizCurrentNote() {
-    const titleEl = document.getElementById('note-title') || document.getElementById('previewTitle');
-    const title = titleEl ? titleEl.textContent : 'this note';
-    askAssistant(`Create a short quiz about the note titled "${title}"`, 'quiz');
+  async function summarizeCurrentNote() {
+    const noteId = getNoteId();
+    if (!noteId) {
+      askAssistant('Summarize the key points of this study material', 'summarize');
+      return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+      showBubble("Sign in to summarize notes!", [
+        { label: 'Sign in', fn: () => { window.location.href = 'signup.html'; } }
+      ]);
+      return;
+    }
+
+    setExpression('thinking', 10);
+    showBubbleLoading("Reading and summarizing...");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/assistant/summarize/${noteId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to summarize');
+      }
+
+      const data = await res.json();
+      setExpression('happy', 2);
+
+      showBubbleAI(data.summary, [
+        { label: 'Quiz me on this', fn: () => quizCurrentNote() },
+        { label: 'Thanks!', fn: () => { setExpression('happy'); dismissBubble(); } }
+      ]);
+
+    } catch (e) {
+      console.error('Summarize error:', e);
+      setExpression('surprised', 2);
+      showBubble("Couldn't summarize this note. " + (e.message || 'Try again.'), [
+        { label: 'Try again', fn: () => summarizeCurrentNote() },
+        { label: 'Dismiss', fn: () => dismissBubble() }
+      ]);
+    }
+  }
+
+  async function quizCurrentNote() {
+    const noteId = getNoteId();
+    if (!noteId) {
+      askAssistant('Create a short quiz about this study material', 'quiz');
+      return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+      showBubble("Sign in to get quizzed!", [
+        { label: 'Sign in', fn: () => { window.location.href = 'signup.html'; } }
+      ]);
+      return;
+    }
+
+    setExpression('thinking', 10);
+    showBubbleLoading("Generating quiz questions...");
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/assistant/quiz/${noteId}?count=3`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to generate quiz');
+      }
+
+      const data = await res.json();
+      setExpression('happy', 2);
+
+      // Display quiz in the bubble
+      showQuizInBubble(data.questions, data.note_title);
+
+    } catch (e) {
+      console.error('Quiz error:', e);
+      setExpression('surprised', 2);
+      showBubble("Couldn't generate a quiz. " + (e.message || 'Try again.'), [
+        { label: 'Try again', fn: () => quizCurrentNote() },
+        { label: 'Dismiss', fn: () => dismissBubble() }
+      ]);
+    }
+  }
+
+  let quizState = { questions: [], current: 0, score: 0 };
+
+  function showQuizInBubble(questions, title) {
+    if (!questions || questions.length === 0) {
+      showBubble("Couldn't generate questions from this note.", [
+        { label: 'OK', fn: () => dismissBubble() }
+      ]);
+      return;
+    }
+
+    quizState = { questions, current: 0, score: 0 };
+    showQuizQuestion();
+  }
+
+  function showQuizQuestion() {
+    const q = quizState.questions[quizState.current];
+    if (!q) return;
+
+    const num = quizState.current + 1;
+    const total = quizState.questions.length;
+
+    const bubble = document.getElementById('sf-assistant-bubble');
+    const msgEl = document.getElementById('sf-assistant-msg');
+    const btnsEl = document.getElementById('sf-assistant-buttons');
+
+    msgEl.innerHTML = `
+      <div style="font-size:10px;color:#999;margin-bottom:4px;">Question ${num}/${total}</div>
+      <div style="font-size:13px;font-weight:600;line-height:1.5;">${q.question}</div>
+    `;
+
+    btnsEl.innerHTML = '';
+    (q.options || []).forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'sf-assistant-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => onQuizAnswer(i, btn, btnsEl));
+      btnsEl.appendChild(btn);
+    });
+
+    bubble.classList.add('visible');
+    bubbleVisible = true;
+  }
+
+  function onQuizAnswer(selectedIndex, btn, btnsEl) {
+    const q = quizState.questions[quizState.current];
+    const correct = q.correct;
+    const isCorrect = selectedIndex === correct;
+
+    if (isCorrect) {
+      quizState.score++;
+      btn.style.background = '#d4edda';
+      btn.style.borderColor = '#28a745';
+      btn.style.color = '#155724';
+      setExpression('happy', 1.5);
+    } else {
+      btn.style.background = '#fce4ec';
+      btn.style.borderColor = '#e74c3c';
+      btn.style.color = '#c62828';
+      // Highlight correct answer
+      const correctBtn = btnsEl.children[correct];
+      if (correctBtn) {
+        correctBtn.style.background = '#d4edda';
+        correctBtn.style.borderColor = '#28a745';
+        correctBtn.style.color = '#155724';
+      }
+      setExpression('thinking', 1.5);
+    }
+
+    // Disable all buttons
+    Array.from(btnsEl.children).forEach(b => { b.disabled = true; b.style.cursor = 'default'; });
+
+    // Show explanation if available
+    if (q.explanation) {
+      const msgEl = document.getElementById('sf-assistant-msg');
+      msgEl.innerHTML += `<div style="margin-top:8px;font-size:11px;color:#888;line-height:1.4;">${q.explanation}</div>`;
+    }
+
+    // Next question after delay
+    setTimeout(() => {
+      quizState.current++;
+      if (quizState.current < quizState.questions.length) {
+        showQuizQuestion();
+      } else {
+        showQuizResults();
+      }
+    }, 1500);
+  }
+
+  function showQuizResults() {
+    const pct = Math.round((quizState.score / quizState.questions.length) * 100);
+    const msg = pct >= 80 ? `${quizState.score}/${quizState.questions.length} correct (${pct}%)! Great job!`
+              : pct >= 50 ? `${quizState.score}/${quizState.questions.length} correct (${pct}%). Nice effort!`
+              : `${quizState.score}/${quizState.questions.length} correct (${pct}%). Keep studying!`;
+
+    setExpression(pct >= 80 ? 'happy' : 'thinking', 3);
+
+    showBubble(msg, [
+      { label: 'Quiz me again', fn: () => quizCurrentNote() },
+      { label: 'Summarize instead', fn: () => summarizeCurrentNote() },
+      { label: 'Done', fn: () => { setExpression('happy'); dismissBubble(); } }
+    ]);
   }
 
   // ========== PARTICLE SYSTEM ==========
