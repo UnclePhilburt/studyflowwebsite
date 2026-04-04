@@ -314,6 +314,17 @@
         return;
       }
     }
+
+    // Check global single-key shortcuts (L for reading guide, etc.)
+    for (const shortcut of GLOBAL_SHORTCUTS) {
+      if (!shortcut.fn || shortcut.keys.length !== 1) continue;
+      const key = shortcut.keys[0];
+      if (e.key === key || e.key.toUpperCase() === key.toUpperCase()) {
+        e.preventDefault();
+        shortcut.fn();
+        return;
+      }
+    }
   }
 
   // ========== INIT ==========

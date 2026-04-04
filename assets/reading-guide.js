@@ -13,14 +13,14 @@
       position: fixed;
       left: 0;
       right: 0;
+      top: -50px;
       height: 36px;
-      background: rgba(124, 152, 133, 0.1);
-      border-top: 1.5px solid rgba(124, 152, 133, 0.25);
-      border-bottom: 1.5px solid rgba(124, 152, 133, 0.25);
+      background: rgba(124, 152, 133, 0.15);
+      border-top: 2px solid rgba(124, 152, 133, 0.4);
+      border-bottom: 2px solid rgba(124, 152, 133, 0.4);
       pointer-events: none;
       z-index: 99980;
       display: none;
-      transition: top 0.05s linear;
     `;
     document.body.appendChild(guide);
   }
@@ -39,7 +39,6 @@
   }
 
   function init() {
-    // Skip on pages that don't need it
     const path = window.location.pathname.toLowerCase();
     const page = path.split('/').pop().replace('.html', '') || 'index';
     if (page.startsWith('admin') || page === 'signup' || page === 'reset-password') return;
@@ -52,7 +51,7 @@
       guide.style.display = 'block';
     }
 
-    document.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('mousemove', onMouseMove);
 
     // Expose toggle globally
     window.toggleReadingGuide = toggle;
