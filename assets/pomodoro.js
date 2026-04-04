@@ -147,6 +147,10 @@
     state = null;
     saveState();
     if (overlay) overlay.style.display = 'none';
+    // Stop ambient sounds if playing
+    if (window.ambientSounds && window.ambientSounds.isPlaying()) {
+      window.ambientSounds.stop();
+    }
   }
 
   // ========== OVERLAY ==========

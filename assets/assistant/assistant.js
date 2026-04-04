@@ -54,6 +54,7 @@
       actions: [
         { label: "What's my day look like?", fn: () => { loadDigest(); }, primary: true },
         { label: 'Start focus session', fn: () => { showPomodoroSetup(); }, keepOpen: true },
+        { label: 'Ambient sounds', fn: () => { showAmbientPicker(); }, keepOpen: true },
         { label: 'Add a widget', fn: () => { openWidgetPicker(); } },
         { label: 'Change theme', fn: () => { if (window.toggleSettingsPanel) window.toggleSettingsPanel(); } }
       ],
@@ -472,6 +473,17 @@
           </select>
         </div>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:12px;color:#888;">Background sound</span>
+        <select id="flo-pomo-sound" style="padding:4px 8px;border-radius:6px;border:1px solid #ddd;font-size:12px;font-family:inherit;">
+          <option value="none">None</option>
+          <option value="rain">Rain</option>
+          <option value="ocean">Ocean</option>
+          <option value="brown">Brown Noise</option>
+          <option value="white">White Noise</option>
+          <option value="fire">Fireplace</option>
+        </select>
+      </div>
     `;
 
     btnsEl.innerHTML = '';
@@ -482,8 +494,12 @@
       const work = parseInt(document.getElementById('flo-pomo-work').value);
       const brk = parseInt(document.getElementById('flo-pomo-break').value);
       const rounds = parseInt(document.getElementById('flo-pomo-rounds').value);
+      const sound = document.getElementById('flo-pomo-sound').value;
       if (window.startPomodoro) {
         window.startPomodoro({ work, break: brk, longBreak: brk * 3, rounds });
+      }
+      if (sound !== 'none' && window.ambientSounds) {
+        window.ambientSounds.play(sound);
       }
       dismissBubble();
       setExpression('happy', 2);
@@ -495,6 +511,53 @@
     cancelBtn.textContent = 'Maybe later';
     cancelBtn.addEventListener('click', () => dismissBubble());
     btnsEl.appendChild(cancelBtn);
+
+    bubble.classList.add('visible');
+    bubbleVisible = true;
+  }
+
+  // ========== AMBIENT SOUNDS PICKER ==========
+  function showAmbientPicker() {
+    const bubble = document.getElementById('sf-assistant-bubble');
+    const msgEl = document.getElementById('sf-assistant-msg');
+    const btnsEl = document.getElementById('sf-assistant-buttons');
+
+    const currentId = window.ambientSounds?.getCurrent();
+    const sounds = window.ambientSounds?.list() || [];
+
+    setExpression('happy', 3);
+
+    msgEl.innerHTML = `<div style="font-size:13px;font-weight:600;margin-bottom:4px;">Ambient Sounds</div>
+      <div style="font-size:11px;color:#888;">Pick a background sound to help you focus.</div>`;
+
+    btnsEl.innerHTML = '';
+
+    // Sound buttons
+    sounds.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'sf-assistant-btn' + (currentId === s.id ? ' primary' : '');
+      btn.textContent = (currentId === s.id ? 'Stop ' : '') + s.name;
+      btn.addEventListener('click', () => {
+        if (window.ambientSounds) window.ambientSounds.toggle(s.id);
+        showAmbientPicker(); // refresh to update active state
+      });
+      btnsEl.appendChild(btn);
+    });
+
+    // Volume slider
+    const vol = window.ambientSounds?.getVolume() || 0.3;
+    const volDiv = document.createElement('div');
+    volDiv.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(128,128,128,0.15);';
+    volDiv.innerHTML = `<span style="font-size:10px;color:#999;">Vol</span>
+      <input type="range" min="0" max="100" value="${Math.round(vol * 100)}" style="flex:1;accent-color:#7c9885;" oninput="if(window.ambientSounds)window.ambientSounds.setVolume(this.value/100)">`;
+    btnsEl.appendChild(volDiv);
+
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'sf-assistant-btn';
+    closeBtn.textContent = 'Close';
+    closeBtn.addEventListener('click', () => dismissBubble());
+    btnsEl.appendChild(closeBtn);
 
     bubble.classList.add('visible');
     bubbleVisible = true;
