@@ -9,7 +9,7 @@
   // Global shortcuts available on every page
   const GLOBAL_SHORTCUTS = [
     { keys: [modKey, 'K'], label: 'Search', fn: () => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: isMac, ctrlKey: !isMac })); } },
-    { keys: ['?'], label: 'Show keyboard shortcuts', fn: () => toggleShortcutsPanel() },
+    { keys: ['/'], label: 'Show keyboard shortcuts', fn: () => toggleShortcutsPanel() },
     { keys: ['Esc'], label: 'Close panel / modal', fn: null }, // handled natively
   ];
 
@@ -49,7 +49,7 @@
     'browse': {
       title: 'Browse',
       shortcuts: [
-        { keys: ['/'], label: 'Focus search', fn: () => { const s = document.querySelector('input[type="search"], input[type="text"]'); if (s) s.focus(); } },
+        { keys: ['S'], label: 'Focus search', fn: () => { const s = document.querySelector('input[type="search"], input[type="text"]'); if (s) s.focus(); } },
         { keys: ['A'], label: 'Advanced filters', fn: () => { if (window.toggleAdvFilters) window.toggleAdvFilters(); } },
         { keys: ['X'], label: 'Clear filters', fn: () => { if (window.clearAdvFilters) window.clearAdvFilters(); } },
       ]
@@ -57,7 +57,7 @@
     'flashcards': {
       title: 'Flashcards',
       shortcuts: [
-        { keys: ['/'], label: 'Focus topic input', fn: () => { const i = document.getElementById('topicInput'); if (i) i.focus(); } },
+        { keys: ['T'], label: 'Focus topic input', fn: () => { const i = document.getElementById('topicInput'); if (i) i.focus(); } },
         { keys: ['Enter'], label: 'Start quiz / Submit answer', fn: null },
       ]
     },
@@ -178,6 +178,9 @@
     }
   }
 
+  // Expose globally so buttons can call it
+  window.toggleShortcutsPanel = toggleShortcutsPanel;
+
   function closeShortcutsPanel() {
     const overlay = document.getElementById('shortcutsOverlay');
     if (overlay) overlay.classList.remove('visible');
@@ -189,8 +192,8 @@
     const tag = e.target.tagName;
     const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable;
 
-    // ? always works (unless in input)
-    if (e.key === '?' && !isInput) {
+    // ? or / opens shortcuts (unless in input)
+    if ((e.key === '?' || e.key === '/') && !isInput) {
       e.preventDefault();
       toggleShortcutsPanel();
       return;
