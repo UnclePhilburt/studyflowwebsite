@@ -5,12 +5,30 @@
   const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
   const modKey = isMac ? 'Cmd' : 'Ctrl';
 
+  // Chord state: tracks first key of a two-key combo (e.g. G then D)
+  let chordKey = null;
+  let chordTimer = null;
+  const CHORD_TIMEOUT = 800; // ms to press second key
+
   // ========== SHORTCUT DEFINITIONS ==========
   // Global shortcuts available on every page
   const GLOBAL_SHORTCUTS = [
     { keys: [modKey, 'K'], label: 'Search', fn: () => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: isMac, ctrlKey: !isMac })); } },
     { keys: ['/'], label: 'Show keyboard shortcuts', fn: () => toggleShortcutsPanel() },
-    { keys: ['Esc'], label: 'Close panel / modal', fn: null }, // handled natively
+    { keys: ['Esc'], label: 'Close panel / modal', fn: null },
+  ];
+
+  const NAV_SHORTCUTS = [
+    { keys: ['G', 'D'], label: 'Go to Dashboard', fn: () => { window.location.href = 'dashboard.html'; } },
+    { keys: ['G', 'N'], label: 'Go to Notes', fn: () => { window.location.href = 'notes.html'; } },
+    { keys: ['G', 'C'], label: 'Go to Chat', fn: () => { window.location.href = 'chat.html'; } },
+    { keys: ['G', 'B'], label: 'Go to Browse', fn: () => { window.location.href = 'browse.html'; } },
+    { keys: ['G', 'F'], label: 'Go to Flashcards', fn: () => { window.location.href = 'flashcards.html'; } },
+    { keys: ['G', 'L'], label: 'Go to Leaderboard', fn: () => { window.location.href = 'leaderboard.html'; } },
+    { keys: ['G', 'K'], label: 'Go to Calendar', fn: () => { window.location.href = 'calendar.html'; } },
+    { keys: ['G', 'S'], label: 'Go to Study Groups', fn: () => { window.location.href = 'study-groups.html'; } },
+    { keys: ['G', 'A'], label: 'Go to Account', fn: () => { window.location.href = 'account.html'; } },
+    { keys: ['G', 'O'], label: 'Go to Office', fn: () => { window.location.href = 'office.html'; } },
   ];
 
   // Page-specific shortcuts
@@ -136,6 +154,9 @@
       sectionsHtml += buildSection(pageConfig.title, pageConfig.shortcuts);
     }
 
+    // Navigation shortcuts
+    sectionsHtml += buildSection('Navigation (G then ...)', NAV_SHORTCUTS);
+
     // Global shortcuts
     sectionsHtml += buildSection('Global', GLOBAL_SHORTCUTS);
 
@@ -160,10 +181,15 @@
   function buildSection(title, shortcuts) {
     if (!shortcuts || shortcuts.length === 0) return '';
     const rows = shortcuts.map(s => {
+      // Use "then" for chord shortcuts (like G then D), "+" for modifier combos (like Cmd+K)
+      const isChord = s.keys.length === 2 && s.keys[0].length === 1 && s.keys[1].length === 1;
+      const separator = isChord
+        ? '<span class="shortcut-plus" style="font-size:10px;color:#aaa;">then</span>'
+        : '<span class="shortcut-plus">+</span>';
       const keysHtml = s.keys.map(k => {
         const display = formatKey(k);
         return `<span class="shortcut-key">${display}</span>`;
-      }).join('<span class="shortcut-plus">+</span>');
+      }).join(separator);
 
       return `<div class="shortcut-row">
         <span class="shortcut-label">${s.label}</span>
@@ -238,29 +264,53 @@
       }
     }
 
-    // Don't fire other shortcuts when in input, or when modifier keys are held (except our Cmd+K which is handled by global-search.js)
+    // Don't fire other shortcuts when in input, or when modifier keys are held
     if (isInput || e.ctrlKey || e.metaKey || e.altKey) return;
 
-    // Panel must be closed for page shortcuts to work
+    // Panel must be closed for shortcuts to work
     const overlay = document.getElementById('shortcutsOverlay');
     if (overlay && overlay.classList.contains('visible')) return;
 
-    // Find matching page shortcut
-    const page = detectPage();
-    const pageConfig = PAGE_SHORTCUTS[page];
-    if (!pageConfig) return;
+    const pressedKey = e.key.toUpperCase();
 
-    const allShortcuts = [...pageConfig.shortcuts];
+    // Check if this is the second key of a chord (e.g. G then D)
+    if (chordKey) {
+      const firstKey = chordKey;
+      chordKey = null;
+      if (chordTimer) { clearTimeout(chordTimer); chordTimer = null; }
 
-    for (const shortcut of allShortcuts) {
-      if (!shortcut.fn) continue;
-      if (shortcut.keys.length === 1) {
-        const key = shortcut.keys[0];
-        if (e.key === key || e.key.toUpperCase() === key || e.key.toLowerCase() === key.toLowerCase()) {
+      for (const shortcut of NAV_SHORTCUTS) {
+        if (!shortcut.fn || shortcut.keys.length !== 2) continue;
+        if (shortcut.keys[0].toUpperCase() === firstKey && shortcut.keys[1].toUpperCase() === pressedKey) {
           e.preventDefault();
           shortcut.fn();
           return;
         }
+      }
+      // No match for chord, fall through to single-key shortcuts
+    }
+
+    // Start a chord if G is pressed
+    if (pressedKey === 'G') {
+      chordKey = 'G';
+      if (chordTimer) clearTimeout(chordTimer);
+      chordTimer = setTimeout(() => { chordKey = null; }, CHORD_TIMEOUT);
+      // Don't prevent default yet -- if no second key comes, G might be a page shortcut
+      return;
+    }
+
+    // Find matching page shortcut (single key)
+    const page = detectPage();
+    const pageConfig = PAGE_SHORTCUTS[page];
+    if (!pageConfig) return;
+
+    for (const shortcut of pageConfig.shortcuts) {
+      if (!shortcut.fn || shortcut.keys.length !== 1) continue;
+      const key = shortcut.keys[0];
+      if (e.key === key || e.key.toUpperCase() === key.toUpperCase()) {
+        e.preventDefault();
+        shortcut.fn();
+        return;
       }
     }
   }
