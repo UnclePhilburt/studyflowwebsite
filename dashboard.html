@@ -1944,6 +1944,7 @@
       backdrop-filter: blur(20px);
     }
 
+
     .upgrade-banner-content {
       height: 100%;
       display: flex;
@@ -8126,6 +8127,12 @@
           if (tier === 'free') {
             document.getElementById('upgradeBanner').style.display = 'block';
             document.querySelector('.dock').style.bottom = '64px';
+            const zoom = document.getElementById('zoomControls');
+            if (zoom) zoom.style.bottom = '72px';
+            const assistant = document.getElementById('sf-assistant-wrap');
+            if (assistant) assistant.style.bottom = '68px';
+            const pomo = document.getElementById('sf-pomodoro-overlay');
+            if (pomo) pomo.style.bottom = '68px';
           } else {
             document.querySelector('.dock').style.bottom = '20px';
           }
@@ -8138,6 +8145,12 @@
     function dismissBanner() {
       document.getElementById('upgradeBanner').style.display = 'none';
       document.querySelector('.dock').style.bottom = '20px';
+      const zoom = document.getElementById('zoomControls');
+      if (zoom) zoom.style.bottom = '24px';
+      const assistant = document.getElementById('sf-assistant-wrap');
+      if (assistant) assistant.style.bottom = '20px';
+      const pomo = document.getElementById('sf-pomodoro-overlay');
+      if (pomo) pomo.style.bottom = '20px';
       sessionStorage.setItem('upgrade_banner_dismissed', '1');
     }
 
