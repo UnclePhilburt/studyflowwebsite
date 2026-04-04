@@ -3562,6 +3562,21 @@
           } else if (data.wallpaper === null) {
             localStorage.removeItem('sf-wallpaper');
           }
+          // Dashboard customization settings
+          if (data.grid) localStorage.setItem('sf-grid', data.grid);
+          if (data.radius) localStorage.setItem('sf-radius', data.radius);
+          if (data.accent) localStorage.setItem('sf-accent', data.accent);
+          else if (data.accent === null) localStorage.removeItem('sf-accent');
+          if (data.font) localStorage.setItem('sf-font', data.font);
+          if (data.opacity) localStorage.setItem('sf-opacity', data.opacity);
+          if (data.dock_pos) localStorage.setItem('sf-dock-pos', data.dock_pos);
+          if (data.dock_hide) localStorage.setItem('sf-dock-hide', data.dock_hide);
+          if (data.anim) localStorage.setItem('sf-anim', data.anim);
+          if (data.clock) localStorage.setItem('sf-clock', data.clock);
+          if (data.particles) localStorage.setItem('sf-particles', data.particles);
+          if (data.cursor) localStorage.setItem('sf-cursor', data.cursor);
+          if (data.colorblind) localStorage.setItem('sf-colorblind', data.colorblind);
+          if (data.textsize) localStorage.setItem('sf-textsize', data.textsize);
           // Flo assistant settings
           if (data.flo && typeof data.flo === 'object') {
             const f = data.flo;
@@ -6852,6 +6867,7 @@
 
     function setCanvasGrid(type) {
       localStorage.setItem('sf-grid', type);
+      saveAllCustomizations();
       // Only update canvas grid if no wallpaper is active
       const cc = document.getElementById('canvasContainer');
       if (!cc) return;
@@ -6878,12 +6894,14 @@
 
     function setWidgetRadius(val) {
       localStorage.setItem('sf-radius', val);
+      saveAllCustomizations();
       document.querySelectorAll('.widget').forEach(w => { w.style.borderRadius = val + 'px'; });
       activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
     }
 
     function setCustomAccent(color) {
       localStorage.setItem('sf-accent', color);
+      saveAllCustomizations();
       document.documentElement.style.setProperty('--accent-primary', color);
       // Derive secondary (slightly darker)
       document.documentElement.style.setProperty('--accent-secondary', color);
@@ -6892,9 +6910,9 @@
 
     function clearCustomAccent() {
       localStorage.removeItem('sf-accent');
+      saveAllCustomizations();
       document.documentElement.style.removeProperty('--accent-primary');
       document.documentElement.style.removeProperty('--accent-secondary');
-      // Re-apply theme to reset
       const t = localStorage.getItem('dashboard-theme') || 'default';
       document.body.setAttribute('data-theme', t);
       activeWidgets.forEach(w => { if (w.type === 'themePicker') renderThemePicker(w); });
@@ -6904,6 +6922,7 @@
       const font = FONT_OPTIONS.find(f => f.id === fontId);
       if (!font) return;
       localStorage.setItem('sf-font', fontId);
+      saveAllCustomizations();
       // Load font if needed
       if (font.url && !document.querySelector(`link[href="${font.url}"]`)) {
         const link = document.createElement('link');
@@ -6917,6 +6936,7 @@
 
     function setWidgetOpacity(val) {
       localStorage.setItem('sf-opacity', val);
+      saveAllCustomizations();
       const opacity = val / 100;
       document.querySelectorAll('.widget').forEach(w => {
         w.style.opacity = opacity;
@@ -6926,6 +6946,7 @@
 
     function setDockPosition(pos) {
       localStorage.setItem('sf-dock-pos', pos);
+      saveAllCustomizations();
       const dock = document.querySelector('.dock');
       if (!dock) return;
       dock.style.transition = 'all 0.3s ease';
@@ -6947,6 +6968,7 @@
 
     function setDockAutoHide(val) {
       localStorage.setItem('sf-dock-hide', val);
+      saveAllCustomizations();
       const dock = document.querySelector('.dock');
       if (!dock) return;
       if (val === 'on') {
@@ -6962,6 +6984,7 @@
 
     function setAnimSpeed(speed) {
       localStorage.setItem('sf-anim', speed);
+      saveAllCustomizations();
       if (speed === 'fast') {
         document.documentElement.style.setProperty('--anim-speed', '0.15s');
       } else if (speed === 'reduced') {
@@ -6974,6 +6997,7 @@
 
     function setClockFormat(fmt) {
       localStorage.setItem('sf-clock', fmt);
+      saveAllCustomizations();
       // Re-render any clock widgets
       activeWidgets.forEach(w => { if (w.type === 'clock') WIDGET_TYPES.clock.render(w); });
       _rerender();
@@ -6986,6 +7010,7 @@
 
     function setParticles(mode) {
       localStorage.setItem('sf-particles', mode);
+      saveAllCustomizations();
       if (mode === 'off') {
         if (_particleCanvas) { _particleCanvas.remove(); _particleCanvas = null; }
         if (_particleAnim) { cancelAnimationFrame(_particleAnim); _particleAnim = null; }
@@ -6997,6 +7022,7 @@
 
     function setCursor(style) {
       localStorage.setItem('sf-cursor', style);
+      saveAllCustomizations();
       if (window.updateCustomCursor) {
         window.updateCustomCursor();
       }
@@ -7005,6 +7031,7 @@
 
     function setColorBlindMode(mode) {
       localStorage.setItem('sf-colorblind', mode);
+      saveAllCustomizations();
       const html = document.documentElement;
 
       // Remove existing color blind class
@@ -7019,10 +7046,34 @@
 
     function setTextSize(size) {
       localStorage.setItem('sf-textsize', size);
+      saveAllCustomizations();
       const percentage = parseInt(size);
       // Apply text size multiplier to entire document
       document.documentElement.style.fontSize = percentage + '%';
       _rerender();
+    }
+
+    // Save all customization settings to Supabase (debounced)
+    let _customSaveTimer = null;
+    function saveAllCustomizations() {
+      if (_customSaveTimer) clearTimeout(_customSaveTimer);
+      _customSaveTimer = setTimeout(() => {
+        savePreferenceToBackend({
+          grid: localStorage.getItem('sf-grid') || 'dots',
+          radius: localStorage.getItem('sf-radius') || '16',
+          accent: localStorage.getItem('sf-accent') || null,
+          font: localStorage.getItem('sf-font') || 'inter',
+          opacity: localStorage.getItem('sf-opacity') || '100',
+          dock_pos: localStorage.getItem('sf-dock-pos') || 'bottom',
+          dock_hide: localStorage.getItem('sf-dock-hide') || 'off',
+          anim: localStorage.getItem('sf-anim') || 'normal',
+          clock: localStorage.getItem('sf-clock') || '12h',
+          particles: localStorage.getItem('sf-particles') || 'full',
+          cursor: localStorage.getItem('sf-cursor') || 'default',
+          colorblind: localStorage.getItem('sf-colorblind') || 'none',
+          textsize: localStorage.getItem('sf-textsize') || '100'
+        });
+      }, 500);
     }
 
     // Save all Flo settings to Supabase
