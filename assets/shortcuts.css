@@ -1,0 +1,213 @@
+/* Keyboard Shortcuts Panel */
+
+.shortcuts-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.shortcuts-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.shortcuts-panel {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  width: 560px;
+  max-width: 92vw;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.shortcuts-overlay.visible .shortcuts-panel {
+  transform: scale(1);
+}
+
+.shortcuts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.shortcuts-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2d2d2d;
+}
+
+.shortcuts-subtitle {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.shortcuts-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 18px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.shortcuts-close:hover {
+  background: #eee;
+  color: #666;
+}
+
+.shortcuts-body {
+  overflow-y: auto;
+  padding: 16px 24px 24px;
+  scrollbar-width: none;
+}
+
+.shortcuts-body::-webkit-scrollbar {
+  display: none;
+}
+
+.shortcuts-section {
+  margin-bottom: 20px;
+}
+
+.shortcuts-section:last-child {
+  margin-bottom: 0;
+}
+
+.shortcuts-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.shortcut-label {
+  font-size: 13px;
+  color: #444;
+}
+
+.shortcut-keys {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 26px;
+  padding: 0 8px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  font-family: 'Inter', -apple-system, monospace;
+  box-shadow: 0 1px 0 #ccc;
+}
+
+.shortcut-plus {
+  font-size: 11px;
+  color: #bbb;
+  margin: 0 1px;
+}
+
+/* Dark theme */
+body[data-theme="dark"] .shortcuts-panel,
+body[data-theme="midnight"] .shortcuts-panel,
+body[data-theme="ember"] .shortcuts-panel,
+body[data-theme="neon"] .shortcuts-panel {
+  background: #2a2a2a;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+
+body[data-theme="dark"] .shortcuts-header,
+body[data-theme="midnight"] .shortcuts-header,
+body[data-theme="ember"] .shortcuts-header,
+body[data-theme="neon"] .shortcuts-header {
+  border-bottom-color: #444;
+}
+
+body[data-theme="dark"] .shortcuts-title,
+body[data-theme="midnight"] .shortcuts-title,
+body[data-theme="ember"] .shortcuts-title,
+body[data-theme="neon"] .shortcuts-title {
+  color: #eee;
+}
+
+body[data-theme="dark"] .shortcut-label,
+body[data-theme="midnight"] .shortcut-label,
+body[data-theme="ember"] .shortcut-label,
+body[data-theme="neon"] .shortcut-label {
+  color: #ccc;
+}
+
+body[data-theme="dark"] .shortcut-key,
+body[data-theme="midnight"] .shortcut-key,
+body[data-theme="ember"] .shortcut-key,
+body[data-theme="neon"] .shortcut-key {
+  background: #3a3a3a;
+  border-color: #555;
+  color: #ddd;
+  box-shadow: 0 1px 0 #444;
+}
+
+body[data-theme="dark"] .shortcuts-close,
+body[data-theme="midnight"] .shortcuts-close,
+body[data-theme="ember"] .shortcuts-close,
+body[data-theme="neon"] .shortcuts-close {
+  background: #3a3a3a;
+  color: #999;
+}
+
+@media (max-width: 480px) {
+  .shortcuts-panel {
+    border-radius: 12px;
+    margin: 12px;
+  }
+
+  .shortcuts-header { padding: 16px 16px 12px; }
+  .shortcuts-body { padding: 12px 16px 16px; }
+  .shortcut-label { font-size: 12px; }
+}
