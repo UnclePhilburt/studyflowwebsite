@@ -3562,6 +3562,22 @@
           } else if (data.wallpaper === null) {
             localStorage.removeItem('sf-wallpaper');
           }
+          // Flo assistant settings
+          if (data.flo && typeof data.flo === 'object') {
+            const f = data.flo;
+            if (f.particles) localStorage.setItem('sf-flo-particles', f.particles);
+            if (f.emojis) localStorage.setItem('sf-flo-emojis', f.emojis);
+            if (f.minimize) localStorage.setItem('sf-flo-minimize', f.minimize);
+            if (f.position) localStorage.setItem('sf-flo-position', f.position);
+            if (f.expressions) localStorage.setItem('sf-flo-expressions', f.expressions);
+            if (f.shape) localStorage.setItem('sf-flo-shape', f.shape);
+            if (f.hat) localStorage.setItem('sf-flo-hat', f.hat);
+            if (f.size) localStorage.setItem('sf-flo-size', f.size);
+            if (f.color) localStorage.setItem('sf-flo-color', f.color);
+            if (f.eyelids !== undefined) localStorage.setItem('sf-flo-eyelids', f.eyelids);
+            if (f.seen) localStorage.setItem('sf-assistant-seen', f.seen);
+            if (f.minimized) localStorage.setItem('sf-assistant-minimized', f.minimized);
+          }
         }
       } catch (err) {
         console.log('Using local preferences');
@@ -7009,22 +7025,48 @@
       _rerender();
     }
 
+    // Save all Flo settings to Supabase
+    let _floSaveTimer = null;
+    function saveFloToBackend() {
+      // Debounce - wait 500ms after last change before saving
+      if (_floSaveTimer) clearTimeout(_floSaveTimer);
+      _floSaveTimer = setTimeout(() => {
+        const floSettings = {
+          particles: localStorage.getItem('sf-flo-particles') || 'on',
+          emojis: localStorage.getItem('sf-flo-emojis') || 'on',
+          minimize: localStorage.getItem('sf-flo-minimize') || 'off',
+          position: localStorage.getItem('sf-flo-position') || 'bottom-left',
+          expressions: localStorage.getItem('sf-flo-expressions') || 'full',
+          shape: localStorage.getItem('sf-flo-shape') || 'sphere',
+          hat: localStorage.getItem('sf-flo-hat') || 'none',
+          size: localStorage.getItem('sf-flo-size') || 'medium',
+          color: localStorage.getItem('sf-flo-color') || 'sage',
+          eyelids: localStorage.getItem('sf-flo-eyelids') || '0',
+          seen: localStorage.getItem('sf-assistant-seen') || '{}',
+          minimized: localStorage.getItem('sf-assistant-minimized') || 'false'
+        };
+        savePreferenceToBackend({ flo: floSettings });
+      }, 500);
+    }
+
     function setFloParticles(val) {
       localStorage.setItem('sf-flo-particles', val);
-      // Notify Flo to update (event will be handled by assistant.js)
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { particles: val } }));
+      saveFloToBackend();
       _rerender();
     }
 
     function setFloEmojis(val) {
       localStorage.setItem('sf-flo-emojis', val);
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { emojis: val } }));
+      saveFloToBackend();
       _rerender();
     }
 
     function setFloExpressions(val) {
       localStorage.setItem('sf-flo-expressions', val);
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { expressions: val } }));
+      saveFloToBackend();
       _rerender();
     }
 
@@ -7055,6 +7097,7 @@
           wrap.style.top = 'auto';
         }
       }
+      saveFloToBackend();
       _rerender();
     }
 
@@ -7066,20 +7109,21 @@
       } else if (wrap) {
         wrap.classList.remove('minimized');
       }
+      saveFloToBackend();
       _rerender();
     }
 
     function setFloShape(val) {
       localStorage.setItem('sf-flo-shape', val);
-      // Flo needs to be recreated with the new shape
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { shape: val, recreate: true } }));
+      saveFloToBackend();
       _rerender();
     }
 
     function setFloHat(val) {
       localStorage.setItem('sf-flo-hat', val);
-      // Flo needs to be recreated with the new hat
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { hat: val, recreate: true } }));
+      saveFloToBackend();
       _rerender();
     }
 
@@ -7104,20 +7148,21 @@
           canvas.style.height = size + 'px';
         }
       }
+      saveFloToBackend();
       _rerender();
     }
 
     function setFloColor(val) {
       localStorage.setItem('sf-flo-color', val);
-      // Flo needs to be recreated with the new color
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { color: val, recreate: true } }));
+      saveFloToBackend();
       _rerender();
     }
 
     function setFloEyelids(val) {
       localStorage.setItem('sf-flo-eyelids', val);
-      // Send event to update eyelids in real-time (no recreation needed)
       window.dispatchEvent(new CustomEvent('flo-settings-changed', { detail: { eyelids: val } }));
+      saveFloToBackend();
     }
 
     function initParticles(mode) {

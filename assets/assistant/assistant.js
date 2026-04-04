@@ -167,6 +167,40 @@
     const seen = getSeenPages();
     seen[page] = Date.now();
     localStorage.setItem(SEEN_KEY, JSON.stringify(seen));
+    saveFloStateToBackend();
+  }
+
+  // Save Flo state to Supabase (debounced)
+  let _floStateSaveTimer = null;
+  function saveFloStateToBackend() {
+    if (_floStateSaveTimer) clearTimeout(_floStateSaveTimer);
+    _floStateSaveTimer = setTimeout(async () => {
+      const token = getAuthToken();
+      if (!token) return;
+      try {
+        const floSettings = {
+          particles: localStorage.getItem('sf-flo-particles') || 'on',
+          emojis: localStorage.getItem('sf-flo-emojis') || 'on',
+          minimize: localStorage.getItem('sf-flo-minimize') || 'off',
+          position: localStorage.getItem('sf-flo-position') || 'bottom-left',
+          expressions: localStorage.getItem('sf-flo-expressions') || 'full',
+          shape: localStorage.getItem('sf-flo-shape') || 'sphere',
+          hat: localStorage.getItem('sf-flo-hat') || 'none',
+          size: localStorage.getItem('sf-flo-size') || 'medium',
+          color: localStorage.getItem('sf-flo-color') || 'sage',
+          eyelids: localStorage.getItem('sf-flo-eyelids') || '0',
+          seen: localStorage.getItem(SEEN_KEY) || '{}',
+          minimized: localStorage.getItem(MINIMIZED_KEY) || 'false'
+        };
+        await fetch(`${BACKEND_URL}/api/user/preferences`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ flo: floSettings })
+        });
+      } catch (e) {
+        console.error('Error saving Flo state:', e);
+      }
+    }, 1000);
   }
 
   function isFirstVisit(page) {
@@ -523,6 +557,7 @@
       const wrap = document.getElementById('sf-assistant-wrap');
       const isMin = wrap.classList.toggle('minimized');
       localStorage.setItem(MINIMIZED_KEY, isMin);
+      saveFloStateToBackend();
       if (isMin) {
         dismissBubble();
         setExpression('sleepy', 1);
@@ -1329,6 +1364,7 @@
     if (wrap.classList.contains('minimized')) {
       wrap.classList.remove('minimized');
       localStorage.setItem(MINIMIZED_KEY, false);
+      saveFloStateToBackend();
       setExpression('happy');
       return;
     }
