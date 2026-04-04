@@ -8,6 +8,32 @@
   }
 }
 
+/* Focus indicators - visible outlines for keyboard navigation only */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2.5px solid rgba(124, 152, 133, 0.8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2.5px solid rgba(124, 152, 133, 0.8);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(124, 152, 133, 0.15);
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2.5px solid rgba(124, 152, 133, 0.8);
+  outline-offset: 0px;
+}
+
 /* StudyFlow Assistant */
 
 #sf-assistant-wrap {
