@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Feature Requests - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/assistant/assistant.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #f5f4f0;
+      color: #2d2d2d;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      background: white;
+      border-bottom: 1px solid rgba(124, 152, 133, 0.12);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Lora', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #7c9885;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover { color: #7c9885; }
+    .nav-link.active { color: #7c9885; }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-family: 'Lora', serif;
+      font-size: 32px;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c9885, #6a8573);
+      color: white;
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124, 152, 133, 0.3); }
+
+    .btn-secondary {
+      background: white;
+      color: #7c9885;
+      border: 1.5px solid #7c9885;
+    }
+
+    .btn-secondary:hover { background: #f9faf8; }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      background: white;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover { border-color: #7c9885; }
+    .filter-btn.active {
+      background: #7c9885;
+      color: white;
+      border-color: #7c9885;
+    }
+
+    /* Request Cards */
+    .requests-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .request-card {
+      background: white;
+      border: 1px solid rgba(124, 152, 133, 0.12);
+      border-radius: 14px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+
+    .request-card:hover {
+      border-color: rgba(124, 152, 133, 0.3);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .request-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .request-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+
+    .request-meta {
+      font-size: 12px;
+      color: #9ca3af;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-reviewing { background: #dbeafe; color: #1e40af; }
+    .status-in-progress { background: #e0e7ff; color: #4338ca; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+
+    .request-description {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #4b5563;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+    }
+
+    .request-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .vote-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: white;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      color: #6b7280;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .vote-btn:hover { border-color: #7c9885; }
+    .vote-btn.voted {
+      background: #7c9885;
+      color: white;
+      border-color: #7c9885;
+    }
+
+    .vote-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .admin-response {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f9faf8;
+      border-left: 3px solid #7c9885;
+      border-radius: 6px;
+    }
+
+    .admin-response-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #7c9885;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .admin-response-text {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-family: 'Lora', serif;
+      font-size: 24px;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+
+    .modal-header p {
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid rgba(124, 152, 133, 0.2);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus { border-color: #7c9885; }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .form-hint {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-desc {
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #9ca3af;
+    }
+
+    /* Error */
+    .error-message {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 24px 16px; }
+      .header h1 { font-size: 24px; }
+      .filters { flex-direction: column; }
+      .filter-group { width: 100%; }
+      .filter-btn { flex: 1; }
+      .request-header { flex-direction: column; gap: 8px; }
+      .request-footer { flex-direction: column; align-items: start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <a href="dashboard.html" class="nav-brand">StudyFlow</a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="notes.html" class="nav-link">Notes</a>
+      <a href="chat.html" class="nav-link">Chat</a>
+      <a href="calendar.html" class="nav-link">Calendar</a>
+      <a href="feature-requests.html" class="nav-link active">Feature Requests</a>
+      <a href="account.html" class="nav-link">Account</a>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>Feature Requests</h1>
+      <p>Help shape the future of StudyFlow Suite by requesting and voting on new features</p>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openSubmitModal()">Submit Request</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all" onclick="setStatusFilter('all')">All</button>
+        <button class="filter-btn" data-filter="pending" onclick="setStatusFilter('pending')">Pending</button>
+        <button class="filter-btn" data-filter="in-progress" onclick="setStatusFilter('in-progress')">In Progress</button>
+        <button class="filter-btn" data-filter="completed" onclick="setStatusFilter('completed')">Completed</button>
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" data-sort="popular" onclick="setSortBy('popular')">Most Popular</button>
+        <button class="filter-btn" data-sort="recent" onclick="setSortBy('recent')">Most Recent</button>
+      </div>
+    </div>
+
+    <!-- Requests List -->
+    <div id="requestsList" class="requests-list">
+      <div class="loading">Loading feature requests...</div>
+    </div>
+
+  </div>
+
+  <!-- Submit Modal -->
+  <div id="submitModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Submit Feature Request</h2>
+        <p>Tell us what feature you'd like to see in StudyFlow Suite</p>
+      </div>
+
+      <div id="modalError" class="error-message" style="display: none;"></div>
+
+      <form id="submitForm" onsubmit="submitRequest(event)">
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" id="requestTitle" class="form-input" placeholder="Brief summary of your request" required maxlength="200">
+          <div class="form-hint">Be specific and concise (5-200 characters)</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="requestDescription" class="form-input" placeholder="Describe the feature in detail. What problem does it solve? How would it work?" required maxlength="2000"></textarea>
+          <div class="form-hint">Provide as much detail as possible (10-2000 characters)</div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeSubmitModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Flo Assistant -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+  <script src="assets/assistant/assistant.js"></script>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    let authToken = localStorage.getItem('auth_token');
+    let currentStatus = 'all';
+    let currentSort = 'popular';
+
+    // Check auth
+    if (!authToken) {
+      window.location.href = 'index.html';
+    }
+
+    // Load requests on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRequests();
+    });
+
+    async function loadRequests() {
+      const container = document.getElementById('requestsList');
+      container.innerHTML = '<div class="loading">Loading feature requests...</div>';
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/feature-requests?status=${currentStatus}&sort=${currentSort}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load feature requests');
+        }
+
+        const data = await response.json();
+        renderRequests(data.requests);
+      } catch (error) {
+        console.error('Error loading requests:', error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <div class="empty-state-title">Error Loading Requests</div>
+            <div class="empty-state-desc">${error.message}</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderRequests(requests) {
+      const container = document.getElementById('requestsList');
+
+      if (!requests || requests.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">💡</div>
+            <div class="empty-state-title">No Feature Requests Yet</div>
+            <div class="empty-state-desc">Be the first to suggest a new feature!</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = requests.map(req => `
+        <div class="request-card">
+          <div class="request-header">
+            <div>
+              <div class="request-title">${escapeHtml(req.title)}</div>
+              <div class="request-meta">
+                <span>${req.username || 'Anonymous'}</span>
+                <span>•</span>
+                <span>${formatDate(req.created_at)}</span>
+              </div>
+            </div>
+            <span class="status-badge status-${req.status}">${formatStatus(req.status)}</span>
+          </div>
+
+          <div class="request-description">${escapeHtml(req.description)}</div>
+
+          ${req.admin_response ? `
+            <div class="admin-response">
+              <div class="admin-response-label">StudyFlow Team Response</div>
+              <div class="admin-response-text">${escapeHtml(req.admin_response)}</div>
+            </div>
+          ` : ''}
+
+          <div class="request-footer">
+            <button class="vote-btn ${req.has_voted ? 'voted' : ''}" onclick="toggleVote('${req.id}', ${req.has_voted})">
+              <svg class="vote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+              </svg>
+              <span id="vote-count-${req.id}">${req.vote_count}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function toggleVote(requestId, currentlyVoted) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/feature-requests/${requestId}/vote`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to toggle vote');
+
+        const data = await response.json();
+
+        // Update UI
+        const voteBtn = event.target.closest('.vote-btn');
+        const countSpan = document.getElementById(`vote-count-${requestId}`);
+
+        if (data.has_voted) {
+          voteBtn.classList.add('voted');
+        } else {
+          voteBtn.classList.remove('voted');
+        }
+
+        countSpan.textContent = data.vote_count;
+
+      } catch (error) {
+        console.error('Error toggling vote:', error);
+        alert('Failed to update vote. Please try again.');
+      }
+    }
+
+    function setStatusFilter(status) {
+      currentStatus = status;
+
+      // Update active state
+      document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === status);
+      });
+
+      loadRequests();
+    }
+
+    function setSortBy(sort) {
+      currentSort = sort;
+
+      // Update active state
+      document.querySelectorAll('[data-sort]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sort === sort);
+      });
+
+      loadRequests();
+    }
+
+    function openSubmitModal() {
+      document.getElementById('submitModal').classList.add('active');
+      document.getElementById('submitForm').reset();
+      document.getElementById('modalError').style.display = 'none';
+    }
+
+    function closeSubmitModal() {
+      document.getElementById('submitModal').classList.remove('active');
+    }
+
+    async function submitRequest(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('requestTitle').value.trim();
+      const description = document.getElementById('requestDescription').value.trim();
+      const errorDiv = document.getElementById('modalError');
+
+      errorDiv.style.display = 'none';
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/feature-requests`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ title, description })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to submit request');
+        }
+
+        closeSubmitModal();
+        loadRequests();
+
+        // Show success message (could use a toast notification here)
+        alert('Feature request submitted successfully!');
+
+      } catch (error) {
+        console.error('Error submitting request:', error);
+        errorDiv.textContent = error.message;
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+      if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+
+      return date.toLocaleDateString();
+    }
+
+    function formatStatus(status) {
+      return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('submitModal').addEventListener('click', (e) => {
+      if (e.target.id === 'submitModal') {
+        closeSubmitModal();
+      }
+    });
+  </script>
+
+</body>
+</html>
