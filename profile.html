@@ -685,16 +685,25 @@
       // Banner
       const banner = document.getElementById('banner');
       if (profileData.banner_url) {
-        banner.innerHTML = `<img src="${profileData.banner_url}" alt="Banner">`;
+        banner.innerHTML = `
+          <img src="${profileData.banner_url}" alt="Banner">
+          <button class="banner-upload" id="bannerUploadBtn" style="display: none;" onclick="alert('Banner upload coming soon!')">Change Banner</button>
+        `;
       }
 
       // Avatar
       const avatar = document.getElementById('avatar');
       if (profileData.avatar_url) {
-        avatar.innerHTML = `<img src="${profileData.avatar_url}" alt="${profileData.username}">`;
+        avatar.innerHTML = `
+          <img src="${profileData.avatar_url}" alt="${profileData.username}">
+          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;">Upload</button>
+        `;
       } else {
         const initial = (profileData.display_name || profileData.username || 'U')[0].toUpperCase();
-        avatar.textContent = initial;
+        avatar.innerHTML = `
+          ${initial}
+          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;">Upload</button>
+        `;
       }
 
       // Info
