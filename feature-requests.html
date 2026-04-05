@@ -490,19 +490,26 @@
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
     const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
-    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let authToken = localStorage.getItem('auth_token');
+    let authToken = null;
+    let currentUser = null;
     let currentStatus = 'all';
     let currentSort = 'popular';
 
-    // Check auth
-    if (!authToken) {
-      window.location.href = 'index.html';
-    }
-
     // Load requests on page load
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check auth with Supabase session
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      currentUser = session.user;
+      authToken = session.access_token;
+
+      // Now load requests
       loadRequests();
     });
 
