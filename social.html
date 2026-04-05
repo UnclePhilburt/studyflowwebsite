@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudyFlow Social - Share and discover study notes">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>Social - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #FAF8F5;
+      --bg-secondary: rgba(255, 255, 255, 0.6);
+      --bg-tertiary: rgba(255, 255, 255, 0.9);
+      --text-primary: #2C2C2C;
+      --text-secondary: #8B7E73;
+      --text-muted: #9B8B7E;
+      --accent-primary: #8B9D83;
+      --accent-secondary: #7A8C73;
+      --border-color: rgba(139, 157, 131, 0.2);
+      --hover-bg: rgba(139, 157, 131, 0.06);
+      --shadow: rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: var(--bg-tertiary);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search-bar {
+      padding: 10px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 14px;
+      width: 250px;
+      transition: all 0.2s;
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: white;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-secondary);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--hover-bg);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .tab:hover:not(.active) {
+      background: var(--hover-bg);
+    }
+
+    /* Feed Grid */
+    .feed {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+
+    /* Post Card */
+    .post-card {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px var(--shadow);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .post-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .post-user-info {
+      flex: 1;
+    }
+
+    .post-username {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .post-time {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .post-thumbnail {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: var(--bg-secondary);
+    }
+
+    .post-content {
+      padding: 16px;
+    }
+
+    .post-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-caption {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .vote-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vote-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .vote-btn:hover {
+      background: var(--hover-bg);
+    }
+
+    .vote-btn.upvoted {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: white;
+    }
+
+    .vote-btn.downvoted {
+      background: #e89b5f;
+      border-color: #e89b5f;
+      color: white;
+    }
+
+    .vote-score {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--hover-bg);
+      color: var(--text-primary);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--bg-tertiary);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+    }
+
+    .modal-close:hover {
+      background: var(--hover-bg);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      background: white;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Dock */
+    .dock {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-tertiary);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      z-index: 100;
+    }
+
+    .dock-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .dock-item:hover {
+      background: var(--hover-bg);
+      color: var(--text-primary);
+    }
+
+    .dock-item.active {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .dock-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .dock-icon svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .dock-label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .dock-divider {
+      width: 1px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+
+    @media (max-width: 768px) {
+      .feed {
+        grid-template-columns: 1fr;
+      }
+
+      .search-bar {
+        width: 150px;
+      }
+
+      .dock {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Social Feed</h1>
+      <div class="header-actions">
+        <input type="text" class="search-bar" placeholder="Search users..." id="searchInput">
+        <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
+        <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
+      <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
+    </div>
+
+    <!-- Feed -->
+    <div id="feedContainer">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading posts...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Post Modal -->
+  <div class="modal" id="createPostModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Post</h2>
+        <button class="modal-close" onclick="closeCreatePostModal()">✕</button>
+      </div>
+      <form id="createPostForm">
+        <div class="form-group">
+          <label>Post Type</label>
+          <select id="postType" onchange="handlePostTypeChange()">
+            <option value="note">Share a Note</option>
+            <option value="text">Text Post</option>
+          </select>
+        </div>
+        <div class="form-group" id="noteSelectGroup">
+          <label>Select Note</label>
+          <select id="noteSelect">
+            <option value="">Loading your notes...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Caption (optional)</label>
+          <textarea id="postCaption" placeholder="Add a caption..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Post</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dock Navigation -->
+  <div class="dock">
+    <a href="dashboard.html" class="dock-item">
+      <div class="dock-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <span class="dock-label">Home</span>
+    </a>
+
+    <a href="chat.html" class="dock-item">
+      <div class="dock-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <span class="dock-label">Chat</span>
+    </a>
+
+    <a href="notes.html" class="dock-item">
+      <div class="dock-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <span class="dock-label">Notes</span>
+    </a>
+
+    <div class="dock-divider"></div>
+
+    <a href="social.html" class="dock-item active">
+      <div class="dock-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <span class="dock-label">Social</span>
+    </a>
+
+    <a href="messages.html" class="dock-item">
+      <div class="dock-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+      <span class="dock-label">Messages</span>
+    </a>
+
+    <a href="study-groups.html" class="dock-item">
+      <div class="dock-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <span class="dock-label">Groups</span>
+    </a>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const supabaseUrl = 'https://lbhhwflhtwqqlltqwsip.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiaGh3Zmxod3dxcWxsdHF3c2lwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUzNDg2NzcsImV4cCI6MjA1MDkyNDY3N30.mNlljOqtOz3Zx-4hUMvf9qgVSp6Th5rrJmYa_BSCK9Y';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    let currentUser = null;
+    let authToken = null;
+    let currentTab = 'following';
+    let userNotes = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = session.user;
+      authToken = session.access_token;
+
+      loadFeed();
+      loadUserNotes();
+    });
+
+    // Switch tabs
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      loadFeed();
+    }
+
+    // Load feed
+    async function loadFeed() {
+      const container = document.getElementById('feedContainer');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading posts...</p></div>';
+
+      try {
+        const endpoint = currentTab === 'following' ? '/api/social/feed' : '/api/social/posts/trending';
+        const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load feed');
+
+        const data = await response.json();
+        const posts = data.posts || [];
+
+        if (posts.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <h3>${currentTab === 'following' ? 'No posts from people you follow' : 'No trending posts yet'}</h3>
+              <p>${currentTab === 'following' ? 'Start following users to see their posts here' : 'Be the first to post!'}</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `<div class="feed">${posts.map(renderPost).join('')}</div>`;
+      } catch (error) {
+        console.error('Error loading feed:', error);
+        container.innerHTML = '<div class="empty-state"><p>Failed to load posts. Please refresh.</p></div>';
+      }
+    }
+
+    // Render post card
+    function renderPost(post) {
+      const timeAgo = getTimeAgo(post.created_at);
+      const userVote = post.user_vote_type || null;
+      const thumbnail = post.notes?.thumbnail_url || 'https://via.placeholder.com/400x300?text=Note';
+      const username = post.username || 'Anonymous';
+      const avatarLetter = username[0].toUpperCase();
+
+      return `
+        <div class="post-card" onclick="viewPost('${post.id}')">
+          <div class="post-header">
+            <div class="post-avatar">${avatarLetter}</div>
+            <div class="post-user-info">
+              <div class="post-username">${username}</div>
+              <div class="post-time">${timeAgo}</div>
+            </div>
+          </div>
+          ${post.post_type === 'note' ? `<img class="post-thumbnail" src="${thumbnail}" alt="Note thumbnail">` : ''}
+          <div class="post-content">
+            ${post.post_type === 'note' && post.notes?.original_filename ? `<div class="post-title">${post.notes.original_filename}</div>` : ''}
+            ${post.text_content ? `<div class="post-caption">${post.text_content}</div>` : ''}
+          </div>
+          <div class="post-actions" onclick="event.stopPropagation()">
+            <div class="vote-buttons">
+              <button class="vote-btn ${userVote === 'upvote' ? 'upvoted' : ''}" onclick="vote('${post.id}', 'upvote')">▲</button>
+              <div class="vote-score">${post.score || 0}</div>
+              <button class="vote-btn ${userVote === 'downvote' ? 'downvoted' : ''}" onclick="vote('${post.id}', 'downvote')">▼</button>
+            </div>
+            <button class="action-btn" onclick="viewPost('${post.id}')">
+              💬 ${post.comment_count || 0} comments
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Vote on post
+    async function vote(postId, voteType) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ vote_type: voteType })
+        });
+
+        if (response.ok) {
+          loadFeed(); // Refresh feed
+        }
+      } catch (error) {
+        console.error('Error voting:', error);
+      }
+    }
+
+    // View post details
+    function viewPost(postId) {
+      window.location.href = `post.html?id=${postId}`;
+    }
+
+    // Create post modal
+    function openCreatePostModal() {
+      document.getElementById('createPostModal').classList.add('active');
+    }
+
+    function closeCreatePostModal() {
+      document.getElementById('createPostModal').classList.remove('active');
+      document.getElementById('createPostForm').reset();
+    }
+
+    // Load user notes
+    async function loadUserNotes() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/notes`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        userNotes = data.notes || [];
+
+        const select = document.getElementById('noteSelect');
+        if (userNotes.length === 0) {
+          select.innerHTML = '<option value="">No notes available</option>';
+        } else {
+          select.innerHTML = userNotes.map(note =>
+            `<option value="${note.id}">${note.original_filename || 'Untitled Note'}</option>`
+          ).join('');
+        }
+      } catch (error) {
+        console.error('Error loading notes:', error);
+      }
+    }
+
+    // Handle post type change
+    function handlePostTypeChange() {
+      const type = document.getElementById('postType').value;
+      const noteGroup = document.getElementById('noteSelectGroup');
+      noteGroup.style.display = type === 'note' ? 'block' : 'none';
+    }
+
+    // Create post
+    document.getElementById('createPostForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const postType = document.getElementById('postType').value;
+      const caption = document.getElementById('postCaption').value.trim();
+      const noteId = document.getElementById('noteSelect').value;
+
+      const postData = {
+        post_type: postType,
+        text_content: caption || null
+      };
+
+      if (postType === 'note') {
+        if (!noteId) {
+          alert('Please select a note to share');
+          return;
+        }
+        postData.note_id = noteId;
+      } else if (!caption) {
+        alert('Please add some text content');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        });
+
+        if (response.ok) {
+          closeCreatePostModal();
+          loadFeed();
+        } else {
+          const error = await response.json();
+          alert(error.error || 'Failed to create post');
+        }
+      } catch (error) {
+        console.error('Error creating post:', error);
+        alert('Failed to create post');
+      }
+    });
+
+    // Time ago helper
+    function getTimeAgo(timestamp) {
+      const now = new Date();
+      const then = new Date(timestamp);
+      const seconds = Math.floor((now - then) / 1000);
+
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+      return then.toLocaleDateString();
+    }
+
+    // Search users
+    document.getElementById('searchInput').addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 2) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // TODO: Show search results dropdown
+          console.log('Search results:', data.users);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+      }
+    });
+  </script>
+</body>
+</html>
