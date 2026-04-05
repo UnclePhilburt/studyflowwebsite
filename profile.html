@@ -527,15 +527,19 @@
 <body>
   <button class="back-btn" onclick="history.back()">←</button>
 
+  <!-- Hidden file inputs -->
+  <input type="file" id="avatarFileInput" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" style="display: none;">
+  <input type="file" id="bannerFileInput" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" style="display: none;">
+
   <div class="profile-banner" id="banner">
-    <button class="banner-upload" id="bannerUploadBtn" style="display: none;" onclick="alert('Banner upload coming soon!')">Change Banner</button>
+    <button class="banner-upload" id="bannerUploadBtn" style="display: none;" onclick="uploadBanner()">Change Banner</button>
   </div>
 
   <div class="container">
     <div class="profile-header">
       <div class="profile-top">
         <div class="profile-avatar" id="avatar">
-          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;">📷</button>
+          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;" onclick="uploadAvatar()">Upload</button>
         </div>
         <div class="profile-info">
           <div class="profile-name-row">
@@ -687,7 +691,7 @@
       if (profileData.banner_url) {
         banner.innerHTML = `
           <img src="${profileData.banner_url}" alt="Banner">
-          <button class="banner-upload" id="bannerUploadBtn" style="display: none;" onclick="alert('Banner upload coming soon!')">Change Banner</button>
+          <button class="banner-upload" id="bannerUploadBtn" style="display: none;" onclick="uploadBanner()">Change Banner</button>
         `;
       }
 
@@ -696,13 +700,13 @@
       if (profileData.avatar_url) {
         avatar.innerHTML = `
           <img src="${profileData.avatar_url}" alt="${profileData.username}">
-          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;">Upload</button>
+          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;" onclick="uploadAvatar()">Upload</button>
         `;
       } else {
         const initial = (profileData.display_name || profileData.username || 'U')[0].toUpperCase();
         avatar.innerHTML = `
           ${initial}
-          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;">Upload</button>
+          <button class="avatar-upload" id="avatarUploadBtn" style="display: none;" onclick="uploadAvatar()">Upload</button>
         `;
       }
 
@@ -856,6 +860,102 @@
         alert('Failed to update profile');
       }
     });
+
+    // Upload avatar
+    function uploadAvatar() {
+      const fileInput = document.getElementById('avatarFileInput');
+      fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Check file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File too large! Maximum 5MB for avatars');
+          return;
+        }
+
+        // Upload file
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/social/profile/avatar`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            // Update avatar immediately
+            const avatar = document.getElementById('avatar');
+            avatar.innerHTML = `
+              <img src="${data.avatar_url}" alt="Avatar">
+              <button class="avatar-upload" id="avatarUploadBtn" style="display: flex;" onclick="uploadAvatar()">Upload</button>
+            `;
+            profileData.avatar_url = data.avatar_url;
+          } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to upload avatar');
+          }
+        } catch (error) {
+          console.error('Error uploading avatar:', error);
+          alert('Failed to upload avatar');
+        }
+
+        // Reset input
+        fileInput.value = '';
+      };
+      fileInput.click();
+    }
+
+    // Upload banner
+    function uploadBanner() {
+      const fileInput = document.getElementById('bannerFileInput');
+      fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Check file size (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File too large! Maximum 10MB for banners');
+          return;
+        }
+
+        // Upload file
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/social/profile/banner`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            // Update banner immediately
+            const banner = document.getElementById('banner');
+            banner.innerHTML = `
+              <img src="${data.banner_url}" alt="Banner">
+              <button class="banner-upload" id="bannerUploadBtn" style="display: block;" onclick="uploadBanner()">Change Banner</button>
+            `;
+            profileData.banner_url = data.banner_url;
+          } else {
+            const error = await response.json();
+            alert(error.error || 'Failed to upload banner');
+          }
+        } catch (error) {
+          console.error('Error uploading banner:', error);
+          alert('Failed to upload banner');
+        }
+
+        // Reset input
+        fileInput.value = '';
+      };
+      fileInput.click();
+    }
 
     // Show followers/following
     async function showFollowers() {
