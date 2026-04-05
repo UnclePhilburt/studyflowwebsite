@@ -569,7 +569,8 @@
         <div class="form-group">
           <label>Post Type</label>
           <select id="postType" onchange="handlePostTypeChange()">
-            <option value="note">Share a Note</option>
+            <option value="note">Share Existing Note</option>
+            <option value="upload">Upload New Note/Photo</option>
             <option value="text">Text Post</option>
           </select>
         </div>
@@ -579,11 +580,29 @@
             <option value="">Loading your notes...</option>
           </select>
         </div>
+        <div class="form-group" id="uploadGroup" style="display: none;">
+          <label>Upload File</label>
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp">
+          <div class="form-help">Max 10MB - PDF or image files</div>
+        </div>
+        <div class="form-group" id="folderSelectGroup" style="display: none;">
+          <label>Save to Folder (optional)</label>
+          <select id="folderSelect">
+            <option value="">No folder - just post</option>
+          </select>
+          <div class="form-help">Choose a folder to save this note to your library</div>
+        </div>
         <div class="form-group">
           <label>Caption (optional)</label>
           <textarea id="postCaption" placeholder="Add a caption..."></textarea>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Post</button>
+        <div id="uploadProgress" style="display: none; margin-bottom: 16px;">
+          <div style="background: var(--bg-secondary); border-radius: 8px; height: 8px; overflow: hidden;">
+            <div id="uploadProgressBar" style="background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="uploadProgressText">Uploading...</div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;" id="postSubmitBtn">Post</button>
       </form>
     </div>
   </div>
@@ -679,6 +698,7 @@
 
       loadFeed();
       loadUserNotes();
+      loadUserFolders();
     });
 
     // Switch tabs
@@ -820,11 +840,39 @@
       }
     }
 
+    // Load user folders
+    async function loadUserFolders() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/folders`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const folders = data.folders || [];
+
+        const select = document.getElementById('folderSelect');
+        const options = ['<option value="">No folder - just post</option>'];
+        folders.forEach(folder => {
+          options.push(`<option value="${folder.id}">${folder.name}</option>`);
+        });
+        select.innerHTML = options.join('');
+      } catch (error) {
+        console.error('Error loading folders:', error);
+      }
+    }
+
     // Handle post type change
     function handlePostTypeChange() {
       const type = document.getElementById('postType').value;
       const noteGroup = document.getElementById('noteSelectGroup');
+      const uploadGroup = document.getElementById('uploadGroup');
+      const folderGroup = document.getElementById('folderSelectGroup');
+
       noteGroup.style.display = type === 'note' ? 'block' : 'none';
+      uploadGroup.style.display = type === 'upload' ? 'block' : 'none';
+      folderGroup.style.display = type === 'upload' ? 'block' : 'none';
     }
 
     // Create post
@@ -833,25 +881,91 @@
 
       const postType = document.getElementById('postType').value;
       const caption = document.getElementById('postCaption').value.trim();
-      const noteId = document.getElementById('noteSelect').value;
+      const submitBtn = document.getElementById('postSubmitBtn');
+      const progressDiv = document.getElementById('uploadProgress');
+      const progressBar = document.getElementById('uploadProgressBar');
+      const progressText = document.getElementById('uploadProgressText');
 
-      const postData = {
-        post_type: postType,
-        text_content: caption || null
-      };
-
-      if (postType === 'note') {
-        if (!noteId) {
-          alert('Please select a note to share');
-          return;
-        }
-        postData.note_id = noteId;
-      } else if (!caption) {
-        alert('Please add some text content');
-        return;
-      }
+      submitBtn.disabled = true;
 
       try {
+        let noteId = null;
+
+        // Handle file upload if "upload" type
+        if (postType === 'upload') {
+          const fileInput = document.getElementById('fileInput');
+          const file = fileInput.files[0];
+
+          if (!file) {
+            alert('Please select a file to upload');
+            submitBtn.disabled = false;
+            return;
+          }
+
+          // Check file size (10MB max)
+          if (file.size > 10 * 1024 * 1024) {
+            alert('File too large! Maximum size is 10MB');
+            submitBtn.disabled = false;
+            return;
+          }
+
+          // Show progress
+          progressDiv.style.display = 'block';
+          progressText.textContent = 'Uploading file...';
+          progressBar.style.width = '30%';
+
+          // Upload file
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const folderId = document.getElementById('folderSelect').value;
+          if (folderId) {
+            formData.append('folder_id', folderId);
+          }
+
+          const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-note`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${authToken}`
+            },
+            body: formData
+          });
+
+          if (!uploadResponse.ok) {
+            const error = await uploadResponse.json();
+            throw new Error(error.error || 'Upload failed');
+          }
+
+          const uploadData = await uploadResponse.json();
+          noteId = uploadData.note_id;
+
+          progressBar.style.width = '70%';
+          progressText.textContent = 'Creating post...';
+        } else if (postType === 'note') {
+          noteId = document.getElementById('noteSelect').value;
+          if (!noteId) {
+            alert('Please select a note to share');
+            submitBtn.disabled = false;
+            return;
+          }
+        } else if (postType === 'text') {
+          if (!caption) {
+            alert('Please add some text content');
+            submitBtn.disabled = false;
+            return;
+          }
+        }
+
+        // Create post
+        const postData = {
+          post_type: noteId ? 'note' : 'text',
+          text_content: caption || null
+        };
+
+        if (noteId) {
+          postData.note_id = noteId;
+        }
+
         const response = await fetch(`${BACKEND_URL}/api/social/posts`, {
           method: 'POST',
           headers: {
@@ -862,15 +976,27 @@
         });
 
         if (response.ok) {
-          closeCreatePostModal();
-          loadFeed();
+          if (progressDiv.style.display === 'block') {
+            progressBar.style.width = '100%';
+            progressText.textContent = 'Done!';
+          }
+          setTimeout(() => {
+            closeCreatePostModal();
+            progressDiv.style.display = 'none';
+            progressBar.style.width = '0%';
+            loadFeed();
+          }, 500);
         } else {
           const error = await response.json();
           alert(error.error || 'Failed to create post');
         }
       } catch (error) {
         console.error('Error creating post:', error);
-        alert('Failed to create post');
+        alert(error.message || 'Failed to create post');
+        progressDiv.style.display = 'none';
+        progressBar.style.width = '0%';
+      } finally {
+        submitBtn.disabled = false;
       }
     });
 
