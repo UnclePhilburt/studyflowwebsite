@@ -16,65 +16,76 @@
     }
 
     :root {
-      --bg-primary: #FAF8F5;
+      --bg-primary: #fafafa;
       --bg-secondary: rgba(255, 255, 255, 0.6);
       --bg-tertiary: rgba(255, 255, 255, 0.9);
-      --text-primary: #2C2C2C;
-      --text-secondary: #8B7E73;
-      --text-muted: #9B8B7E;
+      --text-primary: #262626;
+      --text-secondary: #737373;
+      --text-muted: #a3a3a3;
       --accent-primary: #8B9D83;
       --accent-secondary: #7A8C73;
-      --border-color: rgba(139, 157, 131, 0.2);
+      --border-color: #dbdbdb;
       --hover-bg: rgba(139, 157, 131, 0.06);
       --shadow: rgba(0, 0, 0, 0.04);
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
-      padding: 20px;
-      padding-bottom: 100px;
+      padding: 0;
+      padding-bottom: 80px;
+      margin: 0;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
+      padding: 0 20px;
     }
 
-    /* Header */
+    /* Header - Instagram Minimal Style */
     .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 0;
+      padding: 16px 0;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      background: var(--bg-tertiary);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
     }
 
     .header h1 {
-      font-size: 28px;
-      font-weight: 600;
+      font-size: 32px;
+      font-weight: 400;
       color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -0.5px;
     }
 
     .header-actions {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       align-items: center;
     }
 
     .search-bar {
-      padding: 10px 16px;
+      padding: 8px 16px;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      background: var(--bg-secondary);
+      border-radius: 8px;
+      background: #fafafa;
       color: var(--text-primary);
       font-size: 14px;
-      width: 250px;
+      width: 240px;
       transition: all 0.2s;
     }
 
@@ -84,12 +95,16 @@
       background: white;
     }
 
+    .search-bar::placeholder {
+      color: var(--text-muted);
+    }
+
     .btn {
-      padding: 10px 20px;
+      padding: 8px 16px;
       border: none;
-      border-radius: 12px;
+      border-radius: 8px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -101,93 +116,107 @@
 
     .btn-primary:hover {
       background: var(--accent-secondary);
-      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: var(--bg-secondary);
+      background: transparent;
       color: var(--text-primary);
       border: 1px solid var(--border-color);
     }
 
     .btn-secondary:hover {
-      background: var(--hover-bg);
+      background: #fafafa;
     }
 
-    /* Tabs */
+    /* Tabs - Instagram Clean Style */
     .tabs {
       display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-      padding: 6px;
-      background: var(--bg-tertiary);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
+      gap: 0;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .tab {
       flex: 1;
-      padding: 12px;
+      padding: 16px;
       border: none;
-      border-radius: 8px;
+      border-bottom: 2px solid transparent;
       background: transparent;
       color: var(--text-secondary);
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      letter-spacing: 0.3px;
     }
 
     .tab.active {
-      background: var(--accent-primary);
-      color: white;
+      color: var(--text-primary);
+      border-bottom-color: var(--accent-primary);
     }
 
     .tab:hover:not(.active) {
-      background: var(--hover-bg);
+      color: var(--text-primary);
     }
 
-    /* Feed Grid */
+    /* Feed Grid - Pinterest Masonry Style */
     .feed {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 20px;
+      column-count: 3;
+      column-gap: 20px;
     }
 
-    /* Post Card */
+    @media (max-width: 1200px) {
+      .feed {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .feed {
+        column-count: 1;
+      }
+    }
+
+    /* Post Card - Instagram Minimal Style */
     .post-card {
-      background: var(--bg-tertiary);
+      background: white;
       border: 1px solid var(--border-color);
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      break-inside: avoid;
+      margin-bottom: 20px;
+      display: inline-block;
+      width: 100%;
     }
 
     .post-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px var(--shadow);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      border-color: rgba(139, 157, 131, 0.4);
     }
 
     .post-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px;
-      border-bottom: 1px solid var(--border-color);
+      gap: 10px;
+      padding: 12px 16px;
     }
 
     .post-avatar {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: var(--accent-primary);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 14px;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .post-avatar img {
@@ -203,108 +232,112 @@
 
     .post-username {
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-primary);
+      line-height: 1.2;
     }
 
     .post-time {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
+      margin-top: 2px;
     }
 
     .post-thumbnail {
       width: 100%;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      background: var(--bg-secondary);
+      height: auto;
+      object-fit: contain;
+      background: #fafafa;
+      display: block;
     }
 
     .post-thumbnail-placeholder {
       width: 100%;
-      aspect-ratio: 4/3;
-      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+      padding-top: 75%;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 48px;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 2px;
+      font-size: 32px;
+      font-weight: 600;
+      color: #c4c4c4;
+      letter-spacing: 1px;
+      position: relative;
     }
 
     .post-content {
-      padding: 16px;
+      padding: 12px 16px 8px;
     }
 
     .post-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      line-height: 1.4;
     }
 
     .post-caption {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-secondary);
-      margin-bottom: 16px;
+      margin-bottom: 8px;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      line-height: 1.5;
     }
 
     .post-actions {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       align-items: center;
-      padding: 12px 16px;
-      border-top: 1px solid var(--border-color);
+      padding: 8px 16px 12px;
     }
 
     .vote-buttons {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
     }
 
     .vote-btn {
-      width: 32px;
-      height: 32px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background: var(--bg-secondary);
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      font-size: 16px;
+      color: var(--text-muted);
     }
 
     .vote-btn:hover {
-      background: var(--hover-bg);
+      background: rgba(139, 157, 131, 0.1);
+      transform: scale(1.1);
     }
 
     .vote-btn.upvoted {
-      background: var(--accent-primary);
-      border-color: var(--accent-primary);
-      color: white;
+      color: var(--accent-primary);
     }
 
     .vote-btn.downvoted {
-      background: #e89b5f;
-      border-color: #e89b5f;
-      color: white;
+      color: #e89b5f;
     }
 
     .vote-score {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
-      min-width: 40px;
+      min-width: 30px;
       text-align: center;
     }
 
@@ -312,18 +345,18 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background: var(--bg-secondary);
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
       color: var(--text-secondary);
       font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .action-btn:hover {
-      background: var(--hover-bg);
       color: var(--text-primary);
     }
 
@@ -367,12 +400,12 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Modal */
+    /* Modal - Instagram Style */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.65);
       z-index: 1000;
       padding: 20px;
       overflow-y: auto;
@@ -385,63 +418,70 @@
     }
 
     .modal-content {
-      background: var(--bg-tertiary);
-      border-radius: 16px;
-      max-width: 600px;
+      background: white;
+      border-radius: 12px;
+      max-width: 540px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
-      padding: 24px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
     }
 
     .modal-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      margin-bottom: 20px;
+      position: relative;
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .modal-header h2 {
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 600;
+      margin: 0;
     }
 
     .modal-close {
-      width: 32px;
-      height: 32px;
+      position: absolute;
+      right: 16px;
+      width: 28px;
+      height: 28px;
       border: none;
-      background: var(--bg-secondary);
-      border-radius: 8px;
+      background: transparent;
+      border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--text-secondary);
+      font-size: 20px;
     }
 
     .modal-close:hover {
-      background: var(--hover-bg);
+      background: #f5f5f5;
     }
 
     .form-group {
       margin-bottom: 16px;
+      padding: 0 24px;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-primary);
     }
 
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 10px 14px;
+      padding: 10px 12px;
       border: 1px solid var(--border-color);
-      border-radius: 10px;
-      background: var(--bg-secondary);
+      border-radius: 6px;
+      background: white;
       color: var(--text-primary);
       font-size: 14px;
       font-family: inherit;
@@ -451,13 +491,30 @@
     .form-group select:focus,
     .form-group textarea:focus {
       outline: none;
-      border-color: var(--accent-primary);
-      background: white;
+      border-color: var(--text-primary);
     }
 
     .form-group textarea {
       resize: vertical;
       min-height: 100px;
+    }
+
+    .form-group input[type="file"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: white;
+      font-size: 14px;
+    }
+
+    .form-actions {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .form-actions .btn {
+      width: 100%;
     }
 
     /* Dock */
@@ -548,18 +605,23 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <h1>Social Feed</h1>
-      <div class="header-actions">
-        <input type="text" class="search-bar" placeholder="Search users..." id="searchInput">
-        <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
-        <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
+      <div class="header-inner">
+        <h1>Social Feed</h1>
+        <div class="header-actions">
+          <input type="text" class="search-bar" placeholder="Search users..." id="searchInput">
+          <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
+          <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
+        </div>
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
-      <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
+    <!-- Content Area -->
+    <div style="padding-top: 20px;">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
+        <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
+      </div>
     </div>
 
     <!-- Feed -->
@@ -609,13 +671,15 @@
           <label>Caption (optional)</label>
           <textarea id="postCaption" placeholder="Add a caption..."></textarea>
         </div>
-        <div id="uploadProgress" style="display: none; margin-bottom: 16px;">
-          <div style="background: var(--bg-secondary); border-radius: 8px; height: 8px; overflow: hidden;">
+        <div id="uploadProgress" style="display: none; padding: 0 24px; margin-bottom: 16px;">
+          <div style="background: #efefef; border-radius: 8px; height: 8px; overflow: hidden;">
             <div id="uploadProgressBar" style="background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
           </div>
           <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="uploadProgressText">Uploading...</div>
         </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;" id="postSubmitBtn">Post</button>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="postSubmitBtn">Post</button>
+        </div>
       </form>
     </div>
   </div>
