@@ -287,6 +287,35 @@
       opacity: 1;
     }
 
+    .grid-post-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.2s;
+      z-index: 2;
+    }
+
+    .grid-post:hover .grid-post-delete {
+      opacity: 1;
+    }
+
+    .grid-post-delete:hover {
+      background: #ef4444;
+      transform: scale(1.1);
+    }
+
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -792,15 +821,45 @@
         content = `<div class="grid-post-placeholder">${fileType}</div>`;
       }
 
+      const deleteBtn = profileData && profileData.is_own_profile
+        ? `<button class="grid-post-delete" onclick="event.stopPropagation(); deletePost('${post.id}')" title="Delete post" aria-label="Delete post">&times;</button>`
+        : '';
+
       return `
         <div class="grid-post" onclick="window.location.href='post.html?id=${post.id}'">
           ${content}
+          ${deleteBtn}
           <div class="grid-post-overlay">
             <span>▲ ${post.score || 0}</span>
             <span>💬 ${post.comment_count || 0}</span>
           </div>
         </div>
       `;
+    }
+
+    async function deletePost(postId) {
+      const confirmed = window.sfConfirm ? await window.sfConfirm('Delete this post? This cannot be undone.') : confirm('Delete this post? This cannot be undone.');
+      if (!confirmed) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+          loadPosts();
+          // Update post count
+          const countEl = document.getElementById('postsCount');
+          if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent || '0') - 1);
+        } else {
+          const err = await response.json().catch(() => ({}));
+          alert(err.error || 'Failed to delete post');
+        }
+      } catch (e) {
+        console.error('Delete error:', e);
+        alert('Failed to delete post');
+      }
     }
 
     // Follow/Unfollow
