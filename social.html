@@ -978,16 +978,8 @@
           </div>
         </div>
 
-        <!-- Upload Progress (visible during background upload) -->
-        <div id="backgroundUploadProgress" style="display: none; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 1px solid var(--border-color);">
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-            <div class="spinner" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div>
-            <span style="font-weight: 500; font-size: 14px;">Uploading in background...</span>
-          </div>
-          <div style="background: #e5e7eb; border-radius: 8px; height: 6px; overflow: hidden;">
-            <div id="backgroundProgressBar" style="background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
-          </div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="backgroundProgressText">0%</div>
+        <!-- Upload Progress (hidden - truly background) -->
+        <div id="backgroundUploadProgress" style="display: none;">
         </div>
 
         <!-- Caption -->
@@ -1458,13 +1450,8 @@
       uploadedNoteId = selectedNoteId;
     }
 
-    // Background upload
+    // Background upload (completely hidden)
     async function startBackgroundUpload(file) {
-      const progressDiv = document.getElementById('backgroundUploadProgress');
-      const progressBar = document.getElementById('backgroundProgressBar');
-      const progressText = document.getElementById('backgroundProgressText');
-
-      progressDiv.style.display = 'block';
       isUploadingInBackground = true;
 
       try {
@@ -1476,16 +1463,6 @@
           formData.append('folder_id', folderId);
         }
 
-        // Simulate progress
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-          progress += 5;
-          if (progress <= 90) {
-            progressBar.style.width = progress + '%';
-            progressText.textContent = progress + '%';
-          }
-        }, 200);
-
         const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-note`, {
           method: 'POST',
           headers: {
@@ -1494,27 +1471,17 @@
           body: formData
         });
 
-        clearInterval(progressInterval);
-
         if (!uploadResponse.ok) {
           throw new Error('Upload failed');
         }
 
         const uploadData = await uploadResponse.json();
         uploadedNoteId = uploadData.note_id;
-
-        progressBar.style.width = '100%';
-        progressText.textContent = 'Upload complete!';
-
-        setTimeout(() => {
-          progressDiv.style.display = 'none';
-          isUploadingInBackground = false;
-        }, 1000);
+        isUploadingInBackground = false;
 
       } catch (error) {
         console.error('Background upload error:', error);
         alert('Upload failed: ' + error.message);
-        progressDiv.style.display = 'none';
         isUploadingInBackground = false;
       }
     }
@@ -1528,7 +1495,18 @@
 
       // Wait for background upload if still in progress
       if (isUploadingInBackground) {
-        alert('Please wait for upload to complete...');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+
+        // Poll until upload is complete
+        const checkUpload = setInterval(() => {
+          if (!isUploadingInBackground) {
+            clearInterval(checkUpload);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Share Post';
+            submitPost(); // Retry submission
+          }
+        }, 500);
         return;
       }
 
