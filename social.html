@@ -1835,6 +1835,19 @@
             <option value="">Select a note from your library...</option>
           </select>
         </div>
+        <!-- Poll Creator -->
+        <div id="inlinePollCreator" style="display:none;margin:12px 0 0 48px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Poll Options</div>
+          <div id="pollOptionsContainer">
+            <input type="text" class="poll-option-input" placeholder="Option 1" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);margin-bottom:6px;">
+            <input type="text" class="poll-option-input" placeholder="Option 2" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);margin-bottom:6px;">
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button onclick="addPollOption()" style="font-size:12px;color:var(--accent-primary);background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit;">+ Add option</button>
+            <button onclick="removePoll()" style="font-size:12px;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:inherit;">Remove poll</button>
+          </div>
+        </div>
+
         <!-- Actions bar -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-color);margin-left:48px;">
           <div style="display:flex;gap:4px;">
@@ -1846,6 +1859,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               Library
             </button>
+            <button onclick="togglePollCreator()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">Poll</button>
             <input type="file" id="inlineFileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" multiple style="display:none;" onchange="handleInlineFile(event)">
           </div>
           <button id="inlinePostBtn" onclick="submitInlinePost()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent-primary);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>Post</button>
@@ -2175,6 +2189,124 @@
       } catch (e) {
         container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">Failed to search</div>`;
       }
+    }
+
+    // ========== POLLS ==========
+    let pollActive = false;
+
+    function togglePollCreator() {
+      pollActive = !pollActive;
+      document.getElementById('inlinePollCreator').style.display = pollActive ? 'block' : 'none';
+      if (pollActive) updateInlinePostBtn();
+    }
+
+    function addPollOption() {
+      const container = document.getElementById('pollOptionsContainer');
+      const count = container.querySelectorAll('.poll-option-input').length;
+      if (count >= 6) { if (window.sfToast) sfToast('Max 6 options', 'error'); return; }
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'poll-option-input';
+      input.placeholder = `Option ${count + 1}`;
+      input.style.cssText = 'width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);margin-bottom:6px;';
+      container.appendChild(input);
+    }
+
+    function removePoll() {
+      pollActive = false;
+      document.getElementById('inlinePollCreator').style.display = 'none';
+      document.getElementById('pollOptionsContainer').innerHTML = `
+        <input type="text" class="poll-option-input" placeholder="Option 1" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);margin-bottom:6px;">
+        <input type="text" class="poll-option-input" placeholder="Option 2" style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);margin-bottom:6px;">
+      `;
+    }
+
+    function getPollOptions() {
+      if (!pollActive) return null;
+      const inputs = document.querySelectorAll('#pollOptionsContainer .poll-option-input');
+      const options = Array.from(inputs).map(i => i.value.trim()).filter(v => v);
+      return options.length >= 2 ? options : null;
+    }
+
+    async function votePoll(postId, optionIndex) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/vote-poll`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ option_index: optionIndex })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          // Update poll display
+          const container = document.getElementById(`poll-${postId}`);
+          if (container && data.options) renderPollResults(container, data.options, optionIndex);
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed to vote', 'error');
+        }
+      } catch {}
+    }
+
+    function renderPollResults(container, options, votedIndex) {
+      const total = options.reduce((s, o) => s + (o.votes || 0), 0) || 1;
+      container.innerHTML = options.map((o, i) => {
+        const pct = Math.round(((o.votes || 0) / total) * 100);
+        const isVoted = i === votedIndex;
+        return `<div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+            <span style="color:var(--text-primary);font-weight:${isVoted ? '700' : '400'};">${o.text}${isVoted ? ' &#x2713;' : ''}</span>
+            <span style="color:var(--text-muted);">${pct}%</span>
+          </div>
+          <div style="height:6px;background:var(--border-color);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:${isVoted ? 'var(--accent-primary)' : 'var(--text-muted)'};border-radius:3px;transition:width 0.3s;"></div>
+          </div>
+        </div>`;
+      }).join('') + `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${total} vote${total !== 1 ? 's' : ''}</div>`;
+    }
+
+    // ========== LINK PREVIEW ==========
+    async function fetchLinkPreview(url) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/link-preview`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        if (res.ok) return await res.json();
+      } catch {}
+      return null;
+    }
+
+    function renderLinkPreview(text) {
+      if (!text) return '';
+      const urlMatch = text.match(/https?:\/\/[^\s]+/);
+      if (!urlMatch) return '';
+      const url = urlMatch[0];
+      // Return a placeholder that gets populated async
+      return `<div class="link-preview-placeholder" data-url="${url}" style="margin:8px 0;border:1px solid var(--border-color);border-radius:10px;overflow:hidden;cursor:pointer;" onclick="event.stopPropagation(); window.open('${url}', '_blank')">
+        <div style="padding:12px;font-size:12px;color:var(--text-muted);">Loading preview...</div>
+      </div>`;
+    }
+
+    // Load link previews after feed renders
+    function loadLinkPreviews() {
+      document.querySelectorAll('.link-preview-placeholder').forEach(async el => {
+        const url = el.dataset.url;
+        if (!url || el.dataset.loaded) return;
+        el.dataset.loaded = 'true';
+        const data = await fetchLinkPreview(url);
+        if (data && data.title) {
+          el.innerHTML = `
+            ${data.image ? `<img src="${data.image}" style="width:100%;max-height:180px;object-fit:cover;" onerror="this.style.display='none'">` : ''}
+            <div style="padding:10px 12px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:2px;">${data.title}</div>
+              ${data.description ? `<div style="font-size:12px;color:var(--text-muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${data.description}</div>` : ''}
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${data.site_name || new URL(url).hostname}</div>
+            </div>
+          `;
+        } else {
+          el.innerHTML = `<div style="padding:10px 12px;font-size:12px;"><a href="${url}" target="_blank" style="color:var(--accent-primary);word-break:break-all;">${url}</a></div>`;
+        }
+      });
     }
 
     // ========== STORIES ==========
@@ -2870,11 +3002,14 @@
       btn.textContent = 'Posting...';
 
       try {
+        const pollOpts = getPollOptions();
         const postData = {
           post_type: inlineUploadedNoteId ? 'note' : 'text',
           text_content: text || null,
           note_id: inlineUploadedNoteId || null,
-          images: inlineImageUrls.length > 0 ? inlineImageUrls : undefined
+          images: inlineImageUrls.length > 0 ? inlineImageUrls : undefined,
+          poll_options: pollOpts || undefined,
+          poll_duration: pollOpts ? 24 : undefined
         };
 
         const res = await fetch(`${BACKEND_URL}/api/social/posts`, {
@@ -2888,6 +3023,7 @@
           document.getElementById('inlinePostText').value = '';
           document.getElementById('inlinePostText').style.height = 'auto';
           removeInlineAttach();
+          removePoll();
           if (window.sfToast) sfToast('Posted!', 'success');
           loadFeed();
         } else {
@@ -3442,6 +3578,7 @@
         ` : '';
 
         container.innerHTML = feedHtml + loadMoreBtn;
+        setTimeout(loadLinkPreviews, 100);
       } catch (error) {
         console.error('Error loading feed:', error);
         if (!append) {
@@ -3606,6 +3743,13 @@
           <div class="post-content">
             ${post.post_type === 'note' && post.notes?.original_filename ? `<div class="post-title">${post.notes.original_filename}</div>` : ''}
             ${post.text_content ? `<div class="post-caption">${formatPostText(post.text_content)}</div>` : ''}
+            ${post.text_content ? renderLinkPreview(post.text_content) : ''}
+            ${post.poll_options ? `<div id="poll-${post.id}" style="padding:8px 16px 12px;" onclick="event.stopPropagation();">
+              ${post.poll_options.map((o, i) => `
+                <button onclick="votePoll('${post.id}', ${i})" style="display:block;width:100%;padding:10px 14px;margin-bottom:6px;border:1.5px solid var(--border-color);border-radius:10px;background:none;color:var(--text-primary);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-align:left;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent-primary)'" onmouseout="this.style.borderColor='var(--border-color)'">${o.text}</button>
+              `).join('')}
+              <div style="font-size:11px;color:var(--text-muted);">${post.poll_options.reduce((s, o) => s + (o.votes || 0), 0)} votes${post.poll_ends_at ? ' - ends ' + getTimeAgo(post.poll_ends_at) : ''}</div>
+            </div>` : ''}
             ${isRepost && post.original_post ? `
               <div onclick="event.stopPropagation(); viewPost('${post.original_post.id}')" style="margin:8px 16px 0;border:1px solid var(--border-color);border-radius:10px;padding:12px;cursor:pointer;background:var(--bg-primary);">
                 <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">@${post.original_post.username || 'Unknown'}</div>
