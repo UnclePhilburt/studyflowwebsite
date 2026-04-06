@@ -5,12 +5,13 @@
   const BACKEND_URL = 'https://studyflowsuite.onrender.com';
   const CHECK_INTERVAL = 60000; // Check every 60s
 
-  // Skip pages that don't need it
+  // Skip pages that don't need it or have their own notification system
   const page = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
   if (page.startsWith('admin') || page === 'signup' || page === 'shared' || page === 'index' ||
       page === 'reset-password' || page === 'verify-age' || page === 'verify-edu') return;
-  // Dashboard has its own notification system
   if (page === 'dashboard') return;
+  // Social pages have their own header -- skip the floating bell
+  if (page === 'social' || page === 'profile' || page === 'post' || page === 'messages') return;
 
   let authToken = null;
   let bellEl = null;
@@ -27,17 +28,17 @@
     // Create bell icon (fixed top-right)
     const wrap = document.createElement('div');
     wrap.id = 'sf-notif-wrap';
-    wrap.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9990;font-family:Inter,-apple-system,sans-serif;';
+    wrap.style.cssText = 'position:fixed;top:16px;right:70px;z-index:9990;font-family:Inter,-apple-system,sans-serif;';
 
     wrap.innerHTML = `
       <button id="sf-notif-bell" style="
         width:40px;height:40px;border-radius:10px;border:none;
-        background:var(--widget-bg,rgba(255,255,255,0.8));backdrop-filter:blur(20px);
-        box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;
+        background:var(--bg-secondary,rgba(255,255,255,0.8));backdrop-filter:blur(20px);
+        box-shadow:0 2px 8px var(--shadow,rgba(0,0,0,0.08));cursor:pointer;
         display:flex;align-items:center;justify-content:center;position:relative;
-        transition:all 0.15s;
+        transition:all 0.15s;color:var(--text-primary,#2d2d2d);
       " aria-label="Notifications">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-primary,#2d2d2d);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
