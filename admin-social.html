@@ -84,12 +84,14 @@
 
     <div class="stats" id="statsBar">
       <div class="stat-card"><div class="stat-value" id="totalCount">-</div><div class="stat-label">Total Posts</div></div>
+      <div class="stat-card" style="border-color:#fca5a5;"><div class="stat-value" id="reportedCount" style="color:#ef4444;">-</div><div class="stat-label">Reported</div></div>
       <div class="stat-card"><div class="stat-value" id="approvedCount">-</div><div class="stat-label">Approved</div></div>
       <div class="stat-card"><div class="stat-value" id="deniedCount">-</div><div class="stat-label">Denied</div></div>
     </div>
 
     <div class="filters">
       <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('reported', this)" style="color:#ef4444;border-color:#fca5a5;">Reported</button>
       <button class="filter-btn" onclick="setFilter('approved', this)">Approved</button>
       <button class="filter-btn" onclick="setFilter('denied', this)">Denied</button>
     </div>
@@ -140,38 +142,62 @@
     function updateStats() {
       const approved = allPosts.filter(p => p.moderation_status === 'approved').length;
       const denied = allPosts.filter(p => p.moderation_status === 'denied').length;
+      const reported = allPosts.filter(p => p.report_count > 0).length;
       document.getElementById('totalCount').textContent = allPosts.length;
+      document.getElementById('reportedCount').textContent = reported;
       document.getElementById('approvedCount').textContent = approved;
       document.getElementById('deniedCount').textContent = denied;
     }
 
     function renderPosts() {
       const container = document.getElementById('postsList');
-      if (allPosts.length === 0) {
+
+      let filtered = allPosts;
+      if (currentFilter === 'reported') {
+        filtered = allPosts.filter(p => p.report_count > 0);
+      }
+
+      if (filtered.length === 0) {
         container.innerHTML = '<div class="empty">No posts found</div>';
         return;
       }
 
-      container.innerHTML = allPosts.map(p => {
+      container.innerHTML = filtered.map(p => {
         const avatar = (p.username || 'U').charAt(0).toUpperCase();
         const status = p.moderation_status || 'approved';
         const isDenied = status === 'denied';
         const content = p.text_content ? (p.text_content.length > 200 ? p.text_content.slice(0, 200) + '...' : p.text_content) : '';
         const noteHtml = p.note_filename ? `<div class="post-note">Note: ${escapeHtml(p.note_filename)}</div>` : '';
         const time = new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const isReported = p.report_count > 0;
+
+        let reportHtml = '';
+        if (isReported) {
+          const reasons = p.reports.map(r => r.reason).join(', ');
+          const details = p.reports.filter(r => r.details).map(r => r.details).join('; ');
+          reportHtml = `
+            <div style="margin-top:8px;padding:8px 12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;">
+              <div style="font-size:11px;font-weight:700;color:#dc2626;margin-bottom:4px;">REPORTED (${p.report_count}x)</div>
+              <div style="font-size:12px;color:#991b1b;">Reasons: ${escapeHtml(reasons)}</div>
+              ${details ? `<div style="font-size:11px;color:#b91c1c;margin-top:4px;">"${escapeHtml(details)}"</div>` : ''}
+            </div>
+          `;
+        }
 
         return `
-          <div class="post-card ${isDenied ? 'denied' : ''}">
+          <div class="post-card ${isDenied ? 'denied' : ''}" style="${isReported && !isDenied ? 'border-color:#fca5a5;border-width:2px;' : ''}">
             <div class="post-avatar">${avatar}</div>
             <div class="post-body">
               <div class="post-meta">
                 <span class="post-username">${escapeHtml(p.username || 'Anonymous')}</span>
                 <span class="post-type ${p.post_type}">${p.post_type}</span>
                 <span class="post-status ${status}">${status}</span>
+                ${isReported ? '<span style="font-size:10px;padding:2px 8px;background:#fef2f2;color:#dc2626;border-radius:8px;font-weight:700;">REPORTED</span>' : ''}
                 <span class="post-time">${time}</span>
               </div>
               ${noteHtml}
               ${content ? `<div class="post-content">${escapeHtml(content)}</div>` : ''}
+              ${reportHtml}
               <div class="post-stats">
                 <span>${p.upvote_count || 0} upvotes</span>
                 <span>${p.downvote_count || 0} downvotes</span>

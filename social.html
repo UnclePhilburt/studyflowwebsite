@@ -2415,10 +2415,45 @@
       document.getElementById(`postMenu-${postId}`).classList.remove('show');
     }
 
+    let reportingPostId = null;
+
     function reportPost(postId) {
-      if (confirm('Report this post as inappropriate?')) {
-        showToast('Post reported. Thank you!');
-        document.getElementById(`postMenu-${postId}`).classList.remove('show');
+      reportingPostId = postId;
+      document.getElementById(`postMenu-${postId}`).classList.remove('show');
+      document.getElementById('reportModal').style.display = 'flex';
+    }
+
+    function closeReportModal() {
+      document.getElementById('reportModal').style.display = 'none';
+      reportingPostId = null;
+    }
+
+    async function submitReport() {
+      if (!reportingPostId) return;
+      const reason = document.querySelector('input[name="reportReason"]:checked')?.value;
+      const details = document.getElementById('reportDetails').value.trim();
+
+      if (!reason) {
+        alert('Please select a reason');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${reportingPostId}/report`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason, details: details || undefined })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          closeReportModal();
+          if (window.sfToast) sfToast('Report submitted. We\'ll review it shortly.', 'success');
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed to report', 'error');
+        }
+      } catch (e) {
+        if (window.sfToast) sfToast('Failed to submit report', 'error');
       }
     }
 
@@ -2861,6 +2896,38 @@
     <div class="lightbox-content">
       <button class="lightbox-close" onclick="closeLightbox()">×</button>
       <img id="lightboxImage" class="lightbox-image" src="" alt="Full size">
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="reportModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)closeReportModal()">
+    <div style="background:var(--card-bg);border-radius:14px;padding:24px;max-width:400px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.15);">
+      <h3 style="font-size:17px;margin-bottom:16px;color:var(--text-primary);">Report Post</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border-color);">
+          <input type="radio" name="reportReason" value="spam"> Spam
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border-color);">
+          <input type="radio" name="reportReason" value="harassment"> Harassment
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border-color);">
+          <input type="radio" name="reportReason" value="inappropriate"> Inappropriate Content
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border-color);">
+          <input type="radio" name="reportReason" value="misinformation"> Misinformation
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border-color);">
+          <input type="radio" name="reportReason" value="copyright"> Copyright Violation
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);cursor:pointer;padding:8px;border-radius:8px;border:1px solid var(--border-color);">
+          <input type="radio" name="reportReason" value="other"> Other
+        </label>
+      </div>
+      <textarea id="reportDetails" placeholder="Additional details (optional)..." style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;font-size:13px;min-height:60px;resize:vertical;background:var(--bg-primary);color:var(--text-primary);margin-bottom:16px;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="closeReportModal()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-secondary);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+        <button onclick="submitReport()" style="padding:8px 16px;border-radius:8px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Submit Report</button>
+      </div>
     </div>
   </div>
 </body>
