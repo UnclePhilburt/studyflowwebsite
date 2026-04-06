@@ -771,7 +771,7 @@
       }
 
       // Info
-      document.getElementById('displayName').textContent = profileData.display_name || profileData.username;
+      document.getElementById('displayName').innerHTML = (profileData.display_name || profileData.username) + (profileData.is_verified ? ' <svg width="18" height="18" viewBox="0 0 24 24" fill="#7c9885" style="vertical-align:-3px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : '');
       document.getElementById('username').textContent = `@${profileData.username}`;
       document.getElementById('bio').textContent = profileData.bio || 'No bio yet';
       document.getElementById('followersCount').textContent = profileData.follower_count || 0;
