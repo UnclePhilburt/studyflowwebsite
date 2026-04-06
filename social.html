@@ -2151,6 +2151,7 @@
       // Find @ before cursor by scanning backwards
       const textBefore = val.substring(0, pos);
       const match = textBefore.match(/@(\w*)$/);
+      console.log('[Mention] textBefore:', textBefore, 'match:', match);
 
       if (!match) {
         hideMentionDropdown();
@@ -2172,14 +2173,18 @@
     }
 
     async function showMentionSuggestions(query, textarea) {
-      // Filter following first
-      let suggestions = followingUsernames
-        .filter(u => !query || u.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 5)
-        .map(u => ({ username: u, priority: true }));
+      let suggestions = [];
 
-      // Search backend for more
-      if (suggestions.length < 5 && query.length >= 1) {
+      // Filter following first
+      if (followingUsernames.length > 0) {
+        suggestions = followingUsernames
+          .filter(u => !query || u.toLowerCase().includes(query.toLowerCase()))
+          .slice(0, 5)
+          .map(u => ({ username: u, priority: true }));
+      }
+
+      // Always search backend if we have a query
+      if (query.length >= 1) {
         try {
           const res = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
@@ -2188,12 +2193,14 @@
             const data = await res.json();
             const existing = new Set(suggestions.map(s => s.username));
             (data.users || []).forEach(u => {
-              if (!existing.has(u.username) && suggestions.length < 8) {
+              if (u.username && !existing.has(u.username) && suggestions.length < 8) {
                 suggestions.push({ username: u.username, display_name: u.display_name, avatar_url: u.avatar_url, priority: false });
               }
             });
           }
-        } catch {}
+        } catch (e) {
+          console.error('Mention search error:', e);
+        }
       }
 
       if (suggestions.length === 0) { hideMentionDropdown(); return; }
