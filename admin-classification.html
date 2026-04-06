@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <title>AI Classification Review - Admin - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #f5f4f0; color: #2d2d2d; min-height: 100vh; overflow: hidden; }
+
+    .review-header {
+      position: fixed; top: 0; left: 0; right: 0; height: 56px;
+      background: rgba(248, 247, 244, 0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 100;
+    }
+    .review-header-left { display: flex; align-items: center; gap: 12px; }
+    .review-header-left a { color: #7c9885; text-decoration: none; }
+    .review-header h1 { font-family: 'Lora', serif; font-size: 18px; }
+    #counter { font-size: 13px; color: #999; font-weight: 600; }
+
+    .card-container {
+      position: fixed; top: 56px; left: 0; right: 0; bottom: 80px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .note-card {
+      width: 550px; max-width: 90vw; max-height: calc(100vh - 160px);
+      background: white; border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+      overflow-y: auto; transition: transform 0.3s, opacity 0.3s;
+    }
+    .note-card.swipe-right { transform: translateX(120%) rotate(8deg); opacity: 0; }
+    .note-card.swipe-left { transform: translateX(-120%) rotate(-8deg); opacity: 0; }
+
+    .card-header { padding: 20px; border-bottom: 1px solid #eee; }
+    .card-filename { font-family: 'Lora', serif; font-size: 20px; font-weight: 500; margin-bottom: 8px; }
+    .card-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: #999; }
+    .card-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .classification-badge {
+      display: inline-block; padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .classification-badge.educational { background: #d1fae5; color: #065f46; }
+    .classification-badge.personal { background: #fee2e2; color: #991b1b; }
+    .classification-badge.unknown { background: #f3f4f6; color: #6b7280; }
+
+    .card-preview { background: #fafafa; border-bottom: 1px solid #eee; }
+    .card-preview iframe { width: 100%; height: 400px; border: none; }
+    .card-preview img { width: 100%; max-height: 400px; object-fit: contain; }
+    .card-preview-fallback { padding: 40px; text-align: center; color: #999; font-size: 14px; }
+
+    .card-status {
+      padding: 16px 20px; font-size: 13px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nexus-status { font-weight: 600; }
+    .nexus-status.public { color: #059669; }
+    .nexus-status.private { color: #dc2626; }
+
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
+      background: rgba(248, 247, 244, 0.95); backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex; align-items: center; justify-content: center; gap: 40px; z-index: 100;
+    }
+    .action-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+    }
+    .action-circle {
+      width: 56px; height: 56px; border-radius: 50%; border: none;
+      font-size: 22px; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .action-circle:hover { transform: scale(1.1); }
+    .action-circle.private { background: #fee2e2; color: #dc2626; }
+    .action-circle.keep { background: #e0e7ff; color: #4338ca; }
+    .action-circle.public { background: #d1fae5; color: #059669; }
+    .action-hint { font-size: 10px; color: #999; }
+
+    .flash {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      padding: 16px 32px; border-radius: 12px; font-size: 18px; font-weight: 700;
+      opacity: 0; transition: opacity 0.15s; z-index: 200; pointer-events: none;
+    }
+    .flash.public { background: #d1fae5; color: #059669; }
+    .flash.private { background: #fee2e2; color: #dc2626; }
+    .flash.kept { background: #e0e7ff; color: #4338ca; }
+    .flash.show { opacity: 1; }
+
+    .empty-state, .loading-state {
+      position: fixed; top: 56px; left: 0; right: 0; bottom: 80px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; color: #999; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="review-header">
+    <div class="review-header-left">
+      <a href="admin.html">Back</a>
+      <h1>AI Classification Review</h1>
+    </div>
+    <span id="counter">Loading...</span>
+  </div>
+
+  <div class="loading-state" id="loadingState">Loading uploads...</div>
+
+  <div class="card-container" id="cardContainer" style="display:none;">
+    <div class="note-card" id="noteCard">
+      <div class="card-header">
+        <div class="card-filename" id="cardFilename">Loading...</div>
+        <div class="card-meta">
+          <span>By <strong id="cardUser">-</strong></span>
+          <span id="cardPages">- pages</span>
+          <span id="cardSize">- KB</span>
+          <span id="cardDate">-</span>
+        </div>
+        <div style="margin-top:10px;">
+          <span>AI says: </span>
+          <span class="classification-badge" id="cardClassification">unknown</span>
+          <span style="margin-left:8px;">Currently: </span>
+          <span class="nexus-status" id="cardNexusStatus">-</span>
+        </div>
+      </div>
+      <div class="card-preview" id="cardPreview">
+        <div class="card-preview-fallback">Loading preview...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div>
+      <div style="font-size:48px;margin-bottom:12px;">&#x2705;</div>
+      <div style="font-size:18px;font-weight:600;">All reviewed!</div>
+      <div style="color:#999;margin-top:4px;">No more uploads to check.</div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <div class="action-btn">
+      <button class="action-circle private" onclick="override('make_private')">&#x1F6AB;</button>
+      <div class="action-hint">&#8592; Make Private</div>
+    </div>
+    <div class="action-btn">
+      <button class="action-circle keep" onclick="keepAndNext()">&#x2714;</button>
+      <div class="action-hint">Keep as-is</div>
+    </div>
+    <div class="action-btn">
+      <button class="action-circle public" onclick="override('make_public')">&#x1F30D;</button>
+      <div class="action-hint">Make Public &#8594;</div>
+    </div>
+  </div>
+
+  <div class="flash public" id="flashPublic">MADE PUBLIC</div>
+  <div class="flash private" id="flashPrivate">MADE PRIVATE</div>
+  <div class="flash kept" id="flashKept">KEPT</div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
+    if (!adminKey) window.location.href = 'admin.html';
+
+    let queue = [];
+    let currentIndex = 0;
+    let reviewedCount = 0;
+
+    async function loadQueue() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/admin/classification-queue?key=${encodeURIComponent(adminKey)}&limit=100`);
+        if (!res.ok) {
+          if (res.status === 403) { sessionStorage.removeItem('studyflow_admin_key'); window.location.href = 'admin.html'; return; }
+          throw new Error('Failed');
+        }
+        const data = await res.json();
+        queue = data.notes || [];
+        currentIndex = 0;
+        reviewedCount = 0;
+
+        document.getElementById('loadingState').style.display = 'none';
+        if (queue.length === 0) { showEmpty(); } else { showCard(); }
+        updateCounter();
+      } catch (e) {
+        document.getElementById('loadingState').textContent = 'Error: ' + e.message;
+      }
+    }
+
+    function updateCounter() {
+      const remaining = queue.length - currentIndex;
+      document.getElementById('counter').textContent = `${remaining} remaining | ${reviewedCount} reviewed`;
+    }
+
+    function showCard() {
+      if (currentIndex >= queue.length) { showEmpty(); return; }
+
+      const note = queue[currentIndex];
+      const card = document.getElementById('noteCard');
+      card.className = 'note-card';
+
+      document.getElementById('cardFilename').textContent = note.original_filename || 'Untitled';
+      document.getElementById('cardUser').textContent = '@' + (note.username || 'Unknown');
+      document.getElementById('cardPages').textContent = (note.page_count || '?') + ' pages';
+      document.getElementById('cardSize').textContent = note.file_size ? Math.round(note.file_size / 1024) + ' KB' : '-';
+      document.getElementById('cardDate').textContent = new Date(note.uploaded_at).toLocaleDateString();
+
+      const badge = document.getElementById('cardClassification');
+      const cls = (note.ai_classification || 'unknown').toLowerCase();
+      badge.textContent = note.ai_classification || 'not classified';
+      badge.className = 'classification-badge ' + (cls.includes('educational') ? 'educational' : cls.includes('personal') ? 'personal' : 'unknown');
+
+      const status = document.getElementById('cardNexusStatus');
+      status.textContent = note.is_public ? 'Public (on Nexus)' : 'Private';
+      status.className = 'nexus-status ' + (note.is_public ? 'public' : 'private');
+
+      // Load preview
+      loadPreview(note.id);
+
+      document.getElementById('cardContainer').style.display = 'flex';
+      document.getElementById('emptyState').style.display = 'none';
+      updateCounter();
+    }
+
+    async function loadPreview(noteId) {
+      const container = document.getElementById('cardPreview');
+      container.innerHTML = '<div class="card-preview-fallback">Loading preview...</div>';
+      try {
+        const res = await fetch(`${BACKEND_URL}/admin/note-preview/${noteId}?key=${encodeURIComponent(adminKey)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) {
+            container.innerHTML = `<iframe src="${data.url}"></iframe>`;
+            return;
+          }
+        }
+        container.innerHTML = '<div class="card-preview-fallback">Preview unavailable</div>';
+      } catch {
+        container.innerHTML = '<div class="card-preview-fallback">Preview unavailable</div>';
+      }
+    }
+
+    function showEmpty() {
+      document.getElementById('cardContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'flex';
+      updateCounter();
+    }
+
+    function flash(type) {
+      const el = document.getElementById(type === 'make_public' ? 'flashPublic' : type === 'make_private' ? 'flashPrivate' : 'flashKept');
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 500);
+    }
+
+    async function override(action) {
+      if (currentIndex >= queue.length) return;
+      const note = queue[currentIndex];
+      const card = document.getElementById('noteCard');
+
+      card.classList.add(action === 'make_public' ? 'swipe-right' : 'swipe-left');
+      flash(action);
+
+      try {
+        await fetch(`${BACKEND_URL}/admin/classification/${note.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: adminKey, action })
+        });
+      } catch (e) { console.error('Override error:', e); }
+
+      reviewedCount++;
+      setTimeout(() => { currentIndex++; showCard(); }, 400);
+    }
+
+    function keepAndNext() {
+      if (currentIndex >= queue.length) return;
+      const card = document.getElementById('noteCard');
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.9)';
+      flash('keep');
+      reviewedCount++;
+      setTimeout(() => { currentIndex++; showCard(); }, 300);
+    }
+
+    // Arrow keys
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); override('make_private'); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); override('make_public'); }
+      else if (e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); keepAndNext(); }
+    });
+
+    loadQueue();
+  </script>
+</body>
+</html>
