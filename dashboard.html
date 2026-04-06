@@ -3131,10 +3131,17 @@
       <div class="user-avatar" id="userAvatar" onclick="toggleUserMenu()" role="button" aria-label="User menu"></div>
       <div class="user-menu" id="userMenu">
         <div class="user-menu-email" id="menuEmail">Loading...</div>
-        <a href="account.html" class="user-menu-item">
+        <a href="profile.html" class="user-menu-item">
           <svg viewBox="0 0 24 24">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
+          </svg>
+          My Profile
+        </a>
+        <a href="account.html" class="user-menu-item">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
           Account
         </a>
@@ -3566,6 +3573,20 @@
 
       document.getElementById('userAvatar').textContent = (currentUser.email || 'U').charAt(0).toUpperCase();
       document.getElementById('menuEmail').textContent = currentUser.email;
+
+      // Load profile photo for avatar
+      try {
+        const profileRes = await fetch(`${BACKEND_URL}/api/current-user`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          if (profileData.avatar_url) {
+            const avatarEl = document.getElementById('userAvatar');
+            avatarEl.innerHTML = `<img src="${profileData.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          }
+        }
+      } catch {}
 
       loadNotifications();
 
@@ -4250,6 +4271,13 @@
         name: 'My Citations Rank',
         desc: 'Your rank by notes helping other students',
         render: renderCitationRank,
+        comingSoon: false,
+        category: 'app'
+      },
+      socialActivity: {
+        name: 'Social Activity',
+        desc: 'Recent likes, comments, and follows',
+        render: renderSocialActivity,
         comingSoon: false,
         category: 'app'
       },
@@ -5367,6 +5395,70 @@
         console.error('Leaderboard error:', error);
         container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);">Error loading leaderboard</div>';
       }
+    }
+
+    async function renderSocialActivity(widgetData) {
+      const container = document.getElementById(`widget-${widgetData.id}`);
+      container.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:12px;">Loading...</div>';
+
+      try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) { container.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:12px;">Sign in to see activity</div>'; return; }
+
+        const res = await fetch(`${BACKEND_URL}/api/social/activity`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        const activities = data.activities || [];
+
+        if (activities.length === 0) {
+          container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:12px;">No recent activity.<br><a href="social.html" style="color:var(--accent-primary);">Visit Social</a></div>';
+          return;
+        }
+
+        container.innerHTML = activities.slice(0, 8).map(a => {
+          const name = a.username || 'Someone';
+          let icon, text;
+          if (a.type === 'vote') {
+            icon = a.detail === 'upvote' ? '&#x25B2;' : '&#x25BC;';
+            text = `<strong>${name}</strong> ${a.detail === 'upvote' ? 'liked' : 'downvoted'} your post`;
+          } else if (a.type === 'comment') {
+            icon = '&#x1F4AC;';
+            text = `<strong>${name}</strong> commented: "${a.detail}"`;
+          } else if (a.type === 'follow') {
+            icon = '&#x1F465;';
+            text = `<strong>${name}</strong> started following you`;
+          } else {
+            icon = '&#x2022;';
+            text = `<strong>${name}</strong> interacted`;
+          }
+
+          const timeAgo = getRelativeTime(a.created_at);
+
+          return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;font-size:12px;border-bottom:1px solid var(--border-color);">
+            <span style="font-size:14px;flex-shrink:0;margin-top:1px;">${icon}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="color:var(--text-primary);line-height:1.4;">${text}</div>
+              <div style="color:var(--text-muted);font-size:10px;margin-top:2px;">${timeAgo}</div>
+            </div>
+          </div>`;
+        }).join('') + `<div style="padding:8px 12px;text-align:center;"><a href="social.html" style="font-size:11px;color:var(--accent-primary);text-decoration:none;font-weight:600;">View Social Feed</a></div>`;
+
+      } catch (e) {
+        container.innerHTML = '<div style="padding:12px;color:var(--text-muted);font-size:12px;">Could not load activity</div>';
+      }
+    }
+
+    function getRelativeTime(timestamp) {
+      const now = new Date();
+      const then = new Date(timestamp);
+      const diff = Math.floor((now - then) / 1000);
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return then.toLocaleDateString();
     }
 
     async function renderCitationRank(widgetData) {

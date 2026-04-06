@@ -1945,7 +1945,7 @@
               <div class="card-title">${filename}</div>
               <div class="card-preview">${highlightedPreview.substring(0, 150)}...</div>
               <div class="card-meta">
-                <span class="username">@${username}</span> · ${university} · ${year}
+                <a href="profile.html?user=${username}" class="username" onclick="event.stopPropagation();" style="color:var(--accent-primary);text-decoration:none;">@${username}</a> · ${university} · ${year}
               </div>
             </div>
 

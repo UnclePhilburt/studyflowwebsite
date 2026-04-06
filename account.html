@@ -1287,6 +1287,18 @@
             </span>
           </div>
         </div>
+        <div class="info-item">
+          <div class="info-label">Followers</div>
+          <div class="info-value" id="socialFollowers">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Following</div>
+          <div class="info-value" id="socialFollowing">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Social Posts</div>
+          <div class="info-value"><a href="profile.html" id="socialPosts" style="color:var(--accent-primary);text-decoration:none;">-</a></div>
+        </div>
       </div>
     </div>
 
@@ -2041,7 +2053,22 @@
       await loadProfile();
       await loadSubscriptionStatus();
       await loadDailyDownloadStatus();
+      loadSocialStats();
     })();
+
+    async function loadSocialStats() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/my-stats`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('socialFollowers').textContent = data.followers || 0;
+          document.getElementById('socialFollowing').textContent = data.following || 0;
+          document.getElementById('socialPosts').textContent = data.posts || 0;
+        }
+      } catch {}
+    }
 
     async function loadStudyStreak() {
       try {
