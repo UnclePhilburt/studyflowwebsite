@@ -356,20 +356,20 @@
     let currentFilter = 'all';
     let allRequests = [];
 
-    // Check admin key
-    const adminKey = sessionStorage.getItem('studyflow_admin_key');
-    if (!adminKey) {
-      window.location.href = 'admin.html';
-    }
-
     document.addEventListener('DOMContentLoaded', async () => {
-      // Get Supabase session
+      // Try Supabase session first
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) {
+      if (session) {
+        authToken = session.access_token;
+      } else {
+        // Fallback to localStorage token
+        authToken = localStorage.getItem('auth_token');
+      }
+
+      if (!authToken) {
         document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:Inter,sans-serif;"><h2>Auth Required</h2><p style="color:#888;margin-top:8px;">You need to be logged in to manage feature requests.</p><p style="margin-top:12px;"><a href="signup.html" style="color:#7c9885;">Sign in</a> | <a href="admin.html" style="color:#7c9885;">Back to Admin</a></p></div>';
         return;
       }
-      authToken = session.access_token;
       loadRequests();
     });
 
