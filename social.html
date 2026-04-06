@@ -1799,7 +1799,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               Library
             </button>
-            <input type="file" id="inlineFileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" style="display:none;" onchange="handleInlineFile(event)">
+            <input type="file" id="inlineFileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" multiple style="display:none;" onchange="handleInlineFile(event)">
           </div>
           <button id="inlinePostBtn" onclick="submitInlinePost()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent-primary);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>Post</button>
         </div>
@@ -2129,6 +2129,28 @@
       }
     }
 
+    // ========== IMAGE CAROUSEL ==========
+    const carouselPositions = {};
+
+    function carouselNav(postId, dir) {
+      const carousel = document.getElementById(`carousel-${postId}`);
+      if (!carousel) return;
+      const track = carousel.querySelector('.carousel-track');
+      const imgs = track.querySelectorAll('img');
+      if (!imgs.length) return;
+
+      const current = carouselPositions[postId] || 0;
+      const next = Math.max(0, Math.min(current + dir, imgs.length - 1));
+      carouselPositions[postId] = next;
+
+      track.style.transform = `translateX(-${next * 100}%)`;
+
+      // Update dots
+      carousel.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+        dot.style.background = i === next ? 'white' : 'rgba(255,255,255,0.4)';
+      });
+    }
+
     // ========== PIN / BLOCK / MUTE ==========
     async function pinPost(postId) {
       document.getElementById(`postMenu-${postId}`)?.classList.remove('show');
@@ -2442,61 +2464,91 @@
 
     function updateInlinePostBtn() {
       const hasText = document.getElementById('inlinePostText').value.trim().length > 0;
-      const hasFile = inlineFile || inlineNoteId;
+      const hasFile = inlineFile || inlineNoteId || inlineImageUrls.length > 0;
       const btn = document.getElementById('inlinePostBtn');
       btn.disabled = !(hasText || hasFile);
       btn.style.opacity = (hasText || hasFile) ? '1' : '0.5';
     }
 
+    let inlineImageUrls = [];
+
     function handleInlineFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { if (window.sfToast) sfToast('Max 10MB', 'error'); return; }
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
 
-      inlineFile = file;
-      inlineNoteId = null;
+      const images = files.filter(f => f.type.startsWith('image/'));
+      const docs = files.filter(f => !f.type.startsWith('image/'));
 
-      const preview = document.getElementById('inlineAttachPreview');
-      preview.style.display = 'block';
-      document.getElementById('inlineLibraryPicker').style.display = 'none';
-
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          document.getElementById('inlinePreviewImg').src = e.target.result;
-          document.getElementById('inlinePreviewImg').style.display = 'block';
-          document.getElementById('inlinePreviewFile').style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-      } else {
+      // If it's a single doc (PDF), use the old note upload flow
+      if (docs.length === 1 && images.length === 0) {
+        const file = docs[0];
+        if (file.size > 10 * 1024 * 1024) { if (window.sfToast) sfToast('Max 10MB', 'error'); return; }
+        inlineFile = file;
+        inlineNoteId = null;
+        inlineImageUrls = [];
+        const preview = document.getElementById('inlineAttachPreview');
+        preview.style.display = 'block';
+        document.getElementById('inlineLibraryPicker').style.display = 'none';
         document.getElementById('inlinePreviewImg').style.display = 'none';
         document.getElementById('inlinePreviewFile').style.display = 'block';
         document.getElementById('inlinePreviewName').textContent = file.name;
+        updateInlinePostBtn();
+
+        inlineUploading = true;
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('content_type', 'note');
+        fetch(`${BACKEND_URL}/api/social/upload-note`, {
+          method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
+        }).then(r => r.json()).then(data => { inlineUploadedNoteId = data.note_id; inlineUploading = false; }).catch(() => { inlineUploading = false; });
+        return;
       }
 
-      updateInlinePostBtn();
+      // Multi-image upload
+      if (images.length > 0) {
+        inlineFile = null;
+        inlineNoteId = null;
+        inlineUploadedNoteId = null;
+        inlineImageUrls = [];
 
-      // Background upload
-      inlineUploading = true;
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('content_type', file.type.startsWith('image/') ? 'photo' : 'note');
-      fetch(`${BACKEND_URL}/api/social/upload-note`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${authToken}` },
-        body: formData
-      }).then(r => r.json()).then(data => {
-        inlineUploadedNoteId = data.note_id;
-        inlineUploading = false;
-      }).catch(() => { inlineUploading = false; });
+        const preview = document.getElementById('inlineAttachPreview');
+        preview.style.display = 'block';
+        document.getElementById('inlineLibraryPicker').style.display = 'none';
+        document.getElementById('inlinePreviewFile').style.display = 'none';
+
+        // Show thumbnails preview
+        const thumbsHtml = images.slice(0, 10).map((f, i) => {
+          const url = URL.createObjectURL(f);
+          return `<img src="${url}" style="width:${images.length === 1 ? '100%' : '80px'};height:${images.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
+        }).join('');
+        document.getElementById('inlinePreviewImg').style.display = 'none';
+        preview.querySelector('button')?.insertAdjacentHTML('afterend',
+          `<div id="inlineImageThumbs" style="display:flex;gap:4px;padding:8px;flex-wrap:wrap;overflow:hidden;">${thumbsHtml}</div>`
+        );
+
+        updateInlinePostBtn();
+
+        // Upload all images
+        inlineUploading = true;
+        const formData = new FormData();
+        images.slice(0, 10).forEach(f => formData.append('files', f));
+        fetch(`${BACKEND_URL}/api/social/upload-images`, {
+          method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
+        }).then(r => r.json()).then(data => {
+          inlineImageUrls = data.urls || [];
+          inlineUploading = false;
+        }).catch(() => { inlineUploading = false; });
+      }
     }
 
     function removeInlineAttach() {
       inlineFile = null;
       inlineNoteId = null;
       inlineUploadedNoteId = null;
+      inlineImageUrls = [];
       document.getElementById('inlineAttachPreview').style.display = 'none';
       document.getElementById('inlinePreviewImg').style.display = 'none';
+      document.getElementById('inlineImageThumbs')?.remove();
       document.getElementById('inlinePreviewFile').style.display = 'none';
       document.getElementById('inlineFileInput').value = '';
       updateInlinePostBtn();
@@ -2565,7 +2617,8 @@
         const postData = {
           post_type: inlineUploadedNoteId ? 'note' : 'text',
           text_content: text || null,
-          note_id: inlineUploadedNoteId || null
+          note_id: inlineUploadedNoteId || null,
+          images: inlineImageUrls.length > 0 ? inlineImageUrls : undefined
         };
 
         const res = await fetch(`${BACKEND_URL}/api/social/posts`, {
@@ -3208,7 +3261,30 @@
         thumbnailImageHtml = `<img class="post-thumbnail" src="${post.image_url}" alt="Post image" onclick="event.stopPropagation(); openLightbox('${post.image_url}');" style="cursor: zoom-in;">`;
       }
 
-      // Wrap thumbnail with buttons container if there's an image
+      // Multi-image carousel
+      const postImages = post.images || [];
+      if (postImages.length > 0) {
+        if (postImages.length === 1) {
+          thumbnailImageHtml = `<img class="post-thumbnail" src="${postImages[0]}" alt="Post image" onclick="event.stopPropagation(); openLightbox('${postImages[0]}');" style="cursor:zoom-in;">`;
+        } else {
+          thumbnailImageHtml = `
+            <div class="carousel" id="carousel-${post.id}" style="position:relative;overflow:hidden;">
+              <div class="carousel-track" style="display:flex;transition:transform 0.3s ease;">
+                ${postImages.map((url, i) => `<img src="${url}" alt="Image ${i+1}" style="width:100%;flex-shrink:0;object-fit:cover;max-height:500px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${url}');">`).join('')}
+              </div>
+              ${postImages.length > 1 ? `
+                <button onclick="event.stopPropagation(); carouselNav('${post.id}', -1)" style="position:absolute;top:50%;left:8px;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:16px;cursor:pointer;">&#8249;</button>
+                <button onclick="event.stopPropagation(); carouselNav('${post.id}', 1)" style="position:absolute;top:50%;right:8px;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:16px;cursor:pointer;">&#8250;</button>
+                <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:4px;">
+                  ${postImages.map((_, i) => `<div class="carousel-dot" data-carousel="${post.id}" data-index="${i}" style="width:6px;height:6px;border-radius:50%;background:${i === 0 ? 'white' : 'rgba(255,255,255,0.4)'};"></div>`).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+      }
+
+      // Wrap thumbnail with buttons container if there's an image or carousel
       if (thumbnailImageHtml) {
         thumbnailHtml = `
           <div class="post-thumbnail-container">
