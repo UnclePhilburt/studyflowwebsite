@@ -2121,6 +2121,54 @@
       }
     }
 
+    // ========== EDIT / DELETE OWN POSTS ==========
+    function editPost(postId, currentText) {
+      // Close the menu
+      document.getElementById(`postMenu-${postId}`)?.classList.remove('show');
+
+      const newText = prompt('Edit your post:', currentText);
+      if (newText === null) return; // cancelled
+      if (!newText.trim()) { if (window.sfToast) sfToast('Post cannot be empty', 'error'); return; }
+
+      fetch(`${BACKEND_URL}/api/social/posts/${postId}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text_content: newText.trim() })
+      }).then(async res => {
+        const data = await res.json();
+        if (res.ok) {
+          if (window.sfToast) sfToast('Post updated!', 'success');
+          loadFeed();
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed to edit', 'error');
+        }
+      }).catch(() => {
+        if (window.sfToast) sfToast('Failed to edit post', 'error');
+      });
+    }
+
+    async function deleteOwnPost(postId) {
+      document.getElementById(`postMenu-${postId}`)?.classList.remove('show');
+
+      const confirmed = window.sfConfirm ? await window.sfConfirm('Delete this post? This cannot be undone.') : confirm('Delete this post?');
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${postId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          if (window.sfToast) sfToast('Post deleted', 'success');
+          loadFeed();
+        } else {
+          if (window.sfToast) sfToast('Failed to delete', 'error');
+        }
+      } catch {
+        if (window.sfToast) sfToast('Failed to delete', 'error');
+      }
+    }
+
     // ========== TRENDING HASHTAGS ==========
     async function loadTrendingHashtags() {
       try {
@@ -3117,10 +3165,15 @@
             <div class="post-actions-menu">
               <div class="post-actions-trigger" onclick="event.stopPropagation(); togglePostMenu('${post.id}')">⋯</div>
               <div class="post-actions-dropdown" id="postMenu-${post.id}">
-                <div class="post-action-item" onclick="event.stopPropagation(); copyPostLink('${post.id}')">🔗 Copy Link</div>
-                <div class="post-action-item" onclick="event.stopPropagation(); sharePost('${post.id}')">↗ Share Post</div>
-                <div class="post-action-item" onclick="event.stopPropagation(); hidePost('${post.id}')">👁 Hide Post</div>
-                <div class="post-action-item danger" onclick="event.stopPropagation(); reportPost('${post.id}')">⚠ Report</div>
+                ${post.user_id === currentUser?.id ? `
+                  <div class="post-action-item" onclick="event.stopPropagation(); editPost('${post.id}', \`${(post.text_content || '').replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">Edit Post</div>
+                  <div class="post-action-item danger" onclick="event.stopPropagation(); deleteOwnPost('${post.id}')">Delete Post</div>
+                ` : ''}
+                <div class="post-action-item" onclick="event.stopPropagation(); copyPostLink('${post.id}')">Copy Link</div>
+                ${post.user_id !== currentUser?.id ? `
+                  <div class="post-action-item" onclick="event.stopPropagation(); hidePost('${post.id}')">Hide Post</div>
+                  <div class="post-action-item danger" onclick="event.stopPropagation(); reportPost('${post.id}')">Report</div>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -3155,7 +3208,7 @@
             <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
               <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}${post.is_verified ? ' <svg width="14" height="14" viewBox="0 0 24 24" fill="#7c9885" style="vertical-align:-2px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''} <span class="post-action-verb" style="font-weight:400;font-size:12px;color:var(--text-muted);">${actionVerb}</span></div>
-              <div class="post-time">${timeAgo}</div>
+              <div class="post-time">${timeAgo}${post.updated_at && post.updated_at !== post.created_at ? ' (edited)' : ''}</div>
             </div>
             <div class="content-badge ${badgeClass}">${badgeText}</div>
           </div>
