@@ -718,18 +718,29 @@
 
     /* Preview overlay removed - no dark overlay on hover */
 
+    /* Thumbnail Container */
+    .post-thumbnail-container {
+      position: relative;
+      width: 100%;
+    }
+
     /* Quick Actions on Hover */
     .quick-actions {
       position: absolute;
-      top: 12px;
-      left: 12px;
-      display: none;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
       gap: 8px;
       z-index: 5;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
     }
 
-    .post-card:hover .quick-actions {
-      display: flex;
+    .post-thumbnail-container:hover .quick-actions {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .quick-action-btn {
@@ -1374,9 +1385,17 @@
     /* Post Actions Menu */
     .post-actions-menu {
       position: absolute;
-      top: 12px;
+      bottom: 12px;
       right: 12px;
       z-index: 5;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .post-thumbnail-container:hover .post-actions-menu {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .post-actions-trigger {
@@ -1406,7 +1425,7 @@
 
     .post-actions-dropdown {
       position: absolute;
-      top: 40px;
+      bottom: 40px;
       right: 0;
       width: 200px;
       background: white;
@@ -2171,19 +2190,43 @@
       const badgeText = contentType === 'note' ? 'Notes' : contentType === 'photo' ? 'Photo' : 'Post';
       const badgeClass = contentType;
 
-      // Build thumbnail HTML
+      // Build thumbnail HTML with hover buttons
       let thumbnailHtml = '';
+      let thumbnailImageHtml = '';
+
       if (post.post_type === 'note') {
         if (post.notes?.thumbnail_url) {
-          thumbnailHtml = `
+          thumbnailImageHtml = `
             <img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail" onclick="event.stopPropagation(); openLightbox('${post.notes.thumbnail_url}');" style="cursor: zoom-in;">
           `;
         } else {
           const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
-          thumbnailHtml = `<div class="post-thumbnail-placeholder">${fileType}</div>`;
+          thumbnailImageHtml = `<div class="post-thumbnail-placeholder">${fileType}</div>`;
         }
       } else if (post.image_url) {
-        thumbnailHtml = `<img class="post-thumbnail" src="${post.image_url}" alt="Post image" onclick="event.stopPropagation(); openLightbox('${post.image_url}');" style="cursor: zoom-in;">`;
+        thumbnailImageHtml = `<img class="post-thumbnail" src="${post.image_url}" alt="Post image" onclick="event.stopPropagation(); openLightbox('${post.image_url}');" style="cursor: zoom-in;">`;
+      }
+
+      // Wrap thumbnail with buttons container if there's an image
+      if (thumbnailImageHtml) {
+        thumbnailHtml = `
+          <div class="post-thumbnail-container">
+            ${thumbnailImageHtml}
+            <div class="quick-actions">
+              <button class="quick-action-btn" onclick="event.stopPropagation(); savePost('${post.id}')" title="Save">★</button>
+              <button class="quick-action-btn" onclick="event.stopPropagation(); sharePost('${post.id}')" title="Share">↗</button>
+            </div>
+            <div class="post-actions-menu">
+              <div class="post-actions-trigger" onclick="event.stopPropagation(); togglePostMenu('${post.id}')">⋯</div>
+              <div class="post-actions-dropdown" id="postMenu-${post.id}">
+                <div class="post-action-item" onclick="event.stopPropagation(); copyPostLink('${post.id}')">🔗 Copy Link</div>
+                <div class="post-action-item" onclick="event.stopPropagation(); sharePost('${post.id}')">↗ Share Post</div>
+                <div class="post-action-item" onclick="event.stopPropagation(); hidePost('${post.id}')">👁 Hide Post</div>
+                <div class="post-action-item danger" onclick="event.stopPropagation(); reportPost('${post.id}')">⚠ Report</div>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
       // Build metadata tags
@@ -2201,35 +2244,8 @@
         }
       }
 
-      // Quick actions (visible on hover)
-      const quickActionsHtml = `
-        <div class="quick-actions">
-          <button class="quick-action-btn" onclick="event.stopPropagation(); savePost('${post.id}')" title="Save">
-            ★
-          </button>
-          <button class="quick-action-btn" onclick="event.stopPropagation(); sharePost('${post.id}')" title="Share">
-            ↗
-          </button>
-        </div>
-      `;
-
-      // Post actions menu HTML
-      const actionsMenuHtml = `
-        <div class="post-actions-menu">
-          <div class="post-actions-trigger" onclick="event.stopPropagation(); togglePostMenu('${post.id}')">⋯</div>
-          <div class="post-actions-dropdown" id="postMenu-${post.id}">
-            <div class="post-action-item" onclick="event.stopPropagation(); copyPostLink('${post.id}')">🔗 Copy Link</div>
-            <div class="post-action-item" onclick="event.stopPropagation(); sharePost('${post.id}')">↗ Share Post</div>
-            <div class="post-action-item" onclick="event.stopPropagation(); hidePost('${post.id}')">👁 Hide Post</div>
-            <div class="post-action-item danger" onclick="event.stopPropagation(); reportPost('${post.id}')">⚠ Report</div>
-          </div>
-        </div>
-      `;
-
       return `
         <div class="post-card" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
-          ${quickActionsHtml}
-          ${actionsMenuHtml}
           <div class="content-badge ${badgeClass}">${badgeText}</div>
           <div class="post-header">
             <div class="post-avatar">${avatarLetter}</div>
