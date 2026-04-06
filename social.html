@@ -1995,7 +1995,7 @@
       container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Loading your groups...</div>';
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups`, {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (!res.ok) throw new Error('Failed');
@@ -2035,7 +2035,7 @@
       container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Finding groups...</div>';
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups/discover`, {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/discover`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (!res.ok) throw new Error('Failed');
@@ -2072,7 +2072,7 @@
 
     async function joinGroup(groupId) {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups/${groupId}/join`, {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/${groupId}/join`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -2096,7 +2096,7 @@
       container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Loading group...</div>';
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups/${groupId}/feed`, {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/${groupId}/feed`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
@@ -2131,7 +2131,7 @@
 
       textarea.disabled = true;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups/${groupId}/post`, {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/${groupId}/post`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ text_content: text })
@@ -2177,7 +2177,7 @@
       if (!name) { if (window.sfToast) sfToast('Group name is required', 'error'); return; }
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/groups`, {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, description })
