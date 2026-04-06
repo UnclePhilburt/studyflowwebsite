@@ -2129,6 +2129,40 @@
       }
     }
 
+    // ========== COMMENT REPLIES & VOTES ==========
+    const replyTargets = {}; // { postId: parentCommentId }
+
+    function startReply(postId, commentId, username) {
+      replyTargets[postId] = commentId;
+      document.getElementById(`replyIndicator-${postId}`).style.display = 'block';
+      document.getElementById(`replyTo-${postId}`).textContent = `@${username}`;
+      // Open the comment box if not already
+      const box = document.getElementById(`quickComment-${postId}`);
+      if (!box.classList.contains('show')) {
+        toggleQuickComment(postId);
+      }
+      document.getElementById(`commentInput-${postId}`).focus();
+    }
+
+    function cancelReply(postId) {
+      delete replyTargets[postId];
+      document.getElementById(`replyIndicator-${postId}`).style.display = 'none';
+    }
+
+    async function voteComment(commentId, voteType, btn) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/comments/${commentId}/vote`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vote_type: voteType })
+        });
+        if (res.ok) {
+          // Quick visual feedback
+          btn.style.color = voteType === 'upvote' ? 'var(--accent-primary)' : '#e89b5f';
+        }
+      } catch {}
+    }
+
     // ========== IMAGE CAROUSEL ==========
     const carouselPositions = {};
 
@@ -3029,7 +3063,7 @@
         const res = await fetch(`${BACKEND_URL}/api/social-groups/${groupId}/post`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text_content: text })
+          body: JSON.stringify({ content: text })
         });
         if (res.ok) {
           textarea.value = '';
@@ -3372,15 +3406,29 @@
             </button>
           </div>
           <div class="quick-comment-previews" id="commentPreviews-${post.id}">
-            ${(post.recent_comments || []).map(c => `
-              <div class="quick-comment-preview">
-                <span class="quick-comment-author">${c.username || 'Anonymous'}</span>
-                <span>${c.text_content.length > 120 ? c.text_content.slice(0, 120) + '...' : c.text_content}</span>
-              </div>
-            `).join('')}
-            ${post.comment_count > 2 ? `<div style="font-size:12px;color:var(--text-muted);padding:4px 16px 8px;cursor:pointer;" onclick="event.stopPropagation(); viewPost('${post.id}')">View all ${post.comment_count} comments</div>` : ''}
+            ${(post.recent_comments || []).map(c => {
+              const cText = c.content || c.text_content || '';
+              return `
+              <div class="quick-comment-preview" style="display:flex;gap:8px;align-items:flex-start;">
+                <div style="flex:1;">
+                  <span class="quick-comment-author">${c.username || 'Anonymous'}</span>
+                  <span>${cText.length > 120 ? cText.slice(0, 120) + '...' : cText}</span>
+                  <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;">
+                    <button onclick="event.stopPropagation(); voteComment('${c.id}', 'upvote', this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0;">&#9650; ${c.upvote_count || 0}</button>
+                    <button onclick="event.stopPropagation(); voteComment('${c.id}', 'downvote', this)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0;">&#9660; ${c.downvote_count || 0}</button>
+                    <button onclick="event.stopPropagation(); startReply('${post.id}', '${c.id}', '${c.username || 'Anonymous'}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0;font-weight:600;">Reply</button>
+                    ${c.reply_count > 0 ? `<span style="color:var(--accent-primary);cursor:pointer;" onclick="event.stopPropagation(); viewPost('${post.id}')">${c.reply_count} repl${c.reply_count === 1 ? 'y' : 'ies'}</span>` : ''}
+                  </div>
+                </div>
+              </div>`;
+            }).join('')}
+            ${post.comment_count > 2 ? `<div style="font-size:12px;color:var(--text-muted);padding:4px 0 8px;cursor:pointer;" onclick="event.stopPropagation(); viewPost('${post.id}')">View all ${post.comment_count} comments</div>` : ''}
           </div>
           <div class="quick-comment" id="quickComment-${post.id}">
+            <div id="replyIndicator-${post.id}" style="display:none;padding:4px 0 6px;font-size:11px;color:var(--accent-primary);">
+              Replying to <span id="replyTo-${post.id}"></span>
+              <button onclick="event.stopPropagation(); cancelReply('${post.id}')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;margin-left:4px;">&#x2715;</button>
+            </div>
             <textarea class="quick-comment-input" placeholder="Write a comment..." id="commentInput-${post.id}" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitQuickComment('${post.id}');}"></textarea>
             <div class="quick-comment-actions">
               <button class="quick-comment-btn cancel" onclick="event.stopPropagation(); toggleQuickComment('${post.id}')">Cancel</button>
@@ -3532,18 +3580,22 @@
       input.disabled = true;
 
       try {
+        const commentBody = { content: text };
+        if (replyTargets[postId]) commentBody.parent_id = replyTargets[postId];
+
         const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/comments`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ text_content: text })
+          body: JSON.stringify(commentBody)
         });
 
         if (response.ok) {
           const data = await response.json();
           input.value = '';
+          cancelReply(postId);
           toggleQuickComment(postId);
 
           // Add comment inline without reloading feed
