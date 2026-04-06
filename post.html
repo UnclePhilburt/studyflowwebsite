@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post - StudyFlow Suite</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #151515;
+      --bg-tertiary: #1f1f1f;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --text-muted: #666666;
+      --accent-primary: #6366f1;
+      --accent-hover: #4f46e5;
+      --border-color: #2a2a2a;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --upvote: #ff6b6b;
+      --downvote: #4dabf7;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: var(--bg-tertiary);
+      transform: scale(1.05);
+    }
+
+    .post-detail {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .post-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .post-user-info {
+      flex: 1;
+    }
+
+    .post-username {
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .post-username:hover {
+      text-decoration: underline;
+    }
+
+    .post-time {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .post-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .post-image-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .post-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .post-caption {
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .post-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .vote-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-tertiary);
+      padding: 8px 12px;
+      border-radius: 20px;
+    }
+
+    .vote-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 4px 8px;
+    }
+
+    .vote-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .vote-btn.upvoted {
+      color: var(--upvote);
+    }
+
+    .vote-btn.downvoted {
+      color: var(--downvote);
+    }
+
+    .vote-score {
+      font-weight: 600;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .comments-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .comments-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .comment-input {
+      width: 100%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      margin-bottom: 12px;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .comment-btn {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .comment-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .comment-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .comment {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .comment:last-child {
+      border-bottom: none;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .comment-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .comment-text {
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="history.back()">←</button>
+
+  <div class="container">
+    <div id="postContainer">
+      <div class="loading">Loading post...</div>
+    </div>
+
+    <div class="comments-section" style="display: none;" id="commentsSection">
+      <div class="comments-header">Comments</div>
+
+      <textarea
+        id="commentInput"
+        class="comment-input"
+        placeholder="Add a comment..."></textarea>
+      <button class="comment-btn" onclick="postComment()">Post Comment</button>
+
+      <div id="commentsContainer" style="margin-top: 24px;">
+        <div class="empty-state">No comments yet. Be the first!</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const supabaseUrl = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5Njk1MTksImV4cCI6MjA1MjU0NTUxOX0.MR9pDCkUqGSLM5bMPz5Zi0vVQb8lm0ub-1_lYVVoHLc';
+    const { createClient } = supabase;
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    let authToken = null;
+    let postData = null;
+    let postId = null;
+
+    // Get post ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    postId = urlParams.get('id');
+
+    // Check authentication
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+
+      if (!session) {
+        window.location.href = '/index.html';
+        return;
+      }
+
+      authToken = session.access_token;
+
+      if (!postId) {
+        document.getElementById('postContainer').innerHTML = '<div class="empty-state">Post not found</div>';
+        return;
+      }
+
+      await loadPost();
+      await loadComments();
+      document.getElementById('commentsSection').style.display = 'block';
+    });
+
+    // Load post
+    async function loadPost() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Post not found');
+
+        const data = await response.json();
+        postData = data.post;
+        renderPost();
+      } catch (error) {
+        console.error('Error loading post:', error);
+        document.getElementById('postContainer').innerHTML = '<div class="empty-state">Post not found</div>';
+      }
+    }
+
+    // Render post
+    function renderPost() {
+      const timeAgo = getTimeAgo(postData.created_at);
+      const username = postData.username || 'Anonymous';
+      const avatarLetter = username[0].toUpperCase();
+      const userVote = postData.user_vote_type || null;
+
+      let imageHtml = '';
+      if (postData.post_type === 'note') {
+        if (postData.notes?.thumbnail_url) {
+          imageHtml = `<img class="post-image" src="${postData.notes.thumbnail_url}" alt="Note">`;
+        } else {
+          const fileType = postData.notes?.file_type?.toUpperCase() || 'NOTE';
+          imageHtml = `<div class="post-image-placeholder">${fileType}</div>`;
+        }
+      }
+
+      document.getElementById('postContainer').innerHTML = `
+        <div class="post-detail">
+          <div class="post-header">
+            <div class="post-avatar">${avatarLetter}</div>
+            <div class="post-user-info">
+              <div class="post-username" onclick="viewProfile('${username}')">${username}</div>
+              <div class="post-time">${timeAgo}</div>
+            </div>
+          </div>
+          ${imageHtml}
+          ${postData.notes?.original_filename ? `<div class="post-title">${postData.notes.original_filename}</div>` : ''}
+          ${postData.text_content ? `<div class="post-caption">${postData.text_content}</div>` : ''}
+          <div class="post-actions">
+            <div class="vote-buttons">
+              <button class="vote-btn ${userVote === 'upvote' ? 'upvoted' : ''}" onclick="vote('upvote')">▲</button>
+              <div class="vote-score">${postData.score || 0}</div>
+              <button class="vote-btn ${userVote === 'downvote' ? 'downvoted' : ''}" onclick="vote('downvote')">▼</button>
+            </div>
+            <button class="action-btn">${postData.comment_count || 0} comments</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Vote
+    async function vote(voteType) {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ vote_type: voteType })
+        });
+
+        if (response.ok) {
+          await loadPost();
+        }
+      } catch (error) {
+        console.error('Error voting:', error);
+      }
+    }
+
+    // Load comments
+    async function loadComments() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/comments`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const comments = data.comments || [];
+
+        if (comments.length === 0) {
+          document.getElementById('commentsContainer').innerHTML = '<div class="empty-state">No comments yet. Be the first!</div>';
+          return;
+        }
+
+        document.getElementById('commentsContainer').innerHTML = comments.map(comment => `
+          <div class="comment">
+            <div class="comment-author">${comment.username || 'Anonymous'}</div>
+            <div class="comment-time">${getTimeAgo(comment.created_at)}</div>
+            <div class="comment-text">${comment.text_content}</div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading comments:', error);
+      }
+    }
+
+    // Post comment
+    async function postComment() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/comments`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text_content: text })
+        });
+
+        if (response.ok) {
+          input.value = '';
+          await loadComments();
+          await loadPost(); // Refresh to update comment count
+        }
+      } catch (error) {
+        console.error('Error posting comment:', error);
+        alert('Failed to post comment');
+      }
+    }
+
+    // View profile
+    function viewProfile(username) {
+      window.location.href = `profile.html?user=${username}`;
+    }
+
+    // Time ago helper
+    function getTimeAgo(timestamp) {
+      const now = new Date();
+      const then = new Date(timestamp);
+      const seconds = Math.floor((now - then) / 1000);
+
+      if (seconds < 60) return 'just now';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+      if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+      return then.toLocaleDateString();
+    }
+  </script>
+</body>
+</html>
