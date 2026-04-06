@@ -2626,6 +2626,7 @@
       try {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('content_type', document.getElementById('contentTypeSelect').value || 'note');
 
         const folderId = document.getElementById('folderSelectNewDropdown').value;
         if (folderId) {
