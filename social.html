@@ -2121,6 +2121,53 @@
       }
     }
 
+    // ========== PIN / BLOCK / MUTE ==========
+    async function pinPost(postId) {
+      document.getElementById(`postMenu-${postId}`)?.classList.remove('show');
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/pin`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (window.sfToast) sfToast(data.is_pinned ? 'Post pinned to profile!' : 'Post unpinned', 'success');
+          loadFeed();
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed', 'error');
+        }
+      } catch { if (window.sfToast) sfToast('Failed to pin', 'error'); }
+    }
+
+    async function blockUser(targetId, username) {
+      document.querySelectorAll('.post-actions-dropdown').forEach(d => d.classList.remove('show'));
+      const confirmed = window.sfConfirm ? await window.sfConfirm(`Block @${username}? They won't be able to see your posts or follow you.`) : confirm(`Block @${username}?`);
+      if (!confirmed) return;
+
+      try {
+        await fetch(`${BACKEND_URL}/api/social/block`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_id: targetId, type: 'block' })
+        });
+        if (window.sfToast) sfToast(`@${username} blocked`, 'success');
+        loadFeed();
+      } catch { if (window.sfToast) sfToast('Failed to block', 'error'); }
+    }
+
+    async function muteUser(targetId, username) {
+      document.querySelectorAll('.post-actions-dropdown').forEach(d => d.classList.remove('show'));
+      try {
+        await fetch(`${BACKEND_URL}/api/social/block`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target_id: targetId, type: 'mute' })
+        });
+        if (window.sfToast) sfToast(`@${username} muted. Their posts won't show in your feed.`, 'success');
+        loadFeed();
+      } catch { if (window.sfToast) sfToast('Failed to mute', 'error'); }
+    }
+
     // ========== EDIT / DELETE OWN POSTS ==========
     function editPost(postId, currentText) {
       // Close the menu
@@ -3167,11 +3214,13 @@
               <div class="post-actions-dropdown" id="postMenu-${post.id}">
                 ${post.user_id === currentUser?.id ? `
                   <div class="post-action-item" onclick="event.stopPropagation(); editPost('${post.id}', \`${(post.text_content || '').replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">Edit Post</div>
+                  <div class="post-action-item" onclick="event.stopPropagation(); pinPost('${post.id}')">${post.is_pinned ? 'Unpin from Profile' : 'Pin to Profile'}</div>
                   <div class="post-action-item danger" onclick="event.stopPropagation(); deleteOwnPost('${post.id}')">Delete Post</div>
                 ` : ''}
                 <div class="post-action-item" onclick="event.stopPropagation(); copyPostLink('${post.id}')">Copy Link</div>
                 ${post.user_id !== currentUser?.id ? `
-                  <div class="post-action-item" onclick="event.stopPropagation(); hidePost('${post.id}')">Hide Post</div>
+                  <div class="post-action-item" onclick="event.stopPropagation(); muteUser('${post.user_id}', '${post.username}')">Mute @${post.username}</div>
+                  <div class="post-action-item danger" onclick="event.stopPropagation(); blockUser('${post.user_id}', '${post.username}')">Block @${post.username}</div>
                   <div class="post-action-item danger" onclick="event.stopPropagation(); reportPost('${post.id}')">Report</div>
                 ` : ''}
               </div>
@@ -3890,11 +3939,26 @@
 
     async function loadSuggestedUsers() {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/social/suggested-users?limit=5`, {
+        // Try mutual followers first, fall back to general suggestions
+        let res = await fetch(`${BACKEND_URL}/api/social/who-to-follow?limit=5`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        if (!res.ok) throw new Error('Failed');
-        const data = await res.json();
+        let data = res.ok ? await res.json() : { suggestions: [] };
+
+        if (!data.suggestions || data.suggestions.length < 3) {
+          const res2 = await fetch(`${BACKEND_URL}/api/social/suggested-users?limit=5`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (res2.ok) {
+            const data2 = await res2.json();
+            const existing = new Set((data.suggestions || []).map(s => s.username));
+            (data2.suggestions || []).forEach(s => {
+              if (!existing.has(s.username) && (data.suggestions || []).length < 5) {
+                (data.suggestions = data.suggestions || []).push(s);
+              }
+            });
+          }
+        }
         const container = document.getElementById('suggestedUsers');
 
         if (!data.suggestions || data.suggestions.length === 0) {
