@@ -1767,14 +1767,13 @@
         </div>
       </div>
 
-      <!-- Placeholder for future features -->
+      <!-- Suggested Users -->
       <div class="widget">
         <div class="widget-header">
-          <div class="widget-title">Coming Soon</div>
+          <div class="widget-title">Suggested for You</div>
         </div>
-        <div style="padding: 20px; text-align: center; color: var(--text-muted);">
-          <p style="font-size: 14px; margin-bottom: 8px;">More features on the way!</p>
-          <p style="font-size: 13px;">Trending topics, user suggestions, and study groups.</p>
+        <div id="suggestedUsers" style="padding:4px 0;">
+          <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
         </div>
       </div>
     </aside>
@@ -1925,6 +1924,7 @@
       loadUserFolders();
       setupInfiniteScroll();
       loadUserStats();
+      loadSuggestedUsers();
     });
 
     // Switch tabs
@@ -2864,6 +2864,58 @@
         document.getElementById('userFollowerCount').textContent = '0';
         document.getElementById('userFollowingCount').textContent = '0';
         document.getElementById('userSavedCount').textContent = '0';
+      }
+    }
+
+    async function loadSuggestedUsers() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/suggested-users?limit=5`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        const container = document.getElementById('suggestedUsers');
+
+        if (!data.suggestions || data.suggestions.length === 0) {
+          container.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">No suggestions yet. Follow more people!</div>';
+          return;
+        }
+
+        container.innerHTML = data.suggestions.map(u => {
+          const avatar = u.avatar_url
+            ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+            : u.display_name[0].toUpperCase();
+          return `
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:background 0.15s;border-radius:8px;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background=''" onclick="window.location.href='profile.html?user=${u.username}'">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;">${avatar}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.display_name}</div>
+                <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.reason}</div>
+              </div>
+              <button onclick="event.stopPropagation(); quickFollow('${u.username}', this)" style="padding:5px 12px;border-radius:6px;border:1.5px solid var(--accent-primary);background:none;color:var(--accent-primary);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Follow</button>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('Suggested users error:', e);
+        document.getElementById('suggestedUsers').innerHTML = '';
+      }
+    }
+
+    async function quickFollow(username, btn) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/follow/${username}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          btn.textContent = 'Following';
+          btn.style.background = 'var(--accent-primary)';
+          btn.style.color = 'white';
+          btn.disabled = true;
+        }
+      } catch (e) {
+        console.error('Follow error:', e);
       }
     }
 
