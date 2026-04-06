@@ -485,19 +485,15 @@
     /* Feed Grid - Content-Aware Masonry */
     .feed {
       column-count: 3;
-      column-gap: 20px;
+      column-gap: 16px;
     }
 
-    @media (max-width: 1200px) {
-      .feed {
-        column-count: 2;
-      }
+    @media (max-width: 1400px) {
+      .feed { column-count: 2; }
     }
 
-    @media (max-width: 768px) {
-      .feed {
-        column-count: 1;
-      }
+    @media (max-width: 900px) {
+      .feed { column-count: 1; }
     }
 
     /* Post Card - Content-Aware Design */
@@ -509,8 +505,7 @@
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       break-inside: avoid;
-      margin-bottom: 20px;
-      display: inline-block;
+      margin-bottom: 16px;
       width: 100%;
       position: relative;
     }
@@ -1599,10 +1594,6 @@
     }
 
     @media (max-width: 768px) {
-      .feed {
-        grid-template-columns: 1fr;
-      }
-
       .search-bar {
         width: 150px;
       }
