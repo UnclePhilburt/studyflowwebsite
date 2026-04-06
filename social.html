@@ -2168,6 +2168,9 @@
       const userVote = post.user_vote_type || null;
       const username = post.username || 'Anonymous';
       const avatarLetter = username[0].toUpperCase();
+      const avatarHtml = post.avatar_url
+        ? `<img src="${post.avatar_url}" alt="${username}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : avatarLetter;
 
       // Determine content type
       let contentType = 'text';
@@ -2239,7 +2242,7 @@
         <div class="post-card" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
           <div class="content-badge ${badgeClass}">${badgeText}</div>
           <div class="post-header">
-            <div class="post-avatar">${avatarLetter}</div>
+            <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
               <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}</div>
               <div class="post-time">${timeAgo}</div>
