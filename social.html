@@ -2115,25 +2115,28 @@
     let mentionStartPos = -1;
     let followingUsernames = [];
 
-    // Preload following list for priority
+    // Preload following list for mention priority
     async function loadFollowingForMentions() {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/social/feed`, {
+        // Get current user's username first
+        const userRes = await fetch(`${BACKEND_URL}/api/social/my-stats`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (!userRes.ok) return;
+        const userData = await userRes.json();
+        if (!userData.username) return;
+
+        // Get who they follow
+        const res = await fetch(`${BACKEND_URL}/api/social/profile/${userData.username}/following`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
           const data = await res.json();
-          const seen = new Set();
-          (data.posts || []).forEach(p => {
-            if (p.username && !seen.has(p.username)) {
-              followingUsernames.push(p.username);
-              seen.add(p.username);
-            }
+          (data.users || []).forEach(u => {
+            if (u.username) followingUsernames.push(u.username);
           });
         }
       } catch {}
     }
-    setTimeout(loadFollowingForMentions, 3000);
+    setTimeout(loadFollowingForMentions, 2000);
 
     function setupMentionAutocomplete(textarea) {
       textarea.addEventListener('input', (e) => handleMentionInput(textarea));
@@ -2145,35 +2148,38 @@
       const val = textarea.value;
       const pos = textarea.selectionStart;
 
-      // Find @ before cursor
-      let atPos = -1;
-      for (let i = pos - 1; i >= 0; i--) {
-        if (val[i] === '@') { atPos = i; break; }
-        if (val[i] === ' ' || val[i] === '\n') break;
-      }
+      // Find @ before cursor by scanning backwards
+      const textBefore = val.substring(0, pos);
+      const match = textBefore.match(/@(\w*)$/);
 
-      if (atPos === -1 || (atPos > 0 && val[atPos - 1] !== ' ' && val[atPos - 1] !== '\n' && atPos !== 0)) {
+      if (!match) {
         hideMentionDropdown();
         return;
       }
 
-      const query = val.substring(atPos + 1, pos);
-      if (query.length < 1) { hideMentionDropdown(); return; }
+      const query = match[1];
+      const atPos = pos - query.length - 1;
 
       mentionTarget = textarea;
       mentionStartPos = atPos;
-      showMentionSuggestions(query, textarea);
+
+      if (query.length < 1) {
+        // Just typed @, show following list
+        showMentionSuggestions('', textarea);
+      } else {
+        showMentionSuggestions(query, textarea);
+      }
     }
 
     async function showMentionSuggestions(query, textarea) {
       // Filter following first
       let suggestions = followingUsernames
-        .filter(u => u.toLowerCase().includes(query.toLowerCase()))
+        .filter(u => !query || u.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 5)
         .map(u => ({ username: u, priority: true }));
 
       // Search backend for more
-      if (suggestions.length < 5 && query.length >= 2) {
+      if (suggestions.length < 5 && query.length >= 1) {
         try {
           const res = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
@@ -2200,10 +2206,10 @@
         document.body.appendChild(mentionDropdown);
       }
 
-      // Position near cursor
+      // Position below textarea
       const rect = textarea.getBoundingClientRect();
-      mentionDropdown.style.left = (rect.left + 48) + 'px';
-      mentionDropdown.style.top = (rect.bottom + 4) + 'px';
+      mentionDropdown.style.left = rect.left + 'px';
+      mentionDropdown.style.top = (rect.bottom + window.scrollY + 4) + 'px';
       mentionDropdown.style.display = 'block';
 
       mentionDropdown.innerHTML = suggestions.map((s, i) => {
