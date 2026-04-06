@@ -3320,40 +3320,16 @@
     // Load user stats
     async function loadUserStats() {
       try {
-        // First get current user's username
-        const userRes = await fetch(`${BACKEND_URL}/api/current-user`, {
+        const res = await fetch(`${BACKEND_URL}/api/social/my-stats`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
-        if (!userRes.ok) throw new Error('Failed to get user');
-        const userData = await userRes.json();
-        const username = userData.username;
-        if (!username) throw new Error('No username');
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
 
-        // Get profile stats
-        const profileRes = await fetch(`${BACKEND_URL}/api/social/profile/${username}`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-        if (!profileRes.ok) throw new Error('Failed to get profile');
-        const profileData = await profileRes.json();
-
-        document.getElementById('userPostCount').textContent = profileData.post_count || 0;
-        document.getElementById('userFollowerCount').textContent = profileData.follower_count || 0;
-        document.getElementById('userFollowingCount').textContent = profileData.following_count || 0;
-
-        // Saved/bookmarks count
-        try {
-          const bookmarksRes = await fetch(`${BACKEND_URL}/api/social/bookmarks`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-          });
-          if (bookmarksRes.ok) {
-            const bookmarksData = await bookmarksRes.json();
-            document.getElementById('userSavedCount').textContent = (bookmarksData.posts || []).length;
-          } else {
-            document.getElementById('userSavedCount').textContent = '0';
-          }
-        } catch {
-          document.getElementById('userSavedCount').textContent = '0';
-        }
+        document.getElementById('userPostCount').textContent = data.posts || 0;
+        document.getElementById('userFollowerCount').textContent = data.followers || 0;
+        document.getElementById('userFollowingCount').textContent = data.following || 0;
+        document.getElementById('userSavedCount').textContent = '0';
 
       } catch (error) {
         console.error('Error loading user stats:', error);
