@@ -1039,16 +1039,24 @@
       container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><div class="spinner"></div><p>Loading stats...</p></div>';
 
       try {
-        const res = await fetch(`${BACKEND_URL}/api/social/profile/${viewingUsername}/stats`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-
         let statsData;
-        if (res.ok) {
-          const data = await res.json();
-          statsData = data.stats || {};
-        } else {
-          // If endpoint doesn't exist, use profileData stats
+
+        // Try to fetch from stats endpoint
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/social/profile/${viewingUsername}/stats`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            statsData = data.stats || {};
+          } else {
+            // Endpoint exists but returned error, use fallback
+            throw new Error('Stats endpoint not available');
+          }
+        } catch (fetchError) {
+          // If endpoint doesn't exist or CORS error, use profileData stats
+          console.log('Stats endpoint not available, using profile data');
           statsData = {
             total_posts: profileData.post_count || 0,
             total_upvotes_received: profileData.upvotes_received || 0,
