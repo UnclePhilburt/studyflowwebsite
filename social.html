@@ -1889,8 +1889,16 @@
       currentUser = session.user;
       authToken = session.access_token;
 
-      // Check if user needs onboarding
-      await checkSocialOnboarding();
+      // Check if just signed up (post-signup flow) or needs onboarding
+      const justSignedUp = localStorage.getItem('sf-just-signed-up');
+      if (justSignedUp) {
+        localStorage.removeItem('sf-just-signed-up');
+        const firstName = localStorage.getItem('sf-new-user-name') || '';
+        localStorage.removeItem('sf-new-user-name');
+        await showPostSignupFlow(firstName);
+      } else {
+        await checkSocialOnboarding();
+      }
 
       loadFeed();
       loadUserNotes();
@@ -1986,6 +1994,66 @@
           </div>
         `;
       }
+    }
+
+    // ========== POST-SIGNUP FLOW ==========
+    async function showPostSignupFlow(firstName) {
+      // Step 1: Profile picture
+      await showStep1ProfilePic(firstName);
+    }
+
+    function showStep1ProfilePic(firstName) {
+      return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.id = 'postSignup1';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;display:flex;align-items:center;justify-content:center;font-family:Inter,-apple-system,sans-serif;';
+        modal.innerHTML = `
+          <div style="background:var(--card-bg);border-radius:16px;max-width:420px;width:92%;padding:32px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.2);">
+            <h2 style="font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Welcome${firstName ? ', ' + firstName : ''}!</h2>
+            <p style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">Add a profile picture so people recognize you</p>
+            <div id="signupAvatarPreview" style="width:100px;height:100px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;margin:0 auto 16px;cursor:pointer;overflow:hidden;transition:all 0.2s;" onclick="document.getElementById('signupAvatarInput').click()">
+              ${(firstName || 'U')[0].toUpperCase()}
+            </div>
+            <input type="file" id="signupAvatarInput" accept="image/*" style="display:none;" onchange="handleSignupAvatar(event)">
+            <button onclick="document.getElementById('signupAvatarInput').click()" style="padding:8px 20px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:20px;">Choose Photo</button>
+            <div style="display:flex;gap:10px;">
+              <button onclick="document.getElementById('postSignup1').remove();resolve()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Skip</button>
+              <button id="signupAvatarNext" onclick="document.getElementById('postSignup1').remove();resolve()" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent-primary);color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Next</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        // After this resolves, show the interests onboarding (already built)
+        const origResolve = resolve;
+        resolve = () => {
+          origResolve();
+          showOnboardingModal();
+        };
+      });
+    }
+
+    async function handleSignupAvatar(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('signupAvatarPreview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+      };
+      reader.readAsDataURL(file);
+
+      // Upload in background
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        await fetch(`${BACKEND_URL}/api/social/profile/avatar`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` },
+          body: formData
+        });
+      } catch {}
     }
 
     // ========== ONBOARDING ==========

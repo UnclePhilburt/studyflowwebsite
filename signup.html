@@ -461,14 +461,19 @@
         <div class="form-left">
           <div class="form-row">
             <div class="form-group">
-              <label for="legalName">Legal Name</label>
-              <input type="text" id="legalName" placeholder="Jane A. Doe" required>
-              <div class="form-hint">As it appears on official records</div>
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" placeholder="Jane" required>
             </div>
             <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" placeholder="Doe" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" style="flex:1;">
               <label for="username">Username</label>
               <input type="text" id="username" placeholder="StudyBuddy" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]{3,20}">
-              <div class="form-hint">Shown when you contribute to the Nexus</div>
+              <div class="form-hint">Your public identity on StudyFlow</div>
             </div>
           </div>
 
@@ -580,7 +585,8 @@
     });
 
     const signupForm = document.getElementById('signupForm');
-    const legalNameInput = document.getElementById('legalName');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
     const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -611,7 +617,9 @@
       e.preventDefault();
       hideMessages();
 
-      const legalName = legalNameInput.value.trim();
+      const firstName = firstNameInput.value.trim();
+      const lastName = lastNameInput.value.trim();
+      const fullName = `${firstName} ${lastName}`.trim();
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
@@ -622,7 +630,7 @@
       const academicIntegrity = document.getElementById('academicIntegrity').checked;
       const terms = termsInput.checked;
 
-      if (!legalName || !username || !email || !password) {
+      if (!firstName || !lastName || !username || !email || !password) {
         showError('Please fill in all fields');
         return;
       }
@@ -668,9 +676,10 @@
           password: password,
           options: {
             data: {
-              full_name: legalName,
+              full_name: fullName,
+              first_name: firstName,
+              last_name: lastName,
               username: username,
-              legal_name: legalName,
               university: university || null
             }
           }
@@ -686,10 +695,14 @@
           });
         } catch (e) {}
 
-        showSuccess('Account created! Redirecting to your dashboard...');
+        // Store signup flag for post-signup onboarding
+        localStorage.setItem('sf-just-signed-up', 'true');
+        localStorage.setItem('sf-new-user-name', firstName);
+
+        showSuccess('Account created! Setting up your profile...');
         setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 1500);
+          window.location.href = 'social.html';
+        }, 1200);
 
       } catch (error) {
         console.error('Signup error:', error);
