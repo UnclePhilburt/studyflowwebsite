@@ -1767,6 +1767,53 @@
         </div>
       </div>
 
+      <!-- Stories Bar -->
+      <div id="storiesBar" style="display:flex;gap:12px;padding:12px 0;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+        <!-- Add story button -->
+        <div onclick="openStoryCreator()" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;">
+          <div style="width:56px;height:56px;border-radius:50%;border:2px dashed var(--border-color);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text-muted);transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent-primary)';this.style.color='var(--accent-primary)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-muted)'">+</div>
+          <span style="font-size:10px;color:var(--text-muted);max-width:60px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your Story</span>
+        </div>
+        <!-- Story circles loaded dynamically -->
+        <div id="storyCircles" style="display:flex;gap:12px;"></div>
+      </div>
+
+      <!-- Story Viewer (fullscreen overlay) -->
+      <div id="storyViewer" style="display:none;position:fixed;inset:0;background:black;z-index:10000;align-items:center;justify-content:center;" onclick="closeStoryViewer()">
+        <div style="position:absolute;top:0;left:0;right:0;display:flex;gap:2px;padding:8px 12px;z-index:2;" id="storyProgressBar"></div>
+        <div style="position:absolute;top:24px;left:16px;display:flex;align-items:center;gap:10px;z-index:2;">
+          <div id="storyViewerAvatar" style="width:32px;height:32px;border-radius:50%;background:#666;overflow:hidden;"></div>
+          <span id="storyViewerUsername" style="color:white;font-size:14px;font-weight:600;"></span>
+          <span id="storyViewerTime" style="color:rgba(255,255,255,0.6);font-size:12px;"></span>
+        </div>
+        <button onclick="event.stopPropagation(); closeStoryViewer()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:white;font-size:24px;cursor:pointer;z-index:2;">&#x2715;</button>
+        <div id="storyContent" style="width:100%;max-width:420px;height:100%;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation(); advanceStory()"></div>
+        <button onclick="event.stopPropagation(); prevStory()" style="position:absolute;left:0;top:0;bottom:0;width:30%;background:none;border:none;cursor:pointer;z-index:1;"></button>
+        <button onclick="event.stopPropagation(); advanceStory()" style="position:absolute;right:0;top:0;bottom:0;width:30%;background:none;border:none;cursor:pointer;z-index:1;"></button>
+      </div>
+
+      <!-- Story Creator Modal -->
+      <div id="storyCreator" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeStoryCreator()">
+        <div style="background:var(--card-bg);border-radius:16px;max-width:420px;width:92%;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.2);">
+          <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Create Story</h3>
+          <textarea id="storyText" placeholder="What's happening?" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-family:inherit;min-height:80px;resize:none;background:var(--bg-primary);color:var(--text-primary);"></textarea>
+          <div style="margin:12px 0;font-size:12px;color:var(--text-muted);">Background:</div>
+          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;" id="storyBgOptions">
+            <div onclick="selectStoryBg('linear-gradient(135deg, #667eea, #764ba2)')" class="story-bg-opt selected" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #667eea, #764ba2);border:2px solid var(--accent-primary);"></div>
+            <div onclick="selectStoryBg('linear-gradient(135deg, #f093fb, #f5576c)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #f093fb, #f5576c);border:2px solid transparent;"></div>
+            <div onclick="selectStoryBg('linear-gradient(135deg, #4facfe, #00f2fe)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #4facfe, #00f2fe);border:2px solid transparent;"></div>
+            <div onclick="selectStoryBg('linear-gradient(135deg, #43e97b, #38f9d7)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #43e97b, #38f9d7);border:2px solid transparent;"></div>
+            <div onclick="selectStoryBg('linear-gradient(135deg, #fa709a, #fee140)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #fa709a, #fee140);border:2px solid transparent;"></div>
+            <div onclick="selectStoryBg('linear-gradient(135deg, #8B9D83, #5a7a5a)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #8B9D83, #5a7a5a);border:2px solid transparent;"></div>
+            <div onclick="selectStoryBg('#1a1a1a')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:#1a1a1a;border:2px solid transparent;"></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="closeStoryCreator()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+            <button onclick="submitStory()" id="storySubmitBtn" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent-primary);color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Share Story</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Inline Composer -->
       <div id="inlineComposer" style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:16px;margin-bottom:16px;">
         <div style="display:flex;gap:12px;">
@@ -1957,6 +2004,7 @@
         await checkSocialOnboarding();
       }
 
+      loadStories();
       loadFeed();
       loadUserNotes();
       loadUserFolders();
@@ -2127,6 +2175,180 @@
       } catch (e) {
         container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">Failed to search</div>`;
       }
+    }
+
+    // ========== STORIES ==========
+    let allStories = [];
+    let currentStoryUser = 0;
+    let currentStoryIndex = 0;
+    let storyTimer = null;
+    let selectedStoryBg = 'linear-gradient(135deg, #667eea, #764ba2)';
+
+    async function loadStories() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/stories`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (!res.ok) return;
+        const data = await res.json();
+        allStories = data.stories || [];
+        renderStoryBar();
+      } catch {}
+    }
+
+    function renderStoryBar() {
+      const container = document.getElementById('storyCircles');
+      if (allStories.length === 0) { container.innerHTML = ''; return; }
+
+      container.innerHTML = allStories.map((user, i) => {
+        const av = user.avatar_url
+          ? `<img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+          : `<div style="width:100%;height:100%;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;">${(user.username || '?')[0].toUpperCase()}</div>`;
+        return `
+          <div onclick="openStoryViewer(${i})" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;">
+            <div style="width:56px;height:56px;border-radius:50%;padding:2px;background:linear-gradient(135deg, var(--accent-primary), #f093fb);"><div style="width:100%;height:100%;border-radius:50%;overflow:hidden;border:2px solid var(--bg-primary);">${av}</div></div>
+            <span style="font-size:10px;color:var(--text-muted);max-width:60px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${user.username || 'User'}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openStoryViewer(userIndex) {
+      currentStoryUser = userIndex;
+      currentStoryIndex = 0;
+      document.getElementById('storyViewer').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      showCurrentStory();
+    }
+
+    function closeStoryViewer() {
+      document.getElementById('storyViewer').style.display = 'none';
+      document.body.style.overflow = '';
+      if (storyTimer) { clearTimeout(storyTimer); storyTimer = null; }
+    }
+
+    function showCurrentStory() {
+      if (storyTimer) clearTimeout(storyTimer);
+
+      const user = allStories[currentStoryUser];
+      if (!user || !user.stories[currentStoryIndex]) {
+        // Move to next user or close
+        if (currentStoryUser < allStories.length - 1) {
+          currentStoryUser++;
+          currentStoryIndex = 0;
+          showCurrentStory();
+        } else {
+          closeStoryViewer();
+        }
+        return;
+      }
+
+      const story = user.stories[currentStoryIndex];
+      const av = user.avatar_url
+        ? `<img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`
+        : (user.username || '?')[0].toUpperCase();
+      document.getElementById('storyViewerAvatar').innerHTML = av;
+      document.getElementById('storyViewerUsername').textContent = user.username || 'User';
+      document.getElementById('storyViewerTime').textContent = getTimeAgo(story.created_at);
+
+      // Progress bars
+      const progressBar = document.getElementById('storyProgressBar');
+      progressBar.innerHTML = user.stories.map((_, i) => `
+        <div style="flex:1;height:3px;border-radius:2px;background:${i < currentStoryIndex ? 'white' : i === currentStoryIndex ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)'};overflow:hidden;">
+          ${i === currentStoryIndex ? '<div style="height:100%;background:white;animation:storyProgress 5s linear forwards;"></div>' : ''}
+        </div>
+      `).join('');
+
+      // Content
+      const content = document.getElementById('storyContent');
+      const images = story.images || [];
+      if (images.length > 0) {
+        content.innerHTML = `<img src="${images[0]}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+      } else {
+        const bg = story.story_bg || 'linear-gradient(135deg, #667eea, #764ba2)';
+        content.innerHTML = `<div style="width:100%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;padding:40px;"><div style="color:white;font-size:22px;font-weight:600;text-align:center;line-height:1.5;max-width:320px;">${story.text_content || ''}</div></div>`;
+      }
+
+      // Auto-advance after 5 seconds
+      storyTimer = setTimeout(advanceStory, 5000);
+    }
+
+    function advanceStory() {
+      const user = allStories[currentStoryUser];
+      if (!user) { closeStoryViewer(); return; }
+
+      if (currentStoryIndex < user.stories.length - 1) {
+        currentStoryIndex++;
+        showCurrentStory();
+      } else if (currentStoryUser < allStories.length - 1) {
+        currentStoryUser++;
+        currentStoryIndex = 0;
+        showCurrentStory();
+      } else {
+        closeStoryViewer();
+      }
+    }
+
+    function prevStory() {
+      if (currentStoryIndex > 0) {
+        currentStoryIndex--;
+        showCurrentStory();
+      } else if (currentStoryUser > 0) {
+        currentStoryUser--;
+        currentStoryIndex = allStories[currentStoryUser].stories.length - 1;
+        showCurrentStory();
+      }
+    }
+
+    // Story creator
+    function openStoryCreator() {
+      document.getElementById('storyCreator').style.display = 'flex';
+      document.getElementById('storyText').value = '';
+      document.getElementById('storyText').focus();
+    }
+
+    function closeStoryCreator() {
+      document.getElementById('storyCreator').style.display = 'none';
+    }
+
+    function selectStoryBg(bg) {
+      selectedStoryBg = bg;
+      document.querySelectorAll('.story-bg-opt').forEach(o => o.style.borderColor = 'transparent');
+      event.target.style.borderColor = 'var(--accent-primary)';
+    }
+
+    async function submitStory() {
+      const text = document.getElementById('storyText').value.trim();
+      if (!text) { if (window.sfToast) sfToast('Write something for your story', 'error'); return; }
+
+      const btn = document.getElementById('storySubmitBtn');
+      btn.disabled = true; btn.textContent = 'Posting...';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/stories`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, bg: selectedStoryBg })
+        });
+        if (res.ok) {
+          closeStoryCreator();
+          if (window.sfToast) sfToast('Story posted!', 'success');
+          loadStories();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          if (window.sfToast) sfToast(err.error || 'Failed', 'error');
+        }
+      } catch {
+        if (window.sfToast) sfToast('Failed to post story', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Share Story';
+      }
+    }
+
+    // Add CSS animation for story progress
+    if (!document.getElementById('storyProgressCSS')) {
+      const style = document.createElement('style');
+      style.id = 'storyProgressCSS';
+      style.textContent = '@keyframes storyProgress { from { width: 0; } to { width: 100%; } }';
+      document.head.appendChild(style);
     }
 
     // ========== COMMENT REPLIES & VOTES ==========
