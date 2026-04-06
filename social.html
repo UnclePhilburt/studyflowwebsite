@@ -1889,6 +1889,9 @@
       currentUser = session.user;
       authToken = session.access_token;
 
+      // Check if user needs onboarding
+      await checkSocialOnboarding();
+
       loadFeed();
       loadUserNotes();
       loadUserFolders();
@@ -1983,6 +1986,89 @@
           </div>
         `;
       }
+    }
+
+    // ========== ONBOARDING ==========
+    const SUBJECTS = ['Mathematics', 'Biology', 'Chemistry', 'Physics', 'Computer Science', 'Psychology', 'History', 'English', 'Business', 'Economics', 'Engineering', 'Nursing', 'Art', 'Music', 'Philosophy', 'Sociology', 'Political Science', 'Communications', 'Education', 'Pre-Med'];
+    const CONTENT_PREFS = ['Study Notes', 'Study Tips', 'Discussions', 'Memes & Fun', 'Exam Prep', 'Homework Help', 'Group Projects', 'Career Advice'];
+
+    async function checkSocialOnboarding() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/interests`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (!data.degree && !data.subjects) {
+          showOnboardingModal();
+        }
+      } catch {
+        // If check fails, skip onboarding
+      }
+    }
+
+    function showOnboardingModal() {
+      const modal = document.getElementById('socialOnboarding');
+
+      // Build subject chips
+      const subjectGrid = document.getElementById('subjectGrid');
+      subjectGrid.innerHTML = SUBJECTS.map(s => `
+        <button class="onboard-chip" data-value="${s}" onclick="this.classList.toggle('selected')" style="padding:8px 14px;border-radius:20px;border:1.5px solid var(--border-color);background:none;color:var(--text-primary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;">${s}</button>
+      `).join('');
+
+      // Build content pref chips
+      const contentGrid = document.getElementById('contentPrefGrid');
+      contentGrid.innerHTML = CONTENT_PREFS.map(c => `
+        <button class="onboard-chip" data-value="${c}" onclick="this.classList.toggle('selected')" style="padding:8px 14px;border-radius:20px;border:1.5px solid var(--border-color);background:none;color:var(--text-primary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all 0.15s;">${c}</button>
+      `).join('');
+
+      // Style for selected chips
+      if (!document.getElementById('onboardChipStyle')) {
+        const style = document.createElement('style');
+        style.id = 'onboardChipStyle';
+        style.textContent = '.onboard-chip.selected { background: var(--accent-primary) !important; color: white !important; border-color: var(--accent-primary) !important; }';
+        document.head.appendChild(style);
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    async function saveOnboarding() {
+      const degree = document.getElementById('onboardDegree').value.trim();
+      const subjects = Array.from(document.querySelectorAll('#subjectGrid .selected')).map(b => b.dataset.value);
+      const contentPrefs = Array.from(document.querySelectorAll('#contentPrefGrid .selected')).map(b => b.dataset.value);
+
+      const interests = { degree, subjects, content_prefs: contentPrefs };
+
+      try {
+        await fetch(`${BACKEND_URL}/api/social/interests`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(interests)
+        });
+      } catch {}
+
+      document.getElementById('socialOnboarding').style.display = 'none';
+      if (window.sfToast) sfToast('Feed personalized!', 'success');
+    }
+
+    function skipOnboarding() {
+      // Save empty so we don't show again
+      fetch(`${BACKEND_URL}/api/social/interests`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skipped: true })
+      }).catch(() => {});
+      document.getElementById('socialOnboarding').style.display = 'none';
+    }
+
+    // ========== ENGAGEMENT TRACKING ==========
+    function trackEngagement(postId, action, authorId) {
+      if (!authToken) return;
+      fetch(`${BACKEND_URL}/api/social/engage`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId, action, author_id: authorId })
+      }).catch(() => {});
     }
 
     // ========== GROUPS ==========
@@ -2258,7 +2344,7 @@
       }
 
       try {
-        const endpoint = currentTab === 'following' ? '/api/social/feed' : '/api/social/posts/trending';
+        const endpoint = currentTab === 'following' ? '/api/social/feed' : '/api/social/posts/personalized';
         const response = await fetch(`${BACKEND_URL}${endpoint}`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -2512,6 +2598,11 @@
       void scoreEl.offsetWidth;
       scoreEl.classList.add('bump');
 
+      // Track engagement
+      if (voteType === 'upvote' && newVote === 'upvote') {
+        trackEngagement(postId, 'upvote');
+      }
+
       // Send to backend (fire and forget)
       try {
         await fetch(`${BACKEND_URL}/api/social/posts/${postId}/vote`, {
@@ -2529,6 +2620,7 @@
 
     // View post details
     function viewPost(postId) {
+      trackEngagement(postId, 'click');
       window.location.href = `post.html?id=${postId}`;
     }
 
@@ -2640,6 +2732,7 @@
           }
 
           if (window.sfToast) sfToast('Comment posted!', 'success');
+          trackEngagement(postId, 'comment');
         } else {
           const err = await response.json().catch(() => ({}));
           if (window.sfToast) sfToast(err.error || 'Failed to post comment', 'error');
@@ -3277,6 +3370,41 @@
   </div>
 
   <!-- Report Modal -->
+  <!-- Social Onboarding Modal -->
+  <div id="socialOnboarding" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;display:none;align-items:center;justify-content:center;font-family:Inter,-apple-system,sans-serif;">
+    <div style="background:var(--card-bg);border-radius:16px;max-width:500px;width:92%;max-height:85vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.2);">
+      <div style="padding:28px 24px 0;">
+        <h2 style="font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Welcome to StudyFlow Social</h2>
+        <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px;">Tell us what you're studying so we can personalize your feed.</p>
+      </div>
+
+      <div style="padding:0 24px;">
+        <!-- Degree -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">What's your major / degree?</label>
+          <input type="text" id="onboardDegree" placeholder="e.g., Computer Science, Biology, Business" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:10px;font-size:14px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);">
+        </div>
+
+        <!-- Subjects -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">Subjects you're interested in (tap to select)</label>
+          <div id="subjectGrid" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+
+        <!-- Content prefs -->
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">What do you want to see?</label>
+          <div id="contentPrefGrid" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+      </div>
+
+      <div style="padding:16px 24px 24px;display:flex;gap:10px;">
+        <button onclick="skipOnboarding()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Skip</button>
+        <button onclick="saveOnboarding()" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent-primary);color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Get Started</button>
+      </div>
+    </div>
+  </div>
+
   <div id="reportModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)closeReportModal()">
     <div style="background:var(--card-bg);border-radius:14px;padding:24px;max-width:400px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.15);">
       <h3 style="font-size:17px;margin-bottom:16px;color:var(--text-primary);">Report Post</h3>
