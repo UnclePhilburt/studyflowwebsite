@@ -1430,128 +1430,36 @@
       <!-- Your Stats -->
       <div class="widget">
         <div class="widget-header">
-          <div class="widget-title">Your Stats</div>
+          <div class="widget-title">Your Activity</div>
         </div>
         <div class="stat-grid">
           <div class="stat-item">
-            <div class="stat-value" id="userPostCount">0</div>
+            <div class="stat-value" id="userPostCount">...</div>
             <div class="stat-label">Posts</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" id="userFollowerCount">0</div>
+            <div class="stat-value" id="userFollowerCount">...</div>
             <div class="stat-label">Followers</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" id="userFollowingCount">0</div>
+            <div class="stat-value" id="userFollowingCount">...</div>
             <div class="stat-label">Following</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" id="userSavedCount">0</div>
+            <div class="stat-value" id="userSavedCount">...</div>
             <div class="stat-label">Saved</div>
           </div>
         </div>
       </div>
 
-      <!-- Trending Topics -->
+      <!-- Placeholder for future features -->
       <div class="widget">
         <div class="widget-header">
-          <div class="widget-title">Trending Topics</div>
-          <a href="#" class="widget-action">See all</a>
+          <div class="widget-title">Coming Soon</div>
         </div>
-        <div class="trending-tag">
-          <div class="trending-rank">1</div>
-          <div class="trending-info">
-            <div class="trending-name">Biology 101</div>
-            <div class="trending-count">1.2k posts</div>
-          </div>
-        </div>
-        <div class="trending-tag">
-          <div class="trending-rank">2</div>
-          <div class="trending-info">
-            <div class="trending-name">Calculus Notes</div>
-            <div class="trending-count">856 posts</div>
-          </div>
-        </div>
-        <div class="trending-tag">
-          <div class="trending-rank">3</div>
-          <div class="trending-info">
-            <div class="trending-name">Chemistry Study</div>
-            <div class="trending-count">743 posts</div>
-          </div>
-        </div>
-        <div class="trending-tag">
-          <div class="trending-rank">4</div>
-          <div class="trending-info">
-            <div class="trending-name">Physics Finals</div>
-            <div class="trending-count">621 posts</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Suggested Users -->
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title">Who to Follow</div>
-          <a href="#" class="widget-action">See all</a>
-        </div>
-        <div class="widget-item">
-          <div class="widget-item-avatar">S</div>
-          <div class="widget-item-content">
-            <div class="widget-item-name">Sarah Chen</div>
-            <div class="widget-item-meta">Biology major • 234 followers</div>
-          </div>
-          <div class="widget-item-action">
-            <button class="follow-btn" onclick="event.stopPropagation()">Follow</button>
-          </div>
-        </div>
-        <div class="widget-item">
-          <div class="widget-item-avatar">M</div>
-          <div class="widget-item-content">
-            <div class="widget-item-name">Mike Johnson</div>
-            <div class="widget-item-meta">Physics TA • 567 followers</div>
-          </div>
-          <div class="widget-item-action">
-            <button class="follow-btn" onclick="event.stopPropagation()">Follow</button>
-          </div>
-        </div>
-        <div class="widget-item">
-          <div class="widget-item-avatar">E</div>
-          <div class="widget-item-content">
-            <div class="widget-item-name">Emma Davis</div>
-            <div class="widget-item-meta">Math tutor • 892 followers</div>
-          </div>
-          <div class="widget-item-action">
-            <button class="follow-btn" onclick="event.stopPropagation()">Follow</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active Study Groups -->
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title">Active Study Groups</div>
-          <a href="#" class="widget-action">View all</a>
-        </div>
-        <div class="widget-item">
-          <div class="widget-item-avatar">📚</div>
-          <div class="widget-item-content">
-            <div class="widget-item-name">Bio 101 Study Group</div>
-            <div class="widget-item-meta">145 members • Active now</div>
-          </div>
-        </div>
-        <div class="widget-item">
-          <div class="widget-item-avatar">🔬</div>
-          <div class="widget-item-content">
-            <div class="widget-item-name">Chemistry Lab Partners</div>
-            <div class="widget-item-meta">87 members • 12 online</div>
-          </div>
-        </div>
-        <div class="widget-item">
-          <div class="widget-item-avatar">📐</div>
-          <div class="widget-item-content">
-            <div class="widget-item-name">Calculus Help</div>
-            <div class="widget-item-meta">201 members • 8 online</div>
-          </div>
+        <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+          <p style="font-size: 14px; margin-bottom: 8px;">More features on the way!</p>
+          <p style="font-size: 13px;">Trending topics, user suggestions, and study groups.</p>
         </div>
       </div>
     </aside>
@@ -1700,6 +1608,7 @@
       loadUserNotes();
       loadUserFolders();
       setupInfiniteScroll();
+      loadUserStats();
     });
 
     // Switch tabs
@@ -2343,6 +2252,33 @@
         select.innerHTML = options.join('');
       } catch (error) {
         console.error('Error loading folders:', error);
+      }
+    }
+
+    // Load user stats
+    async function loadUserStats() {
+      try {
+        // Get user's own posts count
+        const postsResponse = await fetch(`${BACKEND_URL}/api/social/profile/${currentUser.email.split('@')[0]}/posts`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (postsResponse.ok) {
+          const postsData = await postsResponse.json();
+          document.getElementById('userPostCount').textContent = postsData.posts?.length || 0;
+        }
+
+        // Get followers/following count (placeholder until we have endpoints)
+        document.getElementById('userFollowerCount').textContent = '0';
+        document.getElementById('userFollowingCount').textContent = '0';
+        document.getElementById('userSavedCount').textContent = '0';
+
+      } catch (error) {
+        console.error('Error loading user stats:', error);
+        document.getElementById('userPostCount').textContent = '0';
+        document.getElementById('userFollowerCount').textContent = '0';
+        document.getElementById('userFollowingCount').textContent = '0';
+        document.getElementById('userSavedCount').textContent = '0';
       }
     }
 
