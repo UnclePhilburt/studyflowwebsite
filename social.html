@@ -219,6 +219,19 @@
       background: var(--bg-secondary);
     }
 
+    .post-thumbnail-placeholder {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+    }
+
     .post-content {
       padding: 16px;
     }
@@ -748,9 +761,19 @@
     function renderPost(post) {
       const timeAgo = getTimeAgo(post.created_at);
       const userVote = post.user_vote_type || null;
-      const thumbnail = post.notes?.thumbnail_url || 'https://via.placeholder.com/400x300?text=Note';
       const username = post.username || 'Anonymous';
       const avatarLetter = username[0].toUpperCase();
+
+      let thumbnailHtml = '';
+      if (post.post_type === 'note') {
+        if (post.notes?.thumbnail_url) {
+          thumbnailHtml = `<img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail">`;
+        } else {
+          // Show placeholder for notes without thumbnails
+          const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
+          thumbnailHtml = `<div class="post-thumbnail-placeholder">${fileType}</div>`;
+        }
+      }
 
       return `
         <div class="post-card" onclick="viewPost('${post.id}')">
@@ -761,7 +784,7 @@
               <div class="post-time">${timeAgo}</div>
             </div>
           </div>
-          ${post.post_type === 'note' ? `<img class="post-thumbnail" src="${thumbnail}" alt="Note thumbnail">` : ''}
+          ${thumbnailHtml}
           <div class="post-content">
             ${post.post_type === 'note' && post.notes?.original_filename ? `<div class="post-title">${post.notes.original_filename}</div>` : ''}
             ${post.text_content ? `<div class="post-caption">${post.text_content}</div>` : ''}

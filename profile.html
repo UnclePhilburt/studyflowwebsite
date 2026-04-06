@@ -256,6 +256,19 @@
       object-fit: cover;
     }
 
+    .grid-post-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+    }
+
     .grid-post-overlay {
       position: absolute;
       inset: 0;
@@ -771,10 +784,17 @@
 
     // Render grid post
     function renderGridPost(post) {
-      const thumbnail = post.notes?.thumbnail_url || 'https://via.placeholder.com/400?text=Post';
+      let content;
+      if (post.notes?.thumbnail_url) {
+        content = `<img src="${post.notes.thumbnail_url}" alt="Post">`;
+      } else {
+        const fileType = post.notes?.file_type?.toUpperCase() || 'POST';
+        content = `<div class="grid-post-placeholder">${fileType}</div>`;
+      }
+
       return `
         <div class="grid-post" onclick="window.location.href='post.html?id=${post.id}'">
-          <img src="${thumbnail}" alt="Post">
+          ${content}
           <div class="grid-post-overlay">
             <span>▲ ${post.score || 0}</span>
             <span>💬 ${post.comment_count || 0}</span>
