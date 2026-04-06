@@ -2110,6 +2110,29 @@
       }
     }
 
+    // ========== REPOST ==========
+    async function repostPost(postId) {
+      const text = prompt('Add a comment (optional):') || '';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/repost`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text.trim() })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          if (window.sfToast) sfToast('Reposted!', 'success');
+          loadFeed();
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed to repost', 'error');
+        }
+      } catch (e) {
+        if (window.sfToast) sfToast('Failed to repost', 'error');
+      }
+    }
+
     // ========== MENTION AUTOCOMPLETE ==========
     let mentionDropdown = null;
     let mentionTarget = null;
@@ -3092,7 +3115,8 @@
       }
 
       // Action verb based on post type
-      const actionVerb = contentType === 'note' ? 'shared a note' : contentType === 'photo' ? 'posted a photo' : 'posted an update';
+      const isRepost = !!post.repost_of;
+      const actionVerb = isRepost ? 'reposted' : contentType === 'note' ? 'shared a note' : contentType === 'photo' ? 'posted a photo' : 'posted an update';
 
       // Random gradient for text posts
       const textBgClass = contentType === 'text' ? `text-bg-${Math.abs(post.id.charCodeAt(0)) % 8}` : '';
@@ -3112,6 +3136,13 @@
           <div class="post-content">
             ${post.post_type === 'note' && post.notes?.original_filename ? `<div class="post-title">${post.notes.original_filename}</div>` : ''}
             ${post.text_content ? `<div class="post-caption">${formatPostText(post.text_content)}</div>` : ''}
+            ${isRepost && post.original_post ? `
+              <div onclick="event.stopPropagation(); viewPost('${post.original_post.id}')" style="margin:8px 16px 0;border:1px solid var(--border-color);border-radius:10px;padding:12px;cursor:pointer;background:var(--bg-primary);">
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">@${post.original_post.username || 'Unknown'}</div>
+                ${post.original_post.text_content ? `<div style="font-size:13px;color:var(--text-secondary);line-height:1.4;">${formatPostText(post.original_post.text_content.substring(0, 200))}${post.original_post.text_content.length > 200 ? '...' : ''}</div>` : ''}
+                ${post.original_post.notes?.original_filename ? `<div style="font-size:11px;color:var(--accent-primary);margin-top:4px;">${post.original_post.notes.original_filename}</div>` : ''}
+              </div>
+            ` : ''}
           </div>
           <div class="post-actions" onclick="event.stopPropagation()">
             <div class="vote-buttons">
@@ -3119,6 +3150,9 @@
               <div class="vote-score" id="score-${post.id}">${post.score || 0}</div>
               <button class="vote-btn ${userVote === 'downvote' ? 'downvoted' : ''}" id="downvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'downvote')">▼</button>
             </div>
+            <button class="action-btn" onclick="event.stopPropagation(); repostPost('${post.id}')" style="display:flex;align-items:center;gap:4px;">
+              &#x1F501; ${post.share_count || 0}
+            </button>
             <button class="action-btn" onclick="toggleQuickComment('${post.id}')">
               ${post.comment_count || 0} comments
             </button>
