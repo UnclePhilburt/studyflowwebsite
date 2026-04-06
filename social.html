@@ -1715,9 +1715,6 @@
           <a href="#" class="sidebar-item active" onclick="showSection('feed'); return false;">
             <span class="sidebar-label">Home Feed</span>
           </a>
-          <a href="#" class="sidebar-item" onclick="showSection('saved'); return false;">
-            <span class="sidebar-label">Saved</span>
-          </a>
         </nav>
       </div>
 
@@ -2015,10 +2012,21 @@
     }
 
     // Quick action: Save post
-    function savePost(postId) {
-      // TODO: Implement save functionality
-      console.log('Save post:', postId);
-      alert('Save feature coming soon!');
+    async function savePost(postId) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/bookmark`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (window.sfToast) sfToast(data.bookmarked ? 'Post saved!' : 'Post unsaved', 'success');
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed to save', 'error');
+        }
+      } catch {
+        if (window.sfToast) sfToast('Failed to save post', 'error');
+      }
     }
 
     // Quick action: Share post

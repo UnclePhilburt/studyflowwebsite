@@ -629,6 +629,14 @@
       </div>
     </div>
 
+    <!-- Profile Tabs -->
+    <div id="profileTabs" style="display:none;border-bottom:1px solid var(--border-color);margin-bottom:16px;">
+      <div style="display:flex;gap:0;">
+        <button class="profile-tab active" onclick="switchProfileTab('posts', this)" style="flex:1;padding:12px;border:none;background:none;font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer;border-bottom:2px solid var(--accent-primary);font-family:inherit;">Posts</button>
+        <button class="profile-tab" onclick="switchProfileTab('saved', this)" style="flex:1;padding:12px;border:none;background:none;font-size:14px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;">Saved</button>
+      </div>
+    </div>
+
     <!-- Posts Grid -->
     <div id="postsContainer">
       <div class="loading">
@@ -791,6 +799,7 @@
         `;
         document.getElementById('avatarUploadBtn').style.display = 'flex';
         document.getElementById('bannerUploadBtn').style.display = 'block';
+        document.getElementById('profileTabs').style.display = 'block';
       } else {
         const followBtn = profileData.is_following
           ? `<button class="btn btn-danger" onclick="unfollowUser()">Unfollow</button>`
@@ -969,6 +978,52 @@
         }
       } catch { if (window.sfToast) sfToast('Failed to post', 'error'); }
       finally { btn.disabled = false; btn.textContent = 'Post'; updateProfilePostBtn(); }
+    }
+
+    // ========== PROFILE TABS ==========
+    let currentProfileTab = 'posts';
+
+    function switchProfileTab(tab, btn) {
+      currentProfileTab = tab;
+      document.querySelectorAll('.profile-tab').forEach(t => {
+        t.style.color = 'var(--text-muted)';
+        t.style.borderBottomColor = 'transparent';
+      });
+      btn.style.color = 'var(--text-primary)';
+      btn.style.borderBottomColor = 'var(--accent-primary)';
+
+      if (tab === 'posts') {
+        loadPosts();
+      } else if (tab === 'saved') {
+        loadSavedPosts();
+      }
+    }
+
+    async function loadSavedPosts() {
+      const container = document.getElementById('postsContainer');
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Loading saved posts...</div>';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/bookmarks`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        const posts = data.posts || [];
+
+        if (posts.length === 0) {
+          container.innerHTML = `<div style="text-align:center;padding:60px 20px;">
+            <div style="font-size:40px;margin-bottom:12px;">&#x2B50;</div>
+            <h3 style="color:var(--text-primary);margin-bottom:8px;">No saved posts</h3>
+            <p style="color:var(--text-muted);">Posts you save will appear here</p>
+          </div>`;
+          return;
+        }
+
+        container.innerHTML = `<div class="posts-grid">${posts.map(renderGridPost).join('')}</div>`;
+      } catch (e) {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Failed to load saved posts</div>';
+      }
     }
 
     // ========== MENTION AUTOCOMPLETE ==========
