@@ -435,8 +435,9 @@
     /* Tabs - Instagram Clean Style */
     .tabs {
       display: flex;
+      align-items: center;
       gap: 0;
-      margin-bottom: 32px;
+      margin-bottom: 20px;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -1719,17 +1720,17 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
-        <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
-      </div>
-
-      <!-- Content Type Filters -->
-      <div class="content-filters">
-        <button class="filter-chip active" data-filter="all" onclick="filterContent('all')">All</button>
-        <button class="filter-chip" data-filter="note" onclick="filterContent('note')">Notes</button>
-        <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Posts</button>
+      <!-- Tabs + Filters -->
+      <div class="tabs" style="justify-content:space-between;">
+        <div style="display:flex;gap:0;">
+          <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
+          <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
+        </div>
+        <div class="content-filters" style="margin:0;padding:0;border:none;">
+          <button class="filter-chip active" data-filter="all" onclick="filterContent('all')">All</button>
+          <button class="filter-chip" data-filter="note" onclick="filterContent('note')">Notes</button>
+          <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Posts</button>
+        </div>
       </div>
 
       <!-- Feed Controls -->
