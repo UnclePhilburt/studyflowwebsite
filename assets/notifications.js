@@ -56,7 +56,10 @@
       ">
         <div style="padding:12px 16px;border-bottom:1px solid var(--border-color,#eee);display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:14px;font-weight:700;color:var(--text-primary,#2d2d2d);">Notifications</span>
-          <a href="social.html" style="font-size:11px;color:var(--accent-primary,#7c9885);text-decoration:none;font-weight:600;">View Social</a>
+          <div style="display:flex;gap:12px;">
+            <button onclick="clearAllNotifs()" style="font-size:11px;color:var(--text-muted,#999);background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit;">Clear all</button>
+            <a href="social.html" style="font-size:11px;color:var(--accent-primary,#7c9885);text-decoration:none;font-weight:600;">View Social</a>
+          </div>
         </div>
         <div id="sf-notif-list" style="overflow-y:auto;max-height:360px;"></div>
       </div>
@@ -207,6 +210,26 @@
       }
     }
   }
+
+  async function clearAllNotifs() {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      await fetch(`${BACKEND_URL}/api/notifications/read`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch {}
+
+    // Clear UI
+    const list = document.getElementById('sf-notif-list');
+    if (list) list.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:13px;">No notifications</div>';
+    if (badgeEl) badgeEl.style.display = 'none';
+  }
+
+  // Expose globally for inline onclick
+  window.clearAllNotifs = clearAllNotifs;
 
   function getRelativeTime(timestamp) {
     const now = new Date();
