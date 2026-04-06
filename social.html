@@ -715,6 +715,69 @@
       width: 100%;
     }
 
+    /* Upload Options Grid */
+    .upload-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      padding: 24px;
+    }
+
+    .upload-option-card {
+      padding: 24px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .upload-option-card:hover {
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .upload-option-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .upload-option-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* Modal Back Button */
+    .modal-back {
+      position: absolute;
+      left: 16px;
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 20px;
+    }
+
+    .modal-back:hover {
+      background: #f5f5f5;
+    }
+
     /* Dock */
     .dock {
       position: fixed;
@@ -840,54 +903,128 @@
     </div>
   </div>
 
-  <!-- Create Post Modal -->
-  <div class="modal" id="createPostModal">
+  <!-- Step 1: Upload/Select Modal -->
+  <div class="modal" id="uploadModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Create Post</h2>
-        <button class="modal-close" onclick="closeCreatePostModal()">✕</button>
+        <h2>Create New Post</h2>
+        <button class="modal-close" onclick="closeUploadModal()">✕</button>
       </div>
-      <form id="createPostForm">
-        <div class="form-group">
-          <label>Post Type</label>
-          <select id="postType" onchange="handlePostTypeChange()">
-            <option value="note">Share Existing Note</option>
-            <option value="upload">Upload New Note/Photo</option>
-            <option value="text">Text Post</option>
-          </select>
+
+      <div class="upload-options">
+        <!-- Upload New File -->
+        <div class="upload-option-card" onclick="document.getElementById('fileInputNew').click()">
+          <div class="upload-icon">📤</div>
+          <h3>Upload Note or Photo</h3>
+          <p>PDF, images, or documents</p>
+          <input type="file" id="fileInputNew" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp" style="display: none;" onchange="handleFileSelect(event)">
         </div>
-        <div class="form-group" id="noteSelectGroup">
-          <label>Select Note</label>
-          <select id="noteSelect">
+
+        <!-- Share Existing Note -->
+        <div class="upload-option-card" onclick="showExistingNotes()">
+          <div class="upload-icon">📚</div>
+          <h3>Share Existing Note</h3>
+          <p>From your library</p>
+        </div>
+
+        <!-- Text Post -->
+        <div class="upload-option-card" onclick="showTextPost()">
+          <div class="upload-icon">✍️</div>
+          <h3>Write Something</h3>
+          <p>Text-only post</p>
+        </div>
+      </div>
+
+      <!-- Existing Notes Selection (hidden by default) -->
+      <div id="existingNotesPanel" style="display: none;">
+        <div style="padding: 0 24px 24px;">
+          <button class="btn btn-secondary" onclick="backToUploadOptions()" style="margin-bottom: 16px; width: 100%;">← Back</button>
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Select a note from your library:</label>
+          <select id="noteSelectExisting" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 16px;">
             <option value="">Loading your notes...</option>
           </select>
+          <button class="btn btn-primary" onclick="selectExistingNote()" style="width: 100%;">Next</button>
         </div>
-        <div class="form-group" id="uploadGroup" style="display: none;">
-          <label>Upload File</label>
-          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp">
-          <div class="form-help">Max 10MB - PDF or image files</div>
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div id="dropZone" style="display: none; padding: 24px;">
+        <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; background: #fafafa;">
+          <div style="font-size: 48px; margin-bottom: 16px;">📎</div>
+          <p style="font-weight: 600; margin-bottom: 8px;">Drag and drop your file here</p>
+          <p style="color: var(--text-muted); font-size: 14px;">or click to browse</p>
+          <button class="btn btn-secondary" onclick="document.getElementById('fileInputNew').click()" style="margin-top: 16px;">Choose File</button>
         </div>
-        <div class="form-group" id="folderSelectGroup" style="display: none;">
-          <label>Save to Folder (optional)</label>
-          <select id="folderSelect">
-            <option value="">No folder - just post</option>
-          </select>
-          <div class="form-help">Choose a folder to save this note to your library</div>
-        </div>
-        <div class="form-group">
-          <label>Caption (optional)</label>
-          <textarea id="postCaption" placeholder="Add a caption..."></textarea>
-        </div>
-        <div id="uploadProgress" style="display: none; padding: 0 24px; margin-bottom: 16px;">
-          <div style="background: #efefef; border-radius: 8px; height: 8px; overflow: hidden;">
-            <div id="uploadProgressBar" style="background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Caption & Details Modal -->
+  <div class="modal" id="captionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="modal-back" onclick="backToUpload()">←</button>
+        <h2>New Post</h2>
+        <button class="modal-close" onclick="closeCaptionModal()">✕</button>
+      </div>
+
+      <div style="padding: 24px;">
+        <!-- Preview -->
+        <div id="postPreview" style="margin-bottom: 20px; border-radius: 8px; overflow: hidden; background: #f5f5f5; max-height: 300px; display: flex; align-items: center; justify-content: center;">
+          <img id="previewImage" style="max-width: 100%; max-height: 300px; object-fit: contain; display: none;">
+          <div id="previewPlaceholder" style="padding: 40px; text-align: center; color: var(--text-muted);">
+            <div style="font-size: 48px; margin-bottom: 12px;">📄</div>
+            <p>Note preview</p>
           </div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="uploadProgressText">Uploading...</div>
         </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary" id="postSubmitBtn">Post</button>
+
+        <!-- Upload Progress (visible during background upload) -->
+        <div id="backgroundUploadProgress" style="display: none; margin-bottom: 20px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <div class="spinner" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div>
+            <span style="font-weight: 500; font-size: 14px;">Uploading in background...</span>
+          </div>
+          <div style="background: #e5e7eb; border-radius: 8px; height: 6px; overflow: hidden;">
+            <div id="backgroundProgressBar" style="background: var(--accent-primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="backgroundProgressText">0%</div>
         </div>
-      </form>
+
+        <!-- Caption -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Caption</label>
+          <textarea id="postCaptionNew" placeholder="Write a caption..." style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; min-height: 100px; font-family: inherit; resize: vertical;"></textarea>
+        </div>
+
+        <!-- Content Type -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Content Type</label>
+          <select id="contentTypeSelect" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+            <option value="note">Study Notes</option>
+            <option value="photo">Photo</option>
+            <option value="resource">Resource/Guide</option>
+            <option value="text">Explanation</option>
+          </select>
+        </div>
+
+        <!-- Course/Subject (optional) -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Course/Subject (optional)</label>
+          <input type="text" id="courseInput" placeholder="e.g., Biology 101, Calculus" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+        </div>
+
+        <!-- Folder (for uploads only) -->
+        <div id="folderSelectNew" style="display: none; margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Save to Folder (optional)</label>
+          <select id="folderSelectNewDropdown" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+            <option value="">Don't save to library</option>
+          </select>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Save this note to your library while posting</p>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn btn-primary" onclick="submitPost()" style="width: 100%; margin-top: 8px;" id="finalPostBtn">Share Post</button>
+      </div>
     </div>
   </div>
 
@@ -1191,13 +1328,264 @@
     }
 
     // Create post modal
+    // Global state for upload flow
+    let selectedFile = null;
+    let selectedNoteId = null;
+    let uploadedNoteId = null;
+    let isUploadingInBackground = false;
+
+    // Step 1: Open upload modal
     function openCreatePostModal() {
-      document.getElementById('createPostModal').classList.add('active');
+      document.getElementById('uploadModal').classList.add('active');
+      loadUserNotes();
     }
 
-    function closeCreatePostModal() {
-      document.getElementById('createPostModal').classList.remove('active');
-      document.getElementById('createPostForm').reset();
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.remove('active');
+      selectedFile = null;
+      selectedNoteId = null;
+    }
+
+    // Step 2: Close caption modal
+    function closeCaptionModal() {
+      document.getElementById('captionModal').classList.remove('active');
+      selectedFile = null;
+      selectedNoteId = null;
+      uploadedNoteId = null;
+    }
+
+    // Back to upload from caption
+    function backToUpload() {
+      document.getElementById('captionModal').classList.remove('active');
+      document.getElementById('uploadModal').classList.add('active');
+    }
+
+    // Show existing notes panel
+    function showExistingNotes() {
+      document.querySelector('.upload-options').style.display = 'none';
+      document.getElementById('existingNotesPanel').style.display = 'block';
+      loadUserNotes();
+    }
+
+    // Back to upload options
+    function backToUploadOptions() {
+      document.querySelector('.upload-options').style.display = 'grid';
+      document.getElementById('existingNotesPanel').style.display = 'none';
+    }
+
+    // Show text post (skip to caption with no file)
+    function showTextPost() {
+      selectedFile = null;
+      selectedNoteId = null;
+      document.getElementById('uploadModal').classList.remove('active');
+      document.getElementById('captionModal').classList.add('active');
+      document.getElementById('previewImage').style.display = 'none';
+      document.getElementById('previewPlaceholder').innerHTML = '<div style="font-size: 48px; margin-bottom: 12px;">✍️</div><p>Text-only post</p>';
+      document.getElementById('folderSelectNew').style.display = 'none';
+      document.getElementById('contentTypeSelect').value = 'text';
+    }
+
+    // Handle file selection
+    async function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // Check file size
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File too large! Maximum size is 10MB');
+        return;
+      }
+
+      selectedFile = file;
+
+      // Close upload modal, open caption modal
+      document.getElementById('uploadModal').classList.remove('active');
+      document.getElementById('captionModal').classList.add('active');
+
+      // Show preview
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('previewImage').src = e.target.result;
+          document.getElementById('previewImage').style.display = 'block';
+          document.getElementById('previewPlaceholder').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById('previewImage').style.display = 'none';
+        document.getElementById('previewPlaceholder').style.display = 'flex';
+        document.getElementById('previewPlaceholder').innerHTML = `<div><div style="font-size: 48px; margin-bottom: 12px;">📄</div><p>${file.name}</p></div>`;
+      }
+
+      // Show folder selection for uploads
+      document.getElementById('folderSelectNew').style.display = 'block';
+      loadUserFolders();
+
+      // Start background upload
+      startBackgroundUpload(file);
+    }
+
+    // Select existing note
+    function selectExistingNote() {
+      const select = document.getElementById('noteSelectExisting');
+      selectedNoteId = select.value;
+
+      if (!selectedNoteId) {
+        alert('Please select a note');
+        return;
+      }
+
+      // Find note details
+      const note = userNotes.find(n => n.id === selectedNoteId);
+
+      // Close upload modal, open caption modal
+      document.getElementById('uploadModal').classList.remove('active');
+      document.getElementById('captionModal').classList.add('active');
+
+      // Show preview
+      if (note && note.thumbnail_url) {
+        document.getElementById('previewImage').src = note.thumbnail_url;
+        document.getElementById('previewImage').style.display = 'block';
+        document.getElementById('previewPlaceholder').style.display = 'none';
+      } else {
+        document.getElementById('previewImage').style.display = 'none';
+        document.getElementById('previewPlaceholder').style.display = 'flex';
+        document.getElementById('previewPlaceholder').innerHTML = `<div><div style="font-size: 48px; margin-bottom: 12px;">📚</div><p>${note?.original_filename || 'Note'}</p></div>`;
+      }
+
+      // Hide folder selection (already in library)
+      document.getElementById('folderSelectNew').style.display = 'none';
+      uploadedNoteId = selectedNoteId;
+    }
+
+    // Background upload
+    async function startBackgroundUpload(file) {
+      const progressDiv = document.getElementById('backgroundUploadProgress');
+      const progressBar = document.getElementById('backgroundProgressBar');
+      const progressText = document.getElementById('backgroundProgressText');
+
+      progressDiv.style.display = 'block';
+      isUploadingInBackground = true;
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const folderId = document.getElementById('folderSelectNewDropdown').value;
+        if (folderId) {
+          formData.append('folder_id', folderId);
+        }
+
+        // Simulate progress
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+          progress += 5;
+          if (progress <= 90) {
+            progressBar.style.width = progress + '%';
+            progressText.textContent = progress + '%';
+          }
+        }, 200);
+
+        const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-note`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: formData
+        });
+
+        clearInterval(progressInterval);
+
+        if (!uploadResponse.ok) {
+          throw new Error('Upload failed');
+        }
+
+        const uploadData = await uploadResponse.json();
+        uploadedNoteId = uploadData.note_id;
+
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Upload complete!';
+
+        setTimeout(() => {
+          progressDiv.style.display = 'none';
+          isUploadingInBackground = false;
+        }, 1000);
+
+      } catch (error) {
+        console.error('Background upload error:', error);
+        alert('Upload failed: ' + error.message);
+        progressDiv.style.display = 'none';
+        isUploadingInBackground = false;
+      }
+    }
+
+    // Submit post
+    async function submitPost() {
+      const caption = document.getElementById('postCaptionNew').value.trim();
+      const contentType = document.getElementById('contentTypeSelect').value;
+      const course = document.getElementById('courseInput').value.trim();
+      const submitBtn = document.getElementById('finalPostBtn');
+
+      // Wait for background upload if still in progress
+      if (isUploadingInBackground) {
+        alert('Please wait for upload to complete...');
+        return;
+      }
+
+      // Validate
+      if (!uploadedNoteId && !selectedNoteId && !caption) {
+        alert('Please add a caption for text-only posts');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Posting...';
+
+      try {
+        const postData = {
+          post_type: uploadedNoteId || selectedNoteId ? 'note' : 'text',
+          text_content: caption || null
+        };
+
+        if (uploadedNoteId || selectedNoteId) {
+          postData.note_id = uploadedNoteId || selectedNoteId;
+        }
+
+        // Add course metadata if provided
+        if (course) {
+          postData.course = course;
+        }
+
+        const response = await fetch(`${BACKEND_URL}/api/social/posts`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        });
+
+        if (response.ok) {
+          closeCaptionModal();
+          loadFeed();
+
+          // Reset form
+          document.getElementById('postCaptionNew').value = '';
+          document.getElementById('courseInput').value = '';
+          selectedFile = null;
+          selectedNoteId = null;
+          uploadedNoteId = null;
+        } else {
+          const error = await response.json();
+          alert(error.error || 'Failed to create post');
+        }
+      } catch (error) {
+        console.error('Error creating post:', error);
+        alert('Failed to create post');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Share Post';
+      }
     }
 
     // Load user notes
@@ -1212,7 +1600,7 @@
         const data = await response.json();
         userNotes = data.notes || [];
 
-        const select = document.getElementById('noteSelect');
+        const select = document.getElementById('noteSelectExisting');
         if (userNotes.length === 0) {
           select.innerHTML = '<option value="">No notes available</option>';
         } else {
@@ -1237,8 +1625,8 @@
         const data = await response.json();
         const folders = data.folders || [];
 
-        const select = document.getElementById('folderSelect');
-        const options = ['<option value="">No folder - just post</option>'];
+        const select = document.getElementById('folderSelectNewDropdown');
+        const options = ['<option value="">Don\'t save to library</option>'];
         folders.forEach(folder => {
           options.push(`<option value="${folder.id}">${folder.name}</option>`);
         });
@@ -1247,143 +1635,6 @@
         console.error('Error loading folders:', error);
       }
     }
-
-    // Handle post type change
-    function handlePostTypeChange() {
-      const type = document.getElementById('postType').value;
-      const noteGroup = document.getElementById('noteSelectGroup');
-      const uploadGroup = document.getElementById('uploadGroup');
-      const folderGroup = document.getElementById('folderSelectGroup');
-
-      noteGroup.style.display = type === 'note' ? 'block' : 'none';
-      uploadGroup.style.display = type === 'upload' ? 'block' : 'none';
-      folderGroup.style.display = type === 'upload' ? 'block' : 'none';
-    }
-
-    // Create post
-    document.getElementById('createPostForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const postType = document.getElementById('postType').value;
-      const caption = document.getElementById('postCaption').value.trim();
-      const submitBtn = document.getElementById('postSubmitBtn');
-      const progressDiv = document.getElementById('uploadProgress');
-      const progressBar = document.getElementById('uploadProgressBar');
-      const progressText = document.getElementById('uploadProgressText');
-
-      submitBtn.disabled = true;
-
-      try {
-        let noteId = null;
-
-        // Handle file upload if "upload" type
-        if (postType === 'upload') {
-          const fileInput = document.getElementById('fileInput');
-          const file = fileInput.files[0];
-
-          if (!file) {
-            alert('Please select a file to upload');
-            submitBtn.disabled = false;
-            return;
-          }
-
-          // Check file size (10MB max)
-          if (file.size > 10 * 1024 * 1024) {
-            alert('File too large! Maximum size is 10MB');
-            submitBtn.disabled = false;
-            return;
-          }
-
-          // Show progress
-          progressDiv.style.display = 'block';
-          progressText.textContent = 'Uploading file...';
-          progressBar.style.width = '30%';
-
-          // Upload file
-          const formData = new FormData();
-          formData.append('file', file);
-
-          const folderId = document.getElementById('folderSelect').value;
-          if (folderId) {
-            formData.append('folder_id', folderId);
-          }
-
-          const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-note`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${authToken}`
-            },
-            body: formData
-          });
-
-          if (!uploadResponse.ok) {
-            const error = await uploadResponse.json();
-            throw new Error(error.error || 'Upload failed');
-          }
-
-          const uploadData = await uploadResponse.json();
-          noteId = uploadData.note_id;
-
-          progressBar.style.width = '70%';
-          progressText.textContent = 'Creating post...';
-        } else if (postType === 'note') {
-          noteId = document.getElementById('noteSelect').value;
-          if (!noteId) {
-            alert('Please select a note to share');
-            submitBtn.disabled = false;
-            return;
-          }
-        } else if (postType === 'text') {
-          if (!caption) {
-            alert('Please add some text content');
-            submitBtn.disabled = false;
-            return;
-          }
-        }
-
-        // Create post
-        const postData = {
-          post_type: noteId ? 'note' : 'text',
-          text_content: caption || null
-        };
-
-        if (noteId) {
-          postData.note_id = noteId;
-        }
-
-        const response = await fetch(`${BACKEND_URL}/api/social/posts`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        });
-
-        if (response.ok) {
-          if (progressDiv.style.display === 'block') {
-            progressBar.style.width = '100%';
-            progressText.textContent = 'Done!';
-          }
-          setTimeout(() => {
-            closeCreatePostModal();
-            progressDiv.style.display = 'none';
-            progressBar.style.width = '0%';
-            loadFeed();
-          }, 500);
-        } else {
-          const error = await response.json();
-          alert(error.error || 'Failed to create post');
-        }
-      } catch (error) {
-        console.error('Error creating post:', error);
-        alert(error.message || 'Failed to create post');
-        progressDiv.style.display = 'none';
-        progressBar.style.width = '0%';
-      } finally {
-        submitBtn.disabled = false;
-      }
-    });
 
     // Time ago helper
     function getTimeAgo(timestamp) {
