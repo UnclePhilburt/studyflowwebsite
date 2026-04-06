@@ -9,108 +9,195 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, sans-serif; background: #f5f4f0; color: #2d2d2d; min-height: 100vh; padding: 24px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    .header { margin-bottom: 24px; }
-    .header h1 { font-family: 'Lora', serif; font-size: 28px; margin-bottom: 6px; }
-    .header p { font-size: 14px; color: #9ca3af; }
-    .back-link { display: inline-block; margin-bottom: 16px; font-size: 14px; color: #7c9885; text-decoration: none; }
-    .back-link:hover { text-decoration: underline; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #f5f4f0; color: #2d2d2d; min-height: 100vh; overflow: hidden; }
 
-    .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .filter-btn { padding: 8px 16px; border-radius: 8px; border: 1.5px solid #ddd; background: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .review-header {
+      position: fixed; top: 0; left: 0; right: 0; height: 56px;
+      background: rgba(248, 247, 244, 0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; z-index: 100;
+    }
+    .review-header-left { display: flex; align-items: center; gap: 12px; }
+    .review-header-left a { color: #7c9885; text-decoration: none; }
+    .review-header h1 { font-family: 'Lora', serif; font-size: 18px; }
+    .review-header-right { font-size: 13px; color: #999; }
+    #counter { font-weight: 600; }
+
+    .filter-bar {
+      position: fixed; top: 56px; left: 0; right: 0; height: 44px;
+      background: rgba(248, 247, 244, 0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 99;
+    }
+    .filter-btn { padding: 6px 14px; border-radius: 8px; border: 1.5px solid #ddd; background: white; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
     .filter-btn:hover { border-color: #7c9885; }
     .filter-btn.active { background: #7c9885; color: white; border-color: #7c9885; }
+    .filter-btn.reported { color: #ef4444; border-color: #fca5a5; }
+    .filter-btn.reported.active { background: #ef4444; color: white; border-color: #ef4444; }
 
-    .stats { display: flex; gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: white; border-radius: 12px; padding: 16px 20px; border: 1px solid #eee; flex: 1; text-align: center; }
-    .stat-value { font-size: 24px; font-weight: 700; color: #2d2d2d; }
-    .stat-label { font-size: 12px; color: #999; margin-top: 2px; }
-
-    .posts-list { display: flex; flex-direction: column; gap: 12px; }
-
-    .post-card { background: white; border-radius: 12px; border: 1px solid #eee; padding: 20px; display: flex; gap: 16px; align-items: flex-start; }
-    .post-card.denied { opacity: 0.5; border-color: #fca5a5; }
-
-    .post-avatar { width: 40px; height: 40px; border-radius: 50%; background: #7c9885; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
-    .post-body { flex: 1; min-width: 0; }
-    .post-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
-    .post-username { font-weight: 600; font-size: 14px; }
-    .post-type { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-    .post-type.note { background: #dbeafe; color: #1d4ed8; }
-    .post-type.text { background: #fef3c7; color: #92400e; }
-    .post-type.group_invite { background: #d1fae5; color: #065f46; }
-    .post-time { font-size: 12px; color: #999; }
-    .post-content { font-size: 14px; color: #444; line-height: 1.5; margin-bottom: 8px; word-break: break-word; }
-    .post-note { font-size: 12px; color: #7c9885; font-weight: 500; margin-bottom: 8px; }
-    .post-stats { display: flex; gap: 16px; font-size: 12px; color: #999; }
-    .post-status { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
-    .post-status.approved { background: #d1fae5; color: #065f46; }
-    .post-status.denied { background: #fee2e2; color: #991b1b; }
-
-    .post-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
-    .action-btn { padding: 8px 14px; border-radius: 8px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; min-width: 80px; }
-    .action-btn.approve { background: #d1fae5; color: #065f46; }
-    .action-btn.approve:hover { background: #a7f3d0; }
-    .action-btn.deny { background: #fee2e2; color: #991b1b; }
-    .action-btn.deny:hover { background: #fca5a5; }
-
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; display: none; align-items: center; justify-content: center; }
-    .modal-overlay.active { display: flex; }
-    .modal { background: white; border-radius: 14px; padding: 24px; max-width: 420px; width: 90%; }
-    .modal h3 { font-size: 17px; margin-bottom: 12px; }
-    .modal textarea { width: 100%; padding: 10px; border: 1.5px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 13px; min-height: 80px; resize: vertical; margin-bottom: 12px; }
-    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
-    .modal-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; }
-    .modal-btn.cancel { background: #f5f5f5; color: #666; }
-    .modal-btn.confirm { background: #ef4444; color: white; }
-
-    .empty { text-align: center; padding: 60px 20px; color: #999; }
-
-    @media (max-width: 600px) {
-      .post-card { flex-direction: column; }
-      .post-actions { flex-direction: row; }
-      .stats { flex-direction: column; }
+    .card-container {
+      position: fixed; top: 100px; left: 0; right: 0; bottom: 80px;
+      display: flex; align-items: center; justify-content: center;
     }
+
+    .post-card {
+      width: 600px; max-width: 90vw; max-height: calc(100vh - 200px);
+      background: white; border-radius: 16px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+      overflow-y: auto; transition: transform 0.3s, opacity 0.3s;
+    }
+    .post-card.swipe-right { transform: translateX(120%) rotate(8deg); opacity: 0; }
+    .post-card.swipe-left { transform: translateX(-120%) rotate(-8deg); opacity: 0; }
+
+    .post-card-header {
+      padding: 16px 20px; border-bottom: 1px solid #eee;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .post-avatar { width: 40px; height: 40px; border-radius: 50%; background: #7c9885; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; overflow: hidden; }
+    .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .post-user-info { flex: 1; }
+    .post-username { font-weight: 600; font-size: 14px; }
+    .post-time { font-size: 12px; color: #999; }
+    .post-type-badge { padding: 3px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #e8f0e5; color: #7c9885; flex-shrink: 0; }
+
+    .report-banner {
+      padding: 12px 20px; background: #fef2f2; border-bottom: 1px solid #fca5a5;
+    }
+    .report-badge { font-size: 11px; font-weight: 700; color: #dc2626; margin-bottom: 4px; }
+    .report-reason { font-size: 12px; color: #991b1b; }
+    .report-details { font-size: 11px; color: #b91c1c; margin-top: 4px; font-style: italic; }
+
+    .post-image { width: 100%; max-height: 500px; object-fit: contain; display: block; background: #fafafa; }
+    .post-file-badge { padding: 40px; text-align: center; background: #fafafa; font-size: 14px; color: #999; }
+
+    .post-text { padding: 16px 20px; font-size: 14px; line-height: 1.6; color: #333; white-space: pre-wrap; }
+
+    .post-stats-bar {
+      padding: 12px 20px; border-top: 1px solid #eee;
+      display: flex; gap: 20px; font-size: 12px; color: #999;
+    }
+
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
+      background: rgba(248, 247, 244, 0.95); backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(124, 152, 133, 0.1);
+      display: flex; align-items: center; justify-content: center; gap: 40px; z-index: 100;
+    }
+    .action-btn {
+      width: 56px; height: 56px; border-radius: 50%; border: none;
+      font-size: 24px; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .action-btn:hover { transform: scale(1.1); }
+    .action-btn:active { transform: scale(0.95); }
+    .action-btn.deny { background: #fee2e2; color: #dc2626; }
+    .action-btn.deny:hover { background: #fca5a5; }
+    .action-btn.approve { background: #d1fae5; color: #059669; }
+    .action-btn.approve:hover { background: #a7f3d0; }
+    .action-hint { font-size: 11px; color: #999; text-align: center; margin-top: 4px; }
+
+    .flash {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      padding: 16px 32px; border-radius: 12px; font-size: 18px; font-weight: 700;
+      opacity: 0; transition: opacity 0.15s; z-index: 200; pointer-events: none;
+    }
+    .flash.approve { background: #d1fae5; color: #059669; }
+    .flash.reject { background: #fee2e2; color: #dc2626; }
+    .flash.show { opacity: 1; }
+
+    .empty-state, .loading-state {
+      position: fixed; top: 100px; left: 0; right: 0; bottom: 80px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; color: #999; font-size: 16px;
+    }
+
+    .deny-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300;
+      display: none; align-items: center; justify-content: center;
+    }
+    .deny-modal.show { display: flex; }
+    .deny-modal-content {
+      background: white; border-radius: 14px; padding: 24px; max-width: 380px; width: 90%;
+    }
+    .deny-modal-content h3 { margin-bottom: 12px; }
+    .reason-btn {
+      display: block; width: 100%; padding: 10px 14px; margin-bottom: 8px;
+      background: rgba(220,38,38,0.04); border: 1px solid rgba(220,38,38,0.15);
+      border-radius: 10px; color: #dc2626; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: inherit; text-align: left;
+    }
+    .reason-btn:hover { background: rgba(220,38,38,0.08); }
   </style>
 </head>
 <body>
-  <div class="container">
-    <a href="admin.html" class="back-link">Back to Admin Hub</a>
-    <div class="header">
-      <h1>Social Post Moderation</h1>
-      <p>Review and moderate social posts. Posts go live immediately -- deny to remove.</p>
+  <div class="review-header">
+    <div class="review-header-left">
+      <a href="admin.html">Back</a>
+      <h1>Social Moderation</h1>
     </div>
-
-    <div class="stats" id="statsBar">
-      <div class="stat-card"><div class="stat-value" id="totalCount">-</div><div class="stat-label">Total Posts</div></div>
-      <div class="stat-card" style="border-color:#fca5a5;"><div class="stat-value" id="reportedCount" style="color:#ef4444;">-</div><div class="stat-label">Reported</div></div>
-      <div class="stat-card"><div class="stat-value" id="approvedCount">-</div><div class="stat-label">Approved</div></div>
-      <div class="stat-card"><div class="stat-value" id="deniedCount">-</div><div class="stat-label">Denied</div></div>
-    </div>
-
-    <div class="filters">
-      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-      <button class="filter-btn" onclick="setFilter('reported', this)" style="color:#ef4444;border-color:#fca5a5;">Reported</button>
-      <button class="filter-btn" onclick="setFilter('approved', this)">Approved</button>
-      <button class="filter-btn" onclick="setFilter('denied', this)">Denied</button>
-    </div>
-
-    <div class="posts-list" id="postsList">
-      <div class="empty">Loading posts...</div>
+    <div class="review-header-right">
+      <span id="counter">Loading...</span>
     </div>
   </div>
 
-  <!-- Deny Modal -->
-  <div class="modal-overlay" id="denyModal">
-    <div class="modal">
-      <h3>Deny Post</h3>
-      <p style="font-size:13px;color:#888;margin-bottom:12px;">This will delete the post and notify the user.</p>
-      <textarea id="denyReason" placeholder="Reason (optional)..."></textarea>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="closeDenyModal()">Cancel</button>
-        <button class="modal-btn confirm" onclick="confirmDeny()">Remove Post</button>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All Posts</button>
+    <button class="filter-btn reported" onclick="setFilter('reported', this)">Reported</button>
+    <button class="filter-btn" onclick="setFilter('approved', this)">Approved</button>
+  </div>
+
+  <div class="loading-state" id="loadingState">Loading posts...</div>
+
+  <div class="card-container" id="cardContainer" style="display:none;">
+    <div class="post-card" id="postCard">
+      <div class="post-card-header">
+        <div class="post-avatar" id="postAvatar">?</div>
+        <div class="post-user-info">
+          <div class="post-username" id="postUsername">Loading...</div>
+          <div class="post-time" id="postTime"></div>
+        </div>
+        <div class="post-type-badge" id="postType">POST</div>
       </div>
+      <div id="reportBanner" style="display:none;"></div>
+      <div id="postMedia"></div>
+      <div class="post-text" id="postText" style="display:none;"></div>
+      <div class="post-stats-bar" id="postStats"></div>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div>
+      <div style="font-size:48px;margin-bottom:12px;">&#x2705;</div>
+      <div style="font-size:18px;font-weight:600;">All caught up!</div>
+      <div style="color:#999;margin-top:4px;">No more posts to review.</div>
+    </div>
+  </div>
+
+  <div class="action-bar" id="actionBar">
+    <div>
+      <button class="action-btn deny" id="denyBtn" onclick="openDenyModal()">&#x2716;</button>
+      <div class="action-hint">&#8592; Deny</div>
+    </div>
+    <div>
+      <button class="action-btn approve" id="approveBtn" onclick="reviewPost('approve')">&#x2714;</button>
+      <div class="action-hint">Approve &#8594;</div>
+    </div>
+  </div>
+
+  <div class="flash approve" id="flashApprove">APPROVED</div>
+  <div class="flash reject" id="flashReject">REMOVED</div>
+
+  <div class="deny-modal" id="denyModal">
+    <div class="deny-modal-content">
+      <h3>Remove Post - Select Reason</h3>
+      <button class="reason-btn" onclick="confirmDeny('Spam or misleading content')">Spam or misleading content</button>
+      <button class="reason-btn" onclick="confirmDeny('Harassment or bullying')">Harassment or bullying</button>
+      <button class="reason-btn" onclick="confirmDeny('Inappropriate content')">Inappropriate content</button>
+      <button class="reason-btn" onclick="confirmDeny('Violates community guidelines')">Violates community guidelines</button>
+      <button class="reason-btn" onclick="confirmDeny('Copyright violation')">Copyright violation</button>
+      <button class="reason-btn" onclick="confirmDeny('Other')">Other</button>
+      <button style="margin-top:8px;width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;background:white;font-size:13px;cursor:pointer;font-family:inherit;" onclick="closeDenyModal()">Cancel</button>
     </div>
   </div>
 
@@ -119,151 +206,199 @@
     const adminKey = sessionStorage.getItem('studyflow_admin_key') || '';
     if (!adminKey) window.location.href = 'admin.html';
 
-    let allPosts = [];
+    let queue = [];
+    let currentIndex = 0;
+    let isProcessing = false;
+    let reviewedCount = 0;
     let currentFilter = 'all';
-    let denyPostId = null;
 
     async function loadPosts() {
       try {
-        const res = await fetch(`${BACKEND_URL}/admin/social/posts?key=${encodeURIComponent(adminKey)}&status=${currentFilter}&limit=100`);
+        const res = await fetch(`${BACKEND_URL}/admin/social/posts?key=${encodeURIComponent(adminKey)}&status=${currentFilter}&limit=200`);
         if (!res.ok) {
           if (res.status === 403) { sessionStorage.removeItem('studyflow_admin_key'); window.location.href = 'admin.html'; return; }
           throw new Error('Failed to load');
         }
         const data = await res.json();
-        allPosts = data.posts;
-        renderPosts();
-        updateStats();
-      } catch (e) {
-        document.getElementById('postsList').innerHTML = `<div class="empty">Error: ${e.message}</div>`;
-      }
-    }
+        queue = data.posts || [];
+        currentIndex = 0;
+        reviewedCount = 0;
 
-    function updateStats() {
-      const approved = allPosts.filter(p => p.moderation_status === 'approved').length;
-      const denied = allPosts.filter(p => p.moderation_status === 'denied').length;
-      const reported = allPosts.filter(p => p.report_count > 0).length;
-      document.getElementById('totalCount').textContent = allPosts.length;
-      document.getElementById('reportedCount').textContent = reported;
-      document.getElementById('approvedCount').textContent = approved;
-      document.getElementById('deniedCount').textContent = denied;
-    }
+        document.getElementById('loadingState').style.display = 'none';
 
-    function renderPosts() {
-      const container = document.getElementById('postsList');
-
-      let filtered = allPosts;
-      if (currentFilter === 'reported') {
-        filtered = allPosts.filter(p => p.report_count > 0);
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty">No posts found</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(p => {
-        const avatar = (p.username || 'U').charAt(0).toUpperCase();
-        const status = p.moderation_status || 'approved';
-        const isDenied = status === 'denied';
-        const content = p.text_content ? (p.text_content.length > 200 ? p.text_content.slice(0, 200) + '...' : p.text_content) : '';
-        const noteHtml = p.note_filename ? `<div class="post-note">Note: ${escapeHtml(p.note_filename)}</div>` : '';
-        const time = new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-        const isReported = p.report_count > 0;
-
-        let reportHtml = '';
-        if (isReported) {
-          const reasons = p.reports.map(r => r.reason).join(', ');
-          const details = p.reports.filter(r => r.details).map(r => r.details).join('; ');
-          reportHtml = `
-            <div style="margin-top:8px;padding:8px 12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;">
-              <div style="font-size:11px;font-weight:700;color:#dc2626;margin-bottom:4px;">REPORTED (${p.report_count}x)</div>
-              <div style="font-size:12px;color:#991b1b;">Reasons: ${escapeHtml(reasons)}</div>
-              ${details ? `<div style="font-size:11px;color:#b91c1c;margin-top:4px;">"${escapeHtml(details)}"</div>` : ''}
-            </div>
-          `;
+        if (queue.length === 0) {
+          showEmpty();
+        } else {
+          showCard();
         }
-
-        return `
-          <div class="post-card ${isDenied ? 'denied' : ''}" style="${isReported && !isDenied ? 'border-color:#fca5a5;border-width:2px;' : ''}">
-            <div class="post-avatar">${avatar}</div>
-            <div class="post-body">
-              <div class="post-meta">
-                <span class="post-username">${escapeHtml(p.username || 'Anonymous')}</span>
-                <span class="post-type ${p.post_type}">${p.post_type}</span>
-                <span class="post-status ${status}">${status}</span>
-                ${isReported ? '<span style="font-size:10px;padding:2px 8px;background:#fef2f2;color:#dc2626;border-radius:8px;font-weight:700;">REPORTED</span>' : ''}
-                <span class="post-time">${time}</span>
-              </div>
-              ${noteHtml}
-              ${content ? `<div class="post-content">${escapeHtml(content)}</div>` : ''}
-              ${reportHtml}
-              <div class="post-stats">
-                <span>${p.upvote_count || 0} upvotes</span>
-                <span>${p.downvote_count || 0} downvotes</span>
-                <span>${p.comment_count || 0} comments</span>
-              </div>
-            </div>
-            <div class="post-actions">
-              ${!isDenied ? `<button class="action-btn approve" onclick="approvePost('${p.id}')">Approve</button>` : ''}
-              ${!isDenied ? `<button class="action-btn deny" onclick="openDenyModal('${p.id}')">Deny</button>` : ''}
-              ${isDenied ? '<span style="font-size:11px;color:#999;">Removed</span>' : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
+        updateCounter();
+      } catch (e) {
+        document.getElementById('loadingState').textContent = 'Error: ' + e.message;
+      }
     }
 
     function setFilter(filter, btn) {
       currentFilter = filter;
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      document.getElementById('loadingState').style.display = 'flex';
+      document.getElementById('cardContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
       loadPosts();
     }
 
-    async function approvePost(postId) {
+    function updateCounter() {
+      const remaining = queue.length - currentIndex;
+      document.getElementById('counter').textContent = remaining + ' remaining | ' + reviewedCount + ' reviewed';
+    }
+
+    function showCard() {
+      if (currentIndex >= queue.length) { showEmpty(); return; }
+
+      const post = queue[currentIndex];
+      const card = document.getElementById('postCard');
+      card.className = 'post-card';
+
+      // Header
+      const avatar = (post.username || 'U')[0].toUpperCase();
+      document.getElementById('postAvatar').innerHTML = avatar;
+      document.getElementById('postUsername').textContent = post.username || 'Anonymous';
+      document.getElementById('postTime').textContent = new Date(post.created_at).toLocaleString();
+      document.getElementById('postType').textContent = (post.post_type || 'post').toUpperCase();
+
+      // Report banner
+      const reportBanner = document.getElementById('reportBanner');
+      if (post.report_count > 0) {
+        const reasons = post.reports.map(r => r.reason).join(', ');
+        const details = post.reports.filter(r => r.details).map(r => '"' + r.details + '"').join('; ');
+        reportBanner.innerHTML = `
+          <div class="report-banner">
+            <div class="report-badge">REPORTED ${post.report_count}x</div>
+            <div class="report-reason">Reasons: ${escapeHtml(reasons)}</div>
+            ${details ? `<div class="report-details">${escapeHtml(details)}</div>` : ''}
+          </div>
+        `;
+        reportBanner.style.display = 'block';
+      } else {
+        reportBanner.style.display = 'none';
+      }
+
+      // Media
+      const mediaEl = document.getElementById('postMedia');
+      if (post.note_id && post.note_filename) {
+        // Show note thumbnail via the view-as-images endpoint
+        mediaEl.innerHTML = `<div class="post-file-badge">Loading note preview...</div>`;
+        loadNotePreview(post.note_id, mediaEl, post.note_filename);
+      } else {
+        mediaEl.innerHTML = '';
+      }
+
+      // Text
+      const textEl = document.getElementById('postText');
+      if (post.text_content) {
+        textEl.textContent = post.text_content;
+        textEl.style.display = 'block';
+      } else {
+        textEl.style.display = 'none';
+      }
+
+      // Stats
+      document.getElementById('postStats').innerHTML = `
+        <span>${post.upvote_count || 0} upvotes</span>
+        <span>${post.downvote_count || 0} downvotes</span>
+        <span>${post.comment_count || 0} comments</span>
+        <span>Score: ${post.score || 0}</span>
+      `;
+
+      document.getElementById('cardContainer').style.display = 'flex';
+      document.getElementById('emptyState').style.display = 'none';
+      updateCounter();
+    }
+
+    async function loadNotePreview(noteId, container, filename) {
       try {
-        await fetch(`${BACKEND_URL}/admin/social/posts/${postId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: adminKey, action: 'approve' })
-        });
-        loadPosts();
-      } catch (e) {
-        alert('Failed to approve: ' + e.message);
+        const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.images && data.images.length > 0) {
+            // Show first page
+            container.innerHTML = `<img class="post-image" src="data:image/png;base64,${data.images[0]}" alt="${escapeHtml(filename)}">`;
+            if (data.images.length > 1) {
+              container.innerHTML += `<div style="text-align:center;padding:8px;font-size:12px;color:#999;">${data.images.length} pages total</div>`;
+            }
+            return;
+          }
+        }
+        container.innerHTML = `<div class="post-file-badge">${escapeHtml(filename)}</div>`;
+      } catch {
+        container.innerHTML = `<div class="post-file-badge">${escapeHtml(filename)}</div>`;
       }
     }
 
-    function openDenyModal(postId) {
-      denyPostId = postId;
-      document.getElementById('denyReason').value = '';
-      document.getElementById('denyModal').classList.add('active');
+    function showEmpty() {
+      document.getElementById('cardContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'flex';
+      updateCounter();
+    }
+
+    function flashResult(type) {
+      const el = document.getElementById(type === 'approve' ? 'flashApprove' : 'flashReject');
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 500);
+    }
+
+    async function reviewPost(action, reason) {
+      if (isProcessing || currentIndex >= queue.length) return;
+      isProcessing = true;
+
+      const post = queue[currentIndex];
+      const card = document.getElementById('postCard');
+      card.classList.add(action === 'approve' ? 'swipe-right' : 'swipe-left');
+      flashResult(action === 'approve' ? 'approve' : 'reject');
+
+      try {
+        await fetch(`${BACKEND_URL}/admin/social/posts/${post.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: adminKey, action: action, reason: reason || '' })
+        });
+      } catch (e) {
+        console.error('Review error:', e);
+      }
+
+      reviewedCount++;
+
+      setTimeout(() => {
+        currentIndex++;
+        showCard();
+        isProcessing = false;
+      }, 400);
+    }
+
+    function openDenyModal() {
+      if (isProcessing || currentIndex >= queue.length) return;
+      document.getElementById('denyModal').classList.add('show');
     }
 
     function closeDenyModal() {
-      denyPostId = null;
-      document.getElementById('denyModal').classList.remove('active');
+      document.getElementById('denyModal').classList.remove('show');
     }
 
-    async function confirmDeny() {
-      if (!denyPostId) return;
-      const reason = document.getElementById('denyReason').value.trim();
-      try {
-        await fetch(`${BACKEND_URL}/admin/social/posts/${denyPostId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: adminKey, action: 'deny', reason })
-        });
-        closeDenyModal();
-        loadPosts();
-      } catch (e) {
-        alert('Failed to deny: ' + e.message);
-      }
+    function confirmDeny(reason) {
+      closeDenyModal();
+      reviewPost('deny', reason);
     }
+
+    // Arrow keys
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); reviewPost('approve'); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); openDenyModal(); }
+      else if (e.key === 'Escape') { closeDenyModal(); }
+    });
 
     function escapeHtml(text) {
       const div = document.createElement('div');
-      div.textContent = text;
+      div.textContent = text || '';
       return div.innerHTML;
     }
 
