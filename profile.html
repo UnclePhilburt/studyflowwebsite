@@ -829,6 +829,9 @@
           return;
         }
 
+        // Sort pinned posts first
+        posts.sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
+
         const composerHtml = profileData.is_own_profile ? buildProfileComposer() : '';
         container.innerHTML = composerHtml + `<div class="posts-grid">${posts.map(renderGridPost).join('')}</div>`;
         // Attach mention autocomplete after composer is in DOM
@@ -1063,9 +1066,12 @@
         ? `<button class="grid-post-delete" onclick="event.stopPropagation(); deletePost('${post.id}')" title="Delete post" aria-label="Delete post">&times;</button>`
         : '';
 
+      const pinBadge = post.is_pinned ? `<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;z-index:2;">Pinned</div>` : '';
+
       return `
-        <div class="grid-post" onclick="window.location.href='post.html?id=${post.id}'">
+        <div class="grid-post" onclick="window.location.href='post.html?id=${post.id}'" style="${post.is_pinned ? 'border:2px solid var(--accent-primary);' : ''}">
           ${content}
+          ${pinBadge}
           ${deleteBtn}
           <div class="grid-post-overlay">
             <span>▲ ${post.score || 0}</span>
