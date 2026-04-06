@@ -716,31 +716,7 @@
       overflow: visible;
     }
 
-    /* Hover Preview Overlay */
-    .preview-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      padding: 20px;
-    }
-
-    .post-card[data-type="note"]:hover .preview-overlay {
-      display: flex;
-    }
-
-    .preview-text {
-      color: white;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-    }
+    /* Preview overlay removed - no dark overlay on hover */
 
     /* Quick Actions on Hover */
     .quick-actions {
@@ -2201,9 +2177,6 @@
         if (post.notes?.thumbnail_url) {
           thumbnailHtml = `
             <img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail" onclick="event.stopPropagation(); openLightbox('${post.notes.thumbnail_url}');" style="cursor: zoom-in;">
-            <div class="preview-overlay">
-              <div class="preview-text">Click to view full size</div>
-            </div>
           `;
         } else {
           const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
