@@ -1770,12 +1770,41 @@
         </div>
       </div>
 
-      <!-- Inline Composer (like Facebook) -->
-      <div id="inlineComposer" style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:text;" onclick="openCreatePostModal()">
-        <div id="composerAvatar" style="width:36px;height:36px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;"></div>
-        <div style="flex:1;padding:10px 14px;border-radius:20px;background:var(--bg-primary);color:var(--text-muted);font-size:14px;border:1px solid var(--border-color);">What's on your mind?</div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="event.stopPropagation(); document.getElementById('fileInputNew').click();" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px;" title="Upload file">&#x1F4CE;</button>
+      <!-- Inline Composer -->
+      <div id="inlineComposer" style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <div style="display:flex;gap:12px;">
+          <div id="composerAvatar" style="width:36px;height:36px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;margin-top:4px;"></div>
+          <textarea id="inlinePostText" placeholder="What's on your mind?" style="flex:1;padding:10px 0;border:none;background:none;color:var(--text-primary);font-size:15px;font-family:inherit;resize:none;outline:none;min-height:40px;max-height:200px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';"></textarea>
+        </div>
+        <!-- Attachment preview -->
+        <div id="inlineAttachPreview" style="display:none;margin:12px 0 0 48px;border-radius:10px;overflow:hidden;background:var(--bg-primary);border:1px solid var(--border-color);position:relative;">
+          <button onclick="removeInlineAttach()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:12px;cursor:pointer;z-index:2;">&#x2715;</button>
+          <img id="inlinePreviewImg" style="max-width:100%;max-height:200px;object-fit:contain;display:none;">
+          <div id="inlinePreviewFile" style="display:none;padding:16px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:4px;">&#x1F4C4;</div>
+            <div id="inlinePreviewName" style="font-size:12px;color:var(--text-muted);"></div>
+          </div>
+        </div>
+        <!-- Library picker -->
+        <div id="inlineLibraryPicker" style="display:none;margin:8px 0 0 48px;">
+          <select id="inlineNoteSelect" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;background:var(--bg-primary);color:var(--text-primary);font-family:inherit;">
+            <option value="">Select a note from your library...</option>
+          </select>
+        </div>
+        <!-- Actions bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-color);margin-left:48px;">
+          <div style="display:flex;gap:4px;">
+            <button onclick="document.getElementById('inlineFileInput').click()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload
+            </button>
+            <button onclick="toggleInlineLibrary()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Library
+            </button>
+            <input type="file" id="inlineFileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" style="display:none;" onchange="handleInlineFile(event)">
+          </div>
+          <button id="inlinePostBtn" onclick="submitInlinePost()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent-primary);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>Post</button>
         </div>
       </div>
 
@@ -2028,6 +2057,169 @@
             <p>This feature is coming soon!</p>
           </div>
         `;
+      }
+    }
+
+    // ========== INLINE COMPOSER ==========
+    let inlineFile = null;
+    let inlineNoteId = null;
+    let inlineUploadedNoteId = null;
+    let inlineUploading = false;
+
+    // Enable/disable post button based on content
+    document.getElementById('inlinePostText').addEventListener('input', updateInlinePostBtn);
+
+    function updateInlinePostBtn() {
+      const hasText = document.getElementById('inlinePostText').value.trim().length > 0;
+      const hasFile = inlineFile || inlineNoteId;
+      const btn = document.getElementById('inlinePostBtn');
+      btn.disabled = !(hasText || hasFile);
+      btn.style.opacity = (hasText || hasFile) ? '1' : '0.5';
+    }
+
+    function handleInlineFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { if (window.sfToast) sfToast('Max 10MB', 'error'); return; }
+
+      inlineFile = file;
+      inlineNoteId = null;
+
+      const preview = document.getElementById('inlineAttachPreview');
+      preview.style.display = 'block';
+      document.getElementById('inlineLibraryPicker').style.display = 'none';
+
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('inlinePreviewImg').src = e.target.result;
+          document.getElementById('inlinePreviewImg').style.display = 'block';
+          document.getElementById('inlinePreviewFile').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        document.getElementById('inlinePreviewImg').style.display = 'none';
+        document.getElementById('inlinePreviewFile').style.display = 'block';
+        document.getElementById('inlinePreviewName').textContent = file.name;
+      }
+
+      updateInlinePostBtn();
+
+      // Background upload
+      inlineUploading = true;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('content_type', file.type.startsWith('image/') ? 'photo' : 'note');
+      fetch(`${BACKEND_URL}/api/social/upload-note`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        body: formData
+      }).then(r => r.json()).then(data => {
+        inlineUploadedNoteId = data.note_id;
+        inlineUploading = false;
+      }).catch(() => { inlineUploading = false; });
+    }
+
+    function removeInlineAttach() {
+      inlineFile = null;
+      inlineNoteId = null;
+      inlineUploadedNoteId = null;
+      document.getElementById('inlineAttachPreview').style.display = 'none';
+      document.getElementById('inlinePreviewImg').style.display = 'none';
+      document.getElementById('inlinePreviewFile').style.display = 'none';
+      document.getElementById('inlineFileInput').value = '';
+      updateInlinePostBtn();
+    }
+
+    function toggleInlineLibrary() {
+      const picker = document.getElementById('inlineLibraryPicker');
+      if (picker.style.display === 'none') {
+        picker.style.display = 'block';
+        loadUserNotes();
+        // Populate select
+        const select = document.getElementById('inlineNoteSelect');
+        setTimeout(() => {
+          if (userNotes.length > 0) {
+            select.innerHTML = '<option value="">Select a note...</option>' +
+              userNotes.map(n => `<option value="${n.id}">${n.original_filename || 'Untitled'}</option>`).join('');
+          }
+        }, 500);
+        select.onchange = function() {
+          if (this.value) {
+            inlineNoteId = this.value;
+            inlineFile = null;
+            inlineUploadedNoteId = this.value;
+            const note = userNotes.find(n => n.id === this.value);
+            const preview = document.getElementById('inlineAttachPreview');
+            preview.style.display = 'block';
+            document.getElementById('inlinePreviewImg').style.display = 'none';
+            document.getElementById('inlinePreviewFile').style.display = 'block';
+            document.getElementById('inlinePreviewName').textContent = note?.original_filename || 'Note';
+            picker.style.display = 'none';
+            updateInlinePostBtn();
+          }
+        };
+      } else {
+        picker.style.display = 'none';
+      }
+    }
+
+    async function submitInlinePost() {
+      const text = document.getElementById('inlinePostText').value.trim();
+      const btn = document.getElementById('inlinePostBtn');
+
+      if (!text && !inlineFile && !inlineNoteId) return;
+
+      // Wait for upload
+      if (inlineUploading) {
+        btn.textContent = 'Uploading...';
+        btn.disabled = true;
+        const check = setInterval(() => {
+          if (!inlineUploading) {
+            clearInterval(check);
+            doInlinePost(text, btn);
+          }
+        }, 200);
+        return;
+      }
+
+      doInlinePost(text, btn);
+    }
+
+    async function doInlinePost(text, btn) {
+      btn.disabled = true;
+      btn.textContent = 'Posting...';
+
+      try {
+        const postData = {
+          post_type: inlineUploadedNoteId ? 'note' : 'text',
+          text_content: text || null,
+          note_id: inlineUploadedNoteId || null
+        };
+
+        const res = await fetch(`${BACKEND_URL}/api/social/posts`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(postData)
+        });
+
+        if (res.ok) {
+          // Reset composer
+          document.getElementById('inlinePostText').value = '';
+          document.getElementById('inlinePostText').style.height = 'auto';
+          removeInlineAttach();
+          if (window.sfToast) sfToast('Posted!', 'success');
+          loadFeed();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          if (window.sfToast) sfToast(err.error || 'Failed to post', 'error');
+        }
+      } catch (e) {
+        if (window.sfToast) sfToast('Failed to post', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Post';
+        updateInlinePostBtn();
       }
     }
 
