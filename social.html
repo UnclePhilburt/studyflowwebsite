@@ -1220,6 +1220,323 @@
       right: -60px;
     }
 
+    /* Profile Hover Card */
+    .profile-card {
+      position: absolute;
+      width: 300px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      padding: 20px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .profile-card.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .profile-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .profile-card-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 24px;
+    }
+
+    .profile-card-info {
+      flex: 1;
+    }
+
+    .profile-card-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .profile-card-username {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .profile-card-bio {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .profile-card-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .profile-card-stat {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .profile-card-stat strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .profile-card-action {
+      width: 100%;
+    }
+
+    /* Quick Comment Box */
+    .quick-comment {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+      display: none;
+      animation: slideDown 0.2s ease;
+    }
+
+    .quick-comment.show {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .quick-comment-input {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      resize: none;
+      margin-bottom: 8px;
+      font-family: inherit;
+    }
+
+    .quick-comment-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .quick-comment-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .quick-comment-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-comment-btn.cancel {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .quick-comment-btn.cancel:hover {
+      background: #f5f5f5;
+    }
+
+    .quick-comment-btn.submit {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .quick-comment-btn.submit:hover {
+      background: var(--accent-secondary);
+    }
+
+    .quick-comment-preview {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quick-comment-preview:last-child {
+      border-bottom: none;
+    }
+
+    .quick-comment-author {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    /* Post Actions Menu */
+    .post-actions-menu {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+    }
+
+    .post-actions-trigger {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s;
+      color: var(--text-secondary);
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .post-card:hover .post-actions-trigger {
+      opacity: 1;
+    }
+
+    .post-actions-trigger:hover {
+      background: #f5f5f5;
+    }
+
+    .post-actions-dropdown {
+      position: absolute;
+      top: 40px;
+      right: 0;
+      width: 200px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: none;
+      overflow: hidden;
+    }
+
+    .post-actions-dropdown.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .post-action-item {
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .post-action-item:hover {
+      background: #f5f5f5;
+    }
+
+    .post-action-item.danger {
+      color: #ef4444;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .post-card {
+      animation: fadeInUp 0.3s ease;
+    }
+
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .vote-btn.upvoted {
+      animation: heartPop 0.3s ease;
+    }
+
+    /* Feed Controls */
+    .feed-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .feed-controls-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .feed-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .feed-select:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .feed-select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
     /* Dock */
     .dock {
       position: fixed;
@@ -1414,6 +1731,24 @@
         <button class="filter-chip" data-filter="photo" onclick="filterContent('photo')">Photos</button>
         <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Explanations</button>
         <button class="filter-chip" data-filter="resource" onclick="filterContent('resource')">Resources</button>
+      </div>
+
+      <!-- Feed Controls -->
+      <div class="feed-controls">
+        <span class="feed-controls-label">Sort by:</span>
+        <select class="feed-select" id="sortSelect" onchange="changeFeedSort()">
+          <option value="recent">Most Recent</option>
+          <option value="popular">Most Popular</option>
+          <option value="discussed">Most Discussed</option>
+        </select>
+
+        <span class="feed-controls-label">Time:</span>
+        <select class="feed-select" id="timeSelect" onchange="changeFeedTime()">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+        </select>
       </div>
 
       <!-- Feed -->
@@ -1904,14 +2239,28 @@
         </div>
       `;
 
+      // Post actions menu HTML
+      const actionsMenuHtml = `
+        <div class="post-actions-menu">
+          <div class="post-actions-trigger" onclick="event.stopPropagation(); togglePostMenu('${post.id}')">⋯</div>
+          <div class="post-actions-dropdown" id="postMenu-${post.id}">
+            <div class="post-action-item" onclick="event.stopPropagation(); copyPostLink('${post.id}')">🔗 Copy Link</div>
+            <div class="post-action-item" onclick="event.stopPropagation(); sharePost('${post.id}')">↗ Share Post</div>
+            <div class="post-action-item" onclick="event.stopPropagation(); hidePost('${post.id}')">👁 Hide Post</div>
+            <div class="post-action-item danger" onclick="event.stopPropagation(); reportPost('${post.id}')">⚠ Report</div>
+          </div>
+        </div>
+      `;
+
       return `
-        <div class="post-card" data-type="${contentType}" onclick="viewPost('${post.id}')">
+        <div class="post-card" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
           ${quickActionsHtml}
+          ${actionsMenuHtml}
           <div class="content-badge ${badgeClass}">${badgeText}</div>
           <div class="post-header">
             <div class="post-avatar">${avatarLetter}</div>
             <div class="post-user-info">
-              <div class="post-username">${username}</div>
+              <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}</div>
               <div class="post-time">${timeAgo}</div>
             </div>
           </div>
@@ -1927,9 +2276,16 @@
               <div class="vote-score">${post.score || 0}</div>
               <button class="vote-btn ${userVote === 'downvote' ? 'downvoted' : ''}" onclick="vote('${post.id}', 'downvote')">▼</button>
             </div>
-            <button class="action-btn" onclick="viewPost('${post.id}')">
+            <button class="action-btn" onclick="toggleQuickComment('${post.id}')">
               ${post.comment_count || 0} comments
             </button>
+          </div>
+          <div class="quick-comment" id="quickComment-${post.id}">
+            <textarea class="quick-comment-input" placeholder="Write a comment..." id="commentInput-${post.id}"></textarea>
+            <div class="quick-comment-actions">
+              <button class="quick-comment-btn cancel" onclick="event.stopPropagation(); toggleQuickComment('${post.id}')">Cancel</button>
+              <button class="quick-comment-btn submit" onclick="event.stopPropagation(); submitQuickComment('${post.id}')">Comment</button>
+            </div>
           </div>
         </div>
       `;
@@ -1961,6 +2317,186 @@
     }
 
     // Create post modal
+    // Profile Hover Card
+    let profileCardTimeout;
+    let currentProfileCard = null;
+
+    function showProfileCard(event, username) {
+      clearTimeout(profileCardTimeout);
+      hideProfileCard();
+
+      profileCardTimeout = setTimeout(async () => {
+        const card = document.createElement('div');
+        card.className = 'profile-card';
+        card.innerHTML = `
+          <div class="profile-card-header">
+            <div class="profile-card-avatar">${username[0].toUpperCase()}</div>
+            <div class="profile-card-info">
+              <div class="profile-card-name">${username}</div>
+              <div class="profile-card-username">@${username}</div>
+            </div>
+          </div>
+          <div class="profile-card-bio">Student sharing study notes and resources</div>
+          <div class="profile-card-stats">
+            <div class="profile-card-stat"><strong>0</strong> posts</div>
+            <div class="profile-card-stat"><strong>0</strong> followers</div>
+          </div>
+          <button class="btn btn-primary profile-card-action" onclick="window.location.href='profile.html?user=${username}'">View Profile</button>
+        `;
+
+        const rect = event.target.getBoundingClientRect();
+        card.style.position = 'fixed';
+        card.style.top = (rect.bottom + 10) + 'px';
+        card.style.left = rect.left + 'px';
+
+        document.body.appendChild(card);
+        currentProfileCard = card;
+
+        setTimeout(() => card.classList.add('show'), 10);
+      }, 500);
+    }
+
+    function hideProfileCard() {
+      clearTimeout(profileCardTimeout);
+      if (currentProfileCard) {
+        currentProfileCard.remove();
+        currentProfileCard = null;
+      }
+    }
+
+    // Quick Comment Box
+    function toggleQuickComment(postId) {
+      const commentBox = document.getElementById(`quickComment-${postId}`);
+      if (commentBox.classList.contains('show')) {
+        commentBox.classList.remove('show');
+      } else {
+        // Hide all other comment boxes
+        document.querySelectorAll('.quick-comment.show').forEach(box => {
+          box.classList.remove('show');
+        });
+        commentBox.classList.add('show');
+        document.getElementById(`commentInput-${postId}`).focus();
+      }
+    }
+
+    async function submitQuickComment(postId) {
+      const input = document.getElementById(`commentInput-${postId}`);
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/comments`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ text_content: text })
+        });
+
+        if (response.ok) {
+          input.value = '';
+          toggleQuickComment(postId);
+          // Show success message
+          showToast('Comment posted!');
+          // Refresh feed to update comment count
+          loadFeed();
+        }
+      } catch (error) {
+        console.error('Error posting comment:', error);
+        showToast('Failed to post comment', 'error');
+      }
+    }
+
+    // Post Actions Menu
+    function togglePostMenu(postId) {
+      const menu = document.getElementById(`postMenu-${postId}`);
+      const isShowing = menu.classList.contains('show');
+
+      // Hide all menus
+      document.querySelectorAll('.post-actions-dropdown.show').forEach(m => {
+        m.classList.remove('show');
+      });
+
+      if (!isShowing) {
+        menu.classList.add('show');
+      }
+    }
+
+    function copyPostLink(postId) {
+      const url = `${window.location.origin}/post.html?id=${postId}`;
+      navigator.clipboard.writeText(url);
+      showToast('Link copied!');
+      document.getElementById(`postMenu-${postId}`).classList.remove('show');
+    }
+
+    function hidePost(postId) {
+      const card = document.querySelector(`[data-post-id="${postId}"]`);
+      if (card) {
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+        showToast('Post hidden');
+      }
+      document.getElementById(`postMenu-${postId}`).classList.remove('show');
+    }
+
+    function reportPost(postId) {
+      if (confirm('Report this post as inappropriate?')) {
+        showToast('Post reported. Thank you!');
+        document.getElementById(`postMenu-${postId}`).classList.remove('show');
+      }
+    }
+
+    // Feed Controls
+    function changeFeedSort() {
+      const sort = document.getElementById('sortSelect').value;
+      console.log('Sort by:', sort);
+      // TODO: Implement sorting when backend supports it
+      showToast(`Sorting by: ${sort}`);
+    }
+
+    function changeFeedTime() {
+      const time = document.getElementById('timeSelect').value;
+      console.log('Filter time:', time);
+      // TODO: Implement time filtering when backend supports it
+      showToast(`Showing: ${time}`);
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: ${type === 'error' ? '#ef4444' : 'var(--accent-primary)'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+      `;
+      toast.textContent = message;
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.post-actions-menu')) {
+        document.querySelectorAll('.post-actions-dropdown.show').forEach(menu => {
+          menu.classList.remove('show');
+        });
+      }
+    });
+
     // Global state for upload flow
     let selectedFile = null;
     let selectedNoteId = null;
