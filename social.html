@@ -159,7 +159,41 @@
       color: var(--text-primary);
     }
 
-    /* Feed Grid - Pinterest Masonry Style */
+    /* Content Type Filters */
+    .content-filters {
+      display: flex;
+      gap: 8px;
+      padding: 16px 0;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .filter-chip {
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      background: white;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--accent-primary);
+      color: var(--text-primary);
+    }
+
+    .filter-chip.active {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+    }
+
+    /* Feed Grid - Content-Aware Masonry */
     .feed {
       column-count: 3;
       column-gap: 20px;
@@ -177,7 +211,7 @@
       }
     }
 
-    /* Post Card - Instagram Minimal Style */
+    /* Post Card - Content-Aware Design */
     .post-card {
       background: white;
       border: 1px solid var(--border-color);
@@ -189,12 +223,28 @@
       margin-bottom: 20px;
       display: inline-block;
       width: 100%;
+      position: relative;
     }
 
     .post-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
       border-color: rgba(139, 157, 131, 0.4);
+    }
+
+    /* Content Type Variations */
+    .post-card[data-type="note"] {
+      border-left: 3px solid #8B9D83;
+    }
+
+    .post-card[data-type="photo"] {
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .post-card[data-type="text"] {
+      background: #f9fafb;
+      border-left: 3px solid #60a5fa;
     }
 
     .post-header {
@@ -246,9 +296,21 @@
     .post-thumbnail {
       width: 100%;
       height: auto;
-      object-fit: contain;
+      object-fit: cover;
       background: #fafafa;
       display: block;
+    }
+
+    /* Note thumbnails - show more content */
+    .post-card[data-type="note"] .post-thumbnail {
+      object-fit: contain;
+      max-height: 600px;
+    }
+
+    /* Photo posts - full bleed */
+    .post-card[data-type="photo"] .post-thumbnail {
+      object-fit: cover;
+      border-radius: 12px;
     }
 
     .post-thumbnail-placeholder {
@@ -263,6 +325,65 @@
       color: #c4c4c4;
       letter-spacing: 1px;
       position: relative;
+    }
+
+    /* Content Type Badge */
+    .content-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .content-badge.note {
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+    }
+
+    .content-badge.photo {
+      color: #ec4899;
+      border: 1px solid #ec4899;
+    }
+
+    .content-badge.text {
+      color: #60a5fa;
+      border: 1px solid #60a5fa;
+    }
+
+    /* Metadata Tags */
+    .post-metadata {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 0 16px 8px;
+    }
+
+    .meta-tag {
+      padding: 4px 8px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .meta-tag.course {
+      background: #e0f2e9;
+      color: var(--accent-primary);
+    }
+
+    .meta-tag.pages {
+      background: #fef3c7;
+      color: #d97706;
     }
 
     .post-content {
@@ -290,6 +411,83 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       line-height: 1.5;
+    }
+
+    /* Text-only posts */
+    .post-card[data-type="text"] .post-content {
+      padding: 20px;
+      min-height: 120px;
+    }
+
+    .post-card[data-type="text"] .post-caption {
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-line-clamp: unset;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Hover Preview Overlay */
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      padding: 20px;
+    }
+
+    .post-card[data-type="note"]:hover .preview-overlay {
+      display: flex;
+    }
+
+    .preview-text {
+      color: white;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Quick Actions on Hover */
+    .quick-actions {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: none;
+      gap: 8px;
+      z-index: 5;
+    }
+
+    .post-card:hover .quick-actions {
+      display: flex;
+    }
+
+    .quick-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .quick-action-btn:hover {
+      background: white;
+      transform: scale(1.1);
+      color: var(--accent-primary);
     }
 
     .post-actions {
@@ -622,6 +820,15 @@
         <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
         <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
       </div>
+
+      <!-- Content Type Filters -->
+      <div class="content-filters">
+        <button class="filter-chip active" data-filter="all" onclick="filterContent('all')">All</button>
+        <button class="filter-chip" data-filter="note" onclick="filterContent('note')">Notes</button>
+        <button class="filter-chip" data-filter="photo" onclick="filterContent('photo')">Photos</button>
+        <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Explanations</button>
+        <button class="filter-chip" data-filter="resource" onclick="filterContent('resource')">Resources</button>
+      </div>
     </div>
 
     <!-- Feed -->
@@ -779,12 +986,54 @@
     });
 
     // Switch tabs
+    let currentFilter = 'all';
+
     function switchTab(tab) {
       currentTab = tab;
       document.querySelectorAll('.tab').forEach(t => {
         t.classList.toggle('active', t.dataset.tab === tab);
       });
       loadFeed();
+    }
+
+    // Filter content by type
+    function filterContent(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.filter === filter);
+      });
+
+      // Show/hide posts based on filter
+      const cards = document.querySelectorAll('.post-card');
+      cards.forEach(card => {
+        if (filter === 'all') {
+          card.style.display = 'inline-block';
+        } else {
+          const cardType = card.dataset.type;
+          card.style.display = cardType === filter ? 'inline-block' : 'none';
+        }
+      });
+    }
+
+    // Quick action: Save post
+    function savePost(postId) {
+      // TODO: Implement save functionality
+      console.log('Save post:', postId);
+      alert('Save feature coming soon!');
+    }
+
+    // Quick action: Share post
+    function sharePost(postId) {
+      const url = `${window.location.origin}/post.html?id=${postId}`;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Check out this post on StudyFlow',
+          url: url
+        });
+      } else {
+        navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+      }
     }
 
     // Load feed
@@ -828,19 +1077,67 @@
       const username = post.username || 'Anonymous';
       const avatarLetter = username[0].toUpperCase();
 
+      // Determine content type
+      let contentType = 'text';
+      if (post.post_type === 'note') {
+        contentType = 'note';
+      } else if (post.notes?.thumbnail_url || post.image_url) {
+        contentType = 'photo';
+      }
+
+      // Content type badge
+      const badgeText = contentType === 'note' ? 'Notes' : contentType === 'photo' ? 'Photo' : 'Post';
+      const badgeClass = contentType;
+
+      // Build thumbnail HTML
       let thumbnailHtml = '';
       if (post.post_type === 'note') {
         if (post.notes?.thumbnail_url) {
-          thumbnailHtml = `<img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail">`;
+          thumbnailHtml = `
+            <img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail">
+            <div class="preview-overlay">
+              <div class="preview-text">Click to view full note</div>
+            </div>
+          `;
         } else {
-          // Show placeholder for notes without thumbnails
           const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
           thumbnailHtml = `<div class="post-thumbnail-placeholder">${fileType}</div>`;
         }
+      } else if (post.image_url) {
+        thumbnailHtml = `<img class="post-thumbnail" src="${post.image_url}" alt="Post image">`;
       }
 
+      // Build metadata tags
+      let metadataHtml = '';
+      if (contentType === 'note' && post.notes) {
+        const tags = [];
+        if (post.notes.course_name) {
+          tags.push(`<span class="meta-tag course">${post.notes.course_name}</span>`);
+        }
+        if (post.notes.page_count) {
+          tags.push(`<span class="meta-tag pages">${post.notes.page_count} pages</span>`);
+        }
+        if (tags.length > 0) {
+          metadataHtml = `<div class="post-metadata">${tags.join('')}</div>`;
+        }
+      }
+
+      // Quick actions (visible on hover)
+      const quickActionsHtml = `
+        <div class="quick-actions">
+          <button class="quick-action-btn" onclick="event.stopPropagation(); savePost('${post.id}')" title="Save">
+            ★
+          </button>
+          <button class="quick-action-btn" onclick="event.stopPropagation(); sharePost('${post.id}')" title="Share">
+            ↗
+          </button>
+        </div>
+      `;
+
       return `
-        <div class="post-card" onclick="viewPost('${post.id}')">
+        <div class="post-card" data-type="${contentType}" onclick="viewPost('${post.id}')">
+          ${quickActionsHtml}
+          <div class="content-badge ${badgeClass}">${badgeText}</div>
           <div class="post-header">
             <div class="post-avatar">${avatarLetter}</div>
             <div class="post-user-info">
@@ -849,6 +1146,7 @@
             </div>
           </div>
           ${thumbnailHtml}
+          ${metadataHtml}
           <div class="post-content">
             ${post.post_type === 'note' && post.notes?.original_filename ? `<div class="post-title">${post.notes.original_filename}</div>` : ''}
             ${post.text_content ? `<div class="post-caption">${post.text_content}</div>` : ''}
@@ -860,7 +1158,7 @@
               <button class="vote-btn ${userVote === 'downvote' ? 'downvoted' : ''}" onclick="vote('${post.id}', 'downvote')">▼</button>
             </div>
             <button class="action-btn" onclick="viewPost('${post.id}')">
-              💬 ${post.comment_count || 0} comments
+              ${post.comment_count || 0} comments
             </button>
           </div>
         </div>
