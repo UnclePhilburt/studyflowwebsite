@@ -1657,7 +1657,10 @@
     <div class="header-inner">
       <h1>Social Feed</h1>
       <div class="header-actions">
-        <input type="text" class="search-bar" placeholder="Search users..." id="searchInput">
+        <div style="position:relative;">
+          <input type="text" class="search-bar" placeholder="Search users..." id="searchInput" autocomplete="off">
+          <div id="searchResults" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-height:300px;overflow-y:auto;z-index:200;"></div>
+        </div>
         <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
         <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
       </div>
@@ -2939,22 +2942,57 @@
     }
 
     // Search users
-    document.getElementById('searchInput').addEventListener('input', async (e) => {
+    let searchTimer = null;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
       const query = e.target.value.trim();
-      if (query.length < 2) return;
+      const results = document.getElementById('searchResults');
 
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        });
+      if (query.length < 2) {
+        results.style.display = 'none';
+        return;
+      }
 
-        if (response.ok) {
-          const data = await response.json();
-          // TODO: Show search results dropdown
-          console.log('Search results:', data.users);
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const users = data.users || [];
+
+            if (users.length === 0) {
+              results.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;">No users found</div>';
+            } else {
+              results.innerHTML = users.map(u => {
+                const avatar = u.avatar_url
+                  ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                  : (u.display_name || u.username || 'U')[0].toUpperCase();
+                return `
+                  <div onclick="window.location.href='profile.html?user=${u.username}'" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background=''">
+                    <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;">${avatar}</div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:13px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${u.display_name || u.username}</div>
+                      <div style="font-size:11px;color:var(--text-muted);">@${u.username}${u.follower_count ? ' - ' + u.follower_count + ' followers' : ''}</div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+            }
+            results.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Search error:', error);
         }
-      } catch (error) {
-        console.error('Search error:', error);
+      }, 300);
+    });
+
+    // Close search results on click outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) {
+        document.getElementById('searchResults').style.display = 'none';
       }
     });
 
