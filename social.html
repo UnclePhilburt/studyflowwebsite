@@ -1796,17 +1796,38 @@
       <div id="storyCreator" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeStoryCreator()">
         <div style="background:var(--card-bg);border-radius:16px;max-width:420px;width:92%;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.2);">
           <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Create Story</h3>
-          <textarea id="storyText" placeholder="What's happening?" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-family:inherit;min-height:80px;resize:none;background:var(--bg-primary);color:var(--text-primary);"></textarea>
-          <div style="margin:12px 0;font-size:12px;color:var(--text-muted);">Background:</div>
-          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;" id="storyBgOptions">
-            <div onclick="selectStoryBg('linear-gradient(135deg, #667eea, #764ba2)')" class="story-bg-opt selected" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #667eea, #764ba2);border:2px solid var(--accent-primary);"></div>
-            <div onclick="selectStoryBg('linear-gradient(135deg, #f093fb, #f5576c)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #f093fb, #f5576c);border:2px solid transparent;"></div>
-            <div onclick="selectStoryBg('linear-gradient(135deg, #4facfe, #00f2fe)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #4facfe, #00f2fe);border:2px solid transparent;"></div>
-            <div onclick="selectStoryBg('linear-gradient(135deg, #43e97b, #38f9d7)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #43e97b, #38f9d7);border:2px solid transparent;"></div>
-            <div onclick="selectStoryBg('linear-gradient(135deg, #fa709a, #fee140)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #fa709a, #fee140);border:2px solid transparent;"></div>
-            <div onclick="selectStoryBg('linear-gradient(135deg, #8B9D83, #5a7a5a)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #8B9D83, #5a7a5a);border:2px solid transparent;"></div>
-            <div onclick="selectStoryBg('#1a1a1a')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:#1a1a1a;border:2px solid transparent;"></div>
+          <!-- Image preview -->
+          <div id="storyImagePreview" style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;position:relative;">
+            <button onclick="removeStoryImage()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:12px;cursor:pointer;z-index:2;">&#x2715;</button>
+            <img id="storyImagePreviewImg" style="width:100%;max-height:250px;object-fit:cover;">
           </div>
+
+          <!-- Text or image -->
+          <textarea id="storyText" placeholder="What's happening?" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-family:inherit;min-height:80px;resize:none;background:var(--bg-primary);color:var(--text-primary);"></textarea>
+
+          <!-- Upload image button -->
+          <div style="margin:12px 0;">
+            <button onclick="document.getElementById('storyImageInput').click()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Add Photo
+            </button>
+            <input type="file" id="storyImageInput" accept="image/*" style="display:none;" onchange="handleStoryImage(event)">
+          </div>
+
+          <!-- Background (only for text stories) -->
+          <div id="storyBgSection">
+            <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">Background:</div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;" id="storyBgOptions">
+              <div onclick="selectStoryBg('linear-gradient(135deg, #667eea, #764ba2)')" class="story-bg-opt selected" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #667eea, #764ba2);border:2px solid var(--accent-primary);"></div>
+              <div onclick="selectStoryBg('linear-gradient(135deg, #f093fb, #f5576c)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #f093fb, #f5576c);border:2px solid transparent;"></div>
+              <div onclick="selectStoryBg('linear-gradient(135deg, #4facfe, #00f2fe)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #4facfe, #00f2fe);border:2px solid transparent;"></div>
+              <div onclick="selectStoryBg('linear-gradient(135deg, #43e97b, #38f9d7)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #43e97b, #38f9d7);border:2px solid transparent;"></div>
+              <div onclick="selectStoryBg('linear-gradient(135deg, #fa709a, #fee140)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #fa709a, #fee140);border:2px solid transparent;"></div>
+              <div onclick="selectStoryBg('linear-gradient(135deg, #8B9D83, #5a7a5a)')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #8B9D83, #5a7a5a);border:2px solid transparent;"></div>
+              <div onclick="selectStoryBg('#1a1a1a')" class="story-bg-opt" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:#1a1a1a;border:2px solid transparent;"></div>
+            </div>
+          </div>
+
           <div style="display:flex;gap:8px;">
             <button onclick="closeStoryCreator()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
             <button onclick="submitStory()" id="storySubmitBtn" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent-primary);color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Share Story</button>
@@ -2431,14 +2452,22 @@
     }
 
     // Story creator
+    let storyImageUrl = null;
+    let storyUploading = false;
+
     function openStoryCreator() {
       document.getElementById('storyCreator').style.display = 'flex';
       document.getElementById('storyText').value = '';
+      document.getElementById('storyImagePreview').style.display = 'none';
+      document.getElementById('storyBgSection').style.display = 'block';
+      storyImageUrl = null;
       document.getElementById('storyText').focus();
     }
 
     function closeStoryCreator() {
       document.getElementById('storyCreator').style.display = 'none';
+      storyImageUrl = null;
+      storyUploading = false;
     }
 
     function selectStoryBg(bg) {
@@ -2447,9 +2476,49 @@
       event.target.style.borderColor = 'var(--accent-primary)';
     }
 
+    function handleStoryImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { if (window.sfToast) sfToast('Max 5MB', 'error'); return; }
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('storyImagePreviewImg').src = e.target.result;
+        document.getElementById('storyImagePreview').style.display = 'block';
+        document.getElementById('storyBgSection').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+
+      // Upload in background
+      storyUploading = true;
+      const formData = new FormData();
+      formData.append('files', file);
+      fetch(`${BACKEND_URL}/api/social/upload-images`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        body: formData
+      }).then(r => r.json()).then(data => {
+        storyImageUrl = (data.urls || [])[0] || null;
+        storyUploading = false;
+      }).catch(() => { storyUploading = false; });
+    }
+
+    function removeStoryImage() {
+      storyImageUrl = null;
+      document.getElementById('storyImagePreview').style.display = 'none';
+      document.getElementById('storyBgSection').style.display = 'block';
+      document.getElementById('storyImageInput').value = '';
+    }
+
     async function submitStory() {
       const text = document.getElementById('storyText').value.trim();
-      if (!text) { if (window.sfToast) sfToast('Write something for your story', 'error'); return; }
+      if (!text && !storyImageUrl) { if (window.sfToast) sfToast('Add text or an image', 'error'); return; }
+
+      if (storyUploading) {
+        if (window.sfToast) sfToast('Image still uploading...', 'info');
+        return;
+      }
 
       const btn = document.getElementById('storySubmitBtn');
       btn.disabled = true; btn.textContent = 'Posting...';
@@ -2458,7 +2527,7 @@
         const res = await fetch(`${BACKEND_URL}/api/social/stories`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, bg: selectedStoryBg })
+          body: JSON.stringify({ text: text || null, bg: selectedStoryBg, image_url: storyImageUrl || null })
         });
         if (res.ok) {
           closeStoryCreator();
