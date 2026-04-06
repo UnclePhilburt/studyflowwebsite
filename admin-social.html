@@ -285,10 +285,10 @@
 
       // Media
       const mediaEl = document.getElementById('postMedia');
-      if (post.note_id && post.note_filename) {
-        // Show note thumbnail via the view-as-images endpoint
-        mediaEl.innerHTML = `<div class="post-file-badge">Loading note preview...</div>`;
-        loadNotePreview(post.note_id, mediaEl, post.note_filename);
+      if (post.note_id) {
+        const fname = post.note_filename || 'Note';
+        mediaEl.innerHTML = `<div class="post-file-badge">Loading preview for ${escapeHtml(fname)}...</div>`;
+        loadNotePreview(post.note_id, mediaEl, fname);
       } else {
         mediaEl.innerHTML = '';
       }
@@ -317,15 +317,16 @@
 
     async function loadNotePreview(noteId, container, filename) {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/notes/${noteId}/view-as-images`);
+        // Use the admin view endpoint that bypasses public check
+        const res = await fetch(`${BACKEND_URL}/admin/note/${noteId}/preview?key=${encodeURIComponent(adminKey)}`);
         if (res.ok) {
           const data = await res.json();
           if (data.images && data.images.length > 0) {
-            // Show first page
-            container.innerHTML = `<img class="post-image" src="data:image/png;base64,${data.images[0]}" alt="${escapeHtml(filename)}">`;
+            let html = `<img class="post-image" src="data:image/png;base64,${data.images[0]}" alt="${escapeHtml(filename)}">`;
             if (data.images.length > 1) {
-              container.innerHTML += `<div style="text-align:center;padding:8px;font-size:12px;color:#999;">${data.images.length} pages total</div>`;
+              html += `<div style="text-align:center;padding:8px;font-size:12px;color:#999;">${data.images.length} pages total</div>`;
             }
+            container.innerHTML = html;
             return;
           }
         }
