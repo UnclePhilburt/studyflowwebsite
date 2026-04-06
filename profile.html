@@ -1218,7 +1218,7 @@
         if (!response.ok) throw new Error('Failed to load list');
 
         const data = await response.json();
-        const users = data[type] || [];
+        const users = data.users || data[type] || [];
 
         if (users.length === 0) {
           container.innerHTML = `<div class="empty-state"><p>No ${type} yet</p></div>`;
