@@ -280,7 +280,7 @@
     .stat-item {
       text-align: center;
       padding: 12px;
-      background: #f9fafb;
+      background: var(--hover-bg);
       border-radius: 8px;
     }
 
@@ -386,7 +386,7 @@
       padding: 8px 16px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      background: #fafafa;
+      background: var(--bg-primary);
       color: var(--text-primary);
       font-size: 14px;
       width: 240px;
@@ -429,7 +429,7 @@
     }
 
     .btn-secondary:hover {
-      background: #fafafa;
+      background: var(--hover-bg);
     }
 
     /* Tabs - Instagram Clean Style */
@@ -1529,6 +1529,7 @@
       border: 1px solid var(--border-color);
       border-radius: 8px;
       background: var(--card-bg);
+      color: var(--text-primary);
       font-size: 14px;
       cursor: pointer;
       transition: all 0.2s;
@@ -1643,20 +1644,16 @@
       <div class="sidebar-section">
         <nav class="sidebar-nav">
           <a href="#" class="sidebar-item active" onclick="showSection('feed'); return false;">
-            <span class="sidebar-icon">🏠</span>
             <span class="sidebar-label">Home Feed</span>
           </a>
           <a href="#" class="sidebar-item" onclick="showSection('discover'); return false;">
-            <span class="sidebar-icon">🔍</span>
             <span class="sidebar-label">Discover</span>
           </a>
           <a href="#" class="sidebar-item" onclick="showSection('saved'); return false;">
-            <span class="sidebar-icon">⭐</span>
             <span class="sidebar-label">Saved</span>
             <span class="sidebar-badge muted">0</span>
           </a>
           <a href="#" class="sidebar-item" onclick="showSection('following'); return false;">
-            <span class="sidebar-icon">👥</span>
             <span class="sidebar-label">Following</span>
           </a>
         </nav>
@@ -1666,31 +1663,11 @@
         <div class="sidebar-section-title">Study Groups</div>
         <nav class="sidebar-nav">
           <a href="#" class="sidebar-item" onclick="showSection('groups'); return false;">
-            <span class="sidebar-icon">📚</span>
             <span class="sidebar-label">My Groups</span>
             <span class="sidebar-badge">3</span>
           </a>
           <a href="#" class="sidebar-item" onclick="showSection('discover-groups'); return false;">
-            <span class="sidebar-icon">➕</span>
             <span class="sidebar-label">Discover Groups</span>
-          </a>
-        </nav>
-      </div>
-
-      <div class="sidebar-section">
-        <div class="sidebar-section-title">Resources</div>
-        <nav class="sidebar-nav">
-          <a href="#" class="sidebar-item" onclick="showSection('study-guides'); return false;">
-            <span class="sidebar-icon">📖</span>
-            <span class="sidebar-label">Study Guides</span>
-          </a>
-          <a href="#" class="sidebar-item" onclick="showSection('flashcards'); return false;">
-            <span class="sidebar-icon">🎴</span>
-            <span class="sidebar-label">Flashcards</span>
-          </a>
-          <a href="#" class="sidebar-item" onclick="showSection('practice'); return false;">
-            <span class="sidebar-icon">✏️</span>
-            <span class="sidebar-label">Practice Tests</span>
           </a>
         </nav>
       </div>
@@ -1699,19 +1676,15 @@
         <div class="sidebar-section-title">Subjects</div>
         <nav class="sidebar-nav">
           <a href="#" class="sidebar-item" onclick="filterBySubject('math'); return false;">
-            <span class="sidebar-icon">📐</span>
             <span class="sidebar-label">Mathematics</span>
           </a>
           <a href="#" class="sidebar-item" onclick="filterBySubject('science'); return false;">
-            <span class="sidebar-icon">🔬</span>
             <span class="sidebar-label">Science</span>
           </a>
           <a href="#" class="sidebar-item" onclick="filterBySubject('history'); return false;">
-            <span class="sidebar-icon">📜</span>
             <span class="sidebar-label">History</span>
           </a>
           <a href="#" class="sidebar-item" onclick="filterBySubject('languages'); return false;">
-            <span class="sidebar-icon">🗣️</span>
             <span class="sidebar-label">Languages</span>
           </a>
         </nav>
