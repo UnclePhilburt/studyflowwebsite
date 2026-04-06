@@ -345,18 +345,31 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
-    let authToken = localStorage.getItem('auth_token');
+    const SUPABASE_URL = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let authToken = null;
     let currentFilter = 'all';
     let allRequests = [];
 
-    // Check auth
-    if (!authToken) {
+    // Check admin key
+    const adminKey = sessionStorage.getItem('studyflow_admin_key');
+    if (!adminKey) {
       window.location.href = 'admin.html';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Get Supabase session
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:Inter,sans-serif;"><h2>Auth Required</h2><p style="color:#888;margin-top:8px;">You need to be logged in to manage feature requests.</p><p style="margin-top:12px;"><a href="signup.html" style="color:#7c9885;">Sign in</a> | <a href="admin.html" style="color:#7c9885;">Back to Admin</a></p></div>';
+        return;
+      }
+      authToken = session.access_token;
       loadRequests();
     });
 
