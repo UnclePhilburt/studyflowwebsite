@@ -3692,6 +3692,7 @@
 
         container.innerHTML = feedHtml + loadMoreBtn;
         setTimeout(loadLinkPreviews, 100);
+        setTimeout(initializeViewTracking, 200);
       } catch (error) {
         console.error('Error loading feed:', error);
         if (!append) {
@@ -3842,7 +3843,7 @@
       const textBgClass = contentType === 'text' ? `text-bg-${Math.abs(post.id.charCodeAt(0)) % 8}` : '';
 
       return `
-        <div class="post-card ${textBgClass}" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
+        <div class="post-card ${textBgClass}" data-type="${contentType}" data-post-id="${post.id}" id="post-${post.id}" onclick="viewPost('${post.id}')">
           <div class="post-header">
             <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
@@ -3883,10 +3884,10 @@
             <button class="action-btn" onclick="toggleQuickComment('${post.id}')">
               ${post.comment_count || 0} comments
             </button>
-            ${post.view_count ? `<span class="action-btn" style="cursor:default;opacity:0.7;">
+            <span class="action-btn" style="cursor:default;opacity:0.7;${!post.view_count ? 'display:none;' : ''}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              ${post.view_count}
-            </span>` : ''}
+              <span class="view-count">${post.view_count || 0}</span>
+            </span>
           </div>
           <div class="quick-comment-previews" id="commentPreviews-${post.id}">
             ${(post.recent_comments || []).map(c => {
@@ -4756,6 +4757,81 @@
         document.getElementById('searchResults').style.display = 'none';
       }
     });
+
+    // View tracking
+    const viewedPosts = new Set();
+    const viewTimers = new Map();
+    let viewObserver = null;
+
+    function initializeViewTracking() {
+      // Disconnect existing observer if any
+      if (viewObserver) {
+        viewObserver.disconnect();
+      }
+
+      // Create new Intersection Observer
+      viewObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          const postId = entry.target.dataset.postId;
+          if (!postId) return;
+
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            // Post is 50%+ visible - start timer
+            if (!viewTimers.has(postId) && !viewedPosts.has(postId)) {
+              const timer = setTimeout(() => {
+                // Still visible after 2 seconds - count as view
+                if (entry.isIntersecting) {
+                  trackPostView(postId);
+                }
+              }, 2000);
+              viewTimers.set(postId, timer);
+            }
+          } else {
+            // Post left viewport - cancel timer
+            const timer = viewTimers.get(postId);
+            if (timer) {
+              clearTimeout(timer);
+              viewTimers.delete(postId);
+            }
+          }
+        });
+      }, {
+        threshold: 0.5,
+        rootMargin: '0px'
+      });
+
+      // Observe all post cards
+      document.querySelectorAll('.post-card').forEach(card => {
+        viewObserver.observe(card);
+      });
+    }
+
+    async function trackPostView(postId) {
+      if (viewedPosts.has(postId)) return;
+      viewedPosts.add(postId);
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/view`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (response.ok) {
+          // Optionally update view count in UI
+          const data = await response.json();
+          if (data.view_count) {
+            const viewCountEl = document.querySelector(`#post-${postId} .view-count`);
+            if (viewCountEl) {
+              viewCountEl.textContent = data.view_count;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error tracking view:', error);
+        // Remove from set so it can retry later
+        viewedPosts.delete(postId);
+      }
+    }
 
     // Image Lightbox
     function openLightbox(imageUrl) {
