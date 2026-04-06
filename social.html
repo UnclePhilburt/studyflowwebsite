@@ -41,7 +41,110 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
+      padding: 0;
+      display: flex;
+      gap: 0;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      width: 260px;
+      position: sticky;
+      top: 73px;
+      height: calc(100vh - 73px);
+      padding: 20px 0;
+      border-right: 1px solid var(--border-color);
+      background: white;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      margin-bottom: 24px;
       padding: 0 20px;
+    }
+
+    .sidebar-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .sidebar-item:hover {
+      background: #f5f5f5;
+    }
+
+    .sidebar-item.active {
+      background: rgba(139, 157, 131, 0.1);
+      color: var(--accent-primary);
+    }
+
+    .sidebar-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .sidebar-label {
+      flex: 1;
+    }
+
+    .sidebar-badge {
+      background: var(--accent-primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .sidebar-badge.muted {
+      background: #e5e7eb;
+      color: var(--text-secondary);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      max-width: 1140px;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
     }
 
     /* Header - Instagram Minimal Style */
@@ -863,21 +966,102 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-inner">
-        <h1>Social Feed</h1>
-        <div class="header-actions">
-          <input type="text" class="search-bar" placeholder="Search users..." id="searchInput">
-          <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
-          <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
-        </div>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <h1>Social Feed</h1>
+      <div class="header-actions">
+        <input type="text" class="search-bar" placeholder="Search users..." id="searchInput">
+        <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
+        <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
       </div>
     </div>
+  </div>
 
-    <!-- Content Area -->
-    <div style="padding-top: 20px;">
+  <!-- Main Container with Sidebar -->
+  <div class="container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-item active" onclick="showSection('feed'); return false;">
+            <span class="sidebar-icon">🏠</span>
+            <span class="sidebar-label">Home Feed</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="showSection('discover'); return false;">
+            <span class="sidebar-icon">🔍</span>
+            <span class="sidebar-label">Discover</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="showSection('saved'); return false;">
+            <span class="sidebar-icon">⭐</span>
+            <span class="sidebar-label">Saved</span>
+            <span class="sidebar-badge muted">0</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="showSection('following'); return false;">
+            <span class="sidebar-icon">👥</span>
+            <span class="sidebar-label">Following</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Study Groups</div>
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-item" onclick="showSection('groups'); return false;">
+            <span class="sidebar-icon">📚</span>
+            <span class="sidebar-label">My Groups</span>
+            <span class="sidebar-badge">3</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="showSection('discover-groups'); return false;">
+            <span class="sidebar-icon">➕</span>
+            <span class="sidebar-label">Discover Groups</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Resources</div>
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-item" onclick="showSection('study-guides'); return false;">
+            <span class="sidebar-icon">📖</span>
+            <span class="sidebar-label">Study Guides</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="showSection('flashcards'); return false;">
+            <span class="sidebar-icon">🎴</span>
+            <span class="sidebar-label">Flashcards</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="showSection('practice'); return false;">
+            <span class="sidebar-icon">✏️</span>
+            <span class="sidebar-label">Practice Tests</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Subjects</div>
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-item" onclick="filterBySubject('math'); return false;">
+            <span class="sidebar-icon">📐</span>
+            <span class="sidebar-label">Mathematics</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="filterBySubject('science'); return false;">
+            <span class="sidebar-icon">🔬</span>
+            <span class="sidebar-label">Science</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="filterBySubject('history'); return false;">
+            <span class="sidebar-icon">📜</span>
+            <span class="sidebar-label">History</span>
+          </a>
+          <a href="#" class="sidebar-item" onclick="filterBySubject('languages'); return false;">
+            <span class="sidebar-icon">🗣️</span>
+            <span class="sidebar-label">Languages</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
       <!-- Tabs -->
       <div class="tabs">
         <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
@@ -892,15 +1076,15 @@
         <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Explanations</button>
         <button class="filter-chip" data-filter="resource" onclick="filterContent('resource')">Resources</button>
       </div>
-    </div>
 
-    <!-- Feed -->
-    <div id="feedContainer">
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Loading posts...</p>
+      <!-- Feed -->
+      <div id="feedContainer">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading posts...</p>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
 
   <!-- Step 1: Upload/Select Modal -->
@@ -1163,6 +1347,69 @@
         navigator.clipboard.writeText(url);
         alert('Link copied to clipboard!');
       }
+    }
+
+    // Sidebar navigation
+    function showSection(section) {
+      // Update active state
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.target.closest('.sidebar-item').classList.add('active');
+
+      // Show placeholder for now
+      const container = document.getElementById('feedContainer');
+      const sectionTitles = {
+        'feed': 'Home Feed',
+        'discover': 'Discover',
+        'saved': 'Saved Posts',
+        'following': 'People You Follow',
+        'groups': 'My Study Groups',
+        'discover-groups': 'Discover Groups',
+        'study-guides': 'Study Guides',
+        'flashcards': 'Flashcards',
+        'practice': 'Practice Tests'
+      };
+
+      if (section === 'feed') {
+        // Load normal feed
+        loadFeed();
+      } else {
+        // Show placeholder
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🚧</div>
+            <h3>${sectionTitles[section] || section}</h3>
+            <p>This feature is coming soon!</p>
+          </div>
+        `;
+      }
+    }
+
+    // Filter by subject
+    function filterBySubject(subject) {
+      // Update active state
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.target.closest('.sidebar-item').classList.add('active');
+
+      // Show placeholder
+      const container = document.getElementById('feedContainer');
+      const subjectNames = {
+        'math': 'Mathematics',
+        'science': 'Science',
+        'history': 'History',
+        'languages': 'Languages'
+      };
+
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🚧</div>
+          <h3>${subjectNames[subject]} Posts</h3>
+          <p>Subject filtering coming soon!</p>
+        </div>
+      `;
     }
 
     // Load feed
