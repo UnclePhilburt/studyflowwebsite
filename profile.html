@@ -824,11 +824,16 @@
               <p>${profileData.is_own_profile ? 'Share your first note!' : 'This user hasnt posted anything yet'}</p>
             </div>
           `;
+          const pt = document.getElementById('profilePostText');
+          if (pt) setupMentionAutocomplete(pt);
           return;
         }
 
         const composerHtml = profileData.is_own_profile ? buildProfileComposer() : '';
         container.innerHTML = composerHtml + `<div class="posts-grid">${posts.map(renderGridPost).join('')}</div>`;
+        // Attach mention autocomplete after composer is in DOM
+        const profileTextarea = document.getElementById('profilePostText');
+        if (profileTextarea) setupMentionAutocomplete(profileTextarea);
       } catch (error) {
         console.error('Error loading posts:', error);
         container.innerHTML = '<div class="empty-state"><p>Failed to load posts</p></div>';
@@ -961,6 +966,87 @@
         }
       } catch { if (window.sfToast) sfToast('Failed to post', 'error'); }
       finally { btn.disabled = false; btn.textContent = 'Post'; updateProfilePostBtn(); }
+    }
+
+    // ========== MENTION AUTOCOMPLETE ==========
+    let mentionDropdown = null;
+    let mentionTarget = null;
+    let mentionStartPos = -1;
+
+    function setupMentionAutocomplete(textarea) {
+      textarea.addEventListener('input', () => handleMentionInput(textarea));
+      textarea.addEventListener('keydown', (e) => {
+        if (!mentionDropdown || mentionDropdown.style.display === 'none') return;
+        if (e.key === 'Enter' || e.key === 'Tab') {
+          e.preventDefault();
+          const first = mentionDropdown.querySelector('[data-username]');
+          if (first) selectMention(first.dataset.username);
+        } else if (e.key === 'Escape') { hideMentionDropdown(); }
+      });
+      textarea.addEventListener('blur', () => setTimeout(hideMentionDropdown, 200));
+    }
+
+    function handleMentionInput(textarea) {
+      const val = textarea.value;
+      const pos = textarea.selectionStart;
+      const match = val.substring(0, pos).match(/@(\w*)$/);
+      if (!match) { hideMentionDropdown(); return; }
+      mentionTarget = textarea;
+      mentionStartPos = pos - match[1].length - 1;
+      showMentionSuggestions(match[1], textarea);
+    }
+
+    async function showMentionSuggestions(query, textarea) {
+      if (query.length < 1) { hideMentionDropdown(); return; }
+      let suggestions = [];
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          suggestions = (data.users || []).slice(0, 8).map(u => ({
+            username: u.username, display_name: u.display_name, avatar_url: u.avatar_url
+          }));
+        }
+      } catch {}
+      if (suggestions.length === 0) { hideMentionDropdown(); return; }
+
+      if (!mentionDropdown) {
+        mentionDropdown = document.createElement('div');
+        mentionDropdown.style.cssText = 'position:absolute;background:var(--bg-tertiary,white);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-height:240px;overflow-y:auto;z-index:300;width:250px;';
+        document.body.appendChild(mentionDropdown);
+      }
+      const rect = textarea.getBoundingClientRect();
+      mentionDropdown.style.left = rect.left + 'px';
+      mentionDropdown.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+      mentionDropdown.style.display = 'block';
+
+      mentionDropdown.innerHTML = suggestions.map(s => {
+        const av = s.avatar_url
+          ? `<img src="${s.avatar_url}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
+          : `<div style="width:28px;height:28px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${(s.username||'?')[0].toUpperCase()}</div>`;
+        return `<div data-username="${s.username}" onmousedown="selectMention('${s.username}')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background=''">
+          ${av}<div><div style="font-size:13px;font-weight:600;color:var(--text-primary);">@${s.username}</div>${s.display_name ? `<div style="font-size:11px;color:var(--text-muted);">${s.display_name}</div>` : ''}</div></div>`;
+      }).join('');
+    }
+
+    function selectMention(username) {
+      if (!mentionTarget || mentionStartPos === -1) return;
+      const val = mentionTarget.value;
+      const pos = mentionTarget.selectionStart;
+      mentionTarget.value = val.substring(0, mentionStartPos) + '@' + username + ' ' + val.substring(pos);
+      const newPos = mentionStartPos + username.length + 2;
+      mentionTarget.selectionStart = newPos;
+      mentionTarget.selectionEnd = newPos;
+      mentionTarget.focus();
+      hideMentionDropdown();
+      mentionTarget.dispatchEvent(new Event('input'));
+    }
+
+    function hideMentionDropdown() {
+      if (mentionDropdown) mentionDropdown.style.display = 'none';
+      mentionStartPos = -1;
     }
 
     // Render grid post
