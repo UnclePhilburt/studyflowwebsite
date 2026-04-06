@@ -1376,11 +1376,15 @@
       background: var(--accent-secondary);
     }
 
+    .quick-comment-previews {
+      padding: 0 16px;
+    }
+
     .quick-comment-preview {
       font-size: 13px;
       color: var(--text-secondary);
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-color);
+      padding: 6px 0;
+      line-height: 1.4;
     }
 
     .quick-comment-preview:last-child {
@@ -1390,7 +1394,7 @@
     .quick-comment-author {
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 4px;
+      margin-right: 6px;
     }
 
     /* Post Actions Menu */
@@ -2254,8 +2258,17 @@
               ${post.comment_count || 0} comments
             </button>
           </div>
+          <div class="quick-comment-previews" id="commentPreviews-${post.id}">
+            ${(post.recent_comments || []).map(c => `
+              <div class="quick-comment-preview">
+                <span class="quick-comment-author">${c.username || 'Anonymous'}</span>
+                <span>${c.text_content.length > 120 ? c.text_content.slice(0, 120) + '...' : c.text_content}</span>
+              </div>
+            `).join('')}
+            ${post.comment_count > 2 ? `<div style="font-size:12px;color:var(--text-muted);padding:4px 16px 8px;cursor:pointer;" onclick="event.stopPropagation(); viewPost('${post.id}')">View all ${post.comment_count} comments</div>` : ''}
+          </div>
           <div class="quick-comment" id="quickComment-${post.id}">
-            <textarea class="quick-comment-input" placeholder="Write a comment..." id="commentInput-${post.id}"></textarea>
+            <textarea class="quick-comment-input" placeholder="Write a comment..." id="commentInput-${post.id}" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitQuickComment('${post.id}');}"></textarea>
             <div class="quick-comment-actions">
               <button class="quick-comment-btn cancel" onclick="event.stopPropagation(); toggleQuickComment('${post.id}')">Cancel</button>
               <button class="quick-comment-btn submit" onclick="event.stopPropagation(); submitQuickComment('${post.id}')">Comment</button>
@@ -2359,6 +2372,9 @@
 
       if (!text) return;
 
+      // Disable while posting
+      input.disabled = true;
+
       try {
         const response = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/comments`, {
           method: 'POST',
@@ -2370,16 +2386,40 @@
         });
 
         if (response.ok) {
+          const data = await response.json();
           input.value = '';
           toggleQuickComment(postId);
-          // Show success message
-          showToast('Comment posted!');
-          // Refresh feed to update comment count
-          loadFeed();
+
+          // Add comment inline without reloading feed
+          const previews = document.getElementById(`commentPreviews-${postId}`);
+          if (previews) {
+            const username = currentUser?.user_metadata?.username || currentUser?.email?.split('@')[0] || 'You';
+            const newComment = document.createElement('div');
+            newComment.className = 'quick-comment-preview';
+            newComment.innerHTML = `<span class="quick-comment-author">${username}</span><span>${text.length > 120 ? text.slice(0, 120) + '...' : text}</span>`;
+            previews.appendChild(newComment);
+          }
+
+          // Update comment count in the button
+          const card = document.querySelector(`[data-post-id="${postId}"]`);
+          if (card) {
+            const btn = card.querySelector('.action-btn');
+            if (btn) {
+              const current = parseInt(btn.textContent) || 0;
+              btn.textContent = `${current + 1} comments`;
+            }
+          }
+
+          if (window.sfToast) sfToast('Comment posted!', 'success');
+        } else {
+          const err = await response.json().catch(() => ({}));
+          if (window.sfToast) sfToast(err.error || 'Failed to post comment', 'error');
         }
       } catch (error) {
         console.error('Error posting comment:', error);
-        showToast('Failed to post comment', 'error');
+        if (window.sfToast) sfToast('Failed to post comment', 'error');
+      } finally {
+        input.disabled = false;
       }
     }
 
