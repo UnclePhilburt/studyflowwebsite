@@ -543,9 +543,32 @@
     }
 
     .post-card[data-type="text"] {
-      background: #f9fafb;
-      border-left: 3px solid #60a5fa;
+      border: none;
     }
+
+    .post-card[data-type="text"].text-bg-0 { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .post-card[data-type="text"].text-bg-1 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .post-card[data-type="text"].text-bg-2 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .post-card[data-type="text"].text-bg-3 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+    .post-card[data-type="text"].text-bg-4 { background: linear-gradient(135deg, #fa709a, #fee140); }
+    .post-card[data-type="text"].text-bg-5 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+    .post-card[data-type="text"].text-bg-6 { background: linear-gradient(135deg, #fccb90, #d57eeb); }
+    .post-card[data-type="text"].text-bg-7 { background: linear-gradient(135deg, #8B9D83, #5a7a5a); }
+
+    .post-card[data-type="text"] .post-header { border-bottom: none; }
+    .post-card[data-type="text"] .post-avatar { border-color: rgba(255,255,255,0.4); }
+    .post-card[data-type="text"] .post-username { color: white; }
+    .post-card[data-type="text"] .post-time { color: rgba(255,255,255,0.7); }
+    .post-card[data-type="text"] .post-action-verb { color: rgba(255,255,255,0.8); }
+    .post-card[data-type="text"] .content-badge { background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3); }
+    .post-card[data-type="text"] .vote-btn { color: rgba(255,255,255,0.7); }
+    .post-card[data-type="text"] .vote-btn.upvoted { color: white; }
+    .post-card[data-type="text"] .vote-btn:hover { background: rgba(255,255,255,0.15); }
+    .post-card[data-type="text"] .vote-score { color: white; }
+    .post-card[data-type="text"] .action-btn { color: rgba(255,255,255,0.8); }
+    .post-card[data-type="text"] .quick-comment-previews { color: rgba(255,255,255,0.8); }
+    .post-card[data-type="text"] .quick-comment-author { color: white; }
+    .post-card[data-type="text"] .post-actions { border-color: rgba(255,255,255,0.15); }
 
     .post-header {
       display: flex;
@@ -716,13 +739,17 @@
 
     /* Text-only posts */
     .post-card[data-type="text"] .post-content {
-      padding: 20px;
-      min-height: 120px;
+      padding: 24px 20px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
     }
 
     .post-card[data-type="text"] .post-caption {
-      font-size: 15px;
+      font-size: 17px;
       line-height: 1.6;
+      font-weight: 500;
+      color: white;
       -webkit-line-clamp: unset;
       display: block;
       overflow: visible;
@@ -2409,12 +2436,18 @@
         }
       }
 
+      // Action verb based on post type
+      const actionVerb = contentType === 'note' ? 'shared a note' : contentType === 'photo' ? 'posted a photo' : 'posted an update';
+
+      // Random gradient for text posts
+      const textBgClass = contentType === 'text' ? `text-bg-${Math.abs(post.id.charCodeAt(0)) % 8}` : '';
+
       return `
-        <div class="post-card" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
+        <div class="post-card ${textBgClass}" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
           <div class="post-header">
             <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
-              <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}${post.is_verified ? ' <svg width="14" height="14" viewBox="0 0 24 24" fill="#7c9885" style="vertical-align:-2px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''}</div>
+              <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}${post.is_verified ? ' <svg width="14" height="14" viewBox="0 0 24 24" fill="#7c9885" style="vertical-align:-2px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''} <span class="post-action-verb" style="font-weight:400;font-size:12px;color:var(--text-muted);">${actionVerb}</span></div>
               <div class="post-time">${timeAgo}</div>
             </div>
             <div class="content-badge ${badgeClass}">${badgeText}</div>
