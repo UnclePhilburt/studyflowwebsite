@@ -1702,7 +1702,6 @@
           </div>
         </div>
         <button class="btn btn-secondary" onclick="window.location.href='profile.html'">My Profile</button>
-        <button class="btn btn-primary" onclick="openCreatePostModal()">Create Post</button>
       </div>
     </div>
   </div>
@@ -1768,6 +1767,15 @@
           <button class="filter-chip active" data-filter="all" onclick="filterContent('all')">All</button>
           <button class="filter-chip" data-filter="note" onclick="filterContent('note')">Notes</button>
           <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Posts</button>
+        </div>
+      </div>
+
+      <!-- Inline Composer (like Facebook) -->
+      <div id="inlineComposer" style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:text;" onclick="openCreatePostModal()">
+        <div id="composerAvatar" style="width:36px;height:36px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;"></div>
+        <div style="flex:1;padding:10px 14px;border-radius:20px;background:var(--bg-primary);color:var(--text-muted);font-size:14px;border:1px solid var(--border-color);">What's on your mind?</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="event.stopPropagation(); document.getElementById('fileInputNew').click();" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px;" title="Upload file">&#x1F4CE;</button>
         </div>
       </div>
 
@@ -1919,6 +1927,20 @@
       setupInfiniteScroll();
       loadUserStats();
       loadSuggestedUsers();
+
+      // Load avatar for inline composer
+      try {
+        const avatarRes = await fetch(`${BACKEND_URL}/api/current-user`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (avatarRes.ok) {
+          const ud = await avatarRes.json();
+          const ce = document.getElementById('composerAvatar');
+          if (ud.avatar_url) {
+            ce.innerHTML = `<img src="${ud.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+          } else {
+            ce.textContent = (ud.name || ud.username || ud.email || 'U')[0].toUpperCase();
+          }
+        }
+      } catch {}
     });
 
     // Switch tabs
