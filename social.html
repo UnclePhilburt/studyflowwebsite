@@ -628,19 +628,16 @@
 
     /* Content Type Badge */
     .content-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 4px 10px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      font-size: 11px;
+      padding: 3px 8px;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      font-size: 10px;
       font-weight: 600;
       color: var(--text-secondary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .content-badge.note {
@@ -2229,13 +2226,13 @@
 
       return `
         <div class="post-card" data-type="${contentType}" data-post-id="${post.id}" onclick="viewPost('${post.id}')">
-          <div class="content-badge ${badgeClass}">${badgeText}</div>
           <div class="post-header">
             <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
               <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}</div>
               <div class="post-time">${timeAgo}</div>
             </div>
+            <div class="content-badge ${badgeClass}">${badgeText}</div>
           </div>
           ${thumbnailHtml}
           ${metadataHtml}
