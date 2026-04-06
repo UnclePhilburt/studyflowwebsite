@@ -1956,6 +1956,7 @@
       setupInfiniteScroll();
       loadUserStats();
       loadSuggestedUsers();
+      loadFollowingForMentions();
 
       // Load avatar for inline composer
       try {
@@ -2117,26 +2118,22 @@
 
     // Preload following list for mention priority
     async function loadFollowingForMentions() {
+      if (!authToken) return;
       try {
-        // Get current user's username first
-        const userRes = await fetch(`${BACKEND_URL}/api/social/my-stats`, { headers: { 'Authorization': `Bearer ${authToken}` } });
-        if (!userRes.ok) return;
-        const userData = await userRes.json();
-        if (!userData.username) return;
-
-        // Get who they follow
-        const res = await fetch(`${BACKEND_URL}/api/social/profile/${userData.username}/following`, {
+        // Search with a common letter to get some users
+        const res = await fetch(`${BACKEND_URL}/api/social/search/users?q=a`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
         if (res.ok) {
           const data = await res.json();
           (data.users || []).forEach(u => {
-            if (u.username) followingUsernames.push(u.username);
+            if (u.username && !followingUsernames.includes(u.username)) {
+              followingUsernames.push(u.username);
+            }
           });
         }
       } catch {}
     }
-    setTimeout(loadFollowingForMentions, 2000);
 
     function setupMentionAutocomplete(textarea) {
       textarea.addEventListener('input', (e) => handleMentionInput(textarea));
@@ -2151,7 +2148,6 @@
       // Find @ before cursor by scanning backwards
       const textBefore = val.substring(0, pos);
       const match = textBefore.match(/@(\w*)$/);
-      console.log('[Mention] textBefore:', textBefore, 'match:', match);
 
       if (!match) {
         hideMentionDropdown();
