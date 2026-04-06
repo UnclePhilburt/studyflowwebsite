@@ -1853,6 +1853,16 @@
           <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
         </div>
       </div>
+
+      <!-- Trending Hashtags -->
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">Trending</div>
+        </div>
+        <div id="trendingHashtags" style="padding:4px 0;">
+          <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
+        </div>
+      </div>
     </aside>
   </div>
 
@@ -1956,6 +1966,7 @@
       setupInfiniteScroll();
       loadUserStats();
       loadSuggestedUsers();
+      loadTrendingHashtags();
       loadFollowingForMentions();
 
       // Load avatar for inline composer
@@ -2107,6 +2118,36 @@
         `;
       } catch (e) {
         container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">Failed to search</div>`;
+      }
+    }
+
+    // ========== TRENDING HASHTAGS ==========
+    async function loadTrendingHashtags() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/trending-hashtags`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        const tags = data.hashtags || [];
+        const container = document.getElementById('trendingHashtags');
+
+        if (tags.length === 0) {
+          container.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">No trending tags yet. Start using #hashtags!</div>';
+          return;
+        }
+
+        container.innerHTML = tags.map((t, i) => `
+          <div onclick="searchHashtag('${t.tag}')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:background 0.15s;border-radius:8px;" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background=''">
+            <span style="font-size:14px;font-weight:700;color:var(--text-muted);width:20px;text-align:right;">${i + 1}</span>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:600;color:var(--text-primary);">#${t.tag}</div>
+              <div style="font-size:11px;color:var(--text-muted);">${t.score} engagement</div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('trendingHashtags').innerHTML = '';
       }
     }
 
@@ -2985,9 +3026,7 @@
 
         const feedHtml = `<div class="feed">${allPosts.map(renderPost).join('')}</div>`;
         const loadMoreBtn = hasMorePosts ? `
-          <div style="text-align: center; padding: 40px 20px;">
-            <button class="btn btn-secondary" onclick="loadMorePosts()" id="loadMoreBtn">Load More Posts</button>
-          </div>
+          <div id="loadMoreSentinel" style="height:1px;"></div>
         ` : '';
 
         container.innerHTML = feedHtml + loadMoreBtn;
@@ -3001,41 +3040,30 @@
 
     async function loadMorePosts() {
       if (isLoadingMore || !hasMorePosts) return;
-
       isLoadingMore = true;
-      const btn = document.getElementById('loadMoreBtn');
-      if (btn) {
-        btn.textContent = 'Loading...';
-        btn.disabled = true;
-      }
-
       currentPage++;
       await loadFeed(true);
       isLoadingMore = false;
     }
 
     // Infinite scroll observer
+    let scrollObserver = null;
+
     function setupInfiniteScroll() {
-      const observer = new IntersectionObserver((entries) => {
+      scrollObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting && hasMorePosts && !isLoadingMore) {
             loadMorePosts();
           }
         });
-      }, {
-        rootMargin: '100px'
+      }, { rootMargin: '300px' });
+
+      // MutationObserver to auto-attach when sentinel appears
+      const mo = new MutationObserver(() => {
+        const sentinel = document.getElementById('loadMoreSentinel');
+        if (sentinel) scrollObserver.observe(sentinel);
       });
-
-      // Observe the feed container
-      const checkForLoadMore = () => {
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-        if (loadMoreBtn) {
-          observer.observe(loadMoreBtn);
-        }
-      };
-
-      // Check periodically
-      setInterval(checkForLoadMore, 1000);
+      mo.observe(document.getElementById('feedContainer'), { childList: true, subtree: true });
     }
 
     // Render post card
