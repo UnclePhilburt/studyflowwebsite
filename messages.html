@@ -27,6 +27,25 @@
       --border-color: rgba(139, 157, 131, 0.2);
       --hover-bg: rgba(139, 157, 131, 0.06);
       --shadow: rgba(0, 0, 0, 0.04);
+      --card-bg: white;
+      --msg-sent: #8B9D83;
+      --msg-received: rgba(255,255,255,0.9);
+    }
+
+    body[data-theme="dark"], body[data-theme="midnight"],
+    body[data-theme="ember"], body[data-theme="neon"] {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: rgba(40, 40, 40, 0.8);
+      --bg-tertiary: rgba(30, 30, 30, 0.95);
+      --text-primary: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --text-muted: #666;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --hover-bg: rgba(139, 157, 131, 0.1);
+      --shadow: rgba(0, 0, 0, 0.3);
+      --card-bg: #242424;
+      --msg-sent: #6a8573;
+      --msg-received: #2a2a2a;
     }
 
     body {
@@ -550,7 +569,11 @@
     <!-- Conversations Sidebar -->
     <div class="conversations-sidebar">
       <div class="sidebar-header">
-        <h1>Messages</h1>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h1>Messages</h1>
+          <a href="social.html" style="font-size:12px;color:var(--accent-primary);text-decoration:none;font-weight:600;">Back to Feed</a>
+        </div>
+        <input type="text" id="dmSearchInput" placeholder="Search messages..." style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:10px;font-size:13px;font-family:inherit;background:var(--bg-primary);color:var(--text-primary);margin-bottom:8px;" oninput="searchDMs(this.value)">
         <button class="new-message-btn" onclick="openNewMessageModal()">New Message</button>
       </div>
       <div class="conversations-list" id="conversationsList">
@@ -602,6 +625,9 @@
     let messagePollingInterval = null;
 
     // Initialize
+    // Load theme
+    (function(){const t=localStorage.getItem('dashboard-theme')||'default';document.body.setAttribute('data-theme',t);})();
+
     document.addEventListener('DOMContentLoaded', async () => {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
@@ -702,9 +728,12 @@
       // Poll for new messages every 3 seconds
       messagePollingInterval = setInterval(() => {
         loadMessages(conversationId, true);
+        checkOnlineStatus();
       }, 3000);
 
-      // Mark as read
+      // Mark as read and check online
+      markAsRead();
+      checkOnlineStatus();
       renderConversations();
 
       // Mobile: show chat area
@@ -749,18 +778,21 @@
           <div class="chat-header-avatar">${avatar}</div>
           <div class="chat-header-info">
             <div class="chat-header-name">${user.display_name || user.username}</div>
-            <div class="chat-header-username">@${user.username}</div>
+            <div class="chat-header-username">@${user.username} <span id="onlineStatus" style="font-size:11px;color:var(--text-muted);"></span></div>
           </div>
           <button class="view-profile-btn" onclick="window.location.href='profile.html?user=${user.username}'">
             View Profile
           </button>
         </div>
         <div class="messages-area" id="messagesArea"></div>
-        <div class="message-input-area">
+        <div class="message-input-area" style="display:flex;align-items:flex-end;gap:8px;">
+          <button onclick="document.getElementById('dmImageInput').click()" style="background:none;border:none;cursor:pointer;font-size:20px;padding:8px;color:var(--text-muted);" title="Send image">&#x1F4CE;</button>
+          <input type="file" id="dmImageInput" accept="image/*" style="display:none;" onchange="sendDmImage(event)">
           <textarea class="message-input" id="messageInput" placeholder="Type a message..." rows="1"
-                    onkeypress="handleMessageKeyPress(event)"></textarea>
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+                    onkeypress="handleMessageKeyPress(event)" oninput="sendTypingSignal()"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">&#x27A4;</button>
         </div>
+        <div id="typingIndicator" style="display:none;padding:4px 16px;font-size:12px;color:var(--text-muted);font-style:italic;"></div>
       `;
 
       renderMessages();
@@ -786,13 +818,24 @@
         const isSent = msg.sender_id === currentUser.id;
         const time = getTimeAgo(msg.created_at);
         const avatar = isSent ? 'You' : activeConversation.other_user.username[0].toUpperCase();
+        const readStatus = isSent && msg.read_at ? '<span style="font-size:10px;color:var(--accent-primary);margin-left:4px;">Seen</span>' : '';
+        const imageHtml = msg.image_url ? `<img src="${msg.image_url}" style="max-width:240px;border-radius:8px;margin-bottom:4px;cursor:pointer;" onclick="window.open('${msg.image_url}','_blank')">` : '';
+        const reactionsHtml = msg.reactions ? `<div style="font-size:14px;margin-top:2px;">${msg.reactions}</div>` : '';
 
         return `
-          <div class="message ${isSent ? 'sent' : 'received'}">
+          <div class="message ${isSent ? 'sent' : 'received'}" data-msg-id="${msg.id}">
             <div class="message-avatar">${avatar}</div>
-            <div class="message-content">
-              <div class="message-text">${escapeHtml(msg.content)}</div>
-              <div class="message-time">${time}</div>
+            <div class="message-content" oncontextmenu="event.preventDefault(); showMsgActions('${msg.id}', ${isSent})">
+              ${imageHtml}
+              ${msg.content ? `<div class="message-text">${escapeHtml(msg.content)}</div>` : ''}
+              ${reactionsHtml}
+              <div class="message-time">${time}${readStatus}</div>
+              <div id="msgActions-${msg.id}" style="display:none;position:absolute;bottom:100%;${isSent ? 'right' : 'left'}:0;background:var(--card-bg,white);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:4px;z-index:10;white-space:nowrap;">
+                <button onclick="reactToDm('${msg.id}','❤️')" style="border:none;background:none;font-size:16px;cursor:pointer;padding:4px;">❤️</button>
+                <button onclick="reactToDm('${msg.id}','👍')" style="border:none;background:none;font-size:16px;cursor:pointer;padding:4px;">👍</button>
+                <button onclick="reactToDm('${msg.id}','😂')" style="border:none;background:none;font-size:16px;cursor:pointer;padding:4px;">😂</button>
+                ${isSent ? `<button onclick="deleteDmMsg('${msg.id}')" style="border:none;background:none;font-size:12px;cursor:pointer;padding:4px 8px;color:#ef4444;">Delete</button>` : ''}
+              </div>
             </div>
           </div>
         `;
@@ -907,15 +950,145 @@
 
     // Escape HTML
     function escapeHtml(text) {
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
       return text.replace(/[&<>"']/g, m => map[m]);
     }
+
+    // ===== READ RECEIPTS =====
+    function markAsRead() {
+      if (!activeConversation) return;
+      fetch(`${BACKEND_URL}/api/social/dm/conversation/${activeConversation.conversation_id}/read-all`, {
+        method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }
+      }).catch(() => {});
+    }
+
+    // ===== TYPING INDICATOR =====
+    let typingTimer = null;
+    function sendTypingSignal() {
+      if (typingTimer) clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        fetch(`${BACKEND_URL}/api/social/dm/typing`, {
+          method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }
+        }).catch(() => {});
+      }, 500);
+    }
+
+    // Check other user's online/typing status
+    async function checkOnlineStatus() {
+      if (!activeConversation) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/dm/online-status/${activeConversation.other_user.id}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const el = document.getElementById('onlineStatus');
+          if (el) {
+            if (data.online) {
+              el.innerHTML = '<span style="color:#22c55e;">&#x25CF; Online</span>';
+            } else if (data.last_active) {
+              el.textContent = 'Last seen ' + getTimeAgo(data.last_active);
+            }
+          }
+        }
+      } catch {}
+    }
+
+    // ===== IMAGE SHARING =====
+    async function sendDmImage(event) {
+      const file = event.target.files[0];
+      if (!file || !activeConversation) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const uploadRes = await fetch(`${BACKEND_URL}/api/social/dm/upload-image`, {
+          method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
+        });
+        if (!uploadRes.ok) throw new Error('Upload failed');
+        const uploadData = await uploadRes.json();
+
+        // Send as message with image
+        await fetch(`${BACKEND_URL}/api/social/dm/conversation/${activeConversation.conversation_id}/send`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: '', image_url: uploadData.url })
+        });
+        await loadMessages(activeConversation.conversation_id);
+      } catch (e) {
+        if (window.sfToast) sfToast('Failed to send image', 'error');
+      }
+      event.target.value = '';
+    }
+
+    // ===== MESSAGE REACTIONS =====
+    function showMsgActions(msgId, isSent) {
+      // Hide all others first
+      document.querySelectorAll('[id^="msgActions-"]').forEach(el => el.style.display = 'none');
+      const el = document.getElementById(`msgActions-${msgId}`);
+      if (el) el.style.display = el.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    async function reactToDm(msgId, emoji) {
+      document.getElementById(`msgActions-${msgId}`).style.display = 'none';
+      try {
+        await fetch(`${BACKEND_URL}/api/social/dm/message/${msgId}/react`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emoji })
+        });
+        await loadMessages(activeConversation.conversation_id);
+      } catch {}
+    }
+
+    // ===== DELETE MESSAGE =====
+    async function deleteDmMsg(msgId) {
+      document.getElementById(`msgActions-${msgId}`).style.display = 'none';
+      try {
+        await fetch(`${BACKEND_URL}/api/social/dm/message/${msgId}`, {
+          method: 'DELETE', headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        await loadMessages(activeConversation.conversation_id);
+      } catch {}
+    }
+
+    // ===== SEARCH MESSAGES =====
+    let searchTimer = null;
+    async function searchDMs(query) {
+      if (query.length < 2) { loadConversations(); return; }
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/social/dm/search?q=${encodeURIComponent(query)}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const container = document.getElementById('conversationsList');
+            if (data.results.length === 0) {
+              container.innerHTML = '<div class="empty-state"><p>No messages found</p></div>';
+            } else {
+              container.innerHTML = data.results.map(r => `
+                <div class="conversation-item" onclick="selectConversation('${r.conversation_id}', '')">
+                  <div class="conversation-info" style="padding:8px 0;">
+                    <div class="conversation-preview">${escapeHtml(r.content)}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">${getTimeAgo(r.created_at)}</div>
+                  </div>
+                </div>
+              `).join('');
+            }
+          }
+        } catch {}
+      }, 300);
+    }
+
+    // Close msg actions on click outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('[id^="msgActions-"]') && !e.target.closest('.message-content')) {
+        document.querySelectorAll('[id^="msgActions-"]').forEach(el => el.style.display = 'none');
+      }
+    });
 
     // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
