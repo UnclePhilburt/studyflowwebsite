@@ -2109,6 +2109,151 @@
       }
     }
 
+    // ========== MENTION AUTOCOMPLETE ==========
+    let mentionDropdown = null;
+    let mentionTarget = null;
+    let mentionStartPos = -1;
+    let followingUsernames = [];
+
+    // Preload following list for priority
+    async function loadFollowingForMentions() {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/feed`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const seen = new Set();
+          (data.posts || []).forEach(p => {
+            if (p.username && !seen.has(p.username)) {
+              followingUsernames.push(p.username);
+              seen.add(p.username);
+            }
+          });
+        }
+      } catch {}
+    }
+    setTimeout(loadFollowingForMentions, 3000);
+
+    function setupMentionAutocomplete(textarea) {
+      textarea.addEventListener('input', (e) => handleMentionInput(textarea));
+      textarea.addEventListener('keydown', (e) => handleMentionKeydown(e, textarea));
+      textarea.addEventListener('blur', () => setTimeout(hideMentionDropdown, 200));
+    }
+
+    function handleMentionInput(textarea) {
+      const val = textarea.value;
+      const pos = textarea.selectionStart;
+
+      // Find @ before cursor
+      let atPos = -1;
+      for (let i = pos - 1; i >= 0; i--) {
+        if (val[i] === '@') { atPos = i; break; }
+        if (val[i] === ' ' || val[i] === '\n') break;
+      }
+
+      if (atPos === -1 || (atPos > 0 && val[atPos - 1] !== ' ' && val[atPos - 1] !== '\n' && atPos !== 0)) {
+        hideMentionDropdown();
+        return;
+      }
+
+      const query = val.substring(atPos + 1, pos);
+      if (query.length < 1) { hideMentionDropdown(); return; }
+
+      mentionTarget = textarea;
+      mentionStartPos = atPos;
+      showMentionSuggestions(query, textarea);
+    }
+
+    async function showMentionSuggestions(query, textarea) {
+      // Filter following first
+      let suggestions = followingUsernames
+        .filter(u => u.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5)
+        .map(u => ({ username: u, priority: true }));
+
+      // Search backend for more
+      if (suggestions.length < 5 && query.length >= 2) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/social/search/users?q=${encodeURIComponent(query)}`, {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const existing = new Set(suggestions.map(s => s.username));
+            (data.users || []).forEach(u => {
+              if (!existing.has(u.username) && suggestions.length < 8) {
+                suggestions.push({ username: u.username, display_name: u.display_name, avatar_url: u.avatar_url, priority: false });
+              }
+            });
+          }
+        } catch {}
+      }
+
+      if (suggestions.length === 0) { hideMentionDropdown(); return; }
+
+      // Create/update dropdown
+      if (!mentionDropdown) {
+        mentionDropdown = document.createElement('div');
+        mentionDropdown.id = 'mentionDropdown';
+        mentionDropdown.style.cssText = 'position:absolute;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-height:240px;overflow-y:auto;z-index:300;width:250px;';
+        document.body.appendChild(mentionDropdown);
+      }
+
+      // Position near cursor
+      const rect = textarea.getBoundingClientRect();
+      mentionDropdown.style.left = (rect.left + 48) + 'px';
+      mentionDropdown.style.top = (rect.bottom + 4) + 'px';
+      mentionDropdown.style.display = 'block';
+
+      mentionDropdown.innerHTML = suggestions.map((s, i) => {
+        const avatar = s.avatar_url
+          ? `<img src="${s.avatar_url}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
+          : `<div style="width:28px;height:28px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${(s.username || '?')[0].toUpperCase()}</div>`;
+        return `<div class="mention-item" data-username="${s.username}" data-index="${i}" onmousedown="selectMention('${s.username}')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;transition:background 0.1s;${i === 0 ? 'background:var(--hover-bg);' : ''}" onmouseover="this.style.background='var(--hover-bg)'" onmouseout="this.style.background=''">
+          ${avatar}
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);">@${s.username}</div>
+            ${s.display_name ? `<div style="font-size:11px;color:var(--text-muted);">${s.display_name}</div>` : ''}
+            ${s.priority ? '<div style="font-size:9px;color:var(--accent-primary);">Following</div>' : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function handleMentionKeydown(e, textarea) {
+      if (!mentionDropdown || mentionDropdown.style.display === 'none') return;
+
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        const first = mentionDropdown.querySelector('.mention-item');
+        if (first) selectMention(first.dataset.username);
+      } else if (e.key === 'Escape') {
+        hideMentionDropdown();
+      }
+    }
+
+    function selectMention(username) {
+      if (!mentionTarget || mentionStartPos === -1) return;
+      const val = mentionTarget.value;
+      const pos = mentionTarget.selectionStart;
+      const before = val.substring(0, mentionStartPos);
+      const after = val.substring(pos);
+      mentionTarget.value = before + '@' + username + ' ' + after;
+      const newPos = mentionStartPos + username.length + 2;
+      mentionTarget.selectionStart = newPos;
+      mentionTarget.selectionEnd = newPos;
+      mentionTarget.focus();
+      hideMentionDropdown();
+      // Trigger input event for post button state
+      mentionTarget.dispatchEvent(new Event('input'));
+    }
+
+    function hideMentionDropdown() {
+      if (mentionDropdown) mentionDropdown.style.display = 'none';
+      mentionStartPos = -1;
+    }
+
     // ========== INLINE COMPOSER ==========
     let inlineFile = null;
     let inlineNoteId = null;
@@ -2117,6 +2262,7 @@
 
     // Enable/disable post button based on content
     document.getElementById('inlinePostText').addEventListener('input', updateInlinePostBtn);
+    setupMentionAutocomplete(document.getElementById('inlinePostText'));
 
     function updateInlinePostBtn() {
       const hasText = document.getElementById('inlinePostText').value.trim().length > 0;
