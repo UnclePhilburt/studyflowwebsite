@@ -1779,119 +1779,62 @@
     </aside>
   </div>
 
-  <!-- Step 1: Upload/Select Modal -->
-  <div class="modal" id="uploadModal">
-    <div class="modal-content">
+  <!-- Unified Create Post Modal -->
+  <div class="modal" id="createPostModal">
+    <div class="modal-content" style="max-width:520px;">
       <div class="modal-header">
-        <h2>Create New Post</h2>
-        <button class="modal-close" onclick="closeUploadModal()">✕</button>
+        <h2>Create Post</h2>
+        <button class="modal-close" onclick="closeCreateModal()">&#x2715;</button>
       </div>
 
-      <div class="upload-options">
-        <!-- Upload New File -->
-        <div class="upload-option-card" onclick="document.getElementById('fileInputNew').click()">
-          <div class="upload-icon">📤</div>
-          <h3>Upload Note or Photo</h3>
-          <p>PDF, images, or documents</p>
-          <input type="file" id="fileInputNew" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp" style="display: none;" onchange="handleFileSelect(event)">
-        </div>
+      <div style="padding:20px 24px;">
+        <!-- Caption / Text -->
+        <textarea id="postCaptionNew" placeholder="What's on your mind?" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:10px;min-height:100px;font-family:inherit;font-size:14px;resize:vertical;background:var(--bg-primary);color:var(--text-primary);"></textarea>
 
-        <!-- Share Existing Note -->
-        <div class="upload-option-card" onclick="showExistingNotes()">
-          <div class="upload-icon">📚</div>
-          <h3>Share Existing Note</h3>
-          <p>From your library</p>
-        </div>
-
-        <!-- Text Post -->
-        <div class="upload-option-card" onclick="showTextPost()">
-          <div class="upload-icon">✍️</div>
-          <h3>Write Something</h3>
-          <p>Text-only post</p>
-        </div>
-      </div>
-
-      <!-- Existing Notes Selection (hidden by default) -->
-      <div id="existingNotesPanel" style="display: none;">
-        <div style="padding: 0 24px 24px;">
-          <button class="btn btn-secondary" onclick="backToUploadOptions()" style="margin-bottom: 16px; width: 100%;">← Back</button>
-          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Select a note from your library:</label>
-          <select id="noteSelectExisting" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 16px;">
-            <option value="">Loading your notes...</option>
-          </select>
-          <button class="btn btn-primary" onclick="selectExistingNote()" style="width: 100%;">Next</button>
-        </div>
-      </div>
-
-      <!-- Drag & Drop Zone -->
-      <div id="dropZone" style="display: none; padding: 24px;">
-        <div style="border: 2px dashed var(--border-color); border-radius: 12px; padding: 40px; text-align: center; background: #fafafa;">
-          <div style="font-size: 48px; margin-bottom: 16px;">📎</div>
-          <p style="font-weight: 600; margin-bottom: 8px;">Drag and drop your file here</p>
-          <p style="color: var(--text-muted); font-size: 14px;">or click to browse</p>
-          <button class="btn btn-secondary" onclick="document.getElementById('fileInputNew').click()" style="margin-top: 16px;">Choose File</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Step 2: Caption & Details Modal -->
-  <div class="modal" id="captionModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button class="modal-back" onclick="backToUpload()">←</button>
-        <h2>New Post</h2>
-        <button class="modal-close" onclick="closeCaptionModal()">✕</button>
-      </div>
-
-      <div style="padding: 24px;">
-        <!-- Preview -->
-        <div id="postPreview" style="margin-bottom: 20px; border-radius: 8px; overflow: hidden; background: #f5f5f5; max-height: 300px; display: flex; align-items: center; justify-content: center;">
-          <img id="previewImage" style="max-width: 100%; max-height: 300px; object-fit: contain; display: none;">
-          <div id="previewPlaceholder" style="padding: 40px; text-align: center; color: var(--text-muted);">
-            <div style="font-size: 48px; margin-bottom: 12px;">📄</div>
-            <p>Note preview</p>
+        <!-- Attachment Preview -->
+        <div id="attachmentPreview" style="display:none;margin-top:12px;border-radius:10px;overflow:hidden;background:var(--bg-primary);border:1px solid var(--border-color);position:relative;">
+          <button onclick="removeAttachment()" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:14px;cursor:pointer;z-index:2;">&#x2715;</button>
+          <img id="previewImage" style="max-width:100%;max-height:250px;object-fit:contain;display:none;">
+          <div id="previewFile" style="display:none;padding:20px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:8px;">&#x1F4C4;</div>
+            <div id="previewFileName" style="font-size:13px;color:var(--text-secondary);"></div>
           </div>
         </div>
 
-        <!-- Upload Progress (hidden - truly background) -->
-        <div id="backgroundUploadProgress" style="display: none;">
+        <!-- Attachment Buttons -->
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button onclick="document.getElementById('fileInputNew').click()" class="btn btn-secondary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload File
+          </button>
+          <button onclick="toggleLibraryPicker()" class="btn btn-secondary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            From Library
+          </button>
+          <input type="file" id="fileInputNew" accept=".pdf,.jpg,.jpeg,.png,.gif,.bmp,.tiff,.webp" style="display:none;" onchange="handleFileSelect(event)">
         </div>
 
-        <!-- Caption -->
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Caption</label>
-          <textarea id="postCaptionNew" placeholder="Write a caption..." style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; min-height: 100px; font-family: inherit; resize: vertical;"></textarea>
-        </div>
-
-        <!-- Content Type -->
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Content Type</label>
-          <select id="contentTypeSelect" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-            <option value="note">Study Notes</option>
-            <option value="photo">Photo</option>
-            <option value="resource">Resource/Guide</option>
-            <option value="text">Explanation</option>
+        <!-- Library Picker (hidden by default) -->
+        <div id="libraryPicker" style="display:none;margin-top:12px;">
+          <select id="noteSelectExisting" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;background:var(--bg-primary);color:var(--text-primary);">
+            <option value="">Select a note...</option>
           </select>
         </div>
 
-        <!-- Course/Subject (optional) -->
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Course/Subject (optional)</label>
-          <input type="text" id="courseInput" placeholder="e.g., Biology 101, Calculus" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-        </div>
+        <!-- Course (optional) -->
+        <input type="text" id="courseInput" placeholder="Course / Subject (optional)" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;margin-top:12px;background:var(--bg-primary);color:var(--text-primary);">
 
-        <!-- Folder (for uploads only) -->
-        <div id="folderSelectNew" style="display: none; margin-bottom: 16px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Save to Folder (optional)</label>
-          <select id="folderSelectNewDropdown" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-            <option value="">Don't save to library</option>
+        <!-- Hidden fields -->
+        <input type="hidden" id="contentTypeSelect" value="text">
+        <div id="folderSelectNew" style="display:none;margin-top:12px;">
+          <select id="folderSelectNewDropdown" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;background:var(--bg-primary);color:var(--text-primary);">
+            <option value="">Save to folder (optional)</option>
           </select>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Save this note to your library while posting</p>
         </div>
+        <div id="backgroundUploadProgress" style="display:none;"></div>
 
         <!-- Submit -->
-        <button class="btn btn-primary" onclick="submitPost()" style="width: 100%; margin-top: 8px;" id="finalPostBtn">Share Post</button>
+        <button class="btn btn-primary" onclick="submitPost()" style="width:100%;margin-top:16px;padding:12px;font-size:14px;" id="finalPostBtn">Share Post</button>
       </div>
     </div>
   </div>
@@ -2554,125 +2497,125 @@
 
     // Step 1: Open upload modal
     function openCreatePostModal() {
-      document.getElementById('uploadModal').classList.add('active');
+      document.getElementById('createPostModal').classList.add('active');
+      resetCreateModal();
       loadUserNotes();
     }
 
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.remove('active');
-      selectedFile = null;
-      selectedNoteId = null;
+    function closeCreateModal() {
+      document.getElementById('createPostModal').classList.remove('active');
+      resetCreateModal();
     }
 
-    // Step 2: Close caption modal
-    function closeCaptionModal() {
-      document.getElementById('captionModal').classList.remove('active');
+    // Legacy aliases
+    function closeUploadModal() { closeCreateModal(); }
+    function closeCaptionModal() { closeCreateModal(); }
+
+    function resetCreateModal() {
       selectedFile = null;
       selectedNoteId = null;
       uploadedNoteId = null;
-    }
-
-    // Back to upload from caption
-    function backToUpload() {
-      document.getElementById('captionModal').classList.remove('active');
-      document.getElementById('uploadModal').classList.add('active');
-    }
-
-    // Show existing notes panel
-    function showExistingNotes() {
-      document.querySelector('.upload-options').style.display = 'none';
-      document.getElementById('existingNotesPanel').style.display = 'block';
-      loadUserNotes();
-    }
-
-    // Back to upload options
-    function backToUploadOptions() {
-      document.querySelector('.upload-options').style.display = 'grid';
-      document.getElementById('existingNotesPanel').style.display = 'none';
-    }
-
-    // Show text post (skip to caption with no file)
-    function showTextPost() {
-      selectedFile = null;
-      selectedNoteId = null;
-      document.getElementById('uploadModal').classList.remove('active');
-      document.getElementById('captionModal').classList.add('active');
+      document.getElementById('postCaptionNew').value = '';
+      document.getElementById('courseInput').value = '';
+      document.getElementById('attachmentPreview').style.display = 'none';
       document.getElementById('previewImage').style.display = 'none';
-      document.getElementById('previewPlaceholder').innerHTML = '<div style="font-size: 48px; margin-bottom: 12px;">✍️</div><p>Text-only post</p>';
+      document.getElementById('previewFile').style.display = 'none';
+      document.getElementById('libraryPicker').style.display = 'none';
       document.getElementById('folderSelectNew').style.display = 'none';
       document.getElementById('contentTypeSelect').value = 'text';
     }
 
-    // Handle file selection
+    function removeAttachment() {
+      selectedFile = null;
+      selectedNoteId = null;
+      uploadedNoteId = null;
+      document.getElementById('attachmentPreview').style.display = 'none';
+      document.getElementById('previewImage').style.display = 'none';
+      document.getElementById('previewFile').style.display = 'none';
+      document.getElementById('folderSelectNew').style.display = 'none';
+      document.getElementById('contentTypeSelect').value = 'text';
+    }
+
+    function toggleLibraryPicker() {
+      const picker = document.getElementById('libraryPicker');
+      if (picker.style.display === 'none') {
+        picker.style.display = 'block';
+        loadUserNotes();
+        // Listen for selection
+        document.getElementById('noteSelectExisting').onchange = function() {
+          if (this.value) selectExistingNote();
+        };
+      } else {
+        picker.style.display = 'none';
+      }
+    }
+
     async function handleFileSelect(event) {
       const file = event.target.files[0];
       if (!file) return;
 
-      // Check file size
       if (file.size > 10 * 1024 * 1024) {
-        alert('File too large! Maximum size is 10MB');
+        if (window.sfToast) sfToast('File too large! Maximum 10MB', 'error');
         return;
       }
 
       selectedFile = file;
-
-      // Close upload modal, open caption modal
-      document.getElementById('uploadModal').classList.remove('active');
-      document.getElementById('captionModal').classList.add('active');
+      selectedNoteId = null;
 
       // Show preview
+      const preview = document.getElementById('attachmentPreview');
+      preview.style.display = 'block';
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
           document.getElementById('previewImage').src = e.target.result;
           document.getElementById('previewImage').style.display = 'block';
-          document.getElementById('previewPlaceholder').style.display = 'none';
+          document.getElementById('previewFile').style.display = 'none';
         };
         reader.readAsDataURL(file);
+        document.getElementById('contentTypeSelect').value = 'photo';
       } else {
         document.getElementById('previewImage').style.display = 'none';
-        document.getElementById('previewPlaceholder').style.display = 'flex';
-        document.getElementById('previewPlaceholder').innerHTML = `<div><div style="font-size: 48px; margin-bottom: 12px;">📄</div><p>${file.name}</p></div>`;
+        document.getElementById('previewFile').style.display = 'block';
+        document.getElementById('previewFileName').textContent = file.name;
+        document.getElementById('contentTypeSelect').value = 'note';
       }
 
-      // Show folder selection for uploads
+      // Show folder selection
       document.getElementById('folderSelectNew').style.display = 'block';
+      document.getElementById('libraryPicker').style.display = 'none';
       loadUserFolders();
 
       // Start background upload
       startBackgroundUpload(file);
     }
 
-    // Select existing note
     function selectExistingNote() {
       const select = document.getElementById('noteSelectExisting');
       selectedNoteId = select.value;
+      if (!selectedNoteId) return;
 
-      if (!selectedNoteId) {
-        alert('Please select a note');
-        return;
-      }
-
-      // Find note details
+      selectedFile = null;
       const note = userNotes.find(n => n.id === selectedNoteId);
 
-      // Close upload modal, open caption modal
-      document.getElementById('uploadModal').classList.remove('active');
-      document.getElementById('captionModal').classList.add('active');
-
       // Show preview
+      const preview = document.getElementById('attachmentPreview');
+      preview.style.display = 'block';
+
       if (note && note.thumbnail_url) {
         document.getElementById('previewImage').src = note.thumbnail_url;
         document.getElementById('previewImage').style.display = 'block';
-        document.getElementById('previewPlaceholder').style.display = 'none';
+        document.getElementById('previewFile').style.display = 'none';
       } else {
         document.getElementById('previewImage').style.display = 'none';
-        document.getElementById('previewPlaceholder').style.display = 'flex';
-        document.getElementById('previewPlaceholder').innerHTML = `<div><div style="font-size: 48px; margin-bottom: 12px;">📚</div><p>${note?.original_filename || 'Note'}</p></div>`;
+        document.getElementById('previewFile').style.display = 'block';
+        document.getElementById('previewFileName').textContent = note?.original_filename || 'Note';
       }
 
-      // Hide folder selection (already in library)
       document.getElementById('folderSelectNew').style.display = 'none';
+      document.getElementById('libraryPicker').style.display = 'none';
+      document.getElementById('contentTypeSelect').value = 'note';
       uploadedNoteId = selectedNoteId;
     }
 
