@@ -1661,6 +1661,94 @@
       border-color: var(--accent-primary);
     }
 
+    /* Mobile Bottom Sheets */
+    .mobile-bottom-sheet {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .mobile-bottom-sheet.active {
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .mobile-sheet-content {
+      width: 100%;
+      max-height: 75vh;
+      background: var(--card-bg);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+      animation: slideUp 0.3s ease-out;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      margin: 12px auto 8px auto;
+    }
+
+    .mobile-sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .mobile-sheet-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .mobile-sheet-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .mobile-sheet-close:active {
+      background: var(--hover-bg);
+    }
+
+    .mobile-sheet-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
     /* Mobile Bottom Dock */
     .mobile-dock {
       display: none;
@@ -1670,24 +1758,24 @@
       right: 0;
       background: var(--card-bg);
       border-top: 1px solid var(--border-color);
-      padding: 8px 16px 12px 16px;
+      padding: 4px 12px 8px 12px;
       z-index: 1000;
       justify-content: space-around;
       align-items: center;
-      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
     }
 
     .mobile-dock-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       background: none;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      padding: 8px 16px;
-      border-radius: 12px;
+      padding: 6px 12px;
+      border-radius: 10px;
       transition: all 0.2s;
       font-family: inherit;
     }
@@ -1695,6 +1783,7 @@
     .mobile-dock-item:active {
       background: var(--hover-bg);
       color: var(--accent-primary);
+      transform: scale(0.95);
     }
 
     .mobile-dock-item svg {
@@ -1702,7 +1791,7 @@
     }
 
     .mobile-dock-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
       color: currentColor;
     }
@@ -1785,11 +1874,16 @@
 
       /* Adjust container for mobile dock */
       body {
-        padding-bottom: 70px;
+        padding-bottom: 56px;
       }
 
       .container {
         padding-top: 12px;
+      }
+
+      /* Hide desktop tabs and filters on mobile */
+      .tabs {
+        display: none !important;
       }
 
       /* Mobile container */
@@ -3471,22 +3565,81 @@
       }
     }
 
+    // ========== MOBILE BOTTOM SHEETS ==========
+    function openMobileSearch() {
+      const sheet = document.getElementById('mobileSearchSheet');
+      sheet.classList.add('active');
+      sheet.style.display = 'flex';
+      setTimeout(() => document.getElementById('mobileSearchInput').focus(), 300);
+    }
+
+    function closeMobileSearch() {
+      const sheet = document.getElementById('mobileSearchSheet');
+      sheet.classList.remove('active');
+      setTimeout(() => sheet.style.display = 'none', 300);
+    }
+
+    function openMobileNotifications() {
+      const sheet = document.getElementById('mobileNotificationsSheet');
+      sheet.classList.add('active');
+      sheet.style.display = 'flex';
+      loadSocialNotifs(true);
+    }
+
+    function closeMobileNotifications() {
+      const sheet = document.getElementById('mobileNotificationsSheet');
+      sheet.classList.remove('active');
+      setTimeout(() => sheet.style.display = 'none', 300);
+    }
+
+    function openMobileFilters() {
+      const sheet = document.getElementById('mobileFiltersSheet');
+      sheet.classList.add('active');
+      sheet.style.display = 'flex';
+
+      // Update filter button states
+      document.querySelectorAll('.mobile-filter-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-tab') === currentTab;
+        btn.style.background = isActive ? 'var(--accent-primary)' : 'var(--bg-secondary)';
+        btn.style.color = isActive ? 'white' : 'var(--text-secondary)';
+      });
+
+      document.querySelectorAll('.mobile-content-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-filter') === currentFilter;
+        btn.style.background = isActive ? 'var(--accent-primary)' : 'var(--bg-secondary)';
+        btn.style.color = isActive ? 'white' : 'var(--text-secondary)';
+      });
+    }
+
+    function closeMobileFilters() {
+      const sheet = document.getElementById('mobileFiltersSheet');
+      sheet.classList.remove('active');
+      setTimeout(() => sheet.style.display = 'none', 300);
+    }
+
     // ========== SOCIAL NOTIFICATIONS ==========
     function toggleSocialNotifs() {
-      const dd = document.getElementById('socialNotifDropdown');
-      const showing = dd.style.display === 'block';
-      dd.style.display = showing ? 'none' : 'block';
-      if (!showing) loadSocialNotifs();
+      // Check if mobile
+      if (window.innerWidth <= 768) {
+        openMobileNotifications();
+      } else {
+        const dd = document.getElementById('socialNotifDropdown');
+        const showing = dd.style.display === 'block';
+        dd.style.display = showing ? 'none' : 'block';
+        if (!showing) loadSocialNotifs(false);
+      }
     }
 
     document.addEventListener('click', (e) => {
       if (!e.target.closest('#socialNotifBell') && !e.target.closest('#socialNotifDropdown')) {
-        document.getElementById('socialNotifDropdown').style.display = 'none';
+        const dd = document.getElementById('socialNotifDropdown');
+        if (dd) dd.style.display = 'none';
       }
     });
 
-    async function loadSocialNotifs() {
-      const list = document.getElementById('socialNotifList');
+    async function loadSocialNotifs(isMobile = false) {
+      const list = isMobile ? document.getElementById('mobileNotifList') : document.getElementById('socialNotifList');
+      if (!list) return;
       list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>';
 
       let items = [];
@@ -5153,7 +5306,6 @@
     });
 
     // Update mobile search tabs to match functionality
-    const originalSwitchSearchTab = window.switchSearchTab;
     window.switchSearchTab = function(tab) {
       currentSearchTab = tab;
 
@@ -5169,21 +5321,21 @@
         desktopPostsTab.style.borderBottom = tab === 'posts' ? '2px solid var(--accent-primary)' : 'none';
       }
 
-      // Update mobile tabs
+      // Update mobile tabs with pill style
       const mobileUsersTab = document.getElementById('mobileSearchTabUsers');
       const mobilePostsTab = document.getElementById('mobileSearchTabPosts');
       if (mobileUsersTab) {
-        mobileUsersTab.style.color = tab === 'users' ? 'var(--accent-primary)' : 'var(--text-muted)';
-        mobileUsersTab.style.borderBottom = tab === 'users' ? '2px solid var(--accent-primary)' : 'none';
+        mobileUsersTab.style.background = tab === 'users' ? 'var(--accent-primary)' : 'var(--bg-secondary)';
+        mobileUsersTab.style.color = tab === 'users' ? 'white' : 'var(--text-secondary)';
       }
       if (mobilePostsTab) {
-        mobilePostsTab.style.color = tab === 'posts' ? 'var(--accent-primary)' : 'var(--text-muted)';
-        mobilePostsTab.style.borderBottom = tab === 'posts' ? '2px solid var(--accent-primary)' : 'none';
+        mobilePostsTab.style.background = tab === 'posts' ? 'var(--accent-primary)' : 'var(--bg-secondary)';
+        mobilePostsTab.style.color = tab === 'posts' ? 'white' : 'var(--text-secondary)';
       }
 
       // Re-run search if there's a query
-      const mobileQuery = document.getElementById('mobileSearchInput').value.trim();
-      if (mobileQuery.length >= 2) {
+      const mobileQuery = document.getElementById('mobileSearchInput')?.value.trim();
+      if (mobileQuery && mobileQuery.length >= 2) {
         const resultsContainer = document.getElementById('mobileSearchResultsContent');
         if (tab === 'users') {
           searchUsers(mobileQuery, resultsContainer);
@@ -5383,34 +5535,89 @@
 
   <!-- Mobile Bottom Dock (visible only on mobile) -->
   <div class="mobile-dock" id="mobileDock">
-    <button class="mobile-dock-item" onclick="document.getElementById('mobileSearchInput').focus(); document.getElementById('mobileSearchOverlay').style.display='flex';" aria-label="Search">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <button class="mobile-dock-item" onclick="openMobileFilters()" aria-label="Filter">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      <span class="mobile-dock-label">Filter</span>
+    </button>
+    <button class="mobile-dock-item" onclick="openMobileSearch()" aria-label="Search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <span class="mobile-dock-label">Search</span>
     </button>
-    <button class="mobile-dock-item" onclick="toggleSocialNotifs()" aria-label="Notifications">
+    <button class="mobile-dock-item" onclick="openMobileNotifications()" aria-label="Notifications">
       <div style="position:relative;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span id="mobileSocialNotifBadge" style="display:none;position:absolute;top:-4px;right:-4px;min-width:14px;height:14px;background:#ef4444;color:white;border-radius:7px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;"></span>
       </div>
       <span class="mobile-dock-label">Alerts</span>
     </button>
     <button class="mobile-dock-item" onclick="window.location.href='profile.html'" aria-label="Profile">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="mobile-dock-label">Profile</span>
     </button>
   </div>
 
-  <!-- Mobile Search Overlay -->
-  <div id="mobileSearchOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-primary);z-index:1000;padding:16px;">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <button onclick="document.getElementById('mobileSearchOverlay').style.display='none'" style="background:none;border:none;color:var(--text-primary);font-size:24px;cursor:pointer;padding:0;">←</button>
-      <input type="text" class="search-bar" placeholder="Search posts and users..." id="mobileSearchInput" autocomplete="off" style="flex:1;width:auto;">
+  <!-- Mobile Search Bottom Sheet -->
+  <div id="mobileSearchSheet" class="mobile-bottom-sheet" onclick="if(event.target===this) closeMobileSearch()">
+    <div class="mobile-sheet-content">
+      <div class="mobile-sheet-handle"></div>
+      <div class="mobile-sheet-header">
+        <h3>Search</h3>
+        <button onclick="closeMobileSearch()" class="mobile-sheet-close">&times;</button>
+      </div>
+      <div class="mobile-sheet-body">
+        <div style="position:relative;margin-bottom:16px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="mobileSearchInput" placeholder="Search posts and users..." style="width:100%;padding:12px 12px 12px 40px;border:1px solid var(--border-color);border-radius:12px;font-size:15px;background:var(--bg-secondary);color:var(--text-primary);font-family:inherit;" autocomplete="off">
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button id="mobileSearchTabUsers" onclick="switchSearchTab('users')" style="flex:1;padding:10px;border:none;background:var(--accent-primary);color:white;font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;">Users</button>
+          <button id="mobileSearchTabPosts" onclick="switchSearchTab('posts')" style="flex:1;padding:10px;border:none;background:var(--bg-secondary);color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;">Posts</button>
+        </div>
+        <div id="mobileSearchResultsContent" style="overflow-y:auto;max-height:calc(70vh - 200px);"></div>
+      </div>
     </div>
-    <div style="display:flex;border-bottom:1px solid var(--border-color);margin-bottom:12px;">
-      <button id="mobileSearchTabUsers" onclick="switchSearchTab('users')" style="flex:1;padding:10px;border:none;background:none;font-size:13px;font-weight:600;color:var(--accent-primary);border-bottom:2px solid var(--accent-primary);cursor:pointer;">Users</button>
-      <button id="mobileSearchTabPosts" onclick="switchSearchTab('posts')" style="flex:1;padding:10px;border:none;background:none;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;">Posts</button>
+  </div>
+
+  <!-- Mobile Notifications Bottom Sheet -->
+  <div id="mobileNotificationsSheet" class="mobile-bottom-sheet" onclick="if(event.target===this) closeMobileNotifications()">
+    <div class="mobile-sheet-content">
+      <div class="mobile-sheet-handle"></div>
+      <div class="mobile-sheet-header">
+        <h3>Notifications</h3>
+        <button onclick="clearSocialNotifs()" style="background:none;border:none;color:var(--accent-primary);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Clear all</button>
+      </div>
+      <div class="mobile-sheet-body">
+        <div id="mobileNotifList" style="overflow-y:auto;max-height:calc(70vh - 120px);"></div>
+      </div>
     </div>
-    <div id="mobileSearchResultsContent" style="overflow-y:auto;"></div>
+  </div>
+
+  <!-- Mobile Filters Bottom Sheet -->
+  <div id="mobileFiltersSheet" class="mobile-bottom-sheet" onclick="if(event.target===this) closeMobileFilters()">
+    <div class="mobile-sheet-content">
+      <div class="mobile-sheet-handle"></div>
+      <div class="mobile-sheet-header">
+        <h3>Filters</h3>
+        <button onclick="closeMobileFilters()" class="mobile-sheet-close">&times;</button>
+      </div>
+      <div class="mobile-sheet-body">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Feed Type</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="switchTab('following'); closeMobileFilters();" class="mobile-filter-btn" data-tab="following" style="flex:1;padding:12px;border:1px solid var(--border-color);background:var(--accent-primary);color:white;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Following</button>
+            <button onclick="switchTab('trending'); closeMobileFilters();" class="mobile-filter-btn" data-tab="trending" style="flex:1;padding:12px;border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Trending</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Content Type</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="filterContent('all'); closeMobileFilters();" class="mobile-content-btn" data-filter="all" style="flex:1;min-width:calc(33.333% - 6px);padding:12px;border:1px solid var(--border-color);background:var(--accent-primary);color:white;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">All</button>
+            <button onclick="filterContent('note'); closeMobileFilters();" class="mobile-content-btn" data-filter="note" style="flex:1;min-width:calc(33.333% - 6px);padding:12px;border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Notes</button>
+            <button onclick="filterContent('text'); closeMobileFilters();" class="mobile-content-btn" data-filter="text" style="flex:1;min-width:calc(33.333% - 6px);padding:12px;border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Posts</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script src="assets/notifications.js"></script>
