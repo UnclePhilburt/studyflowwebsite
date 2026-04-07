@@ -373,7 +373,7 @@
     async function loadFollowers() {
       if (!myUsername) return;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/social/followers/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        const res = await fetch(`${BACKEND_URL}/api/social/profile/${myUsername}/followers`, { headers: { 'Authorization': `Bearer ${authToken}` } });
         if (res.ok) {
           const data = await res.json();
           allUsers = data.users || data.followers || [];
@@ -387,7 +387,7 @@
     async function loadFollowing() {
       if (!myUsername) return;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/social/following/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        const res = await fetch(`${BACKEND_URL}/api/social/profile/${myUsername}/following`, { headers: { 'Authorization': `Bearer ${authToken}` } });
         if (res.ok) {
           const data = await res.json();
           allUsers = data.users || data.following || [];
@@ -412,7 +412,7 @@
     async function loadFollowingSet() {
       if (!myUsername) return;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/social/following/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        const res = await fetch(`${BACKEND_URL}/api/social/profile/${myUsername}/following`, { headers: { 'Authorization': `Bearer ${authToken}` } });
         if (res.ok) {
           const data = await res.json();
           const list = data.users || data.following || [];
