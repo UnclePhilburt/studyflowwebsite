@@ -610,6 +610,7 @@
           </div>
           <div class="profile-username" id="username">@username</div>
           <p class="profile-bio" id="bio">No bio yet</p>
+          <div id="profileBadges" style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;"></div>
           <div class="profile-stats">
             <div class="stat" onclick="showFollowers()">
               <div class="stat-number" id="followersCount">0</div>
@@ -690,6 +691,21 @@
     </div>
   </div>
 
+  <!-- Badge Management Modal -->
+  <div class="modal" id="badgeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Manage Badges</h2>
+        <button class="modal-close" onclick="closeBadgeModal()">✕</button>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Select up to 3 badges to display on your profile and posts</p>
+      <div id="badgeSelection" style="display:grid;gap:12px;"></div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-color);">
+        <button onclick="saveBadgeSelection()" class="btn btn-primary" style="width:100%;">Save Selection</button>
+      </div>
+    </div>
+  </div>
+
   <script>(function(){const t=localStorage.getItem('dashboard-theme')||'default';document.body.setAttribute('data-theme',t);})();</script>
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
@@ -701,6 +717,9 @@
     let authToken = null;
     let profileData = null;
     let viewingUsername = null;
+    let userBadges = [];
+    let equippedBadgeIds = [];
+    let selectedBadges = [];
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
@@ -755,6 +774,7 @@
         profileData = data.profile;
         renderProfile();
         loadPosts();
+        loadProfileBadges();
       } catch (error) {
         console.error('Error loading profile:', error);
         document.querySelector('.profile-info').innerHTML = '<p>Profile not found</p>';
@@ -801,6 +821,7 @@
       if (profileData.is_own_profile) {
         actions.innerHTML = `
           <button class="btn btn-primary" onclick="openEditModal()">Edit Profile</button>
+          <button class="btn btn-secondary" onclick="openBadgeModal()">Manage Badges</button>
           <button class="btn btn-secondary" onclick="window.location.href='messages.html'">Messages</button>
         `;
         document.getElementById('avatarUploadBtn').style.display = 'flex';
@@ -1601,6 +1622,131 @@
           </div>
         </div>
       `;
+    }
+
+    // ========== BADGE SYSTEM ==========
+
+    async function loadProfileBadges() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/badges/${viewingUsername}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const badges = data.badges || [];
+
+        renderProfileBadges(badges);
+      } catch (error) {
+        console.error('Error loading badges:', error);
+      }
+    }
+
+    function renderProfileBadges(badges) {
+      const container = document.getElementById('profileBadges');
+      if (!badges || badges.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = badges.map(badge => `
+        <span title="${badge.name}: ${badge.description}" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--bg-secondary);border:1px solid ${badge.color || 'var(--border-color)'};border-radius:12px;font-size:12px;font-weight:500;color:var(--text-primary);">
+          <span style="font-size:14px;">${badge.icon}</span>
+          <span>${badge.name}</span>
+        </span>
+      `).join('');
+    }
+
+    async function openBadgeModal() {
+      try {
+        // Fetch user's badges
+        const response = await fetch(`${BACKEND_URL}/api/badges/my-badges`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load badges');
+
+        const data = await response.json();
+        userBadges = data.earned_badges || [];
+        equippedBadgeIds = data.equipped_badge_ids || [];
+        selectedBadges = [...equippedBadgeIds];
+
+        renderBadgeSelection();
+        document.getElementById('badgeModal').classList.add('active');
+      } catch (error) {
+        console.error('Error loading badges:', error);
+        alert('Failed to load badges');
+      }
+    }
+
+    function renderBadgeSelection() {
+      const container = document.getElementById('badgeSelection');
+
+      if (userBadges.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><p>You haven\'t earned any badges yet.</p><p style="font-size:12px;margin-top:8px;">Keep posting, getting upvotes, and engaging with the community to earn badges!</p></div>';
+        return;
+      }
+
+      container.innerHTML = userBadges.map(badge => {
+        const isSelected = selectedBadges.includes(badge.id);
+        return `
+          <div onclick="toggleBadge('${badge.id}')" style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-secondary);border:2px solid ${isSelected ? badge.color : 'var(--border-color)'};border-radius:10px;cursor:pointer;transition:all 0.2s;" data-badge-id="${badge.id}">
+            <div style="font-size:24px;">${badge.icon}</div>
+            <div style="flex:1;">
+              <div style="font-weight:600;color:var(--text-primary);font-size:14px;">${badge.name}</div>
+              <div style="font-size:12px;color:var(--text-muted);">${badge.description}</div>
+            </div>
+            ${isSelected ? `<div style="width:20px;height:20px;border-radius:50%;background:${badge.color};display:flex;align-items:center;justify-content:center;color:white;font-size:12px;">✓</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleBadge(badgeId) {
+      const index = selectedBadges.indexOf(badgeId);
+
+      if (index > -1) {
+        // Remove badge
+        selectedBadges.splice(index, 1);
+      } else {
+        // Add badge (max 3)
+        if (selectedBadges.length >= 3) {
+          alert('You can only equip 3 badges at a time');
+          return;
+        }
+        selectedBadges.push(badgeId);
+      }
+
+      renderBadgeSelection();
+    }
+
+    async function saveBadgeSelection() {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/badges/equip`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ badge_ids: selectedBadges })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to save badges');
+        }
+
+        closeBadgeModal();
+        loadProfileBadges(); // Reload to show new badges
+      } catch (error) {
+        console.error('Error saving badges:', error);
+        alert(error.message || 'Failed to save badge selection');
+      }
+    }
+
+    function closeBadgeModal() {
+      document.getElementById('badgeModal').classList.remove('active');
     }
   </script>
 <script src="assets/notifications.js"></script>
