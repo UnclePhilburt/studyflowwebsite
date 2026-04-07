@@ -4165,7 +4165,7 @@
       }
     }
 
-    async function handleInlineFile(event) {
+    function handleInlineFile(event) {
       const files = Array.from(event.target.files);
       if (!files.length) return;
 
@@ -4228,18 +4228,20 @@
         inlineUploading = true;
         const formData = new FormData();
         images.slice(0, 10).forEach(f => formData.append('files', f));
-        try {
-          const res = await fetch(`${BACKEND_URL}/api/social/upload-images`, {
-            method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
-          });
-          if (!res.ok) throw new Error(`Upload returned ${res.status}`);
-          const data = await res.json();
+        fetch(`${BACKEND_URL}/api/social/upload-images`, {
+          method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
+        }).then(function(res) {
+          if (!res.ok) throw new Error('Upload returned ' + res.status);
+          return res.json();
+        }).then(function(data) {
           inlineImageUrls = data.urls || [];
-        } catch (err) {
+          inlineUploading = false;
+          updateInlinePostBtn();
+        }).catch(function(err) {
           console.error('Image upload failed:', err);
           inlineImageUrls = [];
-        }
-        inlineUploading = false;
+          inlineUploading = false;
+        });
       }
     }
 
@@ -4293,7 +4295,7 @@
       const text = document.getElementById('inlinePostText').value.trim();
       const btn = document.getElementById('inlinePostBtn');
 
-      if (!text && !inlineFile && !inlineNoteId) return;
+      if (!text && !inlineFile && !inlineNoteId && !inlineImageUrls.length && !inlineUploading) return;
 
       // Wait for upload
       if (inlineUploading) {
