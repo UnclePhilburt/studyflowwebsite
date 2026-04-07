@@ -6104,6 +6104,12 @@
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
+        if (!response.ok) {
+          // Silently fail - view tracking is not critical
+          console.debug('View tracking failed for post', postId, response.status);
+          return;
+        }
+
         if (response.ok) {
           // Optionally update view count in UI
           const data = await response.json();
@@ -6115,7 +6121,7 @@
           }
         }
       } catch (error) {
-        console.error('Error tracking view:', error);
+        console.debug('Error tracking view:', error);
         // Remove from set so it can retry later
         viewedPosts.delete(postId);
       }
