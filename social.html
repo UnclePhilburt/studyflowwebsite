@@ -85,12 +85,13 @@
     .sidebar {
       width: 280px;
       position: sticky;
-      top: 73px;
-      height: calc(100vh - 73px);
-      padding: 20px 0;
+      top: 60px;
+      height: calc(100vh - 60px);
+      padding: 12px 0;
       border-right: 1px solid var(--border-color);
       background: var(--card-bg);
       overflow-y: auto;
+      flex-shrink: 0;
     }
 
     @media (min-width: 1600px) {
@@ -465,6 +466,9 @@
       border-bottom: 1px solid var(--border-color);
       margin-bottom: 0;
       padding: 16px 0;
+      height: 60px;
+      display: flex;
+      align-items: center;
     }
 
     .header-inner {
