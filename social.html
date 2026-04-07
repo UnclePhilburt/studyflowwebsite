@@ -4254,16 +4254,18 @@
                 ctx.transform(0, 1, 1, 0, 0, 0);
                 break;
               case 6:
-                // Rotate 90° CW
-                ctx.transform(0, 1, -1, 0, height, 0);
+                // Rotate 90° CW (most common for portrait photos)
+                ctx.rotate(90 * Math.PI / 180);
+                ctx.translate(0, -height);
                 break;
               case 7:
                 // Rotate 90° CW + flip horizontal
                 ctx.transform(0, -1, -1, 0, height, width);
                 break;
               case 8:
-                // Rotate 90° CCW
-                ctx.transform(0, -1, 1, 0, 0, width);
+                // Rotate 90° CCW (counter-clockwise)
+                ctx.rotate(-90 * Math.PI / 180);
+                ctx.translate(-width, 0);
                 break;
             }
 
