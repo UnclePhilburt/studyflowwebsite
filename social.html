@@ -995,6 +995,79 @@
       -webkit-line-clamp: unset;
     }
 
+    /* Suggested people inline card */
+    .suggested-people-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 0;
+      margin-bottom: 16px;
+      break-inside: avoid;
+    }
+    .suggested-people-card .sp-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      padding: 0 16px 12px;
+    }
+    .suggested-people-card .sp-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 0 16px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .suggested-people-card .sp-scroll::-webkit-scrollbar { display: none; }
+    .sp-user {
+      flex-shrink: 0;
+      width: 140px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sp-user:active { background: var(--hover-bg); }
+    .sp-avatar {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 600;
+      margin: 0 auto 8px;
+      overflow: hidden;
+    }
+    .sp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .sp-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sp-detail {
+      font-size: 11px; color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sp-follow-btn {
+      margin-top: 10px;
+      padding: 6px 0; width: 100%;
+      border-radius: 8px; border: none;
+      background: var(--accent-primary); color: white;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .sp-follow-btn:active { opacity: 0.8; }
+    .sp-follow-btn.following {
+      background: var(--bg-tertiary, var(--bg-primary));
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
     /* Text-only posts */
     .post-card[data-type="text"] .post-content {
       padding: 24px 20px;
@@ -4977,7 +5050,16 @@
           if (p.user_vote_type) localVotes[p.id] = p.user_vote_type;
         });
 
-        const feedHtml = `<div class="feed">${allPosts.map(renderPost).join('')}</div>`;
+        // Insert "People you may know" card after every 3rd post on mobile
+        const isMobile = window.innerWidth <= 1024;
+        let feedItems = '';
+        allPosts.forEach(function(post, i) {
+          feedItems += renderPost(post);
+          if (isMobile && i === 2 && !append) {
+            feedItems += renderSuggestedPeopleCard();
+          }
+        });
+        const feedHtml = `<div class="feed">${feedItems}</div>`;
         const loadMoreBtn = hasMorePosts ? `
           <div id="loadMoreSentinel" style="height:1px;"></div>
         ` : '';
@@ -6003,6 +6085,55 @@
       }
     }
 
+    // Cached suggestions for inline feed card
+    let cachedSuggestions = [];
+
+    function renderSuggestedPeopleCard() {
+      if (!cachedSuggestions.length) {
+        // Return placeholder that gets filled when suggestions load
+        return '<div id="inlineSuggestedCard"></div>';
+      }
+      return buildSuggestedCardHtml(cachedSuggestions);
+    }
+
+    function buildSuggestedCardHtml(users) {
+      if (!users.length) return '';
+      return `
+        <div class="suggested-people-card">
+          <div class="sp-title">People you may know</div>
+          <div class="sp-scroll">
+            ${users.map(function(u) {
+              var av = u.avatar_url
+                ? '<img src="' + u.avatar_url + '">'
+                : (u.display_name || u.username || '?')[0].toUpperCase();
+              var detail = u.reason || u.mutual_count ? u.mutual_count + ' mutual' : '@' + u.username;
+              return '<div class="sp-user" onclick="window.location.href=\'profile.html?user=' + u.username + '\'">' +
+                '<div class="sp-avatar">' + av + '</div>' +
+                '<div class="sp-name">' + (u.display_name || u.username) + '</div>' +
+                '<div class="sp-detail">' + detail + '</div>' +
+                '<button class="sp-follow-btn" onclick="event.stopPropagation(); followFromCard(this, \'' + u.username + '\')">Follow</button>' +
+              '</div>';
+            }).join('')}
+          </div>
+        </div>`;
+    }
+
+    function followFromCard(btn, username) {
+      if (btn.classList.contains('following')) {
+        btn.classList.remove('following');
+        btn.textContent = 'Follow';
+        fetch(BACKEND_URL + '/api/social/unfollow/' + username, {
+          method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+      } else {
+        btn.classList.add('following');
+        btn.textContent = 'Following';
+        fetch(BACKEND_URL + '/api/social/follow/' + username, {
+          method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+      }
+    }
+
     async function loadSuggestedUsers() {
       try {
         // Try mutual followers first, fall back to general suggestions
@@ -6025,6 +6156,14 @@
             });
           }
         }
+        // Cache for inline feed card
+        cachedSuggestions = data.suggestions || [];
+        // Fill inline placeholder if it exists
+        var inlineCard = document.getElementById('inlineSuggestedCard');
+        if (inlineCard && cachedSuggestions.length) {
+          inlineCard.outerHTML = buildSuggestedCardHtml(cachedSuggestions);
+        }
+
         const container = document.getElementById('suggestedUsers');
 
         if (!data.suggestions || data.suggestions.length === 0) {
