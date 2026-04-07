@@ -1713,6 +1713,227 @@
         transform: none;
         overflow-x: auto;
       }
+
+      /* Mobile header optimization */
+      .header-inner {
+        padding: 0 12px;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .header-actions {
+        gap: 8px;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+
+      /* Hide "My Profile" text on mobile, show icon only */
+      .btn-secondary:last-child {
+        padding: 8px;
+        min-width: auto;
+      }
+
+      /* Mobile container */
+      .container {
+        flex-direction: column;
+      }
+
+      .main-content {
+        padding: 12px;
+        max-width: 100%;
+      }
+
+      /* Post card mobile optimization */
+      .post-card {
+        margin-bottom: 12px;
+        border-radius: 8px;
+      }
+
+      .post-card:hover {
+        transform: none;
+      }
+
+      .post-header {
+        padding: 10px 12px;
+      }
+
+      .post-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+      }
+
+      .post-username {
+        font-size: 13px;
+      }
+
+      .post-time {
+        font-size: 11px;
+      }
+
+      .content-badge {
+        font-size: 9px;
+        padding: 3px 6px;
+      }
+
+      /* Post content mobile */
+      .post-image {
+        max-height: 400px;
+      }
+
+      .post-text-content {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .post-caption {
+        padding: 0 12px 10px 12px;
+        font-size: 13px;
+      }
+
+      /* Post actions mobile */
+      .post-actions {
+        padding: 8px 12px;
+      }
+
+      .vote-btn, .action-btn {
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+
+      .vote-btn svg, .action-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .vote-score {
+        font-size: 13px;
+      }
+
+      /* Quick comment previews mobile */
+      .quick-comment-previews {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      /* Tabs mobile */
+      .tabs {
+        margin-bottom: 12px;
+      }
+
+      .tab {
+        padding: 12px;
+        font-size: 13px;
+      }
+
+      /* Feed layout mobile */
+      .feed {
+        column-count: 1 !important;
+        column-gap: 0;
+      }
+
+      /* Notification dropdown mobile */
+      #socialNotifDropdown {
+        width: calc(100vw - 24px);
+        right: -12px;
+      }
+
+      /* Search results mobile */
+      #searchResults {
+        width: calc(100vw - 24px);
+        left: auto;
+        right: -12px;
+      }
+
+      /* Modal mobile optimization */
+      .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+      }
+
+      .modal-header {
+        padding: 12px;
+      }
+
+      .modal-header h2 {
+        font-size: 16px;
+      }
+
+      .modal-body {
+        padding: 12px;
+      }
+
+      /* Comment section mobile */
+      .comment-section {
+        padding: 12px;
+      }
+
+      .comment-item {
+        padding: 10px;
+        margin-bottom: 8px;
+      }
+
+      .comment-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+
+      .comment-content {
+        font-size: 13px;
+      }
+
+      .comment-username {
+        font-size: 12px;
+      }
+
+      .comment-time {
+        font-size: 10px;
+      }
+
+      /* Compose post mobile */
+      .compose-container textarea {
+        min-height: 100px;
+        font-size: 14px;
+      }
+
+      /* Profile card mobile - hide on small screens */
+      .profile-card {
+        display: none !important;
+      }
+    }
+
+    /* Extra small mobile devices */
+    @media (max-width: 375px) {
+      .header h1 {
+        font-size: 18px;
+      }
+
+      .search-bar {
+        width: 120px;
+        font-size: 12px;
+      }
+
+      .post-username {
+        font-size: 12px;
+      }
+
+      .post-text-content {
+        font-size: 13px;
+      }
+
+      .vote-btn, .action-btn {
+        padding: 5px 8px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>

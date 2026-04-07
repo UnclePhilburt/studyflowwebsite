@@ -560,8 +560,27 @@
     }
 
     @media (max-width: 768px) {
+      /* Container mobile */
+      .container {
+        padding: 0 12px;
+      }
+
+      /* Banner mobile */
       .profile-banner {
         height: 150px;
+      }
+
+      .banner-upload {
+        bottom: 8px;
+        right: 8px;
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* Profile header mobile */
+      .profile-header {
+        padding: 12px;
+        margin-bottom: 16px;
       }
 
       .profile-top {
@@ -574,15 +593,239 @@
         width: 100px;
         height: 100px;
         font-size: 36px;
+        margin-top: -50px;
+      }
+
+      .avatar-upload {
+        width: 32px;
+        height: 32px;
+        bottom: 2px;
+        right: 2px;
+      }
+
+      .avatar-upload svg {
+        width: 16px;
+        height: 16px;
       }
 
       .profile-info {
         padding-top: 0;
+        margin-top: 12px;
+      }
+
+      .profile-display-name {
+        font-size: 20px;
+      }
+
+      .profile-username {
+        font-size: 13px;
+      }
+
+      .profile-bio {
+        font-size: 13px;
+        margin: 8px 0;
+      }
+
+      /* Profile stats mobile - stack on very small screens */
+      .profile-stats {
+        gap: 16px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .stat-number {
+        font-size: 16px;
+      }
+
+      .stat-label {
+        font-size: 12px;
+      }
+
+      /* Profile actions mobile */
+      .profile-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+
+      /* Badge display mobile */
+      .profile-badges {
+        margin-top: 12px;
+      }
+
+      .profile-badges span {
+        font-size: 9px !important;
+        padding: 2px 5px !important;
+      }
+
+      /* Tabs mobile */
+      .tabs {
+        margin-bottom: 16px;
+        gap: 0;
+      }
+
+      .tab {
+        padding: 12px 8px;
+        font-size: 12px;
+      }
+
+      /* Posts grid mobile */
+      .posts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 8px;
+      }
+
+      .post-card {
+        border-radius: 8px;
+      }
+
+      .post-card:hover {
+        transform: none;
+      }
+
+      /* Stats tab mobile */
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .stat-card {
+        padding: 12px;
+      }
+
+      .stat-card-value {
+        font-size: 20px;
+      }
+
+      .stat-card-label {
+        font-size: 12px;
+      }
+
+      /* Modal mobile */
+      .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+      }
+
+      .modal-header {
+        padding: 12px;
+      }
+
+      .modal-header h2 {
+        font-size: 16px;
+      }
+
+      .modal-body {
+        padding: 12px;
+      }
+
+      /* Followers/Following modal mobile */
+      .user-list-item {
+        padding: 10px;
+      }
+
+      .user-list-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+      }
+
+      .user-list-username {
+        font-size: 13px;
+      }
+
+      .user-list-displayname {
+        font-size: 12px;
+      }
+
+      /* Badge management modal mobile */
+      .badge-item {
+        padding: 10px;
+      }
+
+      .badge-icon-large {
+        font-size: 20px;
+        width: 36px;
+        height: 36px;
+      }
+
+      .badge-details h4 {
+        font-size: 13px;
+      }
+
+      .badge-details p {
+        font-size: 11px;
+      }
+
+      .badge-tier {
+        font-size: 9px;
+        padding: 2px 6px;
+      }
+
+      /* Edit profile modal mobile */
+      .edit-form label {
+        font-size: 12px;
+      }
+
+      .edit-form input,
+      .edit-form textarea {
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+
+      /* Back button mobile */
+      .back-btn {
+        top: 12px;
+        left: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+      }
+    }
+
+    /* Extra small mobile devices */
+    @media (max-width: 375px) {
+      .profile-display-name {
+        font-size: 18px;
+      }
+
+      .profile-username {
+        font-size: 12px;
+      }
+
+      .profile-bio {
+        font-size: 12px;
+      }
+
+      .profile-stats {
+        gap: 12px;
+      }
+
+      .stat-number {
+        font-size: 14px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .tab {
+        padding: 10px 6px;
+        font-size: 11px;
       }
 
       .posts-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 6px;
       }
     }
   </style>
