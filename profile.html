@@ -266,65 +266,15 @@
       }
     }
 
-    /* Posts Grid */
+    /* Posts Grid - feed style */
     .posts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 16px;
       margin-bottom: 40px;
-    }
-
-    .grid-post {
-      aspect-ratio: 1;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.2s;
-    }
-
-    .grid-post:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px var(--shadow);
-    }
-
-    .grid-post img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .grid-post-placeholder {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 2px;
-    }
-
-    .grid-post-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      color: white;
-      font-weight: 600;
-    }
-
-    .grid-post:hover .grid-post-overlay {
-      opacity: 1;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .grid-post-delete {
@@ -1744,58 +1694,48 @@
 
     // Render grid post
     function renderGridPost(post) {
-      let content;
+      const hasImages = (post.images && post.images.length > 0) || post.image_url;
+      const hasThumbnail = post.notes?.thumbnail_url;
+      const hasText = post.text_content && post.text_content.trim();
+      const username = post.username || 'Anonymous';
+      const timeAgo = getTimeAgo(post.created_at);
 
-      // Debug what we're getting
-      console.log('Rendering post:', {
-        id: post.id,
-        post_type: post.post_type,
-        has_text_content: !!post.text_content,
-        has_notes: !!post.notes,
-        has_thumbnail: !!post.notes?.thumbnail_url,
-        all_fields: Object.keys(post)
-      });
+      // Image HTML
+      let imageHtml = '';
+      if (hasImages) {
+        const imgSrc = (post.images && post.images[0]) || post.image_url;
+        imageHtml = `<div class="feed-post-image"><img src="${imgSrc}" style="width:100%;max-height:500px;object-fit:contain;display:block;background:#000;"></div>`;
+      } else if (hasThumbnail) {
+        imageHtml = `<div class="feed-post-image"><img src="${post.notes.thumbnail_url}" style="width:100%;max-height:500px;object-fit:contain;display:block;background:#000;"></div>`;
+      }
 
-      // Check for image/thumbnail
-      if (post.notes?.thumbnail_url) {
-        content = `<img src="${post.notes.thumbnail_url}" alt="Post">`;
-      }
-      // Check for text content in various possible locations
-      else if (post.text_content || post.content || post.body) {
-        const textContent = post.text_content || post.content || post.body || '';
-        const textPreview = textContent.substring(0, 150);
-        content = `<div class="grid-post-placeholder" style="padding:16px;font-size:14px;line-height:1.4;text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;font-weight:400;letter-spacing:0;white-space:pre-wrap;">${textPreview}${textContent.length > 150 ? '...' : ''}</div>`;
-      }
-      // Check if it's a note post type
-      else if (post.post_type === 'note' && post.note_id) {
-        const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
-        content = `<div class="grid-post-placeholder">${fileType}</div>`;
-      }
-      // Fallback - show post type at least
-      else {
-        const displayType = post.post_type?.toUpperCase() || 'POST';
-        content = `<div class="grid-post-placeholder">${displayType}</div>`;
-      }
+      // Text-only background
+      const isTextOnly = !hasImages && !hasThumbnail && hasText;
+      const bgStyle = isTextOnly && post.bg_color ? `background:${post.bg_color};` : isTextOnly ? `background:linear-gradient(135deg,#667eea,#764ba2);` : '';
+      const textStyle = isTextOnly ? 'color:white;font-size:17px;font-weight:500;padding:24px 16px;min-height:100px;display:flex;align-items:center;' : 'padding:10px 16px;font-size:14px;color:var(--text-primary);';
 
       const deleteBtn = profileData && profileData.is_own_profile
-        ? `<button class="grid-post-delete desktop-only" onclick="event.stopPropagation(); deletePost('${post.id}')" title="Delete post" aria-label="Delete post">&times;</button>`
-        : '';
-
-      const mobileMenuBtn = profileData && profileData.is_own_profile
-        ? `<button class="grid-post-menu mobile-only" onclick="event.stopPropagation(); openPostMenu('${post.id}')" title="Post options" aria-label="Post options">⋯</button>`
+        ? `<button style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:16px;cursor:pointer;z-index:3;display:none;" class="feed-post-delete" onclick="event.stopPropagation(); deletePost('${post.id}')">&times;</button>`
         : '';
 
       const pinBadge = post.is_pinned ? `<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;z-index:2;">Pinned</div>` : '';
 
       return `
-        <div class="grid-post" onclick="window.location.href='post.html?id=${post.id}'" style="${post.is_pinned ? 'border:2px solid var(--accent-primary);' : ''}">
-          ${content}
+        <div class="feed-post-card" onclick="window.location.href='post.html?id=${post.id}'" style="background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;overflow:hidden;cursor:pointer;position:relative;transition:transform 0.15s;${post.is_pinned ? 'border-color:var(--accent-primary);' : ''}${isTextOnly ? bgStyle : ''}" onmouseover="this.style.transform='translateY(-2px)';var d=this.querySelector('.feed-post-delete');if(d)d.style.display='block'" onmouseout="this.style.transform='';var d=this.querySelector('.feed-post-delete');if(d)d.style.display='none'">
           ${pinBadge}
           ${deleteBtn}
-          ${mobileMenuBtn}
-          <div class="grid-post-overlay">
-            <span>▲ ${post.score || 0}</span>
-            <span>💬 ${post.comment_count || 0}</span>
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;overflow:hidden;">${post.avatar_url ? `<img src="${post.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : username[0].toUpperCase()}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;${isTextOnly ? 'color:white;' : 'color:var(--text-primary);'}">${username}</div>
+              <div style="font-size:11px;${isTextOnly ? 'color:rgba(255,255,255,0.6);' : 'color:var(--text-muted);'}">${timeAgo}</div>
+            </div>
+          </div>
+          ${imageHtml}
+          ${hasText ? `<div style="${textStyle}"><div>${post.text_content.length > 200 ? post.text_content.substring(0, 200) + '...' : post.text_content}</div></div>` : ''}
+          <div style="display:flex;gap:16px;padding:10px 16px;font-size:12px;${isTextOnly ? 'color:rgba(255,255,255,0.7);border-top:1px solid rgba(255,255,255,0.1);' : 'color:var(--text-muted);border-top:1px solid var(--border-color);'}">
+            <span>&#9650; ${post.score || 0}</span>
+            <span>${post.comment_count || 0} comments</span>
           </div>
         </div>
       `;
