@@ -2080,19 +2080,39 @@
         z-index: 1;
       }
 
-      /* Override text post gradient for actions section */
+      /* Remove gradient from text posts on mobile - apply only to content */
+      .post-card[data-type="text"] {
+        background: var(--card-bg) !important;
+      }
+
+      .post-card[data-type="text"].text-bg-0 .post-content,
+      .post-card[data-type="text"].text-bg-0 .post-header { background: linear-gradient(135deg, #667eea, #764ba2); }
+
+      .post-card[data-type="text"].text-bg-1 .post-content,
+      .post-card[data-type="text"].text-bg-1 .post-header { background: linear-gradient(135deg, #f093fb, #f5576c); }
+
+      .post-card[data-type="text"].text-bg-2 .post-content,
+      .post-card[data-type="text"].text-bg-2 .post-header { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+
+      .post-card[data-type="text"].text-bg-3 .post-content,
+      .post-card[data-type="text"].text-bg-3 .post-header { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+      .post-card[data-type="text"].text-bg-4 .post-content,
+      .post-card[data-type="text"].text-bg-4 .post-header { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+      .post-card[data-type="text"].text-bg-5 .post-content,
+      .post-card[data-type="text"].text-bg-5 .post-header { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+
+      .post-card[data-type="text"].text-bg-6 .post-content,
+      .post-card[data-type="text"].text-bg-6 .post-header { background: linear-gradient(135deg, #fccb90, #d57eeb); }
+
+      .post-card[data-type="text"].text-bg-7 .post-content,
+      .post-card[data-type="text"].text-bg-7 .post-header { background: linear-gradient(135deg, #8B9D83, #5a7a5a); }
+
+      /* Actions section stays white */
       .post-card[data-type="text"] .post-actions {
         background: var(--card-bg) !important;
-        border-top: 1px solid rgba(255,255,255,0.15) !important;
-      }
-
-      /* Ensure text post content area doesn't extend below */
-      .post-card[data-type="text"] .post-content {
-        padding-bottom: 0;
-      }
-
-      .post-card[data-type="text"] .post-caption {
-        padding-bottom: 16px;
+        border-top: 1px solid var(--border-color) !important;
       }
 
       .vote-btn, .action-btn {
