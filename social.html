@@ -4339,21 +4339,24 @@
         document.getElementById('inlineLibraryPicker').style.display = 'none';
         document.getElementById('inlinePreviewFile').style.display = 'none';
 
-        // Show thumbnails preview
-        const thumbsHtml = images.slice(0, 10).map((f, i) => {
-          const url = URL.createObjectURL(f);
-          return `<img src="${url}" style="width:${images.length === 1 ? '100%' : '80px'};height:${images.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
-        }).join('');
         document.getElementById('inlinePreviewImg').style.display = 'none';
-        preview.querySelector('button')?.insertAdjacentHTML('afterend',
-          `<div id="inlineImageThumbs" style="display:flex;gap:4px;padding:8px;flex-wrap:wrap;overflow:hidden;">${thumbsHtml}</div>`
-        );
 
         updateInlinePostBtn();
 
-        // Upload all images (fix orientation first)
+        // Fix orientation first, then show preview and upload
         inlineUploading = true;
         const fixedImages = await Promise.all(images.slice(0, 10).map(f => fixImageOrientation(f)));
+
+        // Show thumbnails preview from orientation-fixed images
+        const thumbsHtml = fixedImages.map((f, i) => {
+          const url = URL.createObjectURL(f);
+          return `<img src="${url}" style="width:${fixedImages.length === 1 ? '100%' : '80px'};height:${fixedImages.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
+        }).join('');
+        const existingThumbs = document.getElementById('inlineImageThumbs');
+        if (existingThumbs) existingThumbs.remove();
+        preview.querySelector('button')?.insertAdjacentHTML('afterend',
+          `<div id="inlineImageThumbs" style="display:flex;gap:4px;padding:8px;flex-wrap:wrap;overflow:hidden;">${thumbsHtml}</div>`
+        );
         const formData = new FormData();
         fixedImages.forEach(f => formData.append('files', f));
         fetch(`${BACKEND_URL}/api/social/upload-images`, {
