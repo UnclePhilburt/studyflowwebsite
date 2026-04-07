@@ -324,12 +324,20 @@
 
       hasPhoto = true;
       var img = document.getElementById('previewImg');
-      img.src = URL.createObjectURL(file);
-      img.style.display = 'block';
       document.getElementById('removeBtn').style.display = 'flex';
       document.getElementById('canvas').style.background = '#000';
       document.getElementById('overlayText').placeholder = 'Add text...';
       document.getElementById('bgRow').style.display = 'none';
+
+      // Try to show local preview (won't work for HEIC)
+      var localUrl = URL.createObjectURL(file);
+      img.src = localUrl;
+      img.style.display = 'block';
+      img.onerror = function() {
+        // HEIC or unsupported format — show placeholder until upload finishes
+        img.style.display = 'none';
+        document.getElementById('canvas').style.background = 'linear-gradient(135deg, #2d2d3d, #1a1a2e)';
+      };
 
       // Upload
       uploading = true;
@@ -347,6 +355,12 @@
         imageUrl = (d.urls || [])[0] || null;
         uploading = false;
         document.getElementById('uploadBar').style.display = 'none';
+        // Show server-converted JPEG in preview (works for HEIC)
+        if (imageUrl) {
+          img.src = imageUrl;
+          img.style.display = 'block';
+          document.getElementById('canvas').style.background = '#000';
+        }
         updateShareBtn();
       }).catch(function() {
         uploading = false;

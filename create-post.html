@@ -193,17 +193,22 @@
     });
 
     document.getElementById('fileInput').addEventListener('change', function(e) {
-      const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/')).slice(0, 10);
+      const files = Array.from(e.target.files).slice(0, 10);
       if (!files.length) return;
       noteId = null;
       imageUrls = [];
 
       var preview = document.getElementById('previewArea');
+      var previewImg = document.getElementById('previewImg');
       preview.style.display = 'block';
       document.getElementById('previewFile').style.display = 'none';
-      document.getElementById('previewImg').style.display = 'block';
-      document.getElementById('previewImg').src = URL.createObjectURL(files[0]);
       document.getElementById('bgPicker').style.display = 'none';
+
+      // Try local preview (won't work for HEIC)
+      var localUrl = URL.createObjectURL(files[0]);
+      previewImg.src = localUrl;
+      previewImg.style.display = 'block';
+      previewImg.onerror = function() { previewImg.style.display = 'none'; };
 
       uploading = true;
       document.getElementById('uploadingIndicator').style.display = 'block';
@@ -215,6 +220,8 @@
         method: 'POST', headers: { 'Authorization': 'Bearer ' + authToken }, body: formData
       }).then(function(r) { return r.json(); }).then(function(data) {
         imageUrls = data.urls || [];
+        // Show server-converted image (works for HEIC)
+        if (imageUrls[0]) { previewImg.src = imageUrls[0]; previewImg.style.display = 'block'; }
         uploading = false;
         document.getElementById('uploadingIndicator').style.display = 'none';
         updatePostBtn();
