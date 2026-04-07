@@ -3340,34 +3340,60 @@
 
     async function submitStory() {
       const text = document.getElementById('storyText').value.trim();
-      if (!text && !storyImageUrl) { if (window.sfToast) sfToast('Add text or an image', 'error'); return; }
+      if (!text && !storyImageUrl) {
+        alert('Add text or an image');
+        return;
+      }
 
       if (storyUploading) {
-        if (window.sfToast) sfToast('Image still uploading...', 'info');
+        alert('Image still uploading...');
         return;
       }
 
       const btn = document.getElementById('storySubmitBtn');
-      btn.disabled = true; btn.textContent = 'Posting...';
+      btn.disabled = true;
+      btn.textContent = 'Posting...';
 
       try {
+        console.log('Posting story with:', { text, bg: selectedStoryBg, image_url: storyImageUrl });
+
         const res = await fetch(`${BACKEND_URL}/api/social/stories`, {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text || null, bg: selectedStoryBg, image_url: storyImageUrl || null })
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: text || null,
+            bg: selectedStoryBg,
+            image_url: storyImageUrl || null
+          })
         });
+
+        console.log('Story response status:', res.status);
+
         if (res.ok) {
           closeStoryCreator();
-          if (window.sfToast) sfToast('Story posted!', 'success');
-          loadStories();
+          alert('Story posted!');
+          await loadStories();
         } else {
-          const err = await res.json().catch(() => ({}));
-          if (window.sfToast) sfToast(err.error || 'Failed', 'error');
+          const errText = await res.text();
+          console.error('Story post failed:', res.status, errText);
+          let err;
+          try {
+            err = JSON.parse(errText);
+          } catch {
+            err = { error: errText || 'Failed to post story' };
+          }
+          alert(err.error || err.message || 'Failed to post story');
+          btn.disabled = false;
+          btn.textContent = 'Share Story';
         }
-      } catch {
-        if (window.sfToast) sfToast('Failed to post story', 'error');
-      } finally {
-        btn.disabled = false; btn.textContent = 'Share Story';
+      } catch (error) {
+        console.error('Story post error:', error);
+        alert('Network error: Failed to post story');
+        btn.disabled = false;
+        btn.textContent = 'Share Story';
       }
     }
 
