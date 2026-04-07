@@ -355,6 +355,123 @@
       transform: scale(1.1);
     }
 
+    .grid-post-menu {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .mobile-only {
+      display: none !important;
+    }
+
+    .desktop-only {
+      display: flex !important;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-only {
+        display: flex !important;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .grid-post-menu {
+        opacity: 1 !important;
+      }
+    }
+
+    /* Post Menu Modal */
+    .post-menu-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      align-items: flex-end;
+      animation: fadeIn 0.2s;
+    }
+
+    .post-menu-modal.active {
+      display: flex;
+    }
+
+    .post-menu-content {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      animation: slideUp 0.3s;
+    }
+
+    .post-menu-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .post-menu-option {
+      padding: 16px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 16px;
+      color: var(--text-primary);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+
+    .post-menu-option:active {
+      background: var(--hover-bg);
+    }
+
+    .post-menu-option.danger {
+      color: #ef4444;
+    }
+
+    .post-menu-cancel {
+      margin-top: 12px;
+      padding: 16px;
+      border: none;
+      background: var(--bg-secondary);
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      cursor: pointer;
+      border-radius: 10px;
+      font-family: inherit;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -1110,7 +1227,8 @@
         if (!response.ok) throw new Error('Failed to load posts');
 
         const data = await response.json();
-        const posts = data.posts || [];
+        // Filter out stories (is_story === true)
+        const posts = (data.posts || []).filter(p => !p.is_story);
 
         if (posts.length === 0) {
           const composerHtml = profileData.is_own_profile ? buildProfileComposer() : '';
@@ -1607,7 +1725,11 @@
       }
 
       const deleteBtn = profileData && profileData.is_own_profile
-        ? `<button class="grid-post-delete" onclick="event.stopPropagation(); deletePost('${post.id}')" title="Delete post" aria-label="Delete post">&times;</button>`
+        ? `<button class="grid-post-delete desktop-only" onclick="event.stopPropagation(); deletePost('${post.id}')" title="Delete post" aria-label="Delete post">&times;</button>`
+        : '';
+
+      const mobileMenuBtn = profileData && profileData.is_own_profile
+        ? `<button class="grid-post-menu mobile-only" onclick="event.stopPropagation(); openPostMenu('${post.id}')" title="Post options" aria-label="Post options">⋯</button>`
         : '';
 
       const pinBadge = post.is_pinned ? `<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:white;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;z-index:2;">Pinned</div>` : '';
@@ -1617,6 +1739,7 @@
           ${content}
           ${pinBadge}
           ${deleteBtn}
+          ${mobileMenuBtn}
           <div class="grid-post-overlay">
             <span>▲ ${post.score || 0}</span>
             <span>💬 ${post.comment_count || 0}</span>
@@ -2009,7 +2132,44 @@
     function closeBadgeModal() {
       document.getElementById('badgeModal').classList.remove('active');
     }
+
+    // Post menu for mobile
+    let currentMenuPostId = null;
+
+    function openPostMenu(postId) {
+      currentMenuPostId = postId;
+      document.getElementById('postMenuModal').classList.add('active');
+    }
+
+    function closePostMenu() {
+      document.getElementById('postMenuModal').classList.remove('active');
+      currentMenuPostId = null;
+    }
+
+    function editPostFromMenu() {
+      if (!currentMenuPostId) return;
+      closePostMenu();
+      // Redirect to post page with edit mode
+      window.location.href = `post.html?id=${currentMenuPostId}&edit=true`;
+    }
+
+    async function deletePostFromMenu() {
+      if (!currentMenuPostId) return;
+      closePostMenu();
+      await deletePost(currentMenuPostId);
+    }
   </script>
+
+  <!-- Post Menu Modal for Mobile -->
+  <div id="postMenuModal" class="post-menu-modal" onclick="if(event.target===this) closePostMenu()">
+    <div class="post-menu-content">
+      <div class="post-menu-title">Post Options</div>
+      <button class="post-menu-option" onclick="editPostFromMenu()">Edit Post</button>
+      <button class="post-menu-option danger" onclick="deletePostFromMenu()">Delete Post</button>
+      <button class="post-menu-cancel" onclick="closePostMenu()">Cancel</button>
+    </div>
+  </div>
+
 <script src="assets/notifications.js"></script>
 </body>
 </html>
