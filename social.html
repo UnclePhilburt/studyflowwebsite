@@ -3608,25 +3608,18 @@
         return;
       }
 
-      // Fix orientation first
-      const fixedFile = await fixImageOrientation(file);
+      // Show preview (browser auto-applies EXIF orientation)
+      document.getElementById('storyImagePreviewImg').src = URL.createObjectURL(file);
+      document.getElementById('storyImagePreview').style.display = 'block';
+      document.getElementById('storyBgSection').style.display = 'none';
+      document.getElementById('storyText').style.display = 'none';
+      document.getElementById('storyTextOverlay').textContent = '';
+      document.getElementById('storyTextOverlay').focus();
 
-      // Show preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        document.getElementById('storyImagePreviewImg').src = e.target.result;
-        document.getElementById('storyImagePreview').style.display = 'block';
-        document.getElementById('storyBgSection').style.display = 'none';
-        document.getElementById('storyText').style.display = 'none';
-        document.getElementById('storyTextOverlay').textContent = '';
-        document.getElementById('storyTextOverlay').focus();
-      };
-      reader.readAsDataURL(fixedFile);
-
-      // Upload in background
+      // Upload original (backend handles EXIF rotation)
       storyUploading = true;
       const formData = new FormData();
-      formData.append('files', fixedFile);
+      formData.append('files', file);
       fetch(`${BACKEND_URL}/api/social/upload-images`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${authToken}` },
@@ -4341,24 +4334,23 @@
 
         document.getElementById('inlinePreviewImg').style.display = 'none';
 
-        updateInlinePostBtn();
-
-        // Fix orientation first, then show preview and upload
-        inlineUploading = true;
-        const fixedImages = await Promise.all(images.slice(0, 10).map(f => fixImageOrientation(f)));
-
-        // Show thumbnails preview from orientation-fixed images
-        const thumbsHtml = fixedImages.map((f, i) => {
+        // Show thumbnails preview (browser auto-applies EXIF orientation)
+        const thumbsHtml = images.slice(0, 10).map((f, i) => {
           const url = URL.createObjectURL(f);
-          return `<img src="${url}" style="width:${fixedImages.length === 1 ? '100%' : '80px'};height:${fixedImages.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
+          return `<img src="${url}" style="width:${images.length === 1 ? '100%' : '80px'};height:${images.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
         }).join('');
         const existingThumbs = document.getElementById('inlineImageThumbs');
         if (existingThumbs) existingThumbs.remove();
         preview.querySelector('button')?.insertAdjacentHTML('afterend',
           `<div id="inlineImageThumbs" style="display:flex;gap:4px;padding:8px;flex-wrap:wrap;overflow:hidden;">${thumbsHtml}</div>`
         );
+
+        updateInlinePostBtn();
+
+        // Upload original files (backend handles EXIF rotation with Pillow)
+        inlineUploading = true;
         const formData = new FormData();
-        fixedImages.forEach(f => formData.append('files', f));
+        images.slice(0, 10).forEach(f => formData.append('files', f));
         fetch(`${BACKEND_URL}/api/social/upload-images`, {
           method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
         }).then(r => r.json()).then(data => {
