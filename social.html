@@ -5059,6 +5059,7 @@
         setTimeout(loadLinkPreviews, 100);
         setTimeout(initializeViewTracking, 200);
         setTimeout(() => loadBadgesForPosts(allPosts), 50);
+        setTimeout(tryInjectSuggestedCard, 300);
       } catch (error) {
         console.error('Error loading feed:', error);
         if (!append) {
@@ -6079,6 +6080,18 @@
     // Cached suggestions for inline feed card
     let cachedSuggestions = [];
 
+    function tryInjectSuggestedCard() {
+      if (window.innerWidth > 1024) return;
+      if (!cachedSuggestions.length) return;
+      if (document.getElementById('inlineSuggestedCard')) return;
+      var posts = document.querySelectorAll('.post-card');
+      if (posts.length >= 3) {
+        posts[2].insertAdjacentHTML('afterend',
+          '<div id="inlineSuggestedCard">' + buildSuggestedCardHtml(cachedSuggestions) + '</div>'
+        );
+      }
+    }
+
     function buildSuggestedCardHtml(users) {
       if (!users.length) return '';
       return `
@@ -6139,18 +6152,9 @@
             });
           }
         }
-        // Cache and inject inline card on mobile
+        // Cache for inline card on mobile
         cachedSuggestions = data.suggestions || [];
-        if (window.innerWidth <= 1024 && cachedSuggestions.length > 0) {
-          var feedEl = document.querySelector('.feed');
-          if (feedEl) {
-            var posts = feedEl.querySelectorAll('.post-card');
-            if (posts.length >= 3 && !document.getElementById('inlineSuggestedCard')) {
-              var cardHtml = buildSuggestedCardHtml(cachedSuggestions);
-              posts[2].insertAdjacentHTML('afterend', '<div id="inlineSuggestedCard">' + cardHtml + '</div>');
-            }
-          }
-        }
+        tryInjectSuggestedCard();
 
         const container = document.getElementById('suggestedUsers');
 
