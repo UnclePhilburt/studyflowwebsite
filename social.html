@@ -1974,11 +1974,16 @@
       }
 
       .container {
-        padding-top: 12px;
+        padding-top: 0;
       }
 
       /* Hide desktop tabs and filters on mobile */
       .tabs {
+        display: none !important;
+      }
+
+      /* Hide inline composer on mobile */
+      #inlineComposer {
         display: none !important;
       }
 
@@ -1988,14 +1993,17 @@
       }
 
       .main-content {
-        padding: 12px;
+        padding: 0;
         max-width: 100%;
       }
 
       /* Post card mobile optimization */
       .post-card {
-        margin-bottom: 12px;
-        border-radius: 8px;
+        margin-bottom: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-top: none;
       }
 
       .post-card:hover {
