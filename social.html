@@ -2113,7 +2113,7 @@
         font-size: 12px;
       }
 
-      /* Make compose buttons even smaller */
+      /* Make compose buttons even smaller - hide text, show icons only */
       #inlineComposer button[onclick*="inlineFileInput"],
       #inlineComposer button[onclick*="toggleInlineLibrary"],
       #inlineComposer button[onclick*="togglePollCreator"] {
@@ -2336,7 +2336,10 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
               Library
             </button>
-            <button onclick="togglePollCreator()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">Poll</button>
+            <button onclick="togglePollCreator()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border-color);background:none;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Poll
+            </button>
             <input type="file" id="inlineFileInput" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" multiple style="display:none;" onchange="handleInlineFile(event)">
           </div>
           <button id="inlinePostBtn" onclick="submitInlinePost()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent-primary);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>Post</button>
