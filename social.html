@@ -75,6 +75,7 @@
       max-width: 1800px;
       margin: 0 auto;
       padding: 0;
+      padding-left: 280px;
       display: flex;
       gap: 0;
       width: 100%;
@@ -84,26 +85,32 @@
     /* Left Sidebar */
     .sidebar {
       width: 280px;
-      position: sticky;
+      position: fixed;
       top: 60px;
-      height: calc(100vh - 60px);
+      left: 0;
+      bottom: 0;
       padding: 12px 0;
       border-right: 1px solid var(--border-color);
       background: var(--card-bg);
       overflow-y: auto;
-      flex-shrink: 0;
-      align-self: flex-start;
+      z-index: 50;
     }
 
     @media (min-width: 1600px) {
       .sidebar {
         width: 320px;
       }
+      .container {
+        padding-left: 320px;
+      }
     }
 
     @media (min-width: 2000px) {
       .sidebar {
         width: 380px;
+      }
+      .container {
+        padding-left: 380px;
       }
     }
 
@@ -235,10 +242,11 @@
     .right-sidebar {
       width: 360px;
       position: sticky;
-      top: 73px;
-      height: calc(100vh - 73px);
+      top: 60px;
+      height: calc(100vh - 60px);
       padding: 20px;
       overflow-y: auto;
+      align-self: flex-start;
     }
 
     @media (min-width: 1600px) {
@@ -444,6 +452,7 @@
 
       .container {
         max-width: 100%;
+        padding-left: 0;
       }
     }
 
@@ -2651,17 +2660,10 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Tabs + Filters -->
-      <div class="tabs" style="justify-content:space-between;">
-        <div style="display:flex;gap:0;">
-          <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
-          <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
-        </div>
-        <div class="content-filters" style="margin:0;padding:0;border:none;">
-          <button class="filter-chip active" data-filter="all" onclick="filterContent('all')">All</button>
-          <button class="filter-chip" data-filter="note" onclick="filterContent('note')">Notes</button>
-          <button class="filter-chip" data-filter="text" onclick="filterContent('text')">Posts</button>
-        </div>
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="following" onclick="switchTab('following')">Following</button>
+        <button class="tab" data-tab="trending" onclick="switchTab('trending')">Trending</button>
       </div>
 
       <!-- Stories Bar -->
