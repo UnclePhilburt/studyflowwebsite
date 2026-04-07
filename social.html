@@ -50,6 +50,11 @@
       color: var(--text-primary);
       padding: 0;
       margin: 0;
+      overflow-x: hidden;
+    }
+
+    html {
+      overflow-x: hidden;
     }
 
     .container {
@@ -58,6 +63,8 @@
       padding: 0;
       display: flex;
       gap: 0;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     /* Left Sidebar */
@@ -376,6 +383,7 @@
       }
     }
 
+    /* Tablet and foldable devices */
     @media (max-width: 1024px) {
       .sidebar {
         display: none;
@@ -383,6 +391,23 @@
 
       .main-content {
         padding: 20px;
+        max-width: 100%;
+        flex: 1;
+      }
+
+      .container {
+        max-width: 100%;
+      }
+    }
+
+    /* Narrow devices (Fold outer screen, etc) */
+    @media (max-width: 920px) {
+      .feed {
+        column-count: 1 !important;
+      }
+
+      .main-content {
+        padding: 16px;
       }
     }
 
