@@ -6081,15 +6081,21 @@
     let cachedSuggestions = [];
 
     function tryInjectSuggestedCard() {
+      console.log('[INJECT] trying: width=' + window.innerWidth + ', cached=' + cachedSuggestions.length + ', exists=' + !!document.getElementById('inlineSuggestedCard'));
       if (window.innerWidth > 1024) return;
       if (!cachedSuggestions.length) return;
       if (document.getElementById('inlineSuggestedCard')) return;
-      var posts = document.querySelectorAll('.post-card');
-      if (posts.length >= 3) {
-        posts[2].insertAdjacentHTML('afterend',
-          '<div id="inlineSuggestedCard">' + buildSuggestedCardHtml(cachedSuggestions) + '</div>'
-        );
-      }
+      var feedContainer = document.getElementById('feedContainer');
+      if (!feedContainer) return;
+      var posts = feedContainer.querySelectorAll('.post-card');
+      console.log('[INJECT] posts found:', posts.length);
+      if (posts.length < 3) return;
+      // Insert after 3rd post
+      var wrapper = document.createElement('div');
+      wrapper.id = 'inlineSuggestedCard';
+      wrapper.innerHTML = buildSuggestedCardHtml(cachedSuggestions);
+      posts[2].after(wrapper);
+      console.log('[INJECT] card inserted!');
     }
 
     function buildSuggestedCardHtml(users) {
@@ -6154,6 +6160,7 @@
         }
         // Cache for inline card on mobile
         cachedSuggestions = data.suggestions || [];
+        console.log('[SUGGESTIONS] Got', cachedSuggestions.length, 'suggestions, mobile:', window.innerWidth <= 1024);
         tryInjectSuggestedCard();
 
         const container = document.getElementById('suggestedUsers');
