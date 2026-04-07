@@ -5050,16 +5050,7 @@
           if (p.user_vote_type) localVotes[p.id] = p.user_vote_type;
         });
 
-        // Insert "People you may know" card after every 3rd post on mobile
-        const isMobile = window.innerWidth <= 1024;
-        let feedItems = '';
-        allPosts.forEach(function(post, i) {
-          feedItems += renderPost(post);
-          if (isMobile && i === 2 && !append) {
-            feedItems += renderSuggestedPeopleCard();
-          }
-        });
-        const feedHtml = `<div class="feed">${feedItems}</div>`;
+        const feedHtml = `<div class="feed">${allPosts.map(renderPost).join('')}</div>`;
         const loadMoreBtn = hasMorePosts ? `
           <div id="loadMoreSentinel" style="height:1px;"></div>
         ` : '';
@@ -6088,14 +6079,6 @@
     // Cached suggestions for inline feed card
     let cachedSuggestions = [];
 
-    function renderSuggestedPeopleCard() {
-      if (!cachedSuggestions.length) {
-        // Return placeholder that gets filled when suggestions load
-        return '<div id="inlineSuggestedCard"></div>';
-      }
-      return buildSuggestedCardHtml(cachedSuggestions);
-    }
-
     function buildSuggestedCardHtml(users) {
       if (!users.length) return '';
       return `
@@ -6156,12 +6139,17 @@
             });
           }
         }
-        // Cache for inline feed card
+        // Cache and inject inline card on mobile
         cachedSuggestions = data.suggestions || [];
-        // Fill inline placeholder if it exists
-        var inlineCard = document.getElementById('inlineSuggestedCard');
-        if (inlineCard && cachedSuggestions.length) {
-          inlineCard.outerHTML = buildSuggestedCardHtml(cachedSuggestions);
+        if (window.innerWidth <= 1024 && cachedSuggestions.length > 0) {
+          var feedEl = document.querySelector('.feed');
+          if (feedEl) {
+            var posts = feedEl.querySelectorAll('.post-card');
+            if (posts.length >= 3 && !document.getElementById('inlineSuggestedCard')) {
+              var cardHtml = buildSuggestedCardHtml(cachedSuggestions);
+              posts[2].insertAdjacentHTML('afterend', '<div id="inlineSuggestedCard">' + cardHtml + '</div>');
+            }
+          }
         }
 
         const container = document.getElementById('suggestedUsers');
