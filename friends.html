@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friends - StudyFlow Suite</title>
+  <link rel="icon" type="image/png" href="icon128.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-tertiary: #1e2746;
+      --card-bg: #1e2746;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0b0;
+      --text-muted: #6b7280;
+      --border-color: #2a3050;
+      --hover-bg: rgba(139, 157, 131, 0.08);
+      --accent-primary: #8B9D83;
+      --accent-secondary: #6b8575;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      transition: background 0.15s;
+    }
+
+    .back-btn:hover { background: var(--hover-bg); }
+
+    .top-bar h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .page-container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 14px 0;
+      text-align: center;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab:hover { color: var(--text-primary); }
+
+    .tab.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    .search-box::placeholder { color: var(--text-muted); }
+
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .user-card:hover { background: var(--hover-bg); }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-username {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .user-bio {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .follow-btn {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .follow-btn.following {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .follow-btn.following:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .follow-btn.not-following {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .follow-btn.not-following:hover {
+      background: var(--accent-secondary);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state p { font-size: 15px; margin-top: 8px; }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .loading-spinner::after {
+      content: '';
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .stats-bar {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 20px;
+      padding: 16px 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 600px) {
+      .page-container { padding: 16px 8px; }
+      .user-card { padding: 10px 12px; }
+      .follow-btn { padding: 6px 14px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <button class="back-btn" onclick="window.location.href='social.html'">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h1>Friends</h1>
+  </div>
+
+  <div class="page-container">
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num" id="followersCount">0</div>
+        <div class="stat-label">Followers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="followingCount">0</div>
+        <div class="stat-label">Following</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="tabFollowers" onclick="switchTab('followers')">Followers</button>
+      <button class="tab" id="tabFollowing" onclick="switchTab('following')">Following</button>
+      <button class="tab" id="tabDiscover" onclick="switchTab('discover')">Discover</button>
+    </div>
+
+    <input type="text" class="search-box" id="searchBox" placeholder="Search people..." oninput="filterUsers()">
+
+    <div id="userList" class="user-list">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const supabaseClient = window.supabase.createClient(
+      'https://mxddgbpxjoltaimftpmn.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+    );
+
+    let authToken = null;
+    let myUsername = null;
+    let currentTab = 'followers';
+    let allUsers = [];
+    let followingSet = new Set();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.location.href = 'mobile.html'; return; }
+      authToken = session.access_token;
+
+      // Get current user info
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/current-user`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const ud = await res.json();
+          myUsername = ud.username;
+        }
+      } catch {}
+
+      // Load stats
+      loadStats();
+
+      // Check URL param for initial tab
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'following') {
+        switchTab('following');
+      } else if (params.get('tab') === 'discover') {
+        switchTab('discover');
+      } else {
+        loadFollowers();
+      }
+    });
+
+    async function loadStats() {
+      if (!myUsername) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/profile/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('followersCount').textContent = data.followers_count || 0;
+          document.getElementById('followingCount').textContent = data.following_count || 0;
+        }
+      } catch {}
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+      document.getElementById('searchBox').value = '';
+      document.getElementById('userList').innerHTML = '<div class="loading-spinner"></div>';
+
+      if (tab === 'followers') loadFollowers();
+      else if (tab === 'following') loadFollowing();
+      else if (tab === 'discover') loadDiscover();
+    }
+
+    async function loadFollowers() {
+      if (!myUsername) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/followers/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          allUsers = data.users || data.followers || [];
+          // Also load who I follow to show correct button state
+          await loadFollowingSet();
+          renderUsers();
+        }
+      } catch { renderEmpty('Could not load followers'); }
+    }
+
+    async function loadFollowing() {
+      if (!myUsername) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/following/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          allUsers = data.users || data.following || [];
+          followingSet = new Set(allUsers.map(u => u.username));
+          renderUsers();
+        }
+      } catch { renderEmpty('Could not load following'); }
+    }
+
+    async function loadDiscover() {
+      try {
+        await loadFollowingSet();
+        const res = await fetch(`${BACKEND_URL}/api/social/suggested-users?limit=30`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          allUsers = data.users || data || [];
+          renderUsers();
+        }
+      } catch { renderEmpty('Could not load suggestions'); }
+    }
+
+    async function loadFollowingSet() {
+      if (!myUsername) return;
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/following/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          const list = data.users || data.following || [];
+          followingSet = new Set(list.map(u => u.username));
+        }
+      } catch {}
+    }
+
+    function renderUsers() {
+      const container = document.getElementById('userList');
+      if (!allUsers.length) {
+        const msgs = { followers: 'No followers yet', following: 'Not following anyone yet', discover: 'No suggestions available' };
+        renderEmpty(msgs[currentTab]);
+        return;
+      }
+
+      container.innerHTML = allUsers.map(u => {
+        const isMe = u.username === myUsername;
+        const isFollowing = followingSet.has(u.username);
+        const avatarHtml = u.avatar_url
+          ? `<img src="${u.avatar_url}">`
+          : (u.name || u.username || '?')[0].toUpperCase();
+        const btnHtml = isMe ? '' : `
+          <button class="follow-btn ${isFollowing ? 'following' : 'not-following'}"
+            onclick="event.stopPropagation(); toggleFollow('${u.username}', this)">
+            ${isFollowing ? 'Following' : 'Follow'}
+          </button>`;
+
+        return `
+          <div class="user-card" onclick="window.location.href='profile.html?user=${u.username}'">
+            <div class="user-avatar">${avatarHtml}</div>
+            <div class="user-info">
+              <div class="user-name">${u.name || u.username}${u.is_verified ? ' <span style="color:#38bdf8;">&#10003;</span>' : ''}</div>
+              <div class="user-username">@${u.username}</div>
+              ${u.bio ? `<div class="user-bio">${u.bio}</div>` : ''}
+            </div>
+            ${btnHtml}
+          </div>`;
+      }).join('');
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('userList').innerHTML = `<div class="empty-state"><p>${msg}</p></div>`;
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('searchBox').value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.user-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    async function toggleFollow(username, btn) {
+      const isFollowing = btn.classList.contains('following');
+      const method = isFollowing ? 'DELETE' : 'POST';
+      const url = isFollowing
+        ? `${BACKEND_URL}/api/social/unfollow/${username}`
+        : `${BACKEND_URL}/api/social/follow/${username}`;
+
+      // Optimistic update
+      if (isFollowing) {
+        btn.classList.remove('following');
+        btn.classList.add('not-following');
+        btn.textContent = 'Follow';
+        followingSet.delete(username);
+      } else {
+        btn.classList.remove('not-following');
+        btn.classList.add('following');
+        btn.textContent = 'Following';
+        followingSet.add(username);
+      }
+
+      try {
+        await fetch(url, { method, headers: { 'Authorization': `Bearer ${authToken}` } });
+        loadStats();
+      } catch {
+        // Revert on error
+        if (isFollowing) {
+          btn.classList.remove('not-following');
+          btn.classList.add('following');
+          btn.textContent = 'Following';
+          followingSet.add(username);
+        } else {
+          btn.classList.remove('following');
+          btn.classList.add('not-following');
+          btn.textContent = 'Follow';
+          followingSet.delete(username);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
