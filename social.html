@@ -2672,6 +2672,22 @@
           <div id="composerAvatar" style="width:36px;height:36px;border-radius:50%;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;overflow:hidden;margin-top:4px;"></div>
           <textarea id="inlinePostText" placeholder="What's on your mind?" style="flex:1;padding:10px 0;border:none;background:none;color:var(--text-primary);font-size:15px;font-family:inherit;resize:none;outline:none;min-height:40px;max-height:200px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';"></textarea>
         </div>
+        <!-- Background picker (shown when text only, no images/files) -->
+        <div id="inlinePostBgSection" style="display:none;margin:12px 0 0 48px;">
+          <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">Background:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div onclick="selectPostBg(null)" class="post-bg-opt" data-bg="null" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:var(--card-bg);border:2px solid var(--accent-primary);position:relative;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;">×</div>
+            </div>
+            <div onclick="selectPostBg('linear-gradient(135deg, #667eea, #764ba2)')" class="post-bg-opt" data-bg="linear-gradient(135deg, #667eea, #764ba2)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #667eea, #764ba2);border:2px solid transparent;"></div>
+            <div onclick="selectPostBg('linear-gradient(135deg, #f093fb, #f5576c)')" class="post-bg-opt" data-bg="linear-gradient(135deg, #f093fb, #f5576c)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #f093fb, #f5576c);border:2px solid transparent;"></div>
+            <div onclick="selectPostBg('linear-gradient(135deg, #4facfe, #00f2fe)')" class="post-bg-opt" data-bg="linear-gradient(135deg, #4facfe, #00f2fe)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #4facfe, #00f2fe);border:2px solid transparent;"></div>
+            <div onclick="selectPostBg('linear-gradient(135deg, #43e97b, #38f9d7)')" class="post-bg-opt" data-bg="linear-gradient(135deg, #43e97b, #38f9d7)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #43e97b, #38f9d7);border:2px solid transparent;"></div>
+            <div onclick="selectPostBg('linear-gradient(135deg, #fa709a, #fee140)')" class="post-bg-opt" data-bg="linear-gradient(135deg, #fa709a, #fee140)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #fa709a, #fee140);border:2px solid transparent;"></div>
+            <div onclick="selectPostBg('linear-gradient(135deg, #8B9D83, #5a7a5a)')" class="post-bg-opt" data-bg="linear-gradient(135deg, #8B9D83, #5a7a5a)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #8B9D83, #5a7a5a);border:2px solid transparent;"></div>
+            <div onclick="selectPostBg('#1a1a1a')" class="post-bg-opt" data-bg="#1a1a1a" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:#1a1a1a;border:2px solid transparent;"></div>
+          </div>
+        </div>
         <!-- Attachment preview -->
         <div id="inlineAttachPreview" style="display:none;margin:12px 0 0 48px;border-radius:10px;overflow:hidden;background:var(--bg-primary);border:1px solid var(--border-color);position:relative;">
           <button onclick="removeInlineAttach()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:12px;cursor:pointer;z-index:2;">&#x2715;</button>
@@ -3823,6 +3839,7 @@
     let inlineNoteId = null;
     let inlineUploadedNoteId = null;
     let inlineUploading = false;
+    let selectedPostBg = null;
 
     // Enable/disable post button based on content
     document.getElementById('inlinePostText').addEventListener('input', updateInlinePostBtn);
@@ -3834,6 +3851,20 @@
       const btn = document.getElementById('inlinePostBtn');
       btn.disabled = !(hasText || hasFile);
       btn.style.opacity = (hasText || hasFile) ? '1' : '0.5';
+
+      // Show/hide background picker - only for text-only posts
+      const bgSection = document.getElementById('inlinePostBgSection');
+      if (hasText && !hasFile) {
+        bgSection.style.display = 'block';
+      } else {
+        bgSection.style.display = 'none';
+      }
+    }
+
+    function selectPostBg(bg) {
+      selectedPostBg = bg;
+      document.querySelectorAll('.post-bg-opt').forEach(o => o.style.borderColor = 'transparent');
+      event.target.style.borderColor = 'var(--accent-primary)';
     }
 
     let inlineImageUrls = [];
@@ -3987,7 +4018,8 @@
           note_id: inlineUploadedNoteId || null,
           images: inlineImageUrls.length > 0 ? inlineImageUrls : undefined,
           poll_options: pollOpts || undefined,
-          poll_duration: pollOpts ? 24 : undefined
+          poll_duration: pollOpts ? 24 : undefined,
+          bg_color: selectedPostBg || undefined
         };
 
         const res = await fetch(`${BACKEND_URL}/api/social/posts`, {
@@ -4002,6 +4034,9 @@
           document.getElementById('inlinePostText').style.height = 'auto';
           removeInlineAttach();
           removePoll();
+          selectedPostBg = null;
+          document.querySelectorAll('.post-bg-opt').forEach(o => o.style.borderColor = 'transparent');
+          document.querySelector('.post-bg-opt[data-bg="null"]').style.borderColor = 'var(--accent-primary)';
           if (window.sfToast) sfToast('Posted!', 'success');
           loadFeed();
         } else {
@@ -4778,10 +4813,12 @@
       const actionVerb = isRepost ? 'reposted' : contentType === 'note' ? 'shared a note' : contentType === 'photo' ? 'posted a photo' : 'posted an update';
 
       // Random gradient for text posts
-      const textBgClass = contentType === 'text' ? `text-bg-${Math.abs(post.id.charCodeAt(0)) % 8}` : '';
+      // Background for text posts - use custom bg_color or random gradient
+      const textBgClass = contentType === 'text' && !post.bg_color ? `text-bg-${Math.abs(post.id.charCodeAt(0)) % 8}` : '';
+      const customBgStyle = contentType === 'text' && post.bg_color ? `style="background:${post.bg_color};"` : '';
 
       return `
-        <div class="post-card ${textBgClass}" data-type="${contentType}" data-post-id="${post.id}" id="post-${post.id}" onclick="viewPost('${post.id}')">
+        <div class="post-card ${textBgClass}" data-type="${contentType}" data-post-id="${post.id}" id="post-${post.id}" ${customBgStyle} onclick="viewPost('${post.id}')">
           <div class="post-header">
             <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
