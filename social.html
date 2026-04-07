@@ -2073,7 +2073,7 @@
 
       /* Post actions mobile - below image/content */
       .post-actions {
-        padding: 2px 12px !important;
+        padding: 8px 12px !important;
         background: var(--card-bg) !important;
         border-top: 1px solid var(--border-color);
         position: relative;
@@ -2081,6 +2081,8 @@
         gap: 16px !important;
         min-height: 0 !important;
         line-height: 1;
+        align-items: center !important;
+        display: flex !important;
       }
 
       /* Remove gradient from text posts on mobile - apply only to content */
@@ -2119,30 +2121,37 @@
       }
 
       .vote-btn, .action-btn {
-        padding: 0 6px !important;
-        font-size: 15px !important;
+        padding: 4px 8px !important;
+        font-size: 14px !important;
         color: var(--text-primary) !important;
         background: transparent;
-        line-height: 1 !important;
+        line-height: 1.2 !important;
         height: auto !important;
         min-height: 0 !important;
         border: none !important;
+        display: flex !important;
+        align-items: center !important;
       }
 
       .vote-btn {
         color: var(--text-primary) !important;
         width: auto !important;
         height: auto !important;
-        padding: 0 4px !important;
-        line-height: 1 !important;
-        font-size: 15px !important;
+        padding: 4px 6px !important;
+        line-height: 1.2 !important;
+        font-size: 14px !important;
         min-height: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
 
       .vote-buttons {
         gap: 4px !important;
-        line-height: 1 !important;
+        line-height: 1.2 !important;
         height: auto !important;
+        display: flex !important;
+        align-items: center !important;
       }
 
       .vote-btn.upvoted {
@@ -2159,10 +2168,12 @@
       }
 
       .vote-score {
-        font-size: 15px !important;
+        font-size: 14px !important;
         color: var(--text-primary) !important;
         font-weight: 600;
-        line-height: 1 !important;
+        line-height: 1.2 !important;
+        display: flex !important;
+        align-items: center !important;
       }
 
       .action-btn {
