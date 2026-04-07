@@ -870,21 +870,22 @@
     .post-thumbnail {
       width: 100%;
       height: auto;
-      object-fit: cover;
-      background: #fafafa;
+      max-height: 600px;
+      object-fit: contain;
+      background: #000;
       display: block;
+      image-orientation: from-image;
     }
 
     /* Note thumbnails - show more content */
     .post-card[data-type="note"] .post-thumbnail {
       object-fit: contain;
-      max-height: 600px;
+      background: #fafafa;
     }
 
-    /* Photo posts - full bleed */
+    /* Photo posts */
     .post-card[data-type="photo"] .post-thumbnail {
-      object-fit: cover;
-      border-radius: 12px;
+      object-fit: contain;
     }
 
     .post-thumbnail-placeholder {
@@ -5025,7 +5026,7 @@
           thumbnailImageHtml = `
             <div class="carousel" id="carousel-${post.id}" style="position:relative;overflow:hidden;">
               <div class="carousel-track" style="display:flex;transition:transform 0.3s ease;">
-                ${postImages.map((url, i) => `<img src="${url}" alt="Image ${i+1}" style="width:100%;flex-shrink:0;object-fit:cover;max-height:500px;cursor:zoom-in;" onclick="event.stopPropagation(); openLightbox('${url}');">`).join('')}
+                ${postImages.map((url, i) => `<img src="${url}" alt="Image ${i+1}" style="width:100%;flex-shrink:0;object-fit:contain;max-height:500px;cursor:zoom-in;image-orientation:from-image;background:#000;" onclick="event.stopPropagation(); openLightbox('${url}');">`).join('')}
               </div>
               ${postImages.length > 1 ? `
                 <button onclick="event.stopPropagation(); carouselNav('${post.id}', -1)" style="position:absolute;top:50%;left:8px;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:16px;cursor:pointer;">&#8249;</button>
