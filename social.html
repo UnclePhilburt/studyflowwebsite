@@ -73,12 +73,10 @@
     }
 
     .container {
-      max-width: 1800px;
-      margin: 0 auto;
+      margin: 0;
       padding: 0;
       padding-left: 280px;
-      display: flex;
-      gap: 0;
+      padding-right: 320px;
       width: 100%;
       overflow-x: hidden;
     }
@@ -103,6 +101,7 @@
       }
       .container {
         padding-left: 320px;
+        padding-right: 360px;
       }
     }
 
@@ -112,6 +111,7 @@
       }
       .container {
         padding-left: 380px;
+        padding-right: 400px;
       }
     }
 
@@ -241,24 +241,25 @@
 
     /* Right Sidebar */
     .right-sidebar {
-      width: 360px;
-      position: sticky;
+      width: 320px;
+      position: fixed;
       top: 60px;
-      height: calc(100vh - 60px);
-      padding: 20px;
+      right: 0;
+      bottom: 0;
+      padding: 16px;
       overflow-y: auto;
-      align-self: flex-start;
+      z-index: 50;
     }
 
     @media (min-width: 1600px) {
       .right-sidebar {
-        width: 400px;
+        width: 360px;
       }
     }
 
     @media (min-width: 2000px) {
       .right-sidebar {
-        width: 450px;
+        width: 400px;
       }
     }
 
@@ -433,9 +434,12 @@
       color: var(--text-muted);
     }
 
-    @media (max-width: 1440px) {
+    @media (max-width: 1200px) {
       .right-sidebar {
         display: none;
+      }
+      .container {
+        padding-right: 0;
       }
     }
 
@@ -448,12 +452,11 @@
       .main-content {
         padding: 20px;
         max-width: 100%;
-        flex: 1;
       }
 
       .container {
-        max-width: 100%;
         padding-left: 0;
+        padding-right: 0;
       }
     }
 
@@ -2960,6 +2963,27 @@
 
     <!-- Right Sidebar -->
     <aside class="right-sidebar">
+      <!-- Suggested Users -->
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">People you may know</div>
+          <a href="friends.html?tab=discover" class="widget-action">See All</a>
+        </div>
+        <div id="suggestedUsers" style="padding:4px 0;">
+          <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Trending Hashtags -->
+      <div class="widget">
+        <div class="widget-header">
+          <div class="widget-title">Trending Topics</div>
+        </div>
+        <div id="trendingHashtags" style="padding:4px 0;">
+          <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
+        </div>
+      </div>
+
       <!-- Your Stats -->
       <div class="widget">
         <div class="widget-header">
@@ -2985,24 +3009,13 @@
         </div>
       </div>
 
-      <!-- Suggested Users -->
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title">Suggested for You</div>
-        </div>
-        <div id="suggestedUsers" style="padding:4px 0;">
-          <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
-        </div>
-      </div>
-
-      <!-- Trending Hashtags -->
-      <div class="widget">
-        <div class="widget-header">
-          <div class="widget-title">Trending</div>
-        </div>
-        <div id="trendingHashtags" style="padding:4px 0;">
-          <div style="padding:12px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>
-        </div>
+      <!-- Footer Links -->
+      <div style="padding:8px 4px;font-size:12px;color:var(--text-muted);line-height:1.8;">
+        <a href="privacy.html" style="color:var(--text-muted);text-decoration:none;">Privacy</a> &middot;
+        <a href="terms.html" style="color:var(--text-muted);text-decoration:none;">Terms</a> &middot;
+        <a href="about.html" style="color:var(--text-muted);text-decoration:none;">About</a> &middot;
+        <a href="guidelines.html" style="color:var(--text-muted);text-decoration:none;">Guidelines</a>
+        <div style="margin-top:4px;">StudyFlow Suite &copy; 2026</div>
       </div>
     </aside>
   </div>
