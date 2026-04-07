@@ -1959,6 +1959,45 @@
         font-size: 14px;
       }
 
+      /* Inline composer mobile - remove left margins */
+      #inlineComposer [style*="margin-left:48px"],
+      #inlineComposer [style*="margin:12px 0 0 48px"],
+      #inlineComposer [style*="margin:8px 0 0 48px"] {
+        margin-left: 0 !important;
+        margin: 8px 0 0 0 !important;
+      }
+
+      /* Inline composer actions - make buttons smaller */
+      #inlineComposer button[onclick*="inlineFileInput"],
+      #inlineComposer button[onclick*="toggleInlineLibrary"],
+      #inlineComposer button[onclick*="togglePollCreator"] {
+        padding: 5px 8px !important;
+        font-size: 10px !important;
+        gap: 2px !important;
+      }
+
+      /* Hide button text on very small screens, show icons only */
+      #inlineComposer button[onclick*="inlineFileInput"] svg,
+      #inlineComposer button[onclick*="toggleInlineLibrary"] svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Poll creator mobile */
+      #inlinePollCreator {
+        margin-left: 0 !important;
+      }
+
+      /* Library picker mobile */
+      #inlineLibraryPicker {
+        margin-left: 0 !important;
+      }
+
+      /* Attach preview mobile */
+      #inlineAttachPreview {
+        margin-left: 0 !important;
+      }
+
       /* Profile card mobile - hide on small screens */
       .profile-card {
         display: none !important;
@@ -1967,15 +2006,6 @@
 
     /* Extra small mobile devices */
     @media (max-width: 375px) {
-      .header h1 {
-        font-size: 18px;
-      }
-
-      .search-bar {
-        width: 120px;
-        font-size: 12px;
-      }
-
       .post-username {
         font-size: 12px;
       }
@@ -1987,6 +2017,19 @@
       .vote-btn, .action-btn {
         padding: 5px 8px;
         font-size: 12px;
+      }
+
+      /* Make compose buttons even smaller */
+      #inlineComposer button[onclick*="inlineFileInput"],
+      #inlineComposer button[onclick*="toggleInlineLibrary"],
+      #inlineComposer button[onclick*="togglePollCreator"] {
+        padding: 4px 6px !important;
+        font-size: 0 !important;
+      }
+
+      /* Show only icons on extra small screens */
+      #inlineComposer button svg {
+        margin: 0 !important;
       }
     }
   </style>
