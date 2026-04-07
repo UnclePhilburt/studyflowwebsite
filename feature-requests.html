@@ -502,7 +502,7 @@
       // Check auth with Supabase session
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        window.location.href = 'signup.html?signin';
+        window.location.href = 'mobile.html';
         return;
       }
 

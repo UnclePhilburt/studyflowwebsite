@@ -767,7 +767,7 @@
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        window.location.href = 'signup.html?signin';
+        window.location.href = 'mobile.html';
         return;
       }
       authToken = session.access_token;
@@ -787,7 +787,7 @@
 
         if (metaRes.status === 401) {
           await supabaseClient.auth.signOut();
-          window.location.href = 'signup.html?signin';
+          window.location.href = 'mobile.html';
           return;
         }
 

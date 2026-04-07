@@ -1338,13 +1338,13 @@
 
       if (sessionError) {
         console.error('[Browse Init] Session error:', sessionError);
-        window.location.href = 'signup.html?signin';
+        window.location.href = 'mobile.html';
         return;
       }
 
       if (!session) {
         console.log('[Browse Init] No session found, redirecting to login...');
-        window.location.href = 'signup.html?signin';
+        window.location.href = 'mobile.html';
         return;
       }
 
@@ -1358,7 +1358,7 @@
         // Only redirect on explicit sign out
         if (event === 'SIGNED_OUT') {
           console.log('[Browse Auth] User signed out, redirecting to login...');
-          window.location.href = 'signup.html?signin';
+          window.location.href = 'mobile.html';
         }
 
         // Update token if refreshed successfully
@@ -1446,7 +1446,7 @@
           // Handle errors gracefully
           if (response.status === 401) {
             console.log('Session expired, redirecting to login...');
-            window.location.href = 'signup.html?signin';
+            window.location.href = 'mobile.html';
             return;
           }
           if (response.status === 403) {
@@ -1807,7 +1807,7 @@
           // Check if it's a 401 (unauthorized - session expired)
           if (response.status === 401) {
             console.log('Session expired, redirecting to login...');
-            window.location.href = 'signup.html?signin';
+            window.location.href = 'mobile.html';
             return;
           }
 
