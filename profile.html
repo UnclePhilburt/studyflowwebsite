@@ -963,6 +963,23 @@
         gap: 6px;
       }
     }
+
+    /* Ultra-wide displays - prevent profile info from interfering with banner */
+    @media (min-width: 1920px) {
+      .profile-banner {
+        height: 350px;
+      }
+
+      .profile-top {
+        margin-top: -100px;
+      }
+
+      .profile-avatar {
+        width: 160px;
+        height: 160px;
+        font-size: 56px;
+      }
+    }
   </style>
 </head>
 <body>
