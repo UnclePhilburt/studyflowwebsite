@@ -3340,13 +3340,20 @@
 
     async function submitStory() {
       const text = document.getElementById('storyText').value.trim();
-      if (!text && !storyImageUrl) {
+      const hasImage = document.getElementById('storyImagePreview').style.display !== 'none';
+
+      if (!text && !hasImage) {
         alert('Add text or an image');
         return;
       }
 
       if (storyUploading) {
-        alert('Image still uploading...');
+        alert('Image still uploading... Please wait.');
+        return;
+      }
+
+      if (hasImage && !storyImageUrl) {
+        alert('Image upload failed. Please try again.');
         return;
       }
 
