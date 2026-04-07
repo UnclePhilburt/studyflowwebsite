@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Story - StudyFlow</title>
+  <link rel="icon" type="image/png" href="icon128.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --card-bg: #1e2746;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0b0;
+      --text-muted: #6b7280;
+      --border-color: #2a3050;
+      --accent-primary: #8B9D83;
+      --accent-secondary: #6b8575;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 16px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .top-bar-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      background: none; border: none; color: var(--text-primary);
+      cursor: pointer; padding: 8px; border-radius: 50%;
+      display: flex; align-items: center;
+    }
+    .top-bar h1 { font-size: 18px; font-weight: 700; }
+    .share-btn {
+      padding: 8px 24px; border-radius: 8px; border: none;
+      background: var(--accent-primary); color: white;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .content { padding: 16px; max-width: 500px; margin: 0 auto; }
+
+    .story-preview {
+      width: 100%; aspect-ratio: 9/16; max-height: 65vh;
+      border-radius: 16px; overflow: hidden; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .story-preview.text-mode {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    .story-preview img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .story-text-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .story-text-overlay textarea {
+      background: none; border: none; color: white;
+      font-size: 24px; font-weight: 700; text-align: center;
+      width: 100%; resize: none; outline: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      font-family: inherit;
+    }
+    .story-text-overlay textarea::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .text-input-area {
+      margin-bottom: 16px;
+    }
+    .text-input-area textarea {
+      width: 100%; padding: 14px; border: 1px solid var(--border-color);
+      border-radius: 12px; font-size: 16px; font-family: inherit;
+      min-height: 80px; resize: none;
+      background: var(--card-bg); color: var(--text-primary);
+    }
+    .text-input-area textarea:focus { outline: none; border-color: var(--accent-primary); }
+
+    .bg-picker { margin-bottom: 16px; }
+    .bg-picker-label { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .bg-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .bg-opt {
+      width: 40px; height: 40px; border-radius: 10px; cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .bg-opt.selected { border-color: white; }
+
+    .action-row {
+      display: flex; gap: 12px; margin-bottom: 16px;
+    }
+    .action-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px; border-radius: 10px;
+      border: 1px solid var(--border-color); background: none;
+      color: var(--text-secondary); font-size: 14px; cursor: pointer;
+      font-family: inherit;
+    }
+    .action-btn:active { background: rgba(139,157,131,0.1); }
+    .uploading { text-align: center; padding: 8px; color: var(--text-muted); font-size: 13px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <button class="back-btn" onclick="history.back()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1>Create Story</h1>
+    </div>
+    <button class="share-btn" id="shareBtn" onclick="submitStory()" disabled>Share</button>
+  </div>
+
+  <div class="content">
+    <!-- Preview -->
+    <div class="story-preview text-mode" id="storyPreview">
+      <img id="previewImg" style="display:none;">
+      <div class="story-text-overlay">
+        <textarea id="overlayText" placeholder="Type your story..." rows="3" oninput="updateShareBtn()"></textarea>
+      </div>
+    </div>
+
+    <!-- Text input (shown when no image) -->
+    <div class="text-input-area" id="textArea">
+      <textarea id="storyText" placeholder="What's happening?" oninput="updateShareBtn()"></textarea>
+    </div>
+
+    <!-- Background picker (text mode only) -->
+    <div class="bg-picker" id="bgPicker">
+      <div class="bg-picker-label">Background:</div>
+      <div class="bg-options">
+        <div class="bg-opt selected" style="background:linear-gradient(135deg, #667eea, #764ba2);" onclick="selectBg('linear-gradient(135deg, #667eea, #764ba2)', this)"></div>
+        <div class="bg-opt" style="background:linear-gradient(135deg, #f093fb, #f5576c);" onclick="selectBg('linear-gradient(135deg, #f093fb, #f5576c)', this)"></div>
+        <div class="bg-opt" style="background:linear-gradient(135deg, #4facfe, #00f2fe);" onclick="selectBg('linear-gradient(135deg, #4facfe, #00f2fe)', this)"></div>
+        <div class="bg-opt" style="background:linear-gradient(135deg, #43e97b, #38f9d7);" onclick="selectBg('linear-gradient(135deg, #43e97b, #38f9d7)', this)"></div>
+        <div class="bg-opt" style="background:linear-gradient(135deg, #fa709a, #fee140);" onclick="selectBg('linear-gradient(135deg, #fa709a, #fee140)', this)"></div>
+        <div class="bg-opt" style="background:linear-gradient(135deg, #8B9D83, #5a7a5a);" onclick="selectBg('linear-gradient(135deg, #8B9D83, #5a7a5a)', this)"></div>
+        <div class="bg-opt" style="background:#1a1a1a;" onclick="selectBg('#1a1a1a', this)"></div>
+      </div>
+    </div>
+
+    <!-- Add photo button -->
+    <div class="action-row">
+      <button class="action-btn" onclick="document.getElementById('imageInput').click()" id="photoBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Add Photo
+      </button>
+    </div>
+    <input type="file" id="imageInput" accept="image/*" style="display:none;">
+
+    <div class="uploading" id="uploadingText">Uploading image...</div>
+  </div>
+
+  <script>
+    var BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    var supabaseClient = window.supabase.createClient(
+      'https://mxddgbpxjoltaimftpmn.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+    );
+
+    var authToken = null;
+    var imageUrl = null;
+    var uploading = false;
+    var selectedBg = 'linear-gradient(135deg, #667eea, #764ba2)';
+    var hasImage = false;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      supabaseClient.auth.getSession().then(function(result) {
+        var session = result.data.session;
+        if (!session) { window.location.href = 'mobile.html'; return; }
+        authToken = session.access_token;
+      });
+    });
+
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { alert('Max 5MB'); return; }
+
+      hasImage = true;
+      var preview = document.getElementById('storyPreview');
+      var img = document.getElementById('previewImg');
+      img.src = URL.createObjectURL(file);
+      img.style.display = 'block';
+      preview.classList.remove('text-mode');
+      document.getElementById('textArea').style.display = 'none';
+      document.getElementById('bgPicker').style.display = 'none';
+      document.getElementById('photoBtn').textContent = 'Change Photo';
+
+      // Upload
+      uploading = true;
+      imageUrl = null;
+      document.getElementById('uploadingText').style.display = 'block';
+      updateShareBtn();
+
+      var formData = new FormData();
+      formData.append('files', file);
+      fetch(BACKEND_URL + '/api/social/upload-images', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + authToken },
+        body: formData
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        imageUrl = (data.urls || [])[0] || null;
+        uploading = false;
+        document.getElementById('uploadingText').style.display = 'none';
+        updateShareBtn();
+      }).catch(function(err) {
+        console.error('Upload failed:', err);
+        uploading = false;
+        document.getElementById('uploadingText').style.display = 'none';
+      });
+    });
+
+    function selectBg(bg, el) {
+      selectedBg = bg;
+      document.querySelectorAll('.bg-opt').forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+      document.getElementById('storyPreview').style.background = bg;
+    }
+
+    function updateShareBtn() {
+      var text = document.getElementById('overlayText').value.trim() || document.getElementById('storyText').value.trim();
+      document.getElementById('shareBtn').disabled = (!text && !hasImage) || uploading;
+    }
+
+    function submitStory() {
+      if (uploading) { alert('Still uploading...'); return; }
+      if (hasImage && !imageUrl) { alert('Image upload failed. Try again.'); return; }
+
+      var text = '';
+      if (hasImage) {
+        text = document.getElementById('overlayText').value.trim() || null;
+      } else {
+        text = document.getElementById('storyText').value.trim();
+      }
+
+      if (!text && !imageUrl) return;
+
+      var btn = document.getElementById('shareBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sharing...';
+
+      var body = { text: text };
+      if (imageUrl) body.image_url = imageUrl;
+      if (!hasImage) body.bg_color = selectedBg;
+
+      fetch(BACKEND_URL + '/api/social/stories', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }).then(function(res) {
+        if (res.ok) {
+          window.location.href = 'social.html';
+        } else {
+          return res.json().then(function(err) { alert(err.error || 'Failed to share story'); });
+        }
+      }).catch(function() {
+        alert('Failed to share story');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Share';
+      });
+    }
+  </script>
+</body>
+</html>
