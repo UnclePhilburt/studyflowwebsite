@@ -4148,71 +4148,147 @@
 
     // Fix image orientation based on EXIF data
     async function fixImageOrientation(file) {
-      return new Promise((resolve) => {
+      if (!file.type.match(/image.*/)) {
+        return file; // Not an image, return as-is
+      }
+
+      return new Promise((resolve, reject) => {
         const reader = new FileReader();
+
+        reader.onerror = () => {
+          console.error('Error reading file for orientation fix');
+          resolve(file); // Return original on error
+        };
+
         reader.onload = (e) => {
+          const view = new DataView(e.target.result);
+          let orientation = 1;
+
+          try {
+            // Check for JPEG signature
+            if (view.getUint16(0, false) !== 0xFFD8) {
+              throw new Error('Not a JPEG');
+            }
+
+            const length = view.byteLength;
+            let offset = 2;
+
+            while (offset < length) {
+              if (view.getUint16(offset + 2, false) <= 8) break;
+
+              const marker = view.getUint16(offset, false);
+              offset += 2;
+
+              if (marker === 0xFFE1) {
+                // EXIF marker
+                if (view.getUint32(offset += 2, false) !== 0x45786966) {
+                  break;
+                }
+
+                const little = view.getUint16(offset += 6, false) === 0x4949;
+                offset += view.getUint32(offset + 4, little);
+                const tags = view.getUint16(offset, little);
+                offset += 2;
+
+                for (let i = 0; i < tags; i++) {
+                  if (view.getUint16(offset + (i * 12), little) === 0x0112) {
+                    orientation = view.getUint16(offset + (i * 12) + 8, little);
+                    break;
+                  }
+                }
+                break;
+              } else if ((marker & 0xFF00) !== 0xFF00) {
+                break;
+              } else {
+                offset += view.getUint16(offset, false);
+              }
+            }
+          } catch (err) {
+            console.log('Could not read EXIF data, assuming orientation 1');
+          }
+
+          console.log('Image orientation:', orientation);
+
+          // Load image
           const img = new Image();
+          img.onerror = () => {
+            console.error('Error loading image');
+            resolve(file);
+          };
+
           img.onload = () => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
 
-            // Get EXIF orientation
-            const view = new DataView(e.target.result);
-            let orientation = 1;
+            let width = img.width;
+            let height = img.height;
 
-            if (view.getUint16(0, false) === 0xFFD8) {
-              let offset = 2;
-              while (offset < view.byteLength) {
-                if (view.getUint16(offset + 2, false) <= 8) break;
-                const marker = view.getUint16(offset, false);
-                offset += 2;
-                if (marker === 0xFFE1) {
-                  offset += 2;
-                  if (view.getUint32(offset, false) !== 0x45786966) break;
-                  const little = view.getUint16(offset += 6, false) === 0x4949;
-                  offset += view.getUint32(offset + 4, little);
-                  const tags = view.getUint16(offset, little);
-                  offset += 2;
-                  for (let i = 0; i < tags; i++) {
-                    if (view.getUint16(offset + (i * 12), little) === 0x0112) {
-                      orientation = view.getUint16(offset + (i * 12) + 8, little);
-                      break;
-                    }
-                  }
-                  break;
-                }
-                offset += view.getUint16(offset, false);
-              }
-            }
-
-            // Set canvas dimensions based on orientation
-            if (orientation > 4) {
-              canvas.width = img.height;
-              canvas.height = img.width;
+            // Set proper canvas dimensions based on orientation
+            if (orientation >= 5 && orientation <= 8) {
+              canvas.width = height;
+              canvas.height = width;
             } else {
-              canvas.width = img.width;
-              canvas.height = img.height;
+              canvas.width = width;
+              canvas.height = height;
             }
 
-            // Transform canvas based on EXIF orientation
+            // Apply transformations based on orientation
             switch (orientation) {
-              case 2: ctx.transform(-1, 0, 0, 1, img.width, 0); break;
-              case 3: ctx.transform(-1, 0, 0, -1, img.width, img.height); break;
-              case 4: ctx.transform(1, 0, 0, -1, 0, img.height); break;
-              case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
-              case 6: ctx.transform(0, 1, -1, 0, img.height, 0); break;
-              case 7: ctx.transform(0, -1, -1, 0, img.height, img.width); break;
-              case 8: ctx.transform(0, -1, 1, 0, 0, img.width); break;
+              case 1:
+                // Normal - no transformation needed
+                break;
+              case 2:
+                // Flip horizontal
+                ctx.transform(-1, 0, 0, 1, width, 0);
+                break;
+              case 3:
+                // Rotate 180°
+                ctx.transform(-1, 0, 0, -1, width, height);
+                break;
+              case 4:
+                // Flip vertical
+                ctx.transform(1, 0, 0, -1, 0, height);
+                break;
+              case 5:
+                // Rotate 90° CCW + flip horizontal
+                ctx.transform(0, 1, 1, 0, 0, 0);
+                break;
+              case 6:
+                // Rotate 90° CW
+                ctx.transform(0, 1, -1, 0, height, 0);
+                break;
+              case 7:
+                // Rotate 90° CW + flip horizontal
+                ctx.transform(0, -1, -1, 0, height, width);
+                break;
+              case 8:
+                // Rotate 90° CCW
+                ctx.transform(0, -1, 1, 0, 0, width);
+                break;
             }
 
-            ctx.drawImage(img, 0, 0);
+            // Draw the image
+            ctx.drawImage(img, 0, 0, width, height);
 
+            // Convert to blob
             canvas.toBlob((blob) => {
-              resolve(new File([blob], file.name, { type: file.type }));
-            }, file.type, 0.95);
+              if (blob) {
+                const newFile = new File([blob], file.name, {
+                  type: file.type,
+                  lastModified: Date.now()
+                });
+                console.log('Image orientation fixed');
+                resolve(newFile);
+              } else {
+                console.error('Failed to create blob');
+                resolve(file);
+              }
+            }, file.type, 0.92);
           };
+
           img.src = URL.createObjectURL(file);
         };
+
         reader.readAsArrayBuffer(file);
       });
     }
