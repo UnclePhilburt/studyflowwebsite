@@ -10,6 +10,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     :root {
@@ -226,7 +227,31 @@
 
   <script>
     const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+
+    // Initialize Supabase
+    const supabaseUrl = 'https://mxddgbpxjoltaimftpmn.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU3ODU5NzEsImV4cCI6MjA1MTM2MTk3MX0.YD-tt7cEW-8hP8W9FpSACRcV72PshFxWp43VdMlxHfs';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
     let authToken = localStorage.getItem('sf-auth-token');
+
+    // Check authentication on page load
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        authToken = session.access_token;
+        localStorage.setItem('sf-auth-token', authToken);
+        return true;
+      } else {
+        // Try to get from localStorage
+        authToken = localStorage.getItem('sf-auth-token');
+        if (!authToken) {
+          window.location.href = 'login.html';
+          return false;
+        }
+        return true;
+      }
+    }
 
     async function loadNotifications() {
       const list = document.getElementById('notifList');
@@ -326,7 +351,13 @@
       return new Date(then).toLocaleDateString();
     }
 
-    loadNotifications();
+    // Initialize page
+    (async function init() {
+      const isAuthenticated = await checkAuth();
+      if (isAuthenticated) {
+        loadNotifications();
+      }
+    })();
   </script>
 </body>
 </html>
