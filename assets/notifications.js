@@ -18,8 +18,19 @@
   let badgeEl = null;
   let dropdownEl = null;
 
-  function getToken() {
+  async function getToken() {
     if (authToken) return authToken;
+    // Try Supabase session first
+    try {
+      if (window.supabase) {
+        const sb = window.supabase.createClient(
+          'https://mxddgbpxjoltaimftpmn.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+        );
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) { authToken = session.access_token; return authToken; }
+      }
+    } catch {}
     authToken = localStorage.getItem('auth_token');
     return authToken;
   }
@@ -86,7 +97,7 @@
   }
 
   async function loadNotifications() {
-    const token = getToken();
+    const token = await getToken();
     if (!token) return;
 
     const list = document.getElementById('sf-notif-list');
@@ -172,7 +183,7 @@
   }
 
   async function checkUnread() {
-    const token = getToken();
+    const token = await getToken();
     if (!token) return;
 
     let count = 0;
@@ -212,7 +223,7 @@
   }
 
   async function clearAllNotifs() {
-    const token = getToken();
+    const token = await getToken();
     if (!token) return;
 
     try {

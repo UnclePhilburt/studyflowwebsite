@@ -4398,6 +4398,7 @@
     });
 
     async function loadSocialNotifs(isMobile = false) {
+      if (!authToken) return;
       const list = isMobile ? document.getElementById('mobileNotifList') : document.getElementById('socialNotifList');
       if (!list) return;
       list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">Loading...</div>';
@@ -4445,6 +4446,7 @@
     }
 
     async function checkSocialNotifBadge() {
+      if (!authToken) return;
       try {
         const res = await fetch(`${BACKEND_URL}/api/social/activity`, { headers: { 'Authorization': `Bearer ${authToken}` } });
         if (res.ok) {
