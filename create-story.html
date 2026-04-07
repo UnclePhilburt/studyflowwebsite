@@ -250,7 +250,7 @@
 
       var body = { text: text };
       if (imageUrl) body.image_url = imageUrl;
-      if (!hasImage) body.bg_color = selectedBg;
+      if (!hasImage) body.bg = selectedBg;
 
       fetch(BACKEND_URL + '/api/social/stories', {
         method: 'POST',
