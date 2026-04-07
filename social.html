@@ -2837,6 +2837,23 @@
           </select>
         </div>
 
+        <!-- Background picker (shown when text only, no attachments) -->
+        <div id="modalPostBgSection" style="display:none;margin-top:12px;">
+          <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">Background:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div onclick="selectModalPostBg(null)" class="modal-post-bg-opt" data-bg="null" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:var(--card-bg);border:2px solid var(--accent-primary);position:relative;">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;">×</div>
+            </div>
+            <div onclick="selectModalPostBg('linear-gradient(135deg, #667eea, #764ba2)')" class="modal-post-bg-opt" data-bg="linear-gradient(135deg, #667eea, #764ba2)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #667eea, #764ba2);border:2px solid transparent;"></div>
+            <div onclick="selectModalPostBg('linear-gradient(135deg, #f093fb, #f5576c)')" class="modal-post-bg-opt" data-bg="linear-gradient(135deg, #f093fb, #f5576c)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #f093fb, #f5576c);border:2px solid transparent;"></div>
+            <div onclick="selectModalPostBg('linear-gradient(135deg, #4facfe, #00f2fe)')" class="modal-post-bg-opt" data-bg="linear-gradient(135deg, #4facfe, #00f2fe)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #4facfe, #00f2fe);border:2px solid transparent;"></div>
+            <div onclick="selectModalPostBg('linear-gradient(135deg, #43e97b, #38f9d7)')" class="modal-post-bg-opt" data-bg="linear-gradient(135deg, #43e97b, #38f9d7)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #43e97b, #38f9d7);border:2px solid transparent;"></div>
+            <div onclick="selectModalPostBg('linear-gradient(135deg, #fa709a, #fee140)')" class="modal-post-bg-opt" data-bg="linear-gradient(135deg, #fa709a, #fee140)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #fa709a, #fee140);border:2px solid transparent;"></div>
+            <div onclick="selectModalPostBg('linear-gradient(135deg, #8B9D83, #5a7a5a)')" class="modal-post-bg-opt" data-bg="linear-gradient(135deg, #8B9D83, #5a7a5a)" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:linear-gradient(135deg, #8B9D83, #5a7a5a);border:2px solid transparent;"></div>
+            <div onclick="selectModalPostBg('#1a1a1a')" class="modal-post-bg-opt" data-bg="#1a1a1a" style="width:32px;height:32px;border-radius:8px;cursor:pointer;background:#1a1a1a;border:2px solid transparent;"></div>
+          </div>
+        </div>
+
         <!-- Course (optional) -->
         <input type="text" id="courseInput" placeholder="Course / Subject (optional)" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;margin-top:12px;background:var(--bg-primary);color:var(--text-primary);">
 
@@ -5329,6 +5346,7 @@
     let selectedNoteId = null;
     let uploadedNoteId = null;
     let isUploadingInBackground = false;
+    let selectedModalPostBg = null;
 
     // Step 1: Open upload modal
     function openCreatePostModal() {
@@ -5342,6 +5360,27 @@
       resetCreateModal();
     }
 
+    function selectModalPostBg(bg) {
+      selectedModalPostBg = bg;
+      document.querySelectorAll('.modal-post-bg-opt').forEach(o => o.style.borderColor = 'transparent');
+      event.target.style.borderColor = 'var(--accent-primary)';
+    }
+
+    // Update modal background picker visibility when text or attachments change
+    document.getElementById('postCaptionNew').addEventListener('input', updateModalBgVisibility);
+
+    function updateModalBgVisibility() {
+      const hasText = document.getElementById('postCaptionNew').value.trim().length > 0;
+      const hasFile = selectedFile || selectedNoteId || uploadedNoteId;
+      const bgSection = document.getElementById('modalPostBgSection');
+
+      if (hasText && !hasFile) {
+        bgSection.style.display = 'block';
+      } else {
+        bgSection.style.display = 'none';
+      }
+    }
+
     // Legacy aliases
     function closeUploadModal() { closeCreateModal(); }
     function closeCaptionModal() { closeCreateModal(); }
@@ -5350,6 +5389,7 @@
       selectedFile = null;
       selectedNoteId = null;
       uploadedNoteId = null;
+      selectedModalPostBg = null;
       document.getElementById('postCaptionNew').value = '';
       document.getElementById('courseInput').value = '';
       document.getElementById('attachmentPreview').style.display = 'none';
@@ -5358,10 +5398,15 @@
       document.getElementById('libraryPicker').style.display = 'none';
       document.getElementById('folderSelectNew').style.display = 'none';
       document.getElementById('contentTypeSelect').value = 'text';
+      document.getElementById('modalPostBgSection').style.display = 'none';
+      document.querySelectorAll('.modal-post-bg-opt').forEach(o => o.style.borderColor = 'transparent');
+      const noneOption = document.querySelector('.modal-post-bg-opt[data-bg="null"]');
+      if (noneOption) noneOption.style.borderColor = 'var(--accent-primary)';
     }
 
     function removeAttachment() {
       selectedFile = null;
+      updateModalBgVisibility();
       selectedNoteId = null;
       uploadedNoteId = null;
       document.getElementById('attachmentPreview').style.display = 'none';
@@ -5400,6 +5445,9 @@
       // Show preview
       const preview = document.getElementById('attachmentPreview');
       preview.style.display = 'block';
+
+      // Update background visibility
+      updateModalBgVisibility();
 
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -5537,6 +5585,11 @@
         // Add course metadata if provided
         if (course) {
           postData.course = course;
+        }
+
+        // Add background color if selected
+        if (selectedModalPostBg) {
+          postData.bg_color = selectedModalPostBg;
         }
 
         const response = await fetch(`${BACKEND_URL}/api/social/posts`, {
