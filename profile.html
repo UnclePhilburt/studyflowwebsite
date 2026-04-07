@@ -1744,6 +1744,16 @@
     function renderGridPost(post) {
       let content;
 
+      // Debug what we're getting
+      console.log('Rendering post:', {
+        id: post.id,
+        post_type: post.post_type,
+        has_text_content: !!post.text_content,
+        has_notes: !!post.notes,
+        has_thumbnail: !!post.notes?.thumbnail_url,
+        all_fields: Object.keys(post)
+      });
+
       // Check for image/thumbnail
       if (post.notes?.thumbnail_url) {
         content = `<img src="${post.notes.thumbnail_url}" alt="Post">`;
@@ -1759,9 +1769,10 @@
         const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
         content = `<div class="grid-post-placeholder">${fileType}</div>`;
       }
-      // Fallback
+      // Fallback - show post type at least
       else {
-        content = `<div class="grid-post-placeholder">POST</div>`;
+        const displayType = post.post_type?.toUpperCase() || 'POST';
+        content = `<div class="grid-post-placeholder">${displayType}</div>`;
       }
 
       const deleteBtn = profileData && profileData.is_own_profile
