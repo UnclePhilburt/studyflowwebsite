@@ -1749,6 +1749,161 @@
       to { transform: translateY(0); }
     }
 
+    /* Comment Modal for Mobile */
+    .comment-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .comment-modal.active {
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .comment-modal-content {
+      width: 100%;
+      max-height: 80vh;
+      background: var(--card-bg);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+      animation: slideUp 0.3s ease-out;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .comment-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .comment-modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .comment-modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 28px;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .comment-modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+
+    .comment-modal-comment {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .comment-modal-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .comment-modal-comment-content {
+      flex: 1;
+    }
+
+    .comment-modal-username {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .comment-modal-text {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .comment-modal-actions {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .comment-modal-action-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .comment-modal-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 12px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .comment-modal-input {
+      flex: 1;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      outline: none;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      resize: none;
+      font-family: inherit;
+      max-height: 100px;
+    }
+
+    .comment-modal-send {
+      background: var(--accent-primary);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .comment-modal-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     /* Mobile Header */
     .mobile-header {
       display: none;
@@ -4721,7 +4876,15 @@
     }
 
     // Quick Comment Box
+    let currentCommentPostId = null;
+
     function toggleQuickComment(postId) {
+      // Check if mobile (window width < 768px)
+      if (window.innerWidth < 768) {
+        openCommentModal(postId);
+        return;
+      }
+
       const commentBox = document.getElementById(`quickComment-${postId}`);
       if (commentBox.classList.contains('show')) {
         commentBox.classList.remove('show');
@@ -4732,6 +4895,97 @@
         });
         commentBox.classList.add('show');
         document.getElementById(`commentInput-${postId}`).focus();
+      }
+    }
+
+    async function openCommentModal(postId) {
+      currentCommentPostId = postId;
+      const modal = document.getElementById('commentModal');
+      const body = document.getElementById('commentModalBody');
+
+      // Load comments
+      body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">Loading comments...</div>';
+
+      modal.classList.add('active');
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social/posts/${postId}/comments`, {
+          headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {}
+        });
+
+        if (res.ok) {
+          const comments = await res.json();
+          if (comments.length === 0) {
+            body.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No comments yet. Be the first to comment!</div>';
+          } else {
+            body.innerHTML = comments.map(c => {
+              const initial = (c.username || 'A').charAt(0).toUpperCase();
+              return `
+                <div class="comment-modal-comment">
+                  <div class="comment-modal-avatar">${initial}</div>
+                  <div class="comment-modal-comment-content">
+                    <div class="comment-modal-username">${c.username || 'Anonymous'}</div>
+                    <div class="comment-modal-text">${c.content || c.text_content || ''}</div>
+                    <div class="comment-modal-actions">
+                      <button class="comment-modal-action-btn" onclick="event.stopPropagation(); voteComment('${c.id}', 'upvote', this)">
+                        ▲ ${c.upvote_count || 0}
+                      </button>
+                      <button class="comment-modal-action-btn" onclick="event.stopPropagation(); voteComment('${c.id}', 'downvote', this)">
+                        ▼ ${c.downvote_count || 0}
+                      </button>
+                      ${c.reply_count > 0 ? `<span style="color:var(--accent-primary);">${c.reply_count} repl${c.reply_count === 1 ? 'y' : 'ies'}</span>` : ''}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err) {
+        body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">Error loading comments</div>';
+      }
+
+      document.getElementById('commentModalInput').focus();
+    }
+
+    function closeCommentModal() {
+      document.getElementById('commentModal').classList.remove('active');
+      document.getElementById('commentModalInput').value = '';
+      currentCommentPostId = null;
+    }
+
+    async function submitCommentFromModal() {
+      if (!currentCommentPostId) return;
+
+      const input = document.getElementById('commentModalInput');
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      const sendBtn = document.getElementById('commentModalSend');
+      sendBtn.disabled = true;
+      input.disabled = true;
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/social/posts/${currentCommentPostId}/comments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ content: text })
+        });
+
+        if (response.ok) {
+          input.value = '';
+          // Reload comments
+          await openCommentModal(currentCommentPostId);
+        }
+      } catch (err) {
+        console.error('Error posting comment:', err);
+      } finally {
+        sendBtn.disabled = false;
+        input.disabled = false;
       }
     }
 
@@ -5818,6 +6072,23 @@
             <button onclick="filterContent('text'); closeMobileFilters();" class="mobile-content-btn" data-filter="text" style="flex:1;min-width:calc(33.333% - 6px);padding:12px;border:1px solid var(--border-color);background:var(--bg-secondary);color:var(--text-secondary);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Posts</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Comment Modal -->
+  <div id="commentModal" class="comment-modal" onclick="if(event.target===this) closeCommentModal()">
+    <div class="comment-modal-content">
+      <div class="comment-modal-header">
+        <h3>Comments</h3>
+        <button onclick="closeCommentModal()" class="comment-modal-close">&times;</button>
+      </div>
+      <div class="comment-modal-body" id="commentModalBody">
+        <!-- Comments will be loaded here -->
+      </div>
+      <div class="comment-modal-footer">
+        <textarea id="commentModalInput" class="comment-modal-input" placeholder="Add a comment..." rows="1"></textarea>
+        <button id="commentModalSend" class="comment-modal-send" onclick="submitCommentFromModal()">Post</button>
       </div>
     </div>
   </div>
