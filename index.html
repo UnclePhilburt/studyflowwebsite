@@ -6,9 +6,25 @@
   <meta name="description" content="StudyFlow Suite - AI-powered study assistant and social learning platform">
   <link rel="icon" type="image/png" href="icon128.png">
   <title>StudyFlow Suite</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Immediate redirect to social page
-    window.location.replace('social.html');
+    // Check auth before redirecting
+    (async () => {
+      try {
+        const sb = window.supabase.createClient(
+          'https://mxddgbpxjoltaimftpmn.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+        );
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+          window.location.replace('social.html');
+        } else {
+          window.location.replace('signup.html');
+        }
+      } catch {
+        window.location.replace('signup.html');
+      }
+    })();
   </script>
   <style>
     body {
@@ -45,7 +61,7 @@
     <p>Redirecting to StudyFlow...</p>
   </div>
   <noscript>
-    <meta http-equiv="refresh" content="0; url=social.html">
+    <meta http-equiv="refresh" content="0; url=signup.html">
   </noscript>
 </body>
 </html>
