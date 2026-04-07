@@ -1247,6 +1247,15 @@
         // Filter out stories (is_story === true)
         const posts = (data.posts || []).filter(p => !p.is_story);
 
+        // Debug: log first post to see structure
+        if (posts.length > 0) {
+          console.log('Sample post data:', posts[0]);
+          console.log('Post fields:', Object.keys(posts[0]));
+          console.log('Post type:', posts[0].post_type);
+          console.log('Has text_content:', !!posts[0].text_content);
+          console.log('Has notes:', !!posts[0].notes);
+        }
+
         if (posts.length === 0) {
           const composerHtml = profileData.is_own_profile ? buildProfileComposer() : '';
           container.innerHTML = composerHtml + `
@@ -1734,11 +1743,25 @@
     // Render grid post
     function renderGridPost(post) {
       let content;
+
+      // Check for image/thumbnail
       if (post.notes?.thumbnail_url) {
         content = `<img src="${post.notes.thumbnail_url}" alt="Post">`;
-      } else {
-        const fileType = post.notes?.file_type?.toUpperCase() || 'POST';
+      }
+      // Check for text content in various possible locations
+      else if (post.text_content || post.content || post.body) {
+        const textContent = post.text_content || post.content || post.body || '';
+        const textPreview = textContent.substring(0, 150);
+        content = `<div class="grid-post-placeholder" style="padding:16px;font-size:14px;line-height:1.4;text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;font-weight:400;letter-spacing:0;white-space:pre-wrap;">${textPreview}${textContent.length > 150 ? '...' : ''}</div>`;
+      }
+      // Check if it's a note post type
+      else if (post.post_type === 'note' && post.note_id) {
+        const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
         content = `<div class="grid-post-placeholder">${fileType}</div>`;
+      }
+      // Fallback
+      else {
+        content = `<div class="grid-post-placeholder">POST</div>`;
       }
 
       const deleteBtn = profileData && profileData.is_own_profile
