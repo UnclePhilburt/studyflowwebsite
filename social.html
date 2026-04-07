@@ -5151,7 +5151,6 @@
           ${thumbnailHtml}
           ${metadataHtml}
           <div class="post-content">
-            ${post.post_type === 'note' && post.notes?.original_filename ? `<div class="post-title">${post.notes.original_filename}</div>` : ''}
             ${post.text_content ? `<div class="post-caption">${formatPostText(post.text_content)}</div>` : ''}
             ${post.text_content ? renderLinkPreview(post.text_content) : ''}
             ${post.poll_options ? `<div id="poll-${post.id}" style="padding:8px 16px 12px;" onclick="event.stopPropagation();">
