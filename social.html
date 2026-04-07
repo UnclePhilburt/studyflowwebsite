@@ -2619,13 +2619,15 @@
       <div id="storyCreator" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;" onclick="if(event.target===this)closeStoryCreator()">
         <div style="background:var(--card-bg);border-radius:16px;max-width:420px;width:92%;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.2);">
           <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Create Story</h3>
-          <!-- Image preview -->
-          <div id="storyImagePreview" style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;position:relative;">
-            <button onclick="removeStoryImage()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:12px;cursor:pointer;z-index:2;">&#x2715;</button>
-            <img id="storyImagePreviewImg" style="width:100%;max-height:250px;object-fit:cover;">
+
+          <!-- Image preview with overlay text editor -->
+          <div id="storyImagePreview" style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;position:relative;background:#000;">
+            <button onclick="removeStoryImage()" style="position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:12px;cursor:pointer;z-index:3;">&#x2715;</button>
+            <img id="storyImagePreviewImg" style="width:100%;max-height:400px;object-fit:contain;display:block;">
+            <div id="storyTextOverlay" contenteditable="true" onclick="event.stopPropagation()" style="position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);width:90%;text-align:center;color:white;font-size:24px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,0.8);outline:none;z-index:2;cursor:text;min-height:40px;padding:8px;" placeholder="Tap to add text..."></div>
           </div>
 
-          <!-- Text or image -->
+          <!-- Text or image (only shown when no image) -->
           <textarea id="storyText" placeholder="What's happening?" style="width:100%;padding:14px;border:1px solid var(--border-color);border-radius:10px;font-size:15px;font-family:inherit;min-height:80px;resize:none;background:var(--bg-primary);color:var(--text-primary);"></textarea>
 
           <!-- Upload image button -->
@@ -3285,8 +3287,10 @@
     function openStoryCreator() {
       document.getElementById('storyCreator').style.display = 'flex';
       document.getElementById('storyText').value = '';
+      document.getElementById('storyText').style.display = 'block';
       document.getElementById('storyImagePreview').style.display = 'none';
       document.getElementById('storyBgSection').style.display = 'block';
+      document.getElementById('storyTextOverlay').textContent = '';
       storyImageUrl = null;
       document.getElementById('storyText').focus();
     }
@@ -3306,7 +3310,10 @@
     function handleStoryImage(event) {
       const file = event.target.files[0];
       if (!file) return;
-      if (file.size > 5 * 1024 * 1024) { if (window.sfToast) sfToast('Max 5MB', 'error'); return; }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Max 5MB');
+        return;
+      }
 
       // Show preview
       const reader = new FileReader();
@@ -3314,6 +3321,9 @@
         document.getElementById('storyImagePreviewImg').src = e.target.result;
         document.getElementById('storyImagePreview').style.display = 'block';
         document.getElementById('storyBgSection').style.display = 'none';
+        document.getElementById('storyText').style.display = 'none';
+        document.getElementById('storyTextOverlay').textContent = '';
+        document.getElementById('storyTextOverlay').focus();
       };
       reader.readAsDataURL(file);
 
@@ -3335,12 +3345,20 @@
       storyImageUrl = null;
       document.getElementById('storyImagePreview').style.display = 'none';
       document.getElementById('storyBgSection').style.display = 'block';
+      document.getElementById('storyText').style.display = 'block';
       document.getElementById('storyImageInput').value = '';
+      document.getElementById('storyTextOverlay').textContent = '';
     }
 
     async function submitStory() {
-      const text = document.getElementById('storyText').value.trim();
       const hasImage = document.getElementById('storyImagePreview').style.display !== 'none';
+      let text = '';
+
+      if (hasImage) {
+        text = document.getElementById('storyTextOverlay').textContent.trim();
+      } else {
+        text = document.getElementById('storyText').value.trim();
+      }
 
       if (!text && !hasImage) {
         alert('Add text or an image');
@@ -3404,11 +3422,17 @@
       }
     }
 
-    // Add CSS animation for story progress
+    // Add CSS animation for story progress and contenteditable placeholder
     if (!document.getElementById('storyProgressCSS')) {
       const style = document.createElement('style');
       style.id = 'storyProgressCSS';
-      style.textContent = '@keyframes storyProgress { from { width: 0; } to { width: 100%; } }';
+      style.textContent = `
+        @keyframes storyProgress { from { width: 0; } to { width: 100%; } }
+        #storyTextOverlay:empty:before {
+          content: attr(placeholder);
+          color: rgba(255, 255, 255, 0.5);
+        }
+      `;
       document.head.appendChild(style);
     }
 
