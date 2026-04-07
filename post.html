@@ -286,6 +286,208 @@
       padding: 60px 20px;
       color: var(--text-muted);
     }
+
+    /* Mobile Optimization */
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 12px;
+        margin-top: 0;
+      }
+
+      .back-btn {
+        top: 12px;
+        left: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+
+      .post-detail {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+      }
+
+      .post-header {
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .post-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+
+      .post-username {
+        font-size: 14px;
+      }
+
+      .post-time {
+        font-size: 12px;
+      }
+
+      .post-content {
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      .post-image {
+        border-radius: 10px;
+        max-height: 400px;
+      }
+
+      .post-actions {
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .vote-section {
+        gap: 8px;
+      }
+
+      .vote-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .vote-count {
+        font-size: 15px;
+      }
+
+      .action-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        gap: 6px;
+      }
+
+      .action-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .comment-form {
+        padding: 16px;
+        border-radius: 12px;
+        gap: 10px;
+      }
+
+      .comment-form textarea {
+        min-height: 80px;
+        font-size: 14px;
+        padding: 10px;
+      }
+
+      .comment-form button {
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+
+      .comments-section {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      .comments-header {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+
+      .comment {
+        padding: 12px;
+        gap: 10px;
+      }
+
+      .comment-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+      }
+
+      .comment-username {
+        font-size: 13px;
+      }
+
+      .comment-time {
+        font-size: 11px;
+      }
+
+      .comment-text {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .comment-actions {
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .comment-vote-btn {
+        font-size: 12px;
+        gap: 4px;
+      }
+
+      .empty-state {
+        padding: 30px 16px;
+        font-size: 14px;
+      }
+    }
+
+    /* Extra small mobile devices */
+    @media (max-width: 375px) {
+      .container {
+        padding: 8px;
+      }
+
+      .post-detail {
+        padding: 12px;
+      }
+
+      .post-username {
+        font-size: 13px;
+      }
+
+      .post-time {
+        font-size: 11px;
+      }
+
+      .post-content {
+        font-size: 14px;
+      }
+
+      .vote-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+      }
+
+      .vote-count {
+        font-size: 14px;
+      }
+
+      .action-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .comment-form {
+        padding: 12px;
+      }
+
+      .comment {
+        padding: 10px;
+      }
+
+      .comment-text {
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 <body>
