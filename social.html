@@ -5977,9 +5977,11 @@
     });
 
     // Mobile search input listener
-    document.getElementById('mobileSearchInput').addEventListener('input', (e) => {
-      const query = e.target.value.trim();
-      const resultsContainer = document.getElementById('mobileSearchResultsContent');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    if (mobileSearchInput) {
+      mobileSearchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        const resultsContainer = document.getElementById('mobileSearchResultsContent');
 
       if (query.length < 2) {
         resultsContainer.innerHTML = '';
@@ -5994,7 +5996,8 @@
           searchPosts(query, resultsContainer);
         }
       }, 300);
-    });
+      });
+    }
 
     // Update mobile search tabs to match functionality
     window.switchSearchTab = function(tab) {
