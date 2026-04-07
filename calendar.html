@@ -1067,7 +1067,7 @@
     (async function() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
-        window.location.href = 'index.html';
+        window.location.href = 'signup.html?signin';
         return;
       }
 
@@ -1109,7 +1109,7 @@
     // Logout function
     async function logout() {
       await supabaseClient.auth.signOut();
-      window.location.href = 'index.html';
+      window.location.href = 'signup.html?signin';
     }
 
     // Modal functions

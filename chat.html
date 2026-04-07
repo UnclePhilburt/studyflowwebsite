@@ -4774,7 +4774,7 @@
     // ============ AUTH & INIT ============
     async function init() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-      if (!session) { window.location.href = 'index.html'; return; }
+      if (!session) { window.location.href = 'signup.html?signin'; return; }
 
       currentUser = session.user;
       authToken = session.access_token;
