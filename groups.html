@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<style>#sf-page-transition{position:fixed;inset:0;background:#f5f4f0;z-index:999999;opacity:1;transition:opacity .15s ease;pointer-events:none;}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="icon128.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#7c9885">
+  <title>Groups - StudyFlow Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #fafafa;
+      --bg-secondary: rgba(255,255,255,0.6);
+      --bg-tertiary: rgba(255,255,255,0.9);
+      --text-primary: #262626;
+      --text-secondary: #737373;
+      --text-muted: #a3a3a3;
+      --accent-primary: #8B9D83;
+      --accent-secondary: #7A8C73;
+      --border-color: #dbdbdb;
+      --hover-bg: rgba(139,157,131,0.06);
+      --card-bg: white;
+    }
+
+    body[data-theme="dark"], body[data-theme="midnight"],
+    body[data-theme="ember"], body[data-theme="neon"] {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: rgba(40,40,40,0.8);
+      --bg-tertiary: rgba(40,40,40,0.95);
+      --text-primary: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --text-muted: #666;
+      --border-color: #333;
+      --hover-bg: rgba(139,157,131,0.1);
+      --card-bg: #242424;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--card-bg); border-bottom: 1px solid var(--border-color);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+
+    .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .btn-primary { background: var(--accent-primary); color: white; }
+    .btn-primary:hover { background: var(--accent-secondary); }
+    .btn-secondary { background: transparent; color: var(--text-primary); border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: var(--hover-bg); }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+    .tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .tab { flex: 1; padding: 12px; border: none; background: none; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; font-family: inherit; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .tab.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+    .tab:hover { color: var(--text-primary); }
+
+    .groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+    .group-card {
+      background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px;
+      padding: 20px; cursor: pointer; transition: all 0.2s;
+    }
+    .group-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .group-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .group-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .group-meta { font-size: 12px; color: var(--text-muted); }
+
+    .group-detail { display: none; }
+    .group-detail.active { display: block; }
+
+    .group-header-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    .group-header-name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .group-header-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+
+    .group-post-composer { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+
+    .post-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .post-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    .post-username { font-weight: 600; font-size: 14px; }
+    .post-time { font-size: 12px; color: var(--text-muted); }
+    .post-text { font-size: 14px; line-height: 1.6; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state h3 { color: var(--text-primary); margin: 12px 0 8px; }
+
+    .create-form { max-width: 500px; margin: 0 auto; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px; }
+    .create-form label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
+    .create-form input, .create-form textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--bg-primary); color: var(--text-primary); margin-bottom: 14px; }
+    .create-form textarea { min-height: 60px; resize: vertical; }
+  </style>
+</head>
+<body>
+<div id="sf-page-transition"></div><script>var _t=localStorage.getItem('dashboard-theme');if(_t&&['dark','midnight','ember','neon'].indexOf(_t)>-1)document.getElementById('sf-page-transition').style.background='#1a1a1a';</script><script src="assets/transitions.js"></script>
+
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="social.html" style="color:var(--text-muted);text-decoration:none;font-size:20px;">&#8592;</a>
+      <h1>Groups</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="showTab('create')">Create Group</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('my', this)">My Groups</button>
+      <button class="tab" onclick="showTab('discover', this)">Discover</button>
+    </div>
+
+    <div id="content">
+      <div class="empty-state">Loading groups...</div>
+    </div>
+  </div>
+
+  <script>(function(){const t=localStorage.getItem('dashboard-theme')||'default';document.body.setAttribute('data-theme',t);})();</script>
+  <script>
+    const BACKEND_URL = 'https://studyflowsuite.onrender.com';
+    const supabaseClient = window.supabase.createClient(
+      'https://mxddgbpxjoltaimftpmn.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14ZGRnYnB4am9sdGFpbWZ0cG1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMTUxNzEsImV4cCI6MjA4OTU5MTE3MX0.rlZYIkFEBgJVQmOpLeWxn0ih1hTKhzZpjqax8dhhjeI'
+    );
+
+    let authToken = null;
+    let currentTab = 'my';
+    let currentGroupId = null;
+    let currentGroupName = '';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) { window.location.href = 'index.html'; return; }
+      authToken = session.access_token;
+      loadMyGroups();
+    });
+
+    function showTab(tab, btn) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      if (tab === 'my') loadMyGroups();
+      else if (tab === 'discover') loadDiscoverGroups();
+      else if (tab === 'create') showCreateForm();
+    }
+
+    async function loadMyGroups() {
+      const container = document.getElementById('content');
+      container.innerHTML = '<div class="empty-state">Loading...</div>';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        const groups = data.groups || [];
+
+        if (groups.length === 0) {
+          container.innerHTML = `<div class="empty-state">
+            <div style="font-size:40px;margin-bottom:12px;">&#x1F465;</div>
+            <h3>No groups yet</h3>
+            <p>Join a group or create your own!</p>
+            <button class="btn btn-primary" onclick="showTab('discover')" style="margin-top:12px;">Discover Groups</button>
+          </div>`;
+          return;
+        }
+
+        container.innerHTML = `<div class="groups-grid">${groups.map(g => `
+          <div class="group-card" onclick="openGroup('${g.id}', '${(g.name || '').replace(/'/g, '')}')">
+            <div class="group-name">${g.name}</div>
+            <div class="group-desc">${g.description || 'No description'}</div>
+            <div class="group-meta">${g.member_count || '?'} members</div>
+          </div>
+        `).join('')}</div>`;
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">Failed to load groups</div>';
+      }
+    }
+
+    async function loadDiscoverGroups() {
+      const container = document.getElementById('content');
+      container.innerHTML = '<div class="empty-state">Finding groups...</div>';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/discover`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        const groups = data.groups || [];
+
+        if (groups.length === 0) {
+          container.innerHTML = `<div class="empty-state">
+            <div style="font-size:40px;margin-bottom:12px;">&#x1F50D;</div>
+            <h3>No groups to discover</h3>
+            <p>Be the first to create one!</p>
+            <button class="btn btn-primary" onclick="showTab('create')" style="margin-top:12px;">Create Group</button>
+          </div>`;
+          return;
+        }
+
+        container.innerHTML = `<div class="groups-grid">${groups.map(g => `
+          <div class="group-card">
+            <div class="group-name">${g.name}</div>
+            <div class="group-desc">${g.description || 'No description'}</div>
+            <div class="group-meta">${g.member_count || 0} members &middot; by @${g.owner_username}</div>
+            <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="event.stopPropagation(); joinGroup('${g.id}')">Join Group</button>
+          </div>
+        `).join('')}</div>`;
+      } catch (e) {
+        container.innerHTML = '<div class="empty-state">Failed to load groups</div>';
+      }
+    }
+
+    async function joinGroup(groupId) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/${groupId}/join`, {
+          method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (window.sfToast) sfToast(`Joined ${data.group_name || 'group'}!`, 'success');
+          loadMyGroups();
+          document.querySelector('.tab').click();
+        } else {
+          if (window.sfToast) sfToast(data.error || 'Failed', 'error');
+        }
+      } catch { if (window.sfToast) sfToast('Failed to join', 'error'); }
+    }
+
+    function showCreateForm() {
+      document.getElementById('content').innerHTML = `
+        <div class="create-form">
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">Create a Group</h2>
+          <label>Group Name</label>
+          <input type="text" id="newGroupName" placeholder="e.g., Biology 101 Study Crew">
+          <label>Description</label>
+          <textarea id="newGroupDesc" placeholder="What's this group about?"></textarea>
+          <button class="btn btn-primary" style="width:100%;" onclick="createGroup()">Create Group</button>
+        </div>
+      `;
+    }
+
+    async function createGroup() {
+      const name = document.getElementById('newGroupName').value.trim();
+      const description = document.getElementById('newGroupDesc').value.trim();
+      if (!name) { if (window.sfToast) sfToast('Name required', 'error'); return; }
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description })
+        });
+        if (res.ok) {
+          if (window.sfToast) sfToast('Group created!', 'success');
+          loadMyGroups();
+          document.querySelector('.tab').click();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          if (window.sfToast) sfToast(err.error || 'Failed', 'error');
+        }
+      } catch { if (window.sfToast) sfToast('Failed', 'error'); }
+    }
+
+    async function openGroup(groupId, groupName) {
+      currentGroupId = groupId;
+      currentGroupName = groupName;
+      const container = document.getElementById('content');
+      container.innerHTML = '<div class="empty-state">Loading group...</div>';
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/${groupId}/feed`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const posts = res.ok ? (await res.json()).posts || [] : [];
+
+        container.innerHTML = `
+          <div class="group-header-card">
+            <button class="btn btn-secondary" onclick="loadMyGroups(); document.querySelector('.tab').click();" style="margin-bottom:12px;">&#8592; Back to Groups</button>
+            <div class="group-header-name">${groupName}</div>
+            <div class="group-header-meta">Group Feed</div>
+          </div>
+
+          <div class="group-post-composer">
+            <textarea id="groupPostText" placeholder="Post something to the group..." style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;font-size:14px;min-height:50px;resize:none;background:var(--bg-primary);color:var(--text-primary);"></textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+              <button class="btn btn-primary" onclick="postToGroup()">Post</button>
+            </div>
+          </div>
+
+          <div id="groupFeed">
+            ${posts.length === 0 ? '<div class="empty-state">No posts yet. Be the first!</div>' : posts.map(p => `
+              <div class="post-card">
+                <div class="post-header">
+                  <div class="post-avatar">${(p.username || 'U')[0].toUpperCase()}</div>
+                  <div>
+                    <div class="post-username">${p.username || 'Anonymous'}</div>
+                    <div class="post-time">${getTimeAgo(p.created_at)}</div>
+                  </div>
+                </div>
+                <div class="post-text">${p.text_content || ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch {
+        container.innerHTML = '<div class="empty-state">Failed to load group</div>';
+      }
+    }
+
+    async function postToGroup() {
+      const text = document.getElementById('groupPostText').value.trim();
+      if (!text || !currentGroupId) return;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/social-groups/${currentGroupId}/post`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text_content: text })
+        });
+        if (res.ok) {
+          if (window.sfToast) sfToast('Posted!', 'success');
+          openGroup(currentGroupId, currentGroupName);
+        }
+      } catch { if (window.sfToast) sfToast('Failed to post', 'error'); }
+    }
+
+    function getTimeAgo(timestamp) {
+      const now = new Date();
+      const then = new Date(timestamp);
+      const diff = Math.floor((now - then) / 1000);
+      if (diff < 60) return 'just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return then.toLocaleDateString();
+    }
+  </script>
+
+<link rel="stylesheet" href="assets/skeleton.css">
+<link rel="stylesheet" href="assets/toast.css">
+<script src="assets/toast.js"></script>
+<script src="assets/notifications.js"></script>
+<script src="assets/transitions.js"></script>
+</body>
+</html>
