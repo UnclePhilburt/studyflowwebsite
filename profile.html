@@ -1224,6 +1224,8 @@
 
         // Sort pinned posts first
         posts.sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));
+        // Init vote state
+        posts.forEach(function(p) { if (p.user_vote_type) localVotes[p.id] = p.user_vote_type; });
 
         const composerHtml = profileData.is_own_profile ? buildProfileComposer() : '';
         container.innerHTML = composerHtml + `<div class="posts-grid">${posts.map(renderGridPost).join('')}</div>`;
@@ -1744,12 +1746,67 @@
           </div>
           ${imageHtml}
           ${hasText ? `<div style="${textStyle}"><div>${post.text_content.length > 200 ? post.text_content.substring(0, 200) + '...' : post.text_content}</div></div>` : ''}
-          <div style="display:flex;gap:16px;padding:10px 16px;font-size:12px;${isTextOnly ? 'color:rgba(255,255,255,0.7);border-top:1px solid rgba(255,255,255,0.1);' : 'color:var(--text-muted);border-top:1px solid var(--border-color);'}">
-            <span>&#9650; ${post.score || 0}</span>
-            <span>${post.comment_count || 0} comments</span>
+          <div style="display:flex;align-items:center;gap:4px;padding:8px 16px;font-size:13px;${isTextOnly ? 'border-top:1px solid rgba(255,255,255,0.1);' : 'border-top:1px solid var(--border-color);'}" onclick="event.stopPropagation()">
+            <div style="display:flex;align-items:center;gap:2px;">
+              <button onclick="vote('${post.id}','upvote')" id="up-${post.id}" style="padding:6px 8px;border:none;background:none;cursor:pointer;font-size:14px;border-radius:6px;${post.user_vote_type==='upvote'?'color:var(--accent-primary);':'color:var(--text-muted);'}" onmouseover="this.style.background='var(--hover-bg,rgba(255,255,255,0.05))'" onmouseout="this.style.background='none'">&#9650;</button>
+              <span id="score-${post.id}" style="font-weight:600;min-width:20px;text-align:center;${isTextOnly?'color:rgba(255,255,255,0.8);':'color:var(--text-primary);'}">${post.score || 0}</span>
+              <button onclick="vote('${post.id}','downvote')" id="down-${post.id}" style="padding:6px 8px;border:none;background:none;cursor:pointer;font-size:14px;border-radius:6px;${post.user_vote_type==='downvote'?'color:#e74c3c;':'color:var(--text-muted);'}" onmouseover="this.style.background='var(--hover-bg,rgba(255,255,255,0.05))'" onmouseout="this.style.background='none'">&#9660;</button>
+            </div>
+            <button onclick="openComments('${post.id}')" style="padding:6px 12px;border:none;background:none;cursor:pointer;font-size:13px;border-radius:6px;${isTextOnly?'color:rgba(255,255,255,0.7);':'color:var(--text-muted);'}font-family:inherit;" onmouseover="this.style.background='var(--hover-bg,rgba(255,255,255,0.05))'" onmouseout="this.style.background='none'">${post.comment_count || 0} comments</button>
+            <button onclick="sharePost('${post.id}')" style="padding:6px 12px;border:none;background:none;cursor:pointer;font-size:13px;border-radius:6px;${isTextOnly?'color:rgba(255,255,255,0.7);':'color:var(--text-muted);'}font-family:inherit;margin-left:auto;" onmouseover="this.style.background='var(--hover-bg,rgba(255,255,255,0.05))'" onmouseout="this.style.background='none'">Share</button>
           </div>
         </div>
       `;
+    }
+
+    // Vote on post
+    var localVotes = {};
+    async function vote(postId, type) {
+      var current = localVotes[postId];
+      var scoreEl = document.getElementById('score-' + postId);
+      var upBtn = document.getElementById('up-' + postId);
+      var downBtn = document.getElementById('down-' + postId);
+      var score = parseInt(scoreEl.textContent) || 0;
+
+      if (current === type) {
+        // Undo vote
+        score += (type === 'upvote' ? -1 : 1);
+        localVotes[postId] = null;
+        upBtn.style.color = 'var(--text-muted)';
+        downBtn.style.color = 'var(--text-muted)';
+        fetch(BACKEND_URL + '/api/social/posts/' + postId + '/vote', {
+          method: 'DELETE', headers: { 'Authorization': 'Bearer ' + authToken }
+        });
+      } else {
+        if (current === 'upvote') score -= 1;
+        if (current === 'downvote') score += 1;
+        score += (type === 'upvote' ? 1 : -1);
+        localVotes[postId] = type;
+        upBtn.style.color = type === 'upvote' ? 'var(--accent-primary)' : 'var(--text-muted)';
+        downBtn.style.color = type === 'downvote' ? '#e74c3c' : 'var(--text-muted)';
+        fetch(BACKEND_URL + '/api/social/posts/' + postId + '/vote', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vote_type: type })
+        });
+      }
+      scoreEl.textContent = score;
+    }
+
+    // Share post
+    function sharePost(postId) {
+      var url = window.location.origin + '/post.html?id=' + postId;
+      if (navigator.share) {
+        navigator.share({ title: 'StudyFlow Post', url: url });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+        if (window.sfToast) sfToast('Link copied!', 'success');
+      }
+    }
+
+    // Open comments (go to post page)
+    function openComments(postId) {
+      window.location.href = 'post.html?id=' + postId;
     }
 
     async function deletePost(postId) {
