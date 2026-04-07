@@ -3418,6 +3418,7 @@
         text = document.getElementById('storyText').value.trim();
       }
 
+      // Allow image-only or text-only stories
       if (!text && !hasImage) {
         alert('Add text or an image');
         return;
@@ -3433,6 +3434,11 @@
         return;
       }
 
+      // For image-only stories, text can be null
+      if (hasImage && !text) {
+        text = null;
+      }
+
       const btn = document.getElementById('storySubmitBtn');
       btn.disabled = true;
       btn.textContent = 'Posting...';
@@ -3440,24 +3446,39 @@
       try {
         console.log('Posting story with:', { text, bg: selectedStoryBg, image_url: storyImageUrl });
 
-        const res = await fetch(`${BACKEND_URL}/api/social/stories`, {
+        // Prepare story data - send as regular post with is_story flag
+        const storyData = {
+          post_type: storyImageUrl ? 'photo' : 'text',
+          text_content: text || null,
+          is_story: true
+        };
+
+        if (storyImageUrl) {
+          storyData.images = [storyImageUrl];
+        }
+
+        if (!storyImageUrl && selectedStoryBg) {
+          storyData.bg_color = selectedStoryBg;
+        }
+
+        const res = await fetch(`${BACKEND_URL}/api/social/posts`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            text: text || null,
-            bg: selectedStoryBg,
-            image_url: storyImageUrl || null
-          })
+          body: JSON.stringify(storyData)
         });
 
         console.log('Story response status:', res.status);
 
         if (res.ok) {
           closeStoryCreator();
-          alert('Story posted!');
+          document.getElementById('storyText').value = '';
+          document.getElementById('storyTextOverlay').textContent = '';
+          removeStoryImage();
+          if (window.sfToast) sfToast('Story posted!', 'success');
+          else alert('Story posted!');
           await loadStories();
         } else {
           const errText = await res.text();
@@ -3468,7 +3489,8 @@
           } catch {
             err = { error: errText || 'Failed to post story' };
           }
-          alert(err.error || err.message || 'Failed to post story');
+          if (window.sfToast) sfToast(err.error || err.message || 'Failed to post story', 'error');
+          else alert(err.error || err.message || 'Failed to post story');
           btn.disabled = false;
           btn.textContent = 'Share Story';
         }
