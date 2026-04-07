@@ -4914,34 +4914,45 @@
         });
 
         if (res.ok) {
-          const comments = await res.json();
+          const data = await res.json();
+          const comments = data.comments || data || [];
+
           if (comments.length === 0) {
             body.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No comments yet. Be the first to comment!</div>';
           } else {
             body.innerHTML = comments.map(c => {
-              const initial = (c.username || 'A').charAt(0).toUpperCase();
+              const username = c.username || c.user?.username || 'Anonymous';
+              const initial = username.charAt(0).toUpperCase();
+              const content = c.content || c.text_content || '';
+              const upvotes = c.upvote_count || c.upvotes || 0;
+              const downvotes = c.downvote_count || c.downvotes || 0;
+              const replyCount = c.reply_count || c.replies?.length || 0;
+
               return `
                 <div class="comment-modal-comment">
                   <div class="comment-modal-avatar">${initial}</div>
                   <div class="comment-modal-comment-content">
-                    <div class="comment-modal-username">${c.username || 'Anonymous'}</div>
-                    <div class="comment-modal-text">${c.content || c.text_content || ''}</div>
+                    <div class="comment-modal-username">${username}</div>
+                    <div class="comment-modal-text">${content}</div>
                     <div class="comment-modal-actions">
                       <button class="comment-modal-action-btn" onclick="event.stopPropagation(); voteComment('${c.id}', 'upvote', this)">
-                        ▲ ${c.upvote_count || 0}
+                        ▲ ${upvotes}
                       </button>
                       <button class="comment-modal-action-btn" onclick="event.stopPropagation(); voteComment('${c.id}', 'downvote', this)">
-                        ▼ ${c.downvote_count || 0}
+                        ▼ ${downvotes}
                       </button>
-                      ${c.reply_count > 0 ? `<span style="color:var(--accent-primary);">${c.reply_count} repl${c.reply_count === 1 ? 'y' : 'ies'}</span>` : ''}
+                      ${replyCount > 0 ? `<span style="color:var(--accent-primary);">${replyCount} repl${replyCount === 1 ? 'y' : 'ies'}</span>` : ''}
                     </div>
                   </div>
                 </div>
               `;
             }).join('');
           }
+        } else {
+          body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">Error loading comments</div>';
         }
       } catch (err) {
+        console.error('Error loading comments:', err);
         body.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);">Error loading comments</div>';
       }
 
