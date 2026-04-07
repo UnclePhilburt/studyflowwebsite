@@ -2061,6 +2061,7 @@
     let authToken = null;
     let currentTab = 'following';
     let userNotes = [];
+    let badgeCache = {}; // Cache user badges to avoid repeated API calls
 
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
@@ -3693,6 +3694,7 @@
         container.innerHTML = feedHtml + loadMoreBtn;
         setTimeout(loadLinkPreviews, 100);
         setTimeout(initializeViewTracking, 200);
+        setTimeout(() => loadBadgesForPosts(allPosts), 50);
       } catch (error) {
         console.error('Error loading feed:', error);
         if (!append) {
@@ -3847,7 +3849,7 @@
           <div class="post-header">
             <div class="post-avatar">${avatarHtml}</div>
             <div class="post-user-info">
-              <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}${post.is_verified ? ' <svg width="14" height="14" viewBox="0 0 24 24" fill="#7c9885" style="vertical-align:-2px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''} <span class="post-action-verb" style="font-weight:400;font-size:12px;color:var(--text-muted);">${actionVerb}</span></div>
+              <div class="post-username" onmouseenter="showProfileCard(event, '${username}')" onmouseleave="hideProfileCard()">${username}${post.is_verified ? ' <svg width="14" height="14" viewBox="0 0 24 24" fill="#7c9885" style="vertical-align:-2px;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''}<span id="badges-${post.id}"></span> <span class="post-action-verb" style="font-weight:400;font-size:12px;color:var(--text-muted);">${actionVerb}</span></div>
               <div class="post-time">${timeAgo}${post.updated_at && post.updated_at !== post.created_at ? ' (edited)' : ''}</div>
             </div>
             <div class="content-badge ${badgeClass}">${badgeText}</div>
@@ -4635,6 +4637,57 @@
       if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
       if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
       return then.toLocaleDateString();
+    }
+
+    // Badge system
+    async function getUserBadges(username) {
+      if (badgeCache[username]) {
+        return badgeCache[username];
+      }
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/badges/${username}`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (!response.ok) {
+          badgeCache[username] = [];
+          return [];
+        }
+
+        const data = await response.json();
+        const badges = data.badges || [];
+        badgeCache[username] = badges;
+        return badges;
+      } catch (error) {
+        badgeCache[username] = [];
+        return [];
+      }
+    }
+
+    function renderBadges(badges) {
+      if (!badges || badges.length === 0) return '';
+
+      return badges.map(badge =>
+        `<span title="${badge.name}: ${badge.description}" style="display:inline-flex;align-items:center;margin-left:4px;padding:2px 6px;background:rgba(${hexToRgb(badge.color || '#8B9D83')}, 0.1);border:1px solid ${badge.color || '#8B9D83'};border-radius:8px;font-size:10px;">
+          <span style="font-size:11px;margin-right:2px;">${badge.icon}</span>
+        </span>`
+      ).join('');
+    }
+
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '139, 157, 131';
+    }
+
+    async function loadBadgesForPosts(posts) {
+      for (const post of posts) {
+        const badges = await getUserBadges(post.username);
+        const badgeEl = document.getElementById(`badges-${post.id}`);
+        if (badgeEl) {
+          badgeEl.innerHTML = renderBadges(badges);
+        }
+      }
     }
 
     // Search functionality
