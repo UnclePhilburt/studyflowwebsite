@@ -3600,13 +3600,16 @@
       event.target.style.borderColor = 'var(--accent-primary)';
     }
 
-    function handleStoryImage(event) {
+    async function handleStoryImage(event) {
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) {
         alert('Max 5MB');
         return;
       }
+
+      // Fix orientation first
+      const fixedFile = await fixImageOrientation(file);
 
       // Show preview
       const reader = new FileReader();
@@ -3618,12 +3621,12 @@
         document.getElementById('storyTextOverlay').textContent = '';
         document.getElementById('storyTextOverlay').focus();
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(fixedFile);
 
       // Upload in background
       storyUploading = true;
       const formData = new FormData();
-      formData.append('files', file);
+      formData.append('files', fixedFile);
       fetch(`${BACKEND_URL}/api/social/upload-images`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${authToken}` },
@@ -4143,7 +4146,78 @@
 
     let inlineImageUrls = [];
 
-    function handleInlineFile(event) {
+    // Fix image orientation based on EXIF data
+    async function fixImageOrientation(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Get EXIF orientation
+            const view = new DataView(e.target.result);
+            let orientation = 1;
+
+            if (view.getUint16(0, false) === 0xFFD8) {
+              let offset = 2;
+              while (offset < view.byteLength) {
+                if (view.getUint16(offset + 2, false) <= 8) break;
+                const marker = view.getUint16(offset, false);
+                offset += 2;
+                if (marker === 0xFFE1) {
+                  offset += 2;
+                  if (view.getUint32(offset, false) !== 0x45786966) break;
+                  const little = view.getUint16(offset += 6, false) === 0x4949;
+                  offset += view.getUint32(offset + 4, little);
+                  const tags = view.getUint16(offset, little);
+                  offset += 2;
+                  for (let i = 0; i < tags; i++) {
+                    if (view.getUint16(offset + (i * 12), little) === 0x0112) {
+                      orientation = view.getUint16(offset + (i * 12) + 8, little);
+                      break;
+                    }
+                  }
+                  break;
+                }
+                offset += view.getUint16(offset, false);
+              }
+            }
+
+            // Set canvas dimensions based on orientation
+            if (orientation > 4) {
+              canvas.width = img.height;
+              canvas.height = img.width;
+            } else {
+              canvas.width = img.width;
+              canvas.height = img.height;
+            }
+
+            // Transform canvas based on EXIF orientation
+            switch (orientation) {
+              case 2: ctx.transform(-1, 0, 0, 1, img.width, 0); break;
+              case 3: ctx.transform(-1, 0, 0, -1, img.width, img.height); break;
+              case 4: ctx.transform(1, 0, 0, -1, 0, img.height); break;
+              case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+              case 6: ctx.transform(0, 1, -1, 0, img.height, 0); break;
+              case 7: ctx.transform(0, -1, -1, 0, img.height, img.width); break;
+              case 8: ctx.transform(0, -1, 1, 0, 0, img.width); break;
+            }
+
+            ctx.drawImage(img, 0, 0);
+
+            canvas.toBlob((blob) => {
+              resolve(new File([blob], file.name, { type: file.type }));
+            }, file.type, 0.95);
+          };
+          img.src = URL.createObjectURL(file);
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    async function handleInlineFile(event) {
       const files = Array.from(event.target.files);
       if (!files.length) return;
 
@@ -4199,10 +4273,11 @@
 
         updateInlinePostBtn();
 
-        // Upload all images
+        // Upload all images (fix orientation first)
         inlineUploading = true;
+        const fixedImages = await Promise.all(images.slice(0, 10).map(f => fixImageOrientation(f)));
         const formData = new FormData();
-        images.slice(0, 10).forEach(f => formData.append('files', f));
+        fixedImages.forEach(f => formData.append('files', f));
         fetch(`${BACKEND_URL}/api/social/upload-images`, {
           method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
         }).then(r => r.json()).then(data => {
@@ -5690,12 +5765,17 @@
     }
 
     async function handleFileSelect(event) {
-      const file = event.target.files[0];
+      let file = event.target.files[0];
       if (!file) return;
 
       if (file.size > 10 * 1024 * 1024) {
         if (window.sfToast) sfToast('File too large! Maximum 10MB', 'error');
         return;
+      }
+
+      // Fix image orientation if it's an image
+      if (file.type.startsWith('image/')) {
+        file = await fixImageOrientation(file);
       }
 
       selectedFile = file;
