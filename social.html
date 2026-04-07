@@ -3608,18 +3608,18 @@
         return;
       }
 
-      // Show preview (browser auto-applies EXIF orientation)
-      document.getElementById('storyImagePreviewImg').src = URL.createObjectURL(file);
+      // Fix orientation, then show preview and upload
+      const fixedFile = await fixImageOrientation(file);
+      document.getElementById('storyImagePreviewImg').src = URL.createObjectURL(fixedFile);
       document.getElementById('storyImagePreview').style.display = 'block';
       document.getElementById('storyBgSection').style.display = 'none';
       document.getElementById('storyText').style.display = 'none';
       document.getElementById('storyTextOverlay').textContent = '';
       document.getElementById('storyTextOverlay').focus();
 
-      // Upload original (backend handles EXIF rotation)
       storyUploading = true;
       const formData = new FormData();
-      formData.append('files', file);
+      formData.append('files', fixedFile);
       fetch(`${BACKEND_URL}/api/social/upload-images`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${authToken}` },
@@ -4139,153 +4139,21 @@
 
     let inlineImageUrls = [];
 
-    // Fix image orientation based on EXIF data
+    // Fix image orientation using createImageBitmap (handles EXIF reliably)
     async function fixImageOrientation(file) {
-      if (!file.type.match(/image.*/)) {
-        return file; // Not an image, return as-is
+      if (!file.type.match(/image.*/)) return file;
+      try {
+        const bitmap = await createImageBitmap(file);
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext('2d').drawImage(bitmap, 0, 0);
+        bitmap.close();
+        const blob = await new Promise(r => canvas.toBlob(r, file.type || 'image/jpeg', 0.92));
+        return new File([blob], file.name, { type: file.type, lastModified: Date.now() });
+      } catch {
+        return file;
       }
-
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onerror = () => {
-          console.error('Error reading file for orientation fix');
-          resolve(file); // Return original on error
-        };
-
-        reader.onload = (e) => {
-          const view = new DataView(e.target.result);
-          let orientation = 1;
-
-          try {
-            // Check for JPEG signature
-            if (view.getUint16(0, false) !== 0xFFD8) {
-              throw new Error('Not a JPEG');
-            }
-
-            const length = view.byteLength;
-            let offset = 2;
-
-            while (offset < length) {
-              if (view.getUint16(offset + 2, false) <= 8) break;
-
-              const marker = view.getUint16(offset, false);
-              offset += 2;
-
-              if (marker === 0xFFE1) {
-                // EXIF marker
-                if (view.getUint32(offset += 2, false) !== 0x45786966) {
-                  break;
-                }
-
-                const little = view.getUint16(offset += 6, false) === 0x4949;
-                offset += view.getUint32(offset + 4, little);
-                const tags = view.getUint16(offset, little);
-                offset += 2;
-
-                for (let i = 0; i < tags; i++) {
-                  if (view.getUint16(offset + (i * 12), little) === 0x0112) {
-                    orientation = view.getUint16(offset + (i * 12) + 8, little);
-                    break;
-                  }
-                }
-                break;
-              } else if ((marker & 0xFF00) !== 0xFF00) {
-                break;
-              } else {
-                offset += view.getUint16(offset, false);
-              }
-            }
-          } catch (err) {
-            console.log('Could not read EXIF data, assuming orientation 1');
-          }
-
-          console.log('Image orientation:', orientation);
-
-          // Load image
-          const img = new Image();
-          img.onerror = () => {
-            console.error('Error loading image');
-            resolve(file);
-          };
-
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            let width = img.width;
-            let height = img.height;
-
-            // Set proper canvas dimensions based on orientation
-            if (orientation >= 5 && orientation <= 8) {
-              canvas.width = height;
-              canvas.height = width;
-            } else {
-              canvas.width = width;
-              canvas.height = height;
-            }
-
-            // Apply transformations based on orientation
-            switch (orientation) {
-              case 1:
-                // Normal - no transformation needed
-                break;
-              case 2:
-                // Flip horizontal
-                ctx.transform(-1, 0, 0, 1, width, 0);
-                break;
-              case 3:
-                // Rotate 180°
-                ctx.transform(-1, 0, 0, -1, width, height);
-                break;
-              case 4:
-                // Flip vertical
-                ctx.transform(1, 0, 0, -1, 0, height);
-                break;
-              case 5:
-                // Rotate 90° CCW + flip horizontal
-                ctx.transform(0, 1, 1, 0, 0, 0);
-                break;
-              case 6:
-                // Rotate 90° CW (most common for portrait photos)
-                ctx.rotate(90 * Math.PI / 180);
-                ctx.translate(0, -height);
-                break;
-              case 7:
-                // Rotate 90° CW + flip horizontal
-                ctx.transform(0, -1, -1, 0, height, width);
-                break;
-              case 8:
-                // Rotate 90° CCW (counter-clockwise)
-                ctx.rotate(-90 * Math.PI / 180);
-                ctx.translate(-width, 0);
-                break;
-            }
-
-            // Draw the image
-            ctx.drawImage(img, 0, 0, width, height);
-
-            // Convert to blob
-            canvas.toBlob((blob) => {
-              if (blob) {
-                const newFile = new File([blob], file.name, {
-                  type: file.type,
-                  lastModified: Date.now()
-                });
-                console.log('Image orientation fixed');
-                resolve(newFile);
-              } else {
-                console.error('Failed to create blob');
-                resolve(file);
-              }
-            }, file.type, 0.92);
-          };
-
-          img.src = URL.createObjectURL(file);
-        };
-
-        reader.readAsArrayBuffer(file);
-      });
     }
 
     async function handleInlineFile(event) {
@@ -4333,11 +4201,15 @@
         document.getElementById('inlinePreviewFile').style.display = 'none';
 
         document.getElementById('inlinePreviewImg').style.display = 'none';
+        updateInlinePostBtn();
 
-        // Show thumbnails preview (browser auto-applies EXIF orientation)
-        const thumbsHtml = images.slice(0, 10).map((f, i) => {
+        // Fix orientation, then show preview and upload
+        inlineUploading = true;
+        const fixedImages = await Promise.all(images.slice(0, 10).map(f => fixImageOrientation(f)));
+
+        const thumbsHtml = fixedImages.map((f, i) => {
           const url = URL.createObjectURL(f);
-          return `<img src="${url}" style="width:${images.length === 1 ? '100%' : '80px'};height:${images.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
+          return `<img src="${url}" style="width:${fixedImages.length === 1 ? '100%' : '80px'};height:${fixedImages.length === 1 ? 'auto' : '80px'};object-fit:cover;border-radius:6px;max-height:200px;">`;
         }).join('');
         const existingThumbs = document.getElementById('inlineImageThumbs');
         if (existingThumbs) existingThumbs.remove();
@@ -4345,12 +4217,8 @@
           `<div id="inlineImageThumbs" style="display:flex;gap:4px;padding:8px;flex-wrap:wrap;overflow:hidden;">${thumbsHtml}</div>`
         );
 
-        updateInlinePostBtn();
-
-        // Upload original files (backend handles EXIF rotation with Pillow)
-        inlineUploading = true;
         const formData = new FormData();
-        images.slice(0, 10).forEach(f => formData.append('files', f));
+        fixedImages.forEach(f => formData.append('files', f));
         fetch(`${BACKEND_URL}/api/social/upload-images`, {
           method: 'POST', headers: { 'Authorization': `Bearer ${authToken}` }, body: formData
         }).then(r => r.json()).then(data => {
