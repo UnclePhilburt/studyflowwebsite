@@ -975,14 +975,24 @@
     }
 
     .post-caption {
-      font-size: 13px;
-      color: var(--text-secondary);
+      font-size: 14px;
+      color: var(--text-primary);
       margin-bottom: 8px;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
       overflow: hidden;
       line-height: 1.5;
+    }
+
+    .post-card[data-type="photo"] .post-content {
+      padding: 10px 16px;
+    }
+
+    .post-card[data-type="photo"] .post-caption {
+      font-size: 14px;
+      color: var(--text-primary);
+      -webkit-line-clamp: unset;
     }
 
     /* Text-only posts */
@@ -5024,9 +5034,10 @@
 
       // Determine content type
       let contentType = 'text';
+      const hasImages = (post.images && post.images.length > 0) || post.image_url;
       if (post.post_type === 'note') {
         contentType = 'note';
-      } else if (post.notes?.thumbnail_url || post.image_url) {
+      } else if (post.notes?.thumbnail_url || hasImages) {
         contentType = 'photo';
       }
 
