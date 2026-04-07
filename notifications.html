@@ -279,21 +279,28 @@
       let items = [];
 
       try {
+        console.log('Fetching social activity...');
         const res = await fetch(`${BACKEND_URL}/api/social/activity`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
+        console.log('Social activity response:', res.status);
         if (res.ok) {
           const data = await res.json();
           items = (data.activities || []);
+          console.log('Social activities:', items.length);
         }
-      } catch {}
+      } catch (err) {
+        console.error('Social activity error:', err);
+      }
 
       try {
+        console.log('Fetching notifications...');
         const res = await fetch(`${BACKEND_URL}/api/notifications`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
+        console.log('Notifications response:', res.status);
         if (res.ok) {
           const data = await res.json();
           (data.notifications || data || []).forEach(n => {
@@ -304,15 +311,21 @@
               created_at: n.created_at
             });
           });
+          console.log('Total notifications:', items.length);
         }
-      } catch {}
+      } catch (err) {
+        console.error('Notifications error:', err);
+      }
 
+      console.log('Processing notifications...');
       items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       if (items.length === 0) {
+        console.log('No notifications found, showing empty state');
         list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><p>No notifications yet</p></div>';
         document.getElementById('clearBtn').style.display = 'none';
       } else {
+        console.log('Rendering', items.length, 'notifications');
         document.getElementById('clearBtn').style.display = 'block';
         list.innerHTML = items.map(item => {
           const timeAgo = getTimeAgo(item.created_at);
@@ -368,9 +381,17 @@
 
     // Initialize page
     (async function init() {
-      const isAuthenticated = await checkAuth();
-      if (isAuthenticated) {
-        loadNotifications();
+      console.log('Initializing notifications page...');
+      try {
+        const isAuthenticated = await checkAuth();
+        console.log('Authentication check:', isAuthenticated);
+        if (isAuthenticated) {
+          await loadNotifications();
+          console.log('Notifications loaded successfully');
+        }
+      } catch (err) {
+        console.error('Init error:', err);
+        document.getElementById('notifList').innerHTML = '<div class="empty-state"><p>Error loading notifications</p></div>';
       }
     })();
   </script>
