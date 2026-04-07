@@ -2858,7 +2858,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
               Add Photo
             </button>
-            <input type="file" id="storyImageInput" accept="image/*" style="display:none;" onchange="handleStoryImage(event)">
+            <input type="file" id="storyImageInput" accept="image/*" style="display:none;">
           </div>
 
           <!-- Background (only for text stories) -->
@@ -3600,7 +3600,8 @@
       event.target.style.borderColor = 'var(--accent-primary)';
     }
 
-    async function handleStoryImage(event) {
+    // Wire up story image input via addEventListener (works better on mobile than onchange attr)
+    document.getElementById('storyImageInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) {
@@ -3608,32 +3609,34 @@
         return;
       }
 
-      // Show preview
-      document.getElementById('storyImagePreviewImg').src = URL.createObjectURL(file);
+      // Show preview immediately
+      const objectUrl = URL.createObjectURL(file);
+      document.getElementById('storyImagePreviewImg').src = objectUrl;
       document.getElementById('storyImagePreview').style.display = 'block';
       document.getElementById('storyBgSection').style.display = 'none';
       document.getElementById('storyText').style.display = 'none';
       document.getElementById('storyTextOverlay').textContent = '';
-      document.getElementById('storyTextOverlay').focus();
 
-      // Upload original file (backend handles EXIF rotation)
+      // Upload in background (backend handles EXIF rotation)
       storyUploading = true;
+      storyImageUrl = null;
       const formData = new FormData();
       formData.append('files', file);
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/social/upload-images`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${authToken}` },
-          body: formData
-        });
-        if (!res.ok) throw new Error(`Upload returned ${res.status}`);
-        const data = await res.json();
+      fetch(`${BACKEND_URL}/api/social/upload-images`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        body: formData
+      }).then(function(res) {
+        if (!res.ok) throw new Error('Upload returned ' + res.status);
+        return res.json();
+      }).then(function(data) {
         storyImageUrl = (data.urls || [])[0] || null;
-      } catch (err) {
+        storyUploading = false;
+      }).catch(function(err) {
         console.error('Story image upload failed:', err);
         storyImageUrl = null;
-      }
-      storyUploading = false;
+        storyUploading = false;
+      });
     }
 
     function removeStoryImage() {
