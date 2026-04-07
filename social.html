@@ -3536,7 +3536,8 @@
       const content = document.getElementById('storyContent');
       const images = story.images || [];
       if (images.length > 0) {
-        content.innerHTML = `<img src="${images[0]}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+        const overlayText = story.text_content ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:85%;text-align:center;color:white;font-size:24px;font-weight:700;text-shadow:0 2px 12px rgba(0,0,0,0.8);line-height:1.4;z-index:2;">${story.text_content}</div>` : '';
+        content.innerHTML = `<div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><img src="${images[0]}" style="max-width:100%;max-height:100%;object-fit:contain;">${overlayText}</div>`;
       } else {
         const bg = story.story_bg || 'linear-gradient(135deg, #667eea, #764ba2)';
         content.innerHTML = `<div style="width:100%;height:100%;background:${bg};display:flex;align-items:center;justify-content:center;padding:40px;"><div style="color:white;font-size:22px;font-weight:600;text-align:center;line-height:1.5;max-width:320px;">${story.text_content || ''}</div></div>`;
