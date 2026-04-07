@@ -2071,14 +2071,32 @@
         font-size: 13px;
       }
 
-      /* Post actions mobile */
+      /* Post actions mobile - below image/content */
       .post-actions {
-        padding: 8px 12px;
+        padding: 12px 16px;
+        background: var(--card-bg);
+        border-top: 1px solid var(--border-color);
+        position: relative;
+        z-index: 1;
       }
 
       .vote-btn, .action-btn {
         padding: 6px 10px;
         font-size: 13px;
+        color: var(--text-primary) !important;
+        background: transparent;
+      }
+
+      .vote-btn {
+        color: var(--text-primary) !important;
+      }
+
+      .vote-btn.upvoted {
+        color: var(--accent-primary) !important;
+      }
+
+      .vote-btn.downvoted {
+        color: #e89b5f !important;
       }
 
       .vote-btn svg, .action-btn svg {
@@ -2088,6 +2106,12 @@
 
       .vote-score {
         font-size: 13px;
+        color: var(--text-primary) !important;
+        font-weight: 600;
+      }
+
+      .action-btn {
+        color: var(--text-primary) !important;
       }
 
       /* Quick comment previews mobile */
