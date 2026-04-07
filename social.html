@@ -2269,6 +2269,21 @@
         border-top: 1px solid var(--border-color) !important;
       }
 
+      /* Make text posts more square on mobile */
+      .post-card[data-type="text"] .post-content {
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+      }
+
+      .post-card[data-type="text"] .post-caption {
+        font-size: 18px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
       .vote-btn, .action-btn {
         padding: 4px 6px;
         font-size: 14px;
