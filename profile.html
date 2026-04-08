@@ -1141,14 +1141,19 @@
 
     // Render profile
     function renderProfile() {
-      // Banner
+      // Banner - only update bg image, don't wipe children (avatar is inside banner)
       const banner = document.getElementById('banner');
       if (profileData.banner_url) {
-        banner.innerHTML = `
-          <img src="${profileData.banner_url}" alt="Banner">
-          <button class="banner-upload" id="bannerUploadBtn" style="display: none;" onclick="uploadBanner()">Change Banner</button>
-        `;
+        let bannerImg = document.getElementById('bannerImage');
+        if (!bannerImg) {
+          bannerImg = document.createElement('img');
+          bannerImg.id = 'bannerImage';
+          bannerImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0;';
+          banner.insertBefore(bannerImg, banner.firstChild);
+        }
+        bannerImg.src = profileData.banner_url;
       }
+      const bannerBtn = document.getElementById('bannerUploadBtn');
 
       // Avatar
       const avatar = document.getElementById('avatar');
@@ -1997,12 +2002,15 @@
 
           if (response.ok) {
             const data = await response.json();
-            // Update banner immediately
-            const banner = document.getElementById('banner');
-            banner.innerHTML = `
-              <img src="${data.banner_url}" alt="Banner">
-              <button class="banner-upload" id="bannerUploadBtn" style="display: block;" onclick="uploadBanner()">Change Banner</button>
-            `;
+            // Update banner image without destroying avatar
+            let bannerImg = document.getElementById('bannerImage');
+            if (!bannerImg) {
+              bannerImg = document.createElement('img');
+              bannerImg.id = 'bannerImage';
+              bannerImg.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:absolute;top:0;left:0;';
+              document.getElementById('banner').insertBefore(bannerImg, document.getElementById('banner').firstChild);
+            }
+            bannerImg.src = data.banner_url;
             profileData.banner_url = data.banner_url;
           } else {
             const error = await response.json();
