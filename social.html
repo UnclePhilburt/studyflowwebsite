@@ -1176,6 +1176,27 @@
       gap: 2px;
     }
 
+    .pa-vote-group {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      min-width: 0;
+    }
+    .pa-vote-score {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 24px;
+      text-align: center;
+      padding: 0 2px;
+    }
+    .pa-vote-group .pa-btn {
+      flex: 0 0 auto;
+      padding: 10px 8px;
+    }
+
     .pa-btn {
       flex: 1;
       display: flex;
@@ -5460,13 +5481,15 @@
             ` : ''}
           </div>
           <div class="post-actions" onclick="event.stopPropagation()">
-            <button class="pa-btn pa-vote ${userVote === 'upvote' ? 'is-up' : ''} ${userVote === 'downvote' ? 'is-down' : ''}" id="upvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'upvote')" aria-label="Upvote">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 12h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 24H7"/></svg>
-              <span class="pa-count" id="score-${post.id}">${post.score || 0}</span>
-            </button>
-            <button class="pa-btn pa-down" id="downvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'downvote')" aria-label="Downvote">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 12H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 0H17"/></svg>
-            </button>
+            <div class="pa-vote-group">
+              <button class="pa-btn pa-vote ${userVote === 'upvote' ? 'is-up' : ''}" id="upvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'upvote')" aria-label="Upvote">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 12h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 24H7"/></svg>
+              </button>
+              <span class="pa-vote-score" id="score-${post.id}">${post.score || 0}</span>
+              <button class="pa-btn pa-down ${userVote === 'downvote' ? 'is-down' : ''}" id="downvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'downvote')" aria-label="Downvote">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 12H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 0H17"/></svg>
+              </button>
+            </div>
             <button class="pa-btn" onclick="toggleQuickComment('${post.id}')" aria-label="Comments">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <span class="pa-count">${post.comment_count || 0}</span>
