@@ -1184,7 +1184,7 @@
       if (profileData.is_own_profile) {
         actions.innerHTML = `
           <button class="btn btn-primary" onclick="openEditModal()">Edit Profile</button>
-          <button class="btn btn-secondary" onclick="openBadgeModal()">Manage Badges</button>
+          <button class="btn btn-secondary" onclick="manageBadges()">Manage Badges</button>
           <button class="btn btn-secondary" onclick="window.location.href='messages.html'">Messages</button>
         `;
         document.getElementById('avatarUploadBtn').style.display = 'flex';
@@ -2120,6 +2120,14 @@
           <span>${badge.name}</span>
         </span>
       `).join('');
+    }
+
+    function manageBadges() {
+      if (window.innerWidth <= 1024) {
+        window.location.href = 'badges.html';
+      } else {
+        openBadgeModal();
+      }
     }
 
     async function openBadgeModal() {
