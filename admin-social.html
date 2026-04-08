@@ -285,10 +285,16 @@
 
       // Media
       const mediaEl = document.getElementById('postMedia');
+      const postImages = post.images || (post.image_url ? [post.image_url] : []);
       if (post.note_id) {
         const fname = post.note_filename || 'Note';
         mediaEl.innerHTML = `<div class="post-file-badge">Loading preview for ${escapeHtml(fname)}...</div>`;
         loadNotePreview(post.note_id, mediaEl, fname);
+      } else if (postImages.length > 0) {
+        // Photo post - show all images
+        mediaEl.innerHTML = postImages.map(url =>
+          `<img class="post-image" src="${escapeHtml(url)}" alt="Post image" style="display:block;width:100%;max-height:500px;object-fit:contain;background:#000;border-bottom:1px solid #eee;">`
+        ).join('');
       } else {
         mediaEl.innerHTML = '';
       }
