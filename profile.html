@@ -1815,6 +1815,14 @@
     // Download a note from a post (uses watermarked /api/notes/<id>/download)
     async function downloadNoteFromPost(noteId, filename) {
       if (!noteId) return;
+      const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+      // On mobile, navigate directly to the download URL with token in query param
+      if (isMobile) {
+        window.location.href = `${BACKEND_URL}/api/notes/${noteId}/download?token=${encodeURIComponent(authToken)}`;
+        return;
+      }
+
       try {
         if (window.sfToast) sfToast('Preparing watermarked download...', 'info');
         const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
@@ -1829,8 +1837,7 @@
           throw new Error('Download failed');
         }
         const blob = await response.blob();
-        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-        const downloadBlob = new Blob([blob], { type: isMobile ? 'application/pdf' : 'application/octet-stream' });
+        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
         const url = window.URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;
