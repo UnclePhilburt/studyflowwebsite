@@ -1169,11 +1169,65 @@
 
     .post-actions {
       display: flex;
-      gap: 16px;
       align-items: center;
-      padding: 8px 16px 12px;
+      justify-content: space-between;
+      padding: 4px 8px;
+      border-top: 1px solid var(--border-color);
+      gap: 2px;
     }
 
+    .pa-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 4px;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      min-width: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pa-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .pa-btn:hover {
+      background: var(--hover-bg, rgba(139, 157, 131, 0.08));
+      color: var(--text-primary);
+    }
+    .pa-btn:active {
+      transform: scale(0.95);
+    }
+    .pa-count {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pa-btn.is-up {
+      color: var(--accent-primary);
+    }
+    .pa-btn.is-down {
+      color: #e89b5f;
+    }
+    .pa-down.is-down {
+      color: #e89b5f;
+    }
+    .pa-vote.pop {
+      animation: votePop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+    }
+    .pa-view {
+      opacity: 0.6;
+    }
+
+    /* Hide old vote-buttons for new structure */
     .vote-buttons {
       display: flex;
       align-items: center;
@@ -2599,11 +2653,21 @@
 
       /* Post actions mobile - below image/content */
       .post-actions {
-        padding: 4px 12px !important;
+        padding: 2px 4px !important;
         background: var(--card-bg) !important;
         border-top: 1px solid var(--border-color);
-        gap: 12px !important;
+        gap: 0 !important;
       }
+      .pa-btn {
+        padding: 12px 4px;
+        font-size: 13px;
+        gap: 5px;
+        color: var(--text-primary) !important;
+      }
+      .pa-btn svg { width: 20px; height: 20px; }
+      .pa-btn.is-up { color: var(--accent-primary) !important; }
+      .pa-btn.is-down,
+      .pa-down.is-down { color: #e89b5f !important; }
 
       /* Remove gradient from text posts on mobile - apply only to content */
       .post-card[data-type="text"] {
@@ -5396,25 +5460,28 @@
             ` : ''}
           </div>
           <div class="post-actions" onclick="event.stopPropagation()">
-            <div class="vote-buttons">
-              <button class="vote-btn ${userVote === 'upvote' ? 'upvoted' : ''}" id="upvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'upvote')">▲</button>
-              <div class="vote-score" id="score-${post.id}">${post.score || 0}</div>
-              <button class="vote-btn ${userVote === 'downvote' ? 'downvoted' : ''}" id="downvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'downvote')">▼</button>
-            </div>
-            <button class="action-btn" onclick="event.stopPropagation(); repostPost('${post.id}')" style="display:flex;align-items:center;gap:4px;">
-              &#x1F501; ${post.share_count || 0}
+            <button class="pa-btn pa-vote ${userVote === 'upvote' ? 'is-up' : ''} ${userVote === 'downvote' ? 'is-down' : ''}" id="upvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'upvote')" aria-label="Upvote">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 12h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 24H7"/></svg>
+              <span class="pa-count" id="score-${post.id}">${post.score || 0}</span>
             </button>
-            <button class="action-btn" onclick="toggleQuickComment('${post.id}')">
-              ${post.comment_count || 0} comments
+            <button class="pa-btn pa-down" id="downvote-${post.id}" onclick="event.stopPropagation(); vote('${post.id}', 'downvote')" aria-label="Downvote">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 12H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 0H17"/></svg>
             </button>
-            ${post.note_id ? `<button class="action-btn" onclick="event.stopPropagation(); downloadNoteFromPost('${post.note_id}', '${(post.notes?.original_filename || 'note').replace(/'/g, "")}')" title="Download note (watermarked)" style="display:flex;align-items:center;gap:4px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download
+            <button class="pa-btn" onclick="toggleQuickComment('${post.id}')" aria-label="Comments">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="pa-count">${post.comment_count || 0}</span>
+            </button>
+            <button class="pa-btn" onclick="event.stopPropagation(); repostPost('${post.id}')" aria-label="Repost">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              <span class="pa-count">${post.share_count || 0}</span>
+            </button>
+            ${post.note_id ? `<button class="pa-btn" onclick="event.stopPropagation(); downloadNoteFromPost('${post.note_id}', '${(post.notes?.original_filename || 'note').replace(/'/g, "")}')" aria-label="Download">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>` : ''}
-            <span class="action-btn" style="cursor:default;opacity:0.7;${!post.view_count ? 'display:none;' : ''}">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span class="view-count">${post.view_count || 0}</span>
-            </span>
+            <button class="pa-btn pa-view" style="cursor:default;${!post.view_count ? 'display:none;' : ''}" aria-label="Views">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span class="pa-count">${post.view_count || 0}</span>
+            </button>
           </div>
           <div class="quick-comment-previews" id="commentPreviews-${post.id}">
             ${(post.recent_comments || []).map(c => {
@@ -5516,7 +5583,10 @@
       // Update UI immediately
       localVotes[postId] = newVote;
       upBtn.classList.toggle('upvoted', newVote === 'upvote');
+      upBtn.classList.toggle('is-up', newVote === 'upvote');
+      upBtn.classList.toggle('is-down', newVote === 'downvote');
       downBtn.classList.toggle('downvoted', newVote === 'downvote');
+      downBtn.classList.toggle('is-down', newVote === 'downvote');
       scoreEl.textContent = currentScore;
 
       // Pop animation
