@@ -5398,6 +5398,10 @@
             <button class="action-btn" onclick="toggleQuickComment('${post.id}')">
               ${post.comment_count || 0} comments
             </button>
+            ${post.note_id ? `<button class="action-btn" onclick="event.stopPropagation(); downloadNoteFromPost('${post.note_id}', '${(post.notes?.original_filename || 'note').replace(/'/g, "")}')" title="Download note (watermarked)" style="display:flex;align-items:center;gap:4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </button>` : ''}
             <span class="action-btn" style="cursor:default;opacity:0.7;${!post.view_count ? 'display:none;' : ''}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <span class="view-count">${post.view_count || 0}</span>
@@ -5435,6 +5439,42 @@
           </div>
         </div>
       `;
+    }
+
+    // Download a note from a post (uses the watermarked /api/notes/<id>/download)
+    async function downloadNoteFromPost(noteId, filename) {
+      if (!noteId) return;
+      try {
+        if (window.sfToast) sfToast('Preparing watermarked download...', 'info');
+        const response = await fetch(`${BACKEND_URL}/api/notes/${noteId}/download`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!response.ok) {
+          if (response.status === 403) {
+            const err = await response.json().catch(() => ({}));
+            if (err.limit_reached) { alert('Daily download limit reached. Subscribe for unlimited downloads.'); return; }
+            if (err.good_standing_required) { alert('Good Standing required to download notes. Upload a verified note or subscribe.'); return; }
+          }
+          throw new Error('Download failed');
+        }
+        const blob = await response.blob();
+        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+        const url = window.URL.createObjectURL(downloadBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        const baseName = (filename || 'note').replace(/\.[^/.]+$/, '');
+        a.download = baseName + '_studyflow.pdf';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          if (a.parentNode) document.body.removeChild(a);
+        }, 1000);
+      } catch (e) {
+        console.error('Download error:', e);
+        if (window.sfToast) sfToast('Download failed', 'error');
+        else alert('Download failed. Please try again.');
+      }
     }
 
     // Vote on post
