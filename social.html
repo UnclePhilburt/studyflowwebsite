@@ -868,6 +868,18 @@
       margin-top: 2px;
     }
 
+    /* Disable long-press image context menu on mobile */
+    .post-card img,
+    .post-thumbnail,
+    .post-thumbnail-container img,
+    .carousel-track img,
+    .post-avatar img,
+    #storiesBar img {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
     .post-thumbnail {
       width: 100%;
       height: auto;
@@ -3285,6 +3297,11 @@
     let badgeCache = {}; // Cache user badges to avoid repeated API calls
 
     // Initialize
+    // Block long-press context menu on images (mobile)
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.tagName === 'IMG') e.preventDefault();
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {

@@ -276,6 +276,16 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* Disable long-press image context menu on mobile */
+    .feed-post-card img,
+    .profile-avatar img,
+    .profile-banner img,
+    #bannerImage {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
     /* Posts Grid - feed style */
     .posts-grid {
       display: flex;
@@ -1087,6 +1097,11 @@
     let selectedBadges = [];
 
     // Initialize
+    // Block long-press context menu on images (mobile)
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.tagName === 'IMG') e.preventDefault();
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
