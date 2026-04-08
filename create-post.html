@@ -348,6 +348,8 @@
           headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
           body: JSON.stringify({ image_url: imageUrls[0] })
         }).then(function(r) { return r.json(); }).then(function(data) {
+          // Replace the image URL with the watermarked version
+          if (data.watermarked_url) imageUrls[0] = data.watermarked_url;
           doPost(data.note_id || null);
         }).catch(function() {
           // Fall back to regular post if classification fails

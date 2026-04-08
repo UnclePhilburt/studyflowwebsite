@@ -4539,6 +4539,8 @@
             if (classifyRes.ok) {
               const classifyData = await classifyRes.json();
               linkedNoteId = classifyData.note_id || null;
+              // Replace original image with watermarked version
+              if (classifyData.watermarked_url) inlineImageUrls[0] = classifyData.watermarked_url;
             }
           } catch {}
           btn.textContent = 'Posting...';
