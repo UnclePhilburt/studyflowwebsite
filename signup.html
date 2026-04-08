@@ -704,6 +704,14 @@
           });
         } catch (e) {}
 
+        // Auto-follow official StudyFlow account
+        try {
+          fetch('https://studyflowsuite.onrender.com/api/social/follow/StudyFlowSuite', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + data.session.access_token }
+          });
+        } catch (e) {}
+
         // Store signup flag for post-signup onboarding
         localStorage.setItem('sf-just-signed-up', 'true');
         localStorage.setItem('sf-new-user-name', firstName);
