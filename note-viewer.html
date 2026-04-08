@@ -1115,7 +1115,8 @@
 
         const blob = await response.blob();
         // Force download by setting mimetype to octet-stream (prevents inline preview)
-        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        const downloadBlob = new Blob([blob], { type: isMobile ? 'application/pdf' : 'application/octet-stream' });
         const url = window.URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;
@@ -1167,7 +1168,8 @@
         }
 
         const blob = await response.blob();
-        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        const downloadBlob = new Blob([blob], { type: isMobile ? 'application/pdf' : 'application/octet-stream' });
         const url = window.URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;

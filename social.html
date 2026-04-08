@@ -5534,7 +5534,11 @@
           throw new Error('Download failed');
         }
         const blob = await response.blob();
-        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+        // On mobile, use proper PDF mimetype so Files apps can open it.
+        // On desktop, use octet-stream to force download (browsers preview PDFs inline otherwise).
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        const blobType = isMobile ? 'application/pdf' : 'application/octet-stream';
+        const downloadBlob = new Blob([blob], { type: blobType });
         const url = window.URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;

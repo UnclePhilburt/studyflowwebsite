@@ -1829,7 +1829,8 @@
           throw new Error('Download failed');
         }
         const blob = await response.blob();
-        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        const downloadBlob = new Blob([blob], { type: isMobile ? 'application/pdf' : 'application/octet-stream' });
         const url = window.URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;
