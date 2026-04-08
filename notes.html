@@ -3776,14 +3776,14 @@
         }
 
         const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+        const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+        const url = window.URL.createObjectURL(downloadBlob);
         const a = document.createElement('a');
         a.href = url;
         const baseName = (filename || 'note').replace(/\.[^/.]+$/, '');
         a.download = baseName + '_studyflow.pdf';
         document.body.appendChild(a);
         a.click();
-        // Delay cleanup so Chrome has time to start the download
         setTimeout(() => {
           window.URL.revokeObjectURL(url);
           if (a.parentNode) document.body.removeChild(a);
