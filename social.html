@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="StudyFlow Social - Share and discover study notes">
   <link rel="icon" type="image/png" href="icon128.png">
   <title>Social - StudyFlow Suite</title>
@@ -6881,12 +6881,18 @@
       lightboxImage.src = imageUrl;
       lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
+      // Allow pinch-zoom on photos
+      const vp = document.querySelector('meta[name="viewport"]');
+      if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=4.0, user-scalable=yes');
     }
 
     function closeLightbox() {
       const lightbox = document.getElementById('lightbox');
       lightbox.classList.remove('active');
       document.body.style.overflow = 'auto';
+      // Restore zoom lock on UI
+      const vp = document.querySelector('meta[name="viewport"]');
+      if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
     }
 
     // Close on background click
