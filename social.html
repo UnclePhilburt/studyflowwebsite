@@ -3134,6 +3134,14 @@
           </div>
           <button id="inlinePostBtn" onclick="submitInlinePost()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent-primary);color:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>Post</button>
         </div>
+        <!-- Mark as study note toggle (shown when image attached) -->
+        <label id="inlineMarkAsNoteWrap" style="display:none;align-items:center;gap:10px;padding:10px 12px;margin-top:8px;margin-left:48px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+          <input type="checkbox" id="inlineMarkAsNote" style="width:16px;height:16px;accent-color:var(--accent-primary);cursor:pointer;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Mark as study note</div>
+            <div style="font-size:11px;color:var(--text-muted);">Adds to the searchable Nexus</div>
+          </div>
+        </label>
       </div>
 
       <!-- Feed -->
@@ -4411,6 +4419,10 @@
           `<div id="inlineImageThumbs" style="display:flex;gap:4px;padding:8px;flex-wrap:wrap;overflow:hidden;">${thumbsHtml}</div>`
         );
 
+        // Show "mark as note" toggle for image posts
+        const noteToggle = document.getElementById('inlineMarkAsNoteWrap');
+        if (noteToggle) noteToggle.style.display = 'flex';
+
         updateInlinePostBtn();
 
         // Upload original files (backend handles EXIF rotation)
@@ -4444,6 +4456,11 @@
       document.getElementById('inlineImageThumbs')?.remove();
       document.getElementById('inlinePreviewFile').style.display = 'none';
       document.getElementById('inlineFileInput').value = '';
+      const noteToggle = document.getElementById('inlineMarkAsNoteWrap');
+      if (noteToggle) {
+        noteToggle.style.display = 'none';
+        document.getElementById('inlineMarkAsNote').checked = false;
+      }
       updateInlinePostBtn();
     }
 
@@ -4507,11 +4524,31 @@
       btn.textContent = 'Posting...';
 
       try {
+        // If user marked the image as a study note, run classification first
+        const markAsNoteEl = document.getElementById('inlineMarkAsNote');
+        const markAsNote = markAsNoteEl && markAsNoteEl.checked && inlineImageUrls.length > 0 && !inlineUploadedNoteId;
+        let linkedNoteId = inlineUploadedNoteId;
+        if (markAsNote) {
+          btn.textContent = 'Verifying note...';
+          try {
+            const classifyRes = await fetch(`${BACKEND_URL}/api/social/classify-image-as-note`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image_url: inlineImageUrls[0] })
+            });
+            if (classifyRes.ok) {
+              const classifyData = await classifyRes.json();
+              linkedNoteId = classifyData.note_id || null;
+            }
+          } catch {}
+          btn.textContent = 'Posting...';
+        }
+
         const pollOpts = getPollOptions();
         const postData = {
-          post_type: inlineUploadedNoteId ? 'note' : 'text',
+          post_type: linkedNoteId ? 'note' : 'text',
           text_content: text || null,
-          note_id: inlineUploadedNoteId || null,
+          note_id: linkedNoteId || null,
           images: inlineImageUrls.length > 0 ? inlineImageUrls : undefined,
           poll_options: pollOpts || undefined,
           poll_duration: pollOpts ? 24 : undefined,

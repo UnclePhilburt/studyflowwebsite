@@ -161,6 +161,15 @@
       <input type="file" id="fileInput" accept="image/*" style="display:none;" multiple>
       <input type="file" id="docInput" accept=".pdf" style="display:none;">
     </div>
+
+    <!-- Mark as note toggle (shown only when image is attached) -->
+    <label id="markAsNoteWrap" style="display:none;align-items:center;gap:10px;padding:14px;margin-top:12px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+      <input type="checkbox" id="markAsNote" style="width:18px;height:18px;accent-color:var(--accent-primary);cursor:pointer;">
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Mark as study note</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Adds this photo to the searchable Nexus</div>
+      </div>
+    </label>
   </div>
 
   <script>
@@ -204,6 +213,8 @@
       preview.style.display = 'block';
       document.getElementById('previewFile').style.display = 'none';
       document.getElementById('bgPicker').style.display = 'none';
+      // Show "mark as note" toggle since we have an image
+      document.getElementById('markAsNoteWrap').style.display = 'flex';
 
       // Try local preview (won't work for HEIC)
       var localUrl = URL.createObjectURL(files[0]);
@@ -301,30 +312,50 @@
       btn.disabled = true;
       btn.textContent = 'Posting...';
 
-      var postData = {
-        post_type: noteId ? 'note' : 'text',
-        text_content: text || null,
-        note_id: noteId || null,
-        images: imageUrls.length > 0 ? imageUrls : undefined,
-        bg_color: selectedBg || undefined
-      };
+      var markAsNote = document.getElementById('markAsNote').checked && imageUrls.length > 0 && !noteId;
 
-      fetch(BACKEND_URL + '/api/social/posts', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData)
-      }).then(function(res) {
-        if (res.ok) {
-          window.location.href = 'social.html';
-        } else {
-          return res.json().then(function(err) { alert(err.error || 'Failed to post'); });
-        }
-      }).catch(function() {
-        alert('Failed to post');
-      }).finally(function() {
-        btn.disabled = false;
-        btn.textContent = 'Post';
-      });
+      function doPost(linkedNoteId) {
+        var postData = {
+          post_type: linkedNoteId ? 'note' : 'text',
+          text_content: text || null,
+          note_id: linkedNoteId || null,
+          images: imageUrls.length > 0 ? imageUrls : undefined,
+          bg_color: selectedBg || undefined
+        };
+
+        fetch(BACKEND_URL + '/api/social/posts', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify(postData)
+        }).then(function(res) {
+          if (res.ok) {
+            window.location.href = 'social.html';
+          } else {
+            return res.json().then(function(err) { alert(err.error || 'Failed to post'); });
+          }
+        }).catch(function() {
+          alert('Failed to post');
+        }).finally(function() {
+          btn.disabled = false;
+          btn.textContent = 'Post';
+        });
+      }
+
+      if (markAsNote) {
+        btn.textContent = 'Verifying note...';
+        fetch(BACKEND_URL + '/api/social/classify-image-as-note', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + authToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_url: imageUrls[0] })
+        }).then(function(r) { return r.json(); }).then(function(data) {
+          doPost(data.note_id || null);
+        }).catch(function() {
+          // Fall back to regular post if classification fails
+          doPost(null);
+        });
+      } else {
+        doPost(noteId);
+      }
     }
   </script>
 <script src="assets/transitions.js"></script>
