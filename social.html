@@ -5592,12 +5592,22 @@
 
       const input = document.getElementById('commentModalInput');
       const text = input.value.trim();
-
       if (!text) return;
 
       const sendBtn = document.getElementById('commentModalSend');
       sendBtn.disabled = true;
-      input.disabled = true;
+
+      // Optimistic: clear input immediately and append the comment
+      input.value = '';
+      const list = document.getElementById('commentModalList');
+      if (list) {
+        const username = currentUser?.user_metadata?.username || currentUser?.email?.split('@')[0] || 'You';
+        const tempEl = document.createElement('div');
+        tempEl.style.cssText = 'padding:10px 16px;border-bottom:1px solid var(--border-color);opacity:0.7;';
+        tempEl.innerHTML = '<div style="font-size:13px;"><strong>' + username + '</strong> ' + text + '</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">posting...</div>';
+        list.appendChild(tempEl);
+        list.scrollTop = list.scrollHeight;
+      }
 
       try {
         const response = await fetch(`${BACKEND_URL}/api/social/posts/${currentCommentPostId}/comments`, {
@@ -5610,15 +5620,17 @@
         });
 
         if (response.ok) {
-          input.value = '';
-          // Reload comments
           await openCommentModal(currentCommentPostId);
+        } else {
+          // Revert optimistic update
+          input.value = text;
+          if (window.sfToast) sfToast('Failed to post comment', 'error');
         }
       } catch (err) {
         console.error('Error posting comment:', err);
+        input.value = text;
       } finally {
         sendBtn.disabled = false;
-        input.disabled = false;
       }
     }
 
@@ -6870,5 +6882,6 @@
   </div>
 
 <script src="assets/notifications.js"></script>
+<script src="assets/transitions.js"></script>
 </body>
 </html>
