@@ -3274,6 +3274,15 @@
         <!-- Course (optional) -->
         <input type="text" id="courseInput" placeholder="Course / Subject (optional)" style="width:100%;padding:10px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;margin-top:12px;background:var(--bg-primary);color:var(--text-primary);">
 
+        <!-- Mark as study note toggle (shown when image is attached) -->
+        <label id="modalMarkAsNoteWrap" style="display:none;align-items:center;gap:10px;padding:12px 14px;margin-top:12px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:10px;cursor:pointer;">
+          <input type="checkbox" id="modalMarkAsNote" style="width:18px;height:18px;accent-color:var(--accent-primary);cursor:pointer;">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:var(--text-primary);">Mark as study note</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Adds this photo to the searchable Nexus (verified by AI)</div>
+          </div>
+        </label>
+
         <!-- Hidden fields -->
         <input type="hidden" id="contentTypeSelect" value="text">
         <div id="folderSelectNew" style="display:none;margin-top:12px;">
@@ -5988,6 +5997,12 @@
       document.getElementById('previewFile').style.display = 'none';
       document.getElementById('folderSelectNew').style.display = 'none';
       document.getElementById('contentTypeSelect').value = 'text';
+      const noteToggle = document.getElementById('modalMarkAsNoteWrap');
+      if (noteToggle) {
+        noteToggle.style.display = 'none';
+        const cb = document.getElementById('modalMarkAsNote');
+        if (cb) cb.checked = false;
+      }
     }
 
     function toggleLibraryPicker() {
@@ -6037,11 +6052,16 @@
         };
         reader.readAsDataURL(file);
         document.getElementById('contentTypeSelect').value = 'photo';
+        // Show "Mark as study note" toggle for image attachments
+        const noteToggle = document.getElementById('modalMarkAsNoteWrap');
+        if (noteToggle) noteToggle.style.display = 'flex';
       } else {
         document.getElementById('previewImage').style.display = 'none';
         document.getElementById('previewFile').style.display = 'block';
         document.getElementById('previewFileName').textContent = file.name;
         document.getElementById('contentTypeSelect').value = 'note';
+        const noteToggle = document.getElementById('modalMarkAsNoteWrap');
+        if (noteToggle) noteToggle.style.display = 'none';
       }
 
       // Show folder selection
@@ -6082,35 +6102,46 @@
     }
 
     // Background upload (completely hidden)
+    let uploadedImageUrls = []; // For image posts in desktop modal
+
     async function startBackgroundUpload(file) {
       isUploadingInBackground = true;
+      uploadedImageUrls = [];
+      uploadedNoteId = null;
 
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('content_type', document.getElementById('contentTypeSelect').value || 'note');
+        // Images go to /api/social/upload-images (no notes entry created)
+        // Documents go to /api/social/upload-note (creates notes entry)
+        const isImage = file.type.startsWith('image/');
 
-        const folderId = document.getElementById('folderSelectNewDropdown').value;
-        if (folderId) {
-          formData.append('folder_id', folderId);
+        if (isImage) {
+          const formData = new FormData();
+          formData.append('files', file);
+          const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-images`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+          });
+          if (!uploadResponse.ok) throw new Error('Upload failed');
+          const uploadData = await uploadResponse.json();
+          uploadedImageUrls = uploadData.urls || [];
+        } else {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('content_type', 'note');
+          const folderId = document.getElementById('folderSelectNewDropdown').value;
+          if (folderId) formData.append('folder_id', folderId);
+          const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-note`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+          });
+          if (!uploadResponse.ok) throw new Error('Upload failed');
+          const uploadData = await uploadResponse.json();
+          uploadedNoteId = uploadData.note_id;
         }
 
-        const uploadResponse = await fetch(`${BACKEND_URL}/api/social/upload-note`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${authToken}`
-          },
-          body: formData
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Upload failed');
-        }
-
-        const uploadData = await uploadResponse.json();
-        uploadedNoteId = uploadData.note_id;
         isUploadingInBackground = false;
-
       } catch (error) {
         console.error('Background upload error:', error);
         alert('Upload failed: ' + error.message);
@@ -6143,7 +6174,8 @@
       }
 
       // Validate
-      if (!uploadedNoteId && !selectedNoteId && !caption) {
+      const hasImages = uploadedImageUrls && uploadedImageUrls.length > 0;
+      if (!uploadedNoteId && !selectedNoteId && !hasImages && !caption) {
         alert('Please add a caption for text-only posts');
         return;
       }
@@ -6152,24 +6184,37 @@
       submitBtn.textContent = 'Posting...';
 
       try {
+        // If user marked image as study note, run classification first
+        const markNoteEl = document.getElementById('modalMarkAsNote');
+        const markAsNote = markNoteEl && markNoteEl.checked && hasImages && !uploadedNoteId && !selectedNoteId;
+        let linkedNoteId = uploadedNoteId || selectedNoteId;
+        let finalImageUrls = uploadedImageUrls.slice();
+
+        if (markAsNote) {
+          submitBtn.textContent = 'Verifying note...';
+          try {
+            const classifyRes = await fetch(`${BACKEND_URL}/api/social/classify-image-as-note`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image_url: uploadedImageUrls[0] })
+            });
+            if (classifyRes.ok) {
+              const classifyData = await classifyRes.json();
+              linkedNoteId = classifyData.note_id || null;
+              if (classifyData.watermarked_url) finalImageUrls[0] = classifyData.watermarked_url;
+            }
+          } catch {}
+          submitBtn.textContent = 'Posting...';
+        }
+
         const postData = {
-          post_type: uploadedNoteId || selectedNoteId ? 'note' : 'text',
+          post_type: linkedNoteId ? 'note' : 'text',
           text_content: caption || null
         };
-
-        if (uploadedNoteId || selectedNoteId) {
-          postData.note_id = uploadedNoteId || selectedNoteId;
-        }
-
-        // Add course metadata if provided
-        if (course) {
-          postData.course = course;
-        }
-
-        // Add background color if selected
-        if (selectedModalPostBg) {
-          postData.bg_color = selectedModalPostBg;
-        }
+        if (linkedNoteId) postData.note_id = linkedNoteId;
+        if (finalImageUrls.length > 0) postData.images = finalImageUrls;
+        if (course) postData.course = course;
+        if (selectedModalPostBg) postData.bg_color = selectedModalPostBg;
 
         const response = await fetch(`${BACKEND_URL}/api/social/posts`, {
           method: 'POST',
@@ -6190,6 +6235,8 @@
           selectedFile = null;
           selectedNoteId = null;
           uploadedNoteId = null;
+          uploadedImageUrls = [];
+          if (markNoteEl) markNoteEl.checked = false;
         } else {
           const error = await response.json();
           alert(error.error || 'Failed to create post');
