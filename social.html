@@ -5215,26 +5215,26 @@
       if (post.post_type === 'note') {
         if (post.notes?.thumbnail_url) {
           thumbnailImageHtml = `
-            <img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail" onclick="event.stopPropagation(); openLightbox('${post.notes.thumbnail_url}');" style="cursor: zoom-in;">
+            <img class="post-thumbnail" src="${post.notes.thumbnail_url}" alt="Note thumbnail" loading="lazy" onclick="event.stopPropagation(); openLightbox('${post.notes.thumbnail_url}');" style="cursor: zoom-in;">
           `;
         } else {
           const fileType = post.notes?.file_type?.toUpperCase() || 'NOTE';
           thumbnailImageHtml = `<div class="post-thumbnail-placeholder">${fileType}</div>`;
         }
       } else if (post.image_url) {
-        thumbnailImageHtml = `<img class="post-thumbnail" src="${post.image_url}" alt="Post image" onclick="event.stopPropagation(); openLightbox('${post.image_url}');" style="cursor: zoom-in;">`;
+        thumbnailImageHtml = `<img class="post-thumbnail" src="${post.image_url}" alt="Post image" loading="lazy" onclick="event.stopPropagation(); openLightbox('${post.image_url}');" style="cursor: zoom-in;">`;
       }
 
       // Multi-image carousel
       const postImages = post.images || [];
       if (postImages.length > 0) {
         if (postImages.length === 1) {
-          thumbnailImageHtml = `<img class="post-thumbnail" src="${postImages[0]}" alt="Post image" onclick="event.stopPropagation(); openLightbox('${postImages[0]}');" style="cursor:zoom-in;">`;
+          thumbnailImageHtml = `<img class="post-thumbnail" src="${postImages[0]}" alt="Post image" loading="lazy" onclick="event.stopPropagation(); openLightbox('${postImages[0]}');" style="cursor:zoom-in;">`;
         } else {
           thumbnailImageHtml = `
             <div class="carousel" id="carousel-${post.id}" style="position:relative;overflow:hidden;">
               <div class="carousel-track" style="display:flex;transition:transform 0.3s ease;">
-                ${postImages.map((url, i) => `<img src="${url}" alt="Image ${i+1}" style="width:100%;flex-shrink:0;object-fit:contain;max-height:500px;cursor:zoom-in;image-orientation:from-image;background:#000;" onclick="event.stopPropagation(); openLightbox('${url}');">`).join('')}
+                ${postImages.map((url, i) => `<img src="${url}" alt="Image ${i+1}" loading="lazy" style="width:100%;flex-shrink:0;object-fit:contain;max-height:500px;cursor:zoom-in;image-orientation:from-image;background:#000;" onclick="event.stopPropagation(); openLightbox('${url}');">`).join('')}
               </div>
               ${postImages.length > 1 ? `
                 <button onclick="event.stopPropagation(); carouselNav('${post.id}', -1)" style="position:absolute;top:50%;left:8px;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:white;font-size:16px;cursor:pointer;">&#8249;</button>
