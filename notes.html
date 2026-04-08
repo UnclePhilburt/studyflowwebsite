@@ -3783,8 +3783,11 @@
         a.download = baseName + '_studyflow.pdf';
         document.body.appendChild(a);
         a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        // Delay cleanup so Chrome has time to start the download
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          if (a.parentNode) document.body.removeChild(a);
+        }, 1000);
       } catch (error) {
         console.error('Download error:', error);
       }
