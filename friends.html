@@ -353,8 +353,9 @@
         const res = await fetch(`${BACKEND_URL}/api/social/profile/${myUsername}`, { headers: { 'Authorization': `Bearer ${authToken}` } });
         if (res.ok) {
           const data = await res.json();
-          document.getElementById('followersCount').textContent = data.followers_count || 0;
-          document.getElementById('followingCount').textContent = data.following_count || 0;
+          const p = data.profile || data;
+          document.getElementById('followersCount').textContent = p.follower_count || 0;
+          document.getElementById('followingCount').textContent = p.following_count || 0;
         }
       } catch {}
     }
